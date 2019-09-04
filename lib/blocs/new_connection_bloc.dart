@@ -1,15 +1,15 @@
-import 'package:flutter_appirc/blocs/bloc.dart';
+import 'package:flutter_appirc/provider.dart';
 import 'package:flutter_appirc/blocs/chat_bloc.dart';
-import 'package:flutter_appirc/models/connection_model.dart';
+import 'package:flutter_appirc/models/chat_model.dart';
 
 ///
 /// TODO: make for flutter friendly (streams)
-class NewConnectionBloc extends BlocBase {
+class NewConnectionBloc extends Providable {
   ChatBloc chatBloc;
 
   NewConnectionBloc(this.chatBloc);
 
-  ChannelsConnection connection = ChannelsConnection(
+  ChannelsConnectionInfo connection = ChannelsConnectionInfo(
       networkPreferences: NetworkPreferences(),
       userPreferences: UserPreferences());
 
@@ -19,6 +19,6 @@ class NewConnectionBloc extends BlocBase {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+
   }
 }

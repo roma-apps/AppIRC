@@ -17,5 +17,10 @@
       "channels": "Channels"
     },
     "connect": "Connect"
+  },
+  "chat": {
+    "title": "Chat",
+    "no_active_chat": "Active chat not selected",
+    "empty_chat": "This channel doesn't have any messages yet"
   }
 }

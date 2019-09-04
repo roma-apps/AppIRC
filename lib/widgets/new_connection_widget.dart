@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/blocs/bloc.dart';
+import 'package:flutter_appirc/provider.dart';
 import 'package:flutter_appirc/blocs/chat_bloc.dart';
 import 'package:flutter_appirc/blocs/new_connection_bloc.dart';
-import 'package:flutter_appirc/models/connection_model.dart';
+import 'package:flutter_appirc/models/chat_model.dart';
 
 import 'form_widgets.dart';
 
@@ -14,10 +14,10 @@ class NewConnectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ChatBloc chatBloc = BlocProvider.of<ChatBloc>(context);
+    final ChatBloc chatBloc = Provider.of<ChatBloc>(context);
 
     var newConnectionBloc = NewConnectionBloc(chatBloc);
-    return BlocProvider(
+    return Provider(
       bloc: newConnectionBloc,
       child: Column(
         children: <Widget>[
@@ -31,7 +31,6 @@ class NewConnectionWidget extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 8.0),
               onPressed: () {
                 newConnectionBloc.addConnectionToChat();
-
                 connectCallback();
               },
             ),
@@ -56,7 +55,7 @@ class UserPreferencesConnectionFormState
   final nicknameController =
       TextEditingController(text: UserPreferences.defaultNick);
   final channelsController =
-      TextEditingController(text: UserPreferences.defaultChannels);
+      TextEditingController(text: ChannelsConnectionInfo.defaultChannels);
   final passwordController = TextEditingController();
   final realNameController =
       TextEditingController(text: UserPreferences.defaultRealName);
@@ -64,7 +63,7 @@ class UserPreferencesConnectionFormState
   @override
   Widget build(BuildContext context) {
     final NewConnectionBloc newConnectionBloc =
-        BlocProvider.of<NewConnectionBloc>(context);
+        Provider.of<NewConnectionBloc>(context);
 
     fillPreferences(newConnectionBloc);
 
@@ -97,12 +96,13 @@ class UserPreferencesConnectionFormState
 
   void fillPreferences(NewConnectionBloc newConnectionBloc) {
     final NewConnectionBloc newConnectionBloc =
-        BlocProvider.of<NewConnectionBloc>(context);
+        Provider.of<NewConnectionBloc>(context);
 
-    var preferences = newConnectionBloc.connection.userPreferences;
+    var connection = newConnectionBloc.connection;
+    var preferences = connection.userPreferences;
     preferences.password = passwordController.text;
     preferences.nickname = nicknameController.text;
-    preferences.channels = channelsController.text;
+    connection.channels = channelsController.text;
     preferences.realName = realNameController.text;
   }
 }
@@ -132,7 +132,7 @@ class NetworkPreferencesConnectionFormState
   @override
   Widget build(BuildContext context) {
     final NewConnectionBloc newConnectionBloc =
-        BlocProvider.of<NewConnectionBloc>(context);
+        Provider.of<NewConnectionBloc>(context);
     fillPreferences(newConnectionBloc);
     return Column(
       children: <Widget>[

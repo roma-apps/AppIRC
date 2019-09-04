@@ -1,25 +1,41 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_appirc/models/thelounge_model.dart';
 
-class ChannelsConnection {
+class Channel {
+  String name;
+  bool isActive = false;
+
+  final int remoteId;
+
+  Channel({@required this.name, @required this.remoteId});
+}
+
+class ChatMessage {
+  int channelId;
+  MsgTheLoungeResponseBody msg;
+
+  ChatMessage(this.channelId, this.msg);
+
+
+}
+
+class ChannelMessage {
+  String author;
+  String text;
+
+  ChannelMessage.name({@required this.author, @required this.text});
+
+
+}
+
+class ChannelsConnectionInfo {
   NetworkPreferences networkPreferences;
   UserPreferences userPreferences;
+  String channels;
+  static const String defaultChannels = "#thelounge-spam";
 
-  ChannelsConnection({this.networkPreferences, this.userPreferences});
-
-  TheLoungeRequest toLoungeRequest() => TheLoungeRequest(
-      "network:new",
-      NetworkNewTheLoungeRequestBody(
-        username: userPreferences.nickname,
-        join: userPreferences.channels,
-        realname: userPreferences.realName,
-        password: userPreferences.password,
-        host: networkPreferences.serverHost,
-        port: networkPreferences.serverPort,
-        rejectUnauthorized: networkPreferences.useOnlyTrustedCertificates
-            ? theLoungeOn
-            : theLoungeOff,
-        tls: networkPreferences.useTls ? theLoungeOn : theLoungeOff,
-      ));
+  ChannelsConnectionInfo(
+      {this.networkPreferences, this.userPreferences, this.channels});
 }
 
 class NetworkPreferences {
@@ -46,12 +62,10 @@ class NetworkPreferences {
 class UserPreferences {
   static const String defaultNick = "AppIRC";
   static const String defaultRealName = "AppIRC";
-  static const String defaultChannels = "#thelounge-spam";
 
   String nickname;
   String password;
   String realName;
-  String channels;
 
-  UserPreferences({this.nickname, this.password, this.realName, this.channels});
+  UserPreferences({this.nickname, this.password, this.realName});
 }

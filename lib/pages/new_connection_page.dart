@@ -4,6 +4,10 @@ import 'package:flutter_appirc/pages/chat_page.dart';
 import 'package:flutter_appirc/widgets/new_connection_widget.dart';
 
 class NewConnectionPage extends StatelessWidget {
+  bool isOpenedFromAppStart;
+
+  NewConnectionPage({this.isOpenedFromAppStart = false});
+
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -22,8 +26,12 @@ class NewConnectionPage extends StatelessWidget {
               Container(
                   margin: EdgeInsets.symmetric(horizontal: 8.0),
                   child: NewConnectionWidget(() {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => ChatPage()));
+                    if (isOpenedFromAppStart) {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => ChatPage()));
+                    } else {
+                      Navigator.pop(context);
+                    }
                   })),
             ],
           );
