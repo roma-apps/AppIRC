@@ -1,0 +1,21 @@
+{
+  "new_connection": {
+    "title": "New IRC connection",
+    "network_prefs": {
+      "title": "Network preferences",
+      "name": "Name",
+      "server_host": "Host",
+      "server_port": "Port",
+      "use_tls": "Use TLS",
+      "trusted_only": "Only allow trusted certificates"
+    },
+    "user_prefs": {
+      "title": "User preferences",
+      "nick": "Nickname",
+      "password": "Password",
+      "real_name": "Real name",
+      "channels": "Channels"
+    },
+    "connect": "Connect"
+  }
+}

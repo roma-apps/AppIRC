@@ -1,8 +1,8 @@
-import 'dart:convert';
-import 'service/log_service.dart';
-import 'package:logger_flutter/logger_flutter.dart';
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter/material.dart';
+import 'package:logger_flutter/logger_flutter.dart';
+
+import 'service/log_service.dart';
 
 void main() {
   runApp(MyApp());
@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
   initSocket(String identifier) async {
     setState(() => _isProbablyConnected[identifier] = true);
     SocketIO socket = await manager.createInstance(SocketOptions(
-      //Socket IO server URI
+        //Socket IO server URI
         URI,
         //Query params - can be used for authentication
         query: {
@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
           Transports.WEB_SOCKET,
           Transports.POLLING
         ] //Enable required transport
-    ));
+        ));
     socket.onConnect((data) {
       pprint("connected...");
       pprint(data);
@@ -87,7 +87,6 @@ class _MyAppState extends State<MyApp> {
     sockets[identifier] = socket;
   }
 
-
   bool isProbablyConnected(String identifier) {
     return _isProbablyConnected[identifier] ?? false;
   }
@@ -117,7 +116,6 @@ class _MyAppState extends State<MyApp> {
       pprint("Message emitted from '$identifier'...");
     }
   }
-
 
   Container getButtonSet(String identifier) {
     bool ipc = isProbablyConnected(identifier);
@@ -184,7 +182,7 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.black,
           elevation: 0.0,
         ),
-        body:   LogConsoleOnShake(
+        body: LogConsoleOnShake(
           dark: true,
           child: Container(
             color: Colors.black,
@@ -194,10 +192,10 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 Expanded(
                     child: Center(
-                      child: ListView(
-                        children: toPrint.map((String _) => Text(_ ?? "")).toList(),
-                      ),
-                    )),
+                  child: ListView(
+                    children: toPrint.map((String _) => Text(_ ?? "")).toList(),
+                  ),
+                )),
                 Padding(
                   padding: EdgeInsets.only(left: 8.0, bottom: 8.0),
                   child: Text(
@@ -208,7 +206,7 @@ class _MyAppState extends State<MyApp> {
                   padding: const EdgeInsets.all(16.0),
                   child: TextField(
                     style:
-                    new TextStyle(fontSize: 22.0, color: Color(0xFFbdc6cf)),
+                        new TextStyle(fontSize: 22.0, color: Color(0xFFbdc6cf)),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
@@ -226,7 +224,7 @@ class _MyAppState extends State<MyApp> {
                   padding: const EdgeInsets.all(16.0),
                   child: TextField(
                     style:
-                    new TextStyle(fontSize: 22.0, color: Color(0xFFbdc6cf)),
+                        new TextStyle(fontSize: 22.0, color: Color(0xFFbdc6cf)),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,

@@ -1,7 +1,7 @@
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter_appirc/models/socketio_model.dart';
-import 'log_service.dart';
 
+import 'log_service.dart';
 
 class SocketIOService {
   final SocketIOManager manager;
@@ -15,7 +15,7 @@ class SocketIOService {
   void connect() async {
     isProbablyConnected = true;
     SocketIO socket = await manager.createInstance(SocketOptions(
-      //Socket IO server URI
+        //Socket IO server URI
         uri,
         //Query params - can be used for authentication
         query: {
@@ -29,7 +29,7 @@ class SocketIOService {
           Transports.WEB_SOCKET,
           Transports.POLLING
         ] //Enable required transport
-    ));
+        ));
 
     socket.onConnect((data) {
       pprint("connected...");

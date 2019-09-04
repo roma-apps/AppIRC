@@ -9,15 +9,16 @@ part of 'thelounge_model.dart';
 NetworkNewTheLoungeRequestBody _$NetworkNewTheLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return NetworkNewTheLoungeRequestBody(
-    json['host'] as String,
-    json['join'] as String,
-    json['name'] as String,
-    json['nick'] as String,
-    json['port'] as String,
-    json['realname'] as String,
-    json['rejectUnauthorized'] as String,
-    json['tls'] as String,
-    json['username'] as String,
+    host: json['host'] as String,
+    join: json['join'] as String,
+    name: json['name'] as String,
+    nick: json['nick'] as String,
+    port: json['port'] as String,
+    realname: json['realname'] as String,
+    rejectUnauthorized: json['rejectUnauthorized'] as String,
+    tls: json['tls'] as String,
+    username: json['username'] as String,
+    password: json['password'] as String,
   );
 }
 
@@ -30,6 +31,7 @@ Map<String, dynamic> _$NetworkNewTheLoungeRequestBodyToJson(
       'nick': instance.nick,
       'port': instance.port,
       'realname': instance.realname,
+      'password': instance.password,
       'rejectUnauthorized': instance.rejectUnauthorized,
       'tls': instance.tls,
       'username': instance.username,

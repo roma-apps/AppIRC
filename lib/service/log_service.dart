@@ -27,10 +27,10 @@ void log() {
 }
 
 pprint(data) {
-    if (data is Map) {
-      data = json.encode(data);
-    }
-    print(data);
-    logger.i(data);
-    toPrint.add(data);
+  if (data is Map) {
+    data = json.encode(data);
+  }
+  print(data);
+  logger.i(data);
+  toPrint.add(data);
 }
