@@ -55,7 +55,9 @@ class ChannelWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Expanded(child: MessagesListChannelWidget()),
-                  EnterMessageChannelWidget()
+                  Container(
+                    decoration: BoxDecoration(color: Colors.red),
+                      child: EnterMessageChannelWidget())
                 ],
               ),
             );
