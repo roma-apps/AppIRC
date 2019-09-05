@@ -4,19 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appirc/blocs/chat_bloc.dart';
 import 'package:flutter_appirc/pages/new_connection_page.dart';
 import 'package:flutter_appirc/provider.dart';
-import 'package:flutter_appirc/service/socketio_service.dart';
 import 'package:flutter_appirc/service/thelounge_service.dart';
 import 'package:logger_flutter/logger_flutter.dart';
 
-//const String URI = "https://demo.thelounge.chat/";
-const String URI = "http://192.168.0.103:9000";
+
 var socketIOManager = SocketIOManager();
-var socketIOService = SocketIOService(socketIOManager, URI);
-var loungeService = TheLoungeService(socketIOService);
+
+var loungeService = TheLoungeService(socketIOManager);
 
 Future main() async {
-  await socketIOService.init();
-  loungeService.connect();
   LogConsole.init(bufferSize: 100);
   runApp(EasyLocalization(child: AppIRC()));
 }

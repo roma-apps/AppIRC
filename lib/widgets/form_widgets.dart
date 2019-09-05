@@ -12,7 +12,7 @@ formTitle(BuildContext context, String title) => Padding(
           Divider()
         ],
       ),
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(4.0),
     );
 
 formTextRow(String title, TextEditingController controller,

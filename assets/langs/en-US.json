@@ -17,6 +17,10 @@
       "user_name": "User name",
       "channels": "Channels"
     },
+    "lounge": {
+      "title": "Lounge",
+      "host": "Host"
+    },
     "connect": "Connect"
   },
   "join_channel": {

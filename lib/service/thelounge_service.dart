@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter_appirc/models/chat_model.dart';
 import 'package:flutter_appirc/models/thelounge_model.dart';
 import 'package:flutter_appirc/provider.dart';
@@ -25,13 +26,18 @@ const String _channelStateOptionsLoungeEvent = "channel:state";
 const timeoutForPingInSeconds = 30;
 
 class TheLoungeService extends Providable {
+  static const String defaultLoungeHost = "https://demo.thelounge.chat/";
+
+  String host = defaultLoungeHost;
+
+  SocketIOManager socketIOManager;
   SocketIOService socketIOService;
 
   Timer _pingTimer;
 
-  bool latestPongWasZero = false;
+  bool _latestPongWasZero = false;
 
-  TheLoungeService(this.socketIOService);
+  TheLoungeService(this.socketIOManager);
 
   ReplaySubject<MessageTheLoungeResponseBody> _messagesController =
       new ReplaySubject<MessageTheLoungeResponseBody>();
@@ -114,14 +120,20 @@ class TheLoungeService extends Providable {
   Stream<TopicTheLoungeResponseBody> get outTopic =>
       _topicController.stream;
 
+  bool get isProbablyConnected => socketIOService != null && socketIOService.isProbablyConnected;
+
 
   _sendCommand(TheLoungeRequest request) async {
     await socketIOService.emit(request);
   }
 
   connect() async {
+
+
+    socketIOService = SocketIOService(socketIOManager, host);
+    await socketIOService.init();
     _addSubscriptions();
-    socketIOService.connect();
+    await socketIOService.connect();
     retrieveSettings();
 
     _pingTimer = Timer.periodic(Duration(seconds: timeoutForPingInSeconds), (timer) {
@@ -131,8 +143,11 @@ class TheLoungeService extends Providable {
   }
 
   disconnect() async {
+
+
     _removeSubscriptions();
     socketIOService.disconnect();
+    socketIOService = null;
   }
 
   @override
@@ -161,9 +176,9 @@ class TheLoungeService extends Providable {
 
   void pong() {
     _sendCommand(TheLoungeRawRequest(name: "pong", body: [
-      latestPongWasZero ? 0 : 1
+      _latestPongWasZero ? 0 : 1
     ])); // I am not sure what is just emulate behaviour
-    latestPongWasZero = !latestPongWasZero;
+    _latestPongWasZero = !_latestPongWasZero;
   }
 
   void open(Channel channel) {
@@ -174,10 +189,14 @@ class TheLoungeService extends Providable {
     _sendCommand(TheLoungeRawRequest(name: "names", body: [channel.remoteId]));
   }
 
-  void newNetwork(ChannelsConnectionInfo channelConnectionInfo) {
+  Future newNetwork(ChannelsConnectionInfo channelConnectionInfo) async {
+    if(!isProbablyConnected) {
+      await connect();
+    }
+
     var networkPreferences = channelConnectionInfo.networkPreferences;
     var userPreferences = channelConnectionInfo.userPreferences;
-    _sendCommand(TheLoungeJsonRequest(
+    await _sendCommand(TheLoungeJsonRequest(
         name: "network:new",
         body: NetworkNewTheLoungeRequestBody(
           username: userPreferences.username,

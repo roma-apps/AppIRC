@@ -31,7 +31,7 @@ class SocketIOService {
     ));
   }
 
-  void connect() async {
+  Future connect() async {
     isProbablyConnected = true;
 //    _socketIO.on("network", (data) => pprint("type:network | $data"));
 //    _socketIO.on("*", (data) => pprint("type:all | $data"));
