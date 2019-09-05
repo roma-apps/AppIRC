@@ -32,20 +32,6 @@ class Network {
 
 }
 
-class ChatMessage {
-  int channelId;
-  MsgTheLoungeResponseBody msg;
-
-
-  @override
-  String toString() {
-    return 'ChatMessage{channelId: $channelId, msg: $msg}';
-  }
-
-  ChatMessage(this.channelId, this.msg);
-
-
-}
 
 class ChannelMessage {
   String type;

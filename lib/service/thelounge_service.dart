@@ -14,6 +14,7 @@ const String _msgLoungeEvent = "msg";
 const String _configurationLoungeEvent = "configuration";
 const String _authorizedLoungeEvent = "authorized";
 const String _commandsLoungeEvent = "commands";
+const String _topicLoungeEvent = "topic";
 const String _namesLoungeEvent = "names";
 const String _usersLoungeEvent = "users";
 const String _joinLoungeEvent = "join";
@@ -107,6 +108,13 @@ class TheLoungeService extends Providable {
       _commandsController.stream;
 
 
+  BehaviorSubject<TopicTheLoungeResponseBody> _topicController =
+  new BehaviorSubject<TopicTheLoungeResponseBody>();
+
+  Stream<TopicTheLoungeResponseBody> get outTopic =>
+      _topicController.stream;
+
+
   _sendCommand(TheLoungeRequest request) async {
     await socketIOService.emit(request);
   }
@@ -129,6 +137,7 @@ class TheLoungeService extends Providable {
 
   @override
   void dispose() {
+    _topicController.close();
     _messagesController.close();
     _networksController.close();
     _authorizedController.close();
@@ -194,6 +203,7 @@ class TheLoungeService extends Providable {
   void _addSubscriptions() {
     socketIOService.subscribe(_networkLoungeEvent, _onNetworkResponse);
     socketIOService.subscribe(_msgLoungeEvent, _onMessageResponse);
+    socketIOService.subscribe(_topicLoungeEvent, _onTopicResponse);
     socketIOService.subscribe(_configurationLoungeEvent, _onConfigurationResponse);
     socketIOService.subscribe(_authorizedLoungeEvent, _onAuthorizedResponse);
     socketIOService.subscribe(_commandsLoungeEvent, _onCommandResponse);
@@ -208,6 +218,7 @@ class TheLoungeService extends Providable {
   void _removeSubscriptions() {
     socketIOService.unsubscribe(_networkLoungeEvent, _onNetworkResponse);
     socketIOService.unsubscribe(_msgLoungeEvent, _onMessageResponse);
+    socketIOService.unsubscribe(_topicLoungeEvent, _onTopicResponse);
     socketIOService.unsubscribe(_configurationLoungeEvent, _onConfigurationResponse);
     socketIOService.unsubscribe(_authorizedLoungeEvent, _onAuthorizedResponse);
     socketIOService.unsubscribe(_commandsLoungeEvent, _onCommandResponse);
@@ -220,9 +231,15 @@ class TheLoungeService extends Providable {
   }
 
 
-  void _onMessageResponse(messageResponse) {
-    logi(_logTag, messageResponse);
-    var data = MessageTheLoungeResponseBody.fromJson(messageResponse);
+  void _onTopicResponse(raw) {
+    logi(_logTag, "_onTopicResponse $raw");
+    var data = TopicTheLoungeResponseBody.fromJson(raw);
+    _topicController.sink.add(data);
+  }
+
+  void _onMessageResponse(raw) {
+    logi(_logTag, raw);
+    var data = MessageTheLoungeResponseBody.fromJson(raw);
     _messagesController.sink.add(data);
   }
 

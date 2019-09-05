@@ -8,6 +8,35 @@ import 'package:flutter_appirc/provider.dart';
 
 //final dateFormat = new DateFormat('yyyy-MM-dd hh:mm');
 
+class TopicTitleWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    ChannelTopicBloc bloc = Provider.of<ChannelTopicBloc>(context);
+    return StreamBuilder<String>(
+      stream: bloc.outTopic,
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        var topic = snapshot.data;
+        var channelName = bloc.channel.name;
+        if (topic == null || topic.isEmpty) {
+          return Text(channelName);
+        } else {
+          var captionStyle = Theme.of(context).textTheme.caption;
+          var topicStyle = captionStyle.copyWith(color: Colors.white);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(channelName),
+              Text(topic, style: topicStyle)
+            ],
+          );
+        }
+      },
+    );
+  }
+}
+
 class ChannelWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,7 +49,7 @@ class ChannelWidget extends StatelessWidget {
             return Text(AppLocalizations.of(context).tr("chat.no_active_chat"));
           } else {
             return Provider<ChannelBloc>(
-              bloc: ChannelBloc(chatBloc.lounge, chatBloc, snapshot.data),
+              bloc: ChannelBloc(chatBloc.lounge, snapshot.data),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,

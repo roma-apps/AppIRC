@@ -13,14 +13,12 @@ const String _logTag = "ChatBloc";
 class ChatBloc extends Providable {
   final TheLoungeService lounge;
 
-  StreamSubscription<MessageTheLoungeResponseBody> _messagesSubscription;
+
   StreamSubscription<NetworksTheLoungeResponseBody> _networksSubscription;
   StreamSubscription<JoinTheLoungeResponseBody> _joinSubscription;
 
   ChatBloc(this.lounge) {
-    _messagesSubscription = lounge.outMessages.listen((event) {
-      _messageController.sink.add(ChatMessage(event.chan, event.msg));
-    });
+
     _networksSubscription = lounge.outNetworks.listen((event) {
       var newNetworks = Set<Network>();
 
@@ -71,10 +69,7 @@ class ChatBloc extends Providable {
 
   Stream<List<Network>> get outNetworks => _networkController.stream;
 
-  ReplaySubject<ChatMessage> _messageController =
-      new ReplaySubject<ChatMessage>();
 
-  Stream<ChatMessage> get outMessage => _messageController.stream;
 
   Channel _activeChannel;
   BehaviorSubject<Channel> _activeChannelController =
@@ -96,10 +91,10 @@ class ChatBloc extends Providable {
 
   void dispose() {
     _networkController.close();
-    _messageController.close();
+
     _activeChannelController.close();
     _networksSubscription.cancel();
-    _messagesSubscription.cancel();
+
     _joinSubscription.cancel();
   }
 

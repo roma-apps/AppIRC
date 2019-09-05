@@ -332,6 +332,11 @@ class TopicTheLoungeResponseBody extends TheLoungeResponseBody {
   String topic;
 
 
+  @override
+  String toString() {
+    return 'TopicTheLoungeResponseBody{chan: $chan, topic: $topic}';
+  }
+
   TopicTheLoungeResponseBody(this.chan, this.topic);
 
   factory TopicTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>

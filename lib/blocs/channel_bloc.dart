@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter_appirc/blocs/chat_bloc.dart';
 import 'package:flutter_appirc/models/chat_model.dart';
+import 'package:flutter_appirc/models/thelounge_model.dart';
 import 'package:flutter_appirc/provider.dart';
 import 'package:flutter_appirc/service/log_service.dart';
 import 'package:flutter_appirc/service/thelounge_service.dart';
@@ -10,28 +10,60 @@ import 'package:rxdart/rxdart.dart';
 
 const String _logTag = "ChannelBloc";
 
-class ChannelBloc extends Providable {
+class ChannelTopicBloc extends Providable {
   final TheLoungeService lounge;
-  final ChatBloc chatBloc;
   final Channel channel;
 
-  StreamSubscription<ChatMessage> subscription;
+  StreamSubscription<TopicTheLoungeResponseBody> _topicSubscription;
 
-  ChannelBloc(this.lounge, this.chatBloc, this.channel) {
-    subscription = chatBloc.outMessage.listen((chatMessage) {
-      if (chatMessage.channelId == channel.remoteId) {
+  ChannelTopicBloc(this.lounge, this.channel) {
+    logi(_logTag, "Create topic bloc for ${channel.name}");
+
+    _topicSubscription = lounge.outTopic.listen((loungeMessage) {
+      if (loungeMessage.chan == channel.remoteId) {
+        logi(_logTag, "new topic for ${channel.name} is ${loungeMessage.topic}");
+        _topicController.add(loungeMessage.topic);
+      }
+    });
+  }
+
+  BehaviorSubject<String> _topicController = new BehaviorSubject<String>();
+
+  Stream<String> get outTopic => _topicController.stream;
+
+  @override
+  void dispose() {
+    _topicController.close();
+    _topicSubscription.cancel();
+  }
+
+
+}
+
+class ChannelBloc extends Providable {
+  final TheLoungeService lounge;
+  final Channel channel;
+
+  StreamSubscription<MessageTheLoungeResponseBody> _messagesSubscription;
+
+
+  ChannelBloc(this.lounge, this.channel) {
+    _messagesSubscription = lounge.outMessages.listen((loungeMessage) {
+      if (loungeMessage.chan == channel.remoteId) {
+        var msg = loungeMessage.msg;
         var channelMessage = ChannelMessage.name(
-            text: chatMessage.msg.text,
-            author: chatMessage.msg.from.nick,
-            date: DateTime.parse(chatMessage.msg.time),
-            type: chatMessage.msg.type,
+            text: msg.text,
+            author: msg.from.nick,
+            date: DateTime.parse(msg.time),
+            type: msg.type,
             realName: "");
         logi(_logTag,
-            "new msg for ${channel.name}: $chatMessage \n converted to $channelMessage");
+            "new msg for ${channel.name}: $loungeMessage \n converted to $channelMessage");
         _messages.add(channelMessage);
         _messagesController.sink.add(UnmodifiableListView(_messages));
       }
     });
+
   }
 
   Set<ChannelMessage> _messages = Set<ChannelMessage>();
@@ -41,9 +73,12 @@ class ChannelBloc extends Providable {
 
   Stream<List<ChannelMessage>> get outMessages => _messagesController.stream;
 
+
   void dispose() {
     _messagesController.close();
-    subscription.cancel();
+
+    _messagesSubscription.cancel();
+
   }
 
   sendMessage(String text) => lounge.sendChatMessage(channel.remoteId, text);
