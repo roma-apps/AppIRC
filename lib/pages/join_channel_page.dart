@@ -1,25 +1,27 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appirc/models/chat_model.dart';
 import 'package:flutter_appirc/pages/chat_page.dart';
+import 'package:flutter_appirc/widgets/join_channel_widget.dart';
 import 'package:flutter_appirc/widgets/new_connection_widget.dart';
 
-class NewConnectionPage extends StatefulWidget {
-  final bool isOpenedFromAppStart;
+class JoinChannelPage extends StatefulWidget {
+  final Network network;
 
-  NewConnectionPage({this.isOpenedFromAppStart = false});
 
+  JoinChannelPage(this.network);
 
   @override
   State<StatefulWidget> createState() {
-    return NewConnectionState(isOpenedFromAppStart);
+    return JoinChannelPageState(network);
   }
 }
 
-class NewConnectionState extends State<NewConnectionPage> {
-  final bool isOpenedFromAppStart;
+class JoinChannelPageState extends State<JoinChannelPage> {
+  Network network;
 
 
-  NewConnectionState(this.isOpenedFromAppStart);
+  JoinChannelPageState(this.network);
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -29,7 +31,7 @@ class NewConnectionState extends State<NewConnectionPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).tr('new_connection.title')),
+        title: Text(AppLocalizations.of(context).tr('join_channel.title')),
       ),
       body: ListView.builder(
         itemCount: 1,
@@ -39,13 +41,8 @@ class NewConnectionState extends State<NewConnectionPage> {
             children: <Widget>[
               Container(
                   margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: NewConnectionWidget(() {
-                    if (isOpenedFromAppStart) {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => ChatPage()));
-                    } else {
+                  child: JoinChannelFormWidget(network, () {
                       Navigator.pop(context);
-                    }
                   })),
             ],
           );

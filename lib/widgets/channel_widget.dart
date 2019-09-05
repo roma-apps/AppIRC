@@ -6,6 +6,8 @@ import 'package:flutter_appirc/blocs/chat_bloc.dart';
 import 'package:flutter_appirc/models/chat_model.dart';
 import 'package:flutter_appirc/provider.dart';
 
+//final dateFormat = new DateFormat('yyyy-MM-dd hh:mm');
+
 class ChannelWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,6 +22,8 @@ class ChannelWidget extends StatelessWidget {
             return Provider<ChannelBloc>(
               bloc: ChannelBloc(chatBloc.lounge, chatBloc, snapshot.data),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Expanded(child: MessagesListChannelWidget()),
                   EnterMessageChannelWidget()
@@ -40,20 +44,58 @@ class MessagesListChannelWidget extends StatelessWidget {
         stream: channelBloc.outMessages,
         builder: (BuildContext context,
             AsyncSnapshot<List<ChannelMessage>> snapshot) {
-          if (snapshot.data == null && snapshot.data.length == 0) {
+          if (snapshot.data == null || snapshot.data.length == 0) {
             return Text(AppLocalizations.of(context).tr("chat.empty_chat"));
           } else {
-            return ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-              ChannelMessage message = snapshot.data[index];
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    ChannelMessage message = snapshot.data[index];
 
-              return Column(
-                children: <Widget>[
-                  Text(message.author),
-                  Text(message.text),
-                ],
-              );
-            });
+                    if (message.text == null) {
+                      message.text = "";
+                    }
+                    if (message.author == null) {
+                      message.author = "";
+                    }
+                    return Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Row(
+                              children: <Widget>[
+                                Text(
+                                  message.author,
+                                  style: Theme.of(context).textTheme.body2,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                    message.date.toString(),
+                                    style: Theme.of(context).textTheme.body2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Column(
+                              children: <Widget>[
+                                Text(message.type),
+                                Text(message.text),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+            );
           }
         });
   }
@@ -71,21 +113,23 @@ class EnterMessageChannelState extends State<EnterMessageChannelWidget> {
   Widget build(BuildContext context) {
     ChannelBloc channelBloc = Provider.of<ChannelBloc>(context);
 
-    return Flexible(
-      child: Row(
-        children: <Widget>[
-          TextFormField(
+    return Row(
+      children: <Widget>[
+        Flexible(
+          child: TextFormField(
             controller: messageController,
             textInputAction: TextInputAction.send,
             onFieldSubmitted: (term) {
               _sendMessage(channelBloc);
             },
           ),
-          IconButton(
-              icon: new Icon(Icons.message),
-              onPressed: _sendMessage(channelBloc)),
-        ],
-      ),
+        ),
+        IconButton(
+            icon: new Icon(Icons.message),
+            onPressed: () {
+              _sendMessage(channelBloc);
+            }),
+      ],
     );
   }
 

@@ -1,36 +1,43 @@
-import 'dart:convert';
-
 import 'package:logger/logger.dart';
 
-List<String> toPrint = ["trying to conenct"];
-
-var logger = Logger(
+var _logger = Logger(
   printer: PrettyPrinter(),
 );
 
-var loggerNoStack = Logger(
+
+var _loggerNoStackTrace = Logger(
   printer: PrettyPrinter(methodCount: 0),
 );
 
-void log() {
-  logger.d("Log message with 2 methods");
 
-  loggerNoStack.i("Info message");
+void logd(String tag, dynamic message, {bool stackTrace = true}) {
+  if(stackTrace) {
+    _logger.d(createMessage(tag, message));
+  } else {
+    _loggerNoStackTrace.d(createMessage(tag, message));
+  }
 
-  loggerNoStack.w("Just a warning!");
-
-  logger.e("Error! Something bad happened", "Test Error");
-
-  loggerNoStack.v({"key": 5, "value": "something"});
-
-  Future.delayed(Duration(seconds: 5), log);
 }
 
-pprint(data) {
-  if (data is Map) {
-    data = json.encode(data);
+String createMessage(String tag, message) => "$tag: $message";
+void logi(String tag, dynamic message, {bool stackTrace = false}) {
+  if(stackTrace) {
+    _logger.i(createMessage(tag, message));
+  } else {
+    _loggerNoStackTrace.i(createMessage(tag, message));
   }
-  print(data);
-  logger.i(data);
-  toPrint.add(data);
+}
+void logw(String tag, dynamic message, {bool stackTrace = true}) {
+  if(stackTrace) {
+    _logger.w(createMessage(tag, message));
+  } else {
+    _loggerNoStackTrace.w(createMessage(tag, message));
+  }
+}
+void loge(String tag, dynamic message, {bool stackTrace = false}) {
+  if(stackTrace) {
+    _logger.e(createMessage(tag, message));
+  } else {
+    _loggerNoStackTrace.e(createMessage(tag, message));
+  }
 }

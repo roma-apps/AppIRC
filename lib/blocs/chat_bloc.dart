@@ -4,49 +4,86 @@ import 'dart:collection';
 import 'package:flutter_appirc/models/chat_model.dart';
 import 'package:flutter_appirc/models/thelounge_model.dart';
 import 'package:flutter_appirc/provider.dart';
+import 'package:flutter_appirc/service/log_service.dart';
 import 'package:flutter_appirc/service/thelounge_service.dart';
 import 'package:rxdart/rxdart.dart';
+
+const String _logTag = "ChatBloc";
 
 class ChatBloc extends Providable {
   final TheLoungeService lounge;
 
   StreamSubscription<MessageTheLoungeResponseBody> _messagesSubscription;
   StreamSubscription<NetworksTheLoungeResponseBody> _networksSubscription;
+  StreamSubscription<JoinTheLoungeResponseBody> _joinSubscription;
 
   ChatBloc(this.lounge) {
     _messagesSubscription = lounge.outMessages.listen((event) {
       _messageController.sink.add(ChatMessage(event.chan, event.msg));
     });
     _networksSubscription = lounge.outNetworks.listen((event) {
-      var newChannels = List<Channel>();
+      var newNetworks = Set<Network>();
 
       for (var network in event.networks) {
+        List<Channel> newChannels = List();
+        var newNetwork = Network(network.name, network.uuid, newChannels);
         for (var loungeChannel in network.channels) {
           newChannels.add(
               Channel(name: loungeChannel.name, remoteId: loungeChannel.id));
         }
+        newNetworks.add(newNetwork);
       }
 
-      _channelsController.sink.add(UnmodifiableListView(newChannels));
+      changeAvailableNetworks(newNetworks);
+    });
 
-      if (_activeChannel == null && newChannels.length > 0) {
-        changeActiveChanel(newChannels[0]);
-      }
+    _joinSubscription = lounge.outJoin.listen((event) {
+      var networkForChannel =
+          _networks.firstWhere((network) => network.remoteId == event.network);
+      var newChannel = Channel(name: event.chan.name, remoteId: event.chan.id);
+      networkForChannel.channels
+          .add(newChannel);
+      _onNetworksListChanged();
+      changeActiveChanel(newChannel);
+
     });
   }
 
-  final Set<Channel> _channels = Set<Channel>();
+  void changeAvailableNetworks(Set<Network> newNetworks) {
 
-  void connect(ChannelsConnectionInfo channelConnectionInfo) =>
+    _networks = newNetworks;
+
+    _onNetworksListChanged();
+
+    if (_activeChannel == null) {
+      var allChannels = _calculateAvailableChannels();
+      if (allChannels.length > 0) {
+        changeActiveChanel(allChannels.elementAt(0));
+      }
+    }
+  }
+
+  List<Channel> _calculateAvailableChannels() {
+    var allChannels = List<Channel>();
+    _networks.forEach((network) {
+      allChannels.addAll(network.channels);
+    });
+
+    return allChannels;
+  }
+
+  Set<Network> _networks = Set<Network>();
+
+  void newNetwork(ChannelsConnectionInfo channelConnectionInfo) =>
       lounge.newNetwork(channelConnectionInfo);
 
-  BehaviorSubject<List<Channel>> _channelsController =
-      new BehaviorSubject<List<Channel>>(seedValue: []);
+  BehaviorSubject<List<Network>> _networkController =
+      new BehaviorSubject<List<Network>>(seedValue: []);
 
-  Stream<List<Channel>> get outChannels => _channelsController.stream;
+  Stream<List<Network>> get outNetworks => _networkController.stream;
 
-  BehaviorSubject<ChatMessage> _messageController =
-      new BehaviorSubject<ChatMessage>();
+  ReplaySubject<ChatMessage> _messageController =
+      new ReplaySubject<ChatMessage>();
 
   Stream<ChatMessage> get outMessage => _messageController.stream;
 
@@ -56,20 +93,30 @@ class ChatBloc extends Providable {
 
   Stream<Channel> get outActiveChannel => _activeChannelController.stream;
 
-  void _onChannelsChanged() {
-    _channelsController.sink.add(UnmodifiableListView(_channels));
+  void _onNetworksListChanged() {
+    logi(_logTag, "_onNetworksListChanged $_networks");
+    _networkController.sink.add(UnmodifiableListView(_networks));
   }
 
   void dispose() {
-    _channelsController.close();
+    _networkController.close();
     _messageController.close();
     _activeChannelController.close();
     _networksSubscription.cancel();
     _messagesSubscription.cancel();
+    _joinSubscription.cancel();
   }
 
-  void changeActiveChanel(Channel channel) {
-    _activeChannel = channel;
-    _activeChannelController.sink.add(channel);
+  void changeActiveChanel(Channel newActiveChannel) {
+    if (_activeChannel == newActiveChannel) {
+      return;
+    }
+
+    logi(_logTag, "changeActiveChanel $changeActiveChanel");
+    _activeChannel = newActiveChannel;
+    _activeChannelController.sink.add(newActiveChannel);
+
+    lounge.open(newActiveChannel);
+    lounge.names(newActiveChannel);
   }
 }

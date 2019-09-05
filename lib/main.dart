@@ -8,7 +8,8 @@ import 'package:flutter_appirc/service/socketio_service.dart';
 import 'package:flutter_appirc/service/thelounge_service.dart';
 import 'package:logger_flutter/logger_flutter.dart';
 
-const String URI = "https://demo.thelounge.chat/";
+//const String URI = "https://demo.thelounge.chat/";
+const String URI = "http://192.168.0.103:9000";
 var socketIOManager = SocketIOManager();
 var socketIOService = SocketIOService(socketIOManager, URI);
 var loungeService = TheLoungeService(socketIOService);

@@ -22,14 +22,8 @@ class SocketIOService {
     _socketIO = await _manager.createInstance(SocketOptions(
       //Socket IO server URI
         uri,
-        //Query params - can be used for authentication
-        query: {
-          "auth": "--SOME AUTH STRING---",
-          "info": "new connection from adhara-socketio",
-          "timestamp": DateTime.now().toString()
-        },
         //Enable or disable platform channel logging
-        enableLogging: false,
+        enableLogging: true,
         transports: [
           Transports.WEB_SOCKET,
           Transports.POLLING
@@ -39,8 +33,9 @@ class SocketIOService {
 
   void connect() async {
     isProbablyConnected = true;
+//    _socketIO.on("network", (data) => pprint("type:network | $data"));
+//    _socketIO.on("*", (data) => pprint("type:all | $data"));
     _socketIO.connect();
-
 
 //    socket.onConnect((data) {
 //      pprint("connected...");
@@ -60,7 +55,7 @@ class SocketIOService {
 //    socket.on("authorized", (data) => pprint("type:authorized | $data"));
 //    socket.on("init", (data) => pprint("type:init | $data"));
 //    socket.on("commands", (data) => pprint("type:commands | $data"));
-//    socket.on("network", (data) => pprint("type:network | $data"));
+
 //    socket.on("msg", (data) => pprint("type:msg | $data"));
 //    socket.on("open", (data) => pprint("type:open | $data"));
 //    socket.on("names", (data) => pprint("type:names | $data"));
@@ -73,6 +68,8 @@ class SocketIOService {
 
 
   }
+
+
 
   emit(SocketIOCommand command) async {
     await _socketIO.emit(command.getName(), command.getBody());

@@ -25,8 +25,7 @@ class ChatPage extends StatelessWidget {
             },
           ),
         ),
-        body: Center(child: LogConsole()),
-//        body: Center(child: ChannelWidget()),
+        body: Center(child: ChannelWidget()),
         drawer: Drawer(child: ChannelsListWidget()));
   }
 }

@@ -14,13 +14,23 @@
       "nick": "Nickname",
       "password": "Password",
       "real_name": "Real name",
+      "user_name": "User name",
       "channels": "Channels"
     },
     "connect": "Connect"
   },
+  "join_channel": {
+    "title": "Join channel",
+    "channel": "Channel",
+    "password": "Password (optional)",
+    "join": "Join"
+  },
   "chat": {
     "title": "Chat",
     "no_active_chat": "Active chat not selected",
-    "empty_chat": "This channel doesn't have any messages yet"
+    "empty_chat": "This channel doesn't have any messages yet",
+    "channels": {
+      "new_connection": "New connection"
+    }
   }
 }

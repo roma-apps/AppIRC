@@ -3,16 +3,44 @@ import 'package:flutter_appirc/models/thelounge_model.dart';
 
 class Channel {
   String name;
-  bool isActive = false;
 
   final int remoteId;
 
+
+  @override
+  String toString() {
+    return 'Channel{name: $name, remoteId: $remoteId}';
+  }
+
   Channel({@required this.name, @required this.remoteId});
+}
+
+
+class Network {
+  String name;
+  final String remoteId;
+
+  List<Channel> channels;
+
+  Network(this.name, this.remoteId, this.channels);
+
+  @override
+  String toString() {
+    return 'Network{name: $name, remoteId: $remoteId, channels: $channels}';
+  }
+
+
 }
 
 class ChatMessage {
   int channelId;
   MsgTheLoungeResponseBody msg;
+
+
+  @override
+  String toString() {
+    return 'ChatMessage{channelId: $channelId, msg: $msg}';
+  }
 
   ChatMessage(this.channelId, this.msg);
 
@@ -20,10 +48,20 @@ class ChatMessage {
 }
 
 class ChannelMessage {
+  String type;
   String author;
+  String realName;
+  DateTime date;
   String text;
 
-  ChannelMessage.name({@required this.author, @required this.text});
+
+  ChannelMessage.name({this.type, this.author, this.realName, this.date,
+      this.text});
+
+  @override
+  String toString() {
+    return 'ChannelMessage{author: $author, text: $text}';
+  }
 
 
 }
@@ -62,10 +100,12 @@ class NetworkPreferences {
 class UserPreferences {
   static const String defaultNick = "AppIRC";
   static const String defaultRealName = "AppIRC";
+  static const String defaultUserName = "AppIRC";
 
   String nickname;
+  String username;
   String password;
   String realName;
 
-  UserPreferences({this.nickname, this.password, this.realName});
+  UserPreferences({this.nickname, this.password, this.realName, this.username});
 }

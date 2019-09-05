@@ -14,7 +14,7 @@ class NewConnectionBloc extends Providable {
       userPreferences: UserPreferences());
 
   void addConnectionToChat() {
-    chatBloc.connect(connection);
+    chatBloc.newNetwork(connection);
   }
 
   @override

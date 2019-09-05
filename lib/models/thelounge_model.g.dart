@@ -70,6 +70,88 @@ Map<String, dynamic> _$MessageTheLoungeResponseBodyToJson(
       'msg': instance.msg,
     };
 
+JoinTheLoungeResponseBody _$JoinTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return JoinTheLoungeResponseBody(
+    json['chan'] == null
+        ? null
+        : ChannelTheLoungeResponseBody.fromJson(
+            json['chan'] as Map<String, dynamic>),
+    json['index'] as int,
+    json['network'] as String,
+  );
+}
+
+Map<String, dynamic> _$JoinTheLoungeResponseBodyToJson(
+        JoinTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'chan': instance.chan,
+      'index': instance.index,
+      'network': instance.network,
+    };
+
+NetworkStatusTheLoungeResponseBody _$NetworkStatusTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return NetworkStatusTheLoungeResponseBody(
+    json['connected'] as bool,
+    json['network'] as String,
+    json['secure'] as bool,
+  );
+}
+
+Map<String, dynamic> _$NetworkStatusTheLoungeResponseBodyToJson(
+        NetworkStatusTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'connected': instance.connected,
+      'network': instance.network,
+      'secure': instance.secure,
+    };
+
+NetworkOptionsTheLoungeResponseBody
+    _$NetworkOptionsTheLoungeResponseBodyFromJson(Map<String, dynamic> json) {
+  return NetworkOptionsTheLoungeResponseBody(
+    json['network'] as String,
+    json['serverOptions'] as Map<String, dynamic>,
+  );
+}
+
+Map<String, dynamic> _$NetworkOptionsTheLoungeResponseBodyToJson(
+        NetworkOptionsTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'network': instance.network,
+      'serverOptions': instance.serverOptions,
+    };
+
+ChannelStateTheLoungeResponseBody _$ChannelStateTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return ChannelStateTheLoungeResponseBody(
+    json['chan'] as int,
+    json['state'] as int,
+  );
+}
+
+Map<String, dynamic> _$ChannelStateTheLoungeResponseBodyToJson(
+        ChannelStateTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'chan': instance.chan,
+      'state': instance.state,
+    };
+
+UsersTheLoungeResponseBody _$UsersTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return UsersTheLoungeResponseBody(
+    json['chan'] as int,
+    json['msg'],
+  );
+}
+
+Map<String, dynamic> _$UsersTheLoungeResponseBodyToJson(
+        UsersTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'chan': instance.chan,
+      'msg': instance.msg,
+    };
+
 MsgTheLoungeResponseBody _$MsgTheLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MsgTheLoungeResponseBody(
@@ -119,6 +201,117 @@ Map<String, dynamic> _$MsgFromTheLoungeResponseBodyToJson(
       'nick': instance.nick,
     };
 
+ConfigurationTheLoungeResponseBody _$ConfigurationTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return ConfigurationTheLoungeResponseBody(
+    json['defaultTheme'] as String,
+    json['defaults'] as Map<String, dynamic>,
+    json['displayNetwork'] as bool,
+    json['fileUpload'] as bool,
+    json['ldapEnabled'] as bool,
+    json['lockNetwork'] as bool,
+    json['prefetch'] as bool,
+    json['public'] as bool,
+    json['useHexIp'] as bool,
+    json['fileUploadMaxSize'] as int,
+    json['gitCommit'] as String,
+    json['version'] as String,
+    json['themes'] as List,
+  );
+}
+
+Map<String, dynamic> _$ConfigurationTheLoungeResponseBodyToJson(
+        ConfigurationTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'defaultTheme': instance.defaultTheme,
+      'defaults': instance.defaults,
+      'displayNetwork': instance.displayNetwork,
+      'fileUpload': instance.fileUpload,
+      'ldapEnabled': instance.ldapEnabled,
+      'lockNetwork': instance.lockNetwork,
+      'prefetch': instance.prefetch,
+      'public': instance.public,
+      'useHexIp': instance.useHexIp,
+      'fileUploadMaxSize': instance.fileUploadMaxSize,
+      'gitCommit': instance.gitCommit,
+      'version': instance.version,
+      'themes': instance.themes,
+    };
+
+InitTheLoungeResponseBody _$InitTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return InitTheLoungeResponseBody(
+    json['active'] as int,
+    json['applicationServerKey'] as String,
+    json['token'] as String,
+    (json['networks'] as List)
+        ?.map((e) => e == null
+            ? null
+            : NetworkTheLoungeResponseBody.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$InitTheLoungeResponseBodyToJson(
+        InitTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'active': instance.active,
+      'applicationServerKey': instance.applicationServerKey,
+      'token': instance.token,
+      'networks': instance.networks,
+    };
+
+NamesTheLoungeResponseBody _$NamesTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return NamesTheLoungeResponseBody(
+    json['id'] as int,
+    (json['users'] as List)
+        ?.map((e) => e == null
+            ? null
+            : UserTheLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$NamesTheLoungeResponseBodyToJson(
+        NamesTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'users': instance.users,
+    };
+
+TopicTheLoungeResponseBody _$TopicTheLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return TopicTheLoungeResponseBody(
+    json['chan'] as int,
+    json['topic'] as String,
+  );
+}
+
+Map<String, dynamic> _$TopicTheLoungeResponseBodyToJson(
+        TopicTheLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'chan': instance.chan,
+      'topic': instance.topic,
+    };
+
+UserTheLoungeResponseBodyPart _$UserTheLoungeResponseBodyPartFromJson(
+    Map<String, dynamic> json) {
+  return UserTheLoungeResponseBodyPart(
+    json['lastMessage'] as int,
+    json['mode'] as String,
+    json['nick'] as String,
+  );
+}
+
+Map<String, dynamic> _$UserTheLoungeResponseBodyPartToJson(
+        UserTheLoungeResponseBodyPart instance) =>
+    <String, dynamic>{
+      'lastMessage': instance.lastMessage,
+      'mode': instance.mode,
+      'nick': instance.nick,
+    };
+
 NetworksTheLoungeResponseBody _$NetworksTheLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return NetworksTheLoungeResponseBody(
@@ -142,10 +335,10 @@ NetworkTheLoungeResponseBody _$NetworkTheLoungeResponseBodyFromJson(
     json['uuid'] as String,
     json['name'] as String,
     json['host'] as String,
-    json['port'] as String,
+    json['port'] as int,
     json['lts'] as String,
-    json['userDisconnected'] as String,
-    json['rejectUnauthorized'] as String,
+    json['userDisconnected'] as bool,
+    json['rejectUnauthorized'] as bool,
     json['nick'] as String,
     json['username'] as String,
     json['realname'] as String,

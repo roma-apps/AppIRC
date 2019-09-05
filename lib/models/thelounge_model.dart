@@ -7,11 +7,10 @@ part 'thelounge_model.g.dart';
 const String theLoungeOn = "on";
 const String theLoungeOff = "off";
 
-class TheLoungeRequest extends SocketIOCommand {
+abstract class TheLoungeRequest extends SocketIOCommand {
   String name;
-  TheLoungeRequestBody body;
 
-  TheLoungeRequest(this.name, this.body);
+  TheLoungeRequest(this.name);
 
   @override
   String getName() => name;
@@ -20,8 +19,38 @@ class TheLoungeRequest extends SocketIOCommand {
   /// but socket.io require List<dynamic> argument
   /// in this case argument is List<Map<String, dynamic>>
   /// Map<String, dynamic> is json root
+
   @override
-  List<dynamic> getBody() => [body.toJson()];
+  List<dynamic> getBody();
+}
+
+class TheLoungeJsonRequest extends TheLoungeRequest {
+  TheLoungeRequestBody body;
+
+  TheLoungeJsonRequest({@required String name, this.body}) : super(name);
+
+  /// Actually TheLounge body looks like json,
+  /// but socket.io require List<dynamic> argument
+  /// in this case argument is List<Map<String, dynamic>>
+  /// Map<String, dynamic> is json root
+  @override
+  List<dynamic> getBody() {
+    if (body != null) {
+      return [body.toJson()];
+    } else {
+      return [];
+    }
+  }
+}
+
+class TheLoungeRawRequest extends TheLoungeRequest {
+  List<dynamic> body;
+
+  TheLoungeRawRequest({@required String name, this.body = const []})
+      : super(name);
+
+  @override
+  List<dynamic> getBody() => body;
 }
 
 abstract class TheLoungeRequestBody {
@@ -30,15 +59,12 @@ abstract class TheLoungeRequestBody {
 
 abstract class TheLoungeResponseBody extends TheLoungeResponseBodyPart {}
 
-abstract class TheLoungeResponseBodyPart {
-
-}
+abstract class TheLoungeResponseBodyPart {}
 
 @JsonSerializable()
 class InputTheLoungeRequestBody extends TheLoungeRequestBody {
   final int target;
   final String text;
-
 
   @override
   String toString() {
@@ -63,7 +89,6 @@ class NetworkNewTheLoungeRequestBody extends TheLoungeRequestBody {
   final String rejectUnauthorized;
   final String tls;
   final String username;
-
 
   @override
   String toString() {
@@ -90,7 +115,6 @@ class MessageTheLoungeResponseBody extends TheLoungeResponseBody {
   int chan;
   MsgTheLoungeResponseBody msg;
 
-
   @override
   String toString() {
     return 'MessageTheLoungeResponseBody{chan: $chan, msg: $msg}';
@@ -102,6 +126,101 @@ class MessageTheLoungeResponseBody extends TheLoungeResponseBody {
       _$MessageTheLoungeResponseBodyFromJson(json);
 }
 
+
+@JsonSerializable()
+class JoinTheLoungeResponseBody extends TheLoungeResponseBody {
+  ChannelTheLoungeResponseBody chan;
+  int index;
+  String network;
+
+
+  JoinTheLoungeResponseBody(this.chan, this.index, this.network);
+
+  @override
+  String toString() {
+    return 'JoinTheLoungeResponseBody{chan: $chan, index: $index, network: $network}';
+  }
+
+  factory JoinTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$JoinTheLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
+class NetworkStatusTheLoungeResponseBody extends TheLoungeResponseBody {
+  bool connected;
+  String network;
+  bool secure;
+
+
+  NetworkStatusTheLoungeResponseBody(this.connected, this.network, this.secure);
+
+
+  @override
+  String toString() {
+    return 'NetworkStatusTheLoungeResponseBody{connected: $connected, network: $network, secure: $secure}';
+  }
+
+  factory NetworkStatusTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$NetworkStatusTheLoungeResponseBodyFromJson(json);
+}
+
+
+
+@JsonSerializable()
+class NetworkOptionsTheLoungeResponseBody extends TheLoungeResponseBody {
+
+  String network;
+  Map<String, dynamic> serverOptions;
+
+
+  NetworkOptionsTheLoungeResponseBody(this.network, this.serverOptions);
+
+
+  @override
+  String toString() {
+    return 'NetworkOptionsTheLoungeResponseBody{network: $network, serverOptions: $serverOptions}';
+  }
+
+  factory NetworkOptionsTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$NetworkOptionsTheLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
+class ChannelStateTheLoungeResponseBody extends TheLoungeResponseBody {
+
+  int chan;
+  int state;
+
+
+  ChannelStateTheLoungeResponseBody(this.chan, this.state);
+
+
+  @override
+  String toString() {
+    return 'ChannelStateTheLoungeResponseBody{chan: $chan, state: $state}';
+  }
+
+  factory ChannelStateTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$ChannelStateTheLoungeResponseBodyFromJson(json);
+}
+
+
+
+
+
+@JsonSerializable()
+class UsersTheLoungeResponseBody extends TheLoungeResponseBody {
+  int chan;
+  dynamic msg;
+
+
+  UsersTheLoungeResponseBody(this.chan, this.msg);
+
+  factory UsersTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$UsersTheLoungeResponseBodyFromJson(json);
+}
 
 @JsonSerializable()
 class MsgTheLoungeResponseBody extends TheLoungeResponseBodyPart {
@@ -116,9 +235,16 @@ class MsgTheLoungeResponseBody extends TheLoungeResponseBodyPart {
   List<dynamic> previews;
   int id;
 
-
-  MsgTheLoungeResponseBody(this.from, this.type, this.time, this.text,
-      this.self, this.highlight, this.showInActive, this.users, this.previews,
+  MsgTheLoungeResponseBody(
+      this.from,
+      this.type,
+      this.time,
+      this.text,
+      this.self,
+      this.highlight,
+      this.showInActive,
+      this.users,
+      this.previews,
       this.id);
 
   @override
@@ -128,14 +254,12 @@ class MsgTheLoungeResponseBody extends TheLoungeResponseBodyPart {
 
   factory MsgTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$MsgTheLoungeResponseBodyFromJson(json);
-
 }
 
 @JsonSerializable()
 class MsgFromTheLoungeResponseBody extends TheLoungeResponseBodyPart {
   dynamic mode;
   String nick;
-
 
   MsgFromTheLoungeResponseBody(this.mode, this.nick);
 
@@ -146,14 +270,91 @@ class MsgFromTheLoungeResponseBody extends TheLoungeResponseBodyPart {
 
   factory MsgFromTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$MsgFromTheLoungeResponseBodyFromJson(json);
+}
+
+@JsonSerializable()
+class ConfigurationTheLoungeResponseBody extends TheLoungeResponseBody {
+  String defaultTheme;
+  Map<String, dynamic> defaults;
+  bool displayNetwork;
+  bool fileUpload;
+  bool ldapEnabled;
+  bool lockNetwork;
+  bool prefetch;
+  bool public;
+  bool useHexIp;
+  int fileUploadMaxSize;
+  String gitCommit;
+  String version;
+  List<dynamic> themes;
 
 
+  ConfigurationTheLoungeResponseBody(this.defaultTheme, this.defaults,
+      this.displayNetwork, this.fileUpload, this.ldapEnabled, this.lockNetwork,
+      this.prefetch, this.public, this.useHexIp, this.fileUploadMaxSize,
+      this.gitCommit, this.version, this.themes);
+
+  factory ConfigurationTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$ConfigurationTheLoungeResponseBodyFromJson(json);
+}
+
+@JsonSerializable()
+class InitTheLoungeResponseBody extends TheLoungeResponseBody {
+  int active;
+  String applicationServerKey;
+  String token;
+  List<NetworkTheLoungeResponseBody> networks;
+
+
+  InitTheLoungeResponseBody(this.active, this.applicationServerKey, this.token,
+      this.networks);
+
+  factory InitTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$InitTheLoungeResponseBodyFromJson(json);
+}
+
+@JsonSerializable()
+class NamesTheLoungeResponseBody extends TheLoungeResponseBody {
+  int id;
+  List<UserTheLoungeResponseBodyPart> users;
+
+
+  NamesTheLoungeResponseBody(this.id, this.users);
+
+  factory NamesTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$NamesTheLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
+class TopicTheLoungeResponseBody extends TheLoungeResponseBody {
+  int chan;
+  String topic;
+
+
+  TopicTheLoungeResponseBody(this.chan, this.topic);
+
+  factory TopicTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$TopicTheLoungeResponseBodyFromJson(json);
+}
+
+@JsonSerializable()
+class UserTheLoungeResponseBodyPart extends TheLoungeResponseBodyPart {
+  int lastMessage;
+  String mode;
+  String nick;
+
+
+  UserTheLoungeResponseBodyPart(this.lastMessage, this.mode, this.nick);
+
+  factory UserTheLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$UserTheLoungeResponseBodyPartFromJson(json);
 }
 
 @JsonSerializable()
 class NetworksTheLoungeResponseBody extends TheLoungeResponseBody {
-  List<NetworkTheLoungeResponseBody> networks;
 
+  List<NetworkTheLoungeResponseBody> networks;
 
   @override
   String toString() {
@@ -171,10 +372,10 @@ class NetworkTheLoungeResponseBody extends TheLoungeResponseBodyPart {
   String uuid;
   String name;
   String host;
-  String port;
+  int port;
   String lts;
-  String userDisconnected;
-  String rejectUnauthorized;
+  bool userDisconnected;
+  bool rejectUnauthorized;
   String nick;
   String username;
   String realname;
@@ -183,16 +384,26 @@ class NetworkTheLoungeResponseBody extends TheLoungeResponseBodyPart {
   Map<String, dynamic> serverOptions;
   Map<String, dynamic> status;
 
-
   @override
   String toString() {
     return 'NetworkTheLoungeResponseBody{uuid: $uuid, name: $name, host: $host, port: $port, lts: $lts, userDisconnected: $userDisconnected, rejectUnauthorized: $rejectUnauthorized, nick: $nick, username: $username, realname: $realname, commands: $commands, channels: $channels, serverOptions: $serverOptions, status: $status}';
   }
 
-  NetworkTheLoungeResponseBody(this.uuid, this.name, this.host, this.port,
-      this.lts, this.userDisconnected, this.rejectUnauthorized, this.nick,
-      this.username, this.realname, this.commands, this.channels,
-      this.serverOptions, this.status);
+  NetworkTheLoungeResponseBody(
+      this.uuid,
+      this.name,
+      this.host,
+      this.port,
+      this.lts,
+      this.userDisconnected,
+      this.rejectUnauthorized,
+      this.nick,
+      this.username,
+      this.realname,
+      this.commands,
+      this.channels,
+      this.serverOptions,
+      this.status);
 
   factory NetworkTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NetworkTheLoungeResponseBodyFromJson(json);
@@ -213,15 +424,24 @@ class ChannelTheLoungeResponseBody extends TheLoungeResponseBodyPart {
   int highlight;
   List<dynamic> users;
 
-
   @override
   String toString() {
     return 'ChannelTheLoungeResponseBody{name: $name, type: $type, id: $id, messages: $messages, moreHistoryAvailable: $moreHistoryAvailable, key: $key, topic: $topic, state: $state, firstUnread: $firstUnread, unread: $unread, highlight: $highlight, users: $users}';
   }
 
-  ChannelTheLoungeResponseBody(this.name, this.type, this.id,
-      this.messages, this.moreHistoryAvailable, this.key, this.topic,
-      this.state, this.firstUnread, this.unread, this.highlight, this.users);
+  ChannelTheLoungeResponseBody(
+      this.name,
+      this.type,
+      this.id,
+      this.messages,
+      this.moreHistoryAvailable,
+      this.key,
+      this.topic,
+      this.state,
+      this.firstUnread,
+      this.unread,
+      this.highlight,
+      this.users);
 
   factory ChannelTheLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ChannelTheLoungeResponseBodyFromJson(json);
