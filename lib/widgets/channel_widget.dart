@@ -56,7 +56,7 @@ class ChannelWidget extends StatelessWidget {
                 children: <Widget>[
                   Expanded(child: MessagesListChannelWidget()),
                   Container(
-                    decoration: BoxDecoration(color: Colors.red),
+                      decoration: BoxDecoration(color: Colors.red),
                       child: EnterMessageChannelWidget())
                 ],
               ),
@@ -79,50 +79,57 @@ class MessagesListChannelWidget extends StatelessWidget {
             return Text(AppLocalizations.of(context).tr("chat.empty_chat"));
           } else {
             return Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(10.0),
               child: ListView.builder(
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context, int index) {
                     ChannelMessage message = snapshot.data[index];
 
-                    if (message.text == null) {
-                      message.text = "";
+                    if (message.text == null || message.text.isEmpty) {
+                      return Container();
                     }
+
                     if (message.author == null) {
                       message.author = "";
                     }
-                    return Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Row(
-                              children: <Widget>[
-                                Text(
-                                  message.author,
-                                  style: Theme.of(context).textTheme.body2,
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Container(
+                        decoration:
+                            BoxDecoration(border: Border.all(color: Colors.red)),
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      message.author,
+                                      style: Theme.of(context).textTheme.body2,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Text(
+                                        message.date.toString(),
+                                        style:
+                                            Theme.of(context).textTheme.body2,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Text(
-                                    message.date.toString(),
-                                    style: Theme.of(context).textTheme.body2,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text("${message.type}: ${message.text}"),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Column(
-                              children: <Widget>[
-                                Text(message.type),
-                                Text(message.text),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     );
                   }),
