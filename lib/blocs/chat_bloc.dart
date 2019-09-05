@@ -34,7 +34,9 @@ class ChatBloc extends Providable {
         newNetworks.add(newNetwork);
       }
 
-      changeAvailableNetworks(newNetworks);
+      _networks.addAll(newNetworks);
+
+      _onNetworksListChanged();
     });
 
     _joinSubscription = lounge.outJoin.listen((event) {
@@ -49,19 +51,6 @@ class ChatBloc extends Providable {
     });
   }
 
-  void changeAvailableNetworks(Set<Network> newNetworks) {
-
-    _networks = newNetworks;
-
-    _onNetworksListChanged();
-
-    if (_activeChannel == null) {
-      var allChannels = _calculateAvailableChannels();
-      if (allChannels.length > 0) {
-        changeActiveChanel(allChannels.elementAt(0));
-      }
-    }
-  }
 
   List<Channel> _calculateAvailableChannels() {
     var allChannels = List<Channel>();
@@ -96,6 +85,13 @@ class ChatBloc extends Providable {
   void _onNetworksListChanged() {
     logi(_logTag, "_onNetworksListChanged $_networks");
     _networkController.sink.add(UnmodifiableListView(_networks));
+
+    if (_activeChannel == null) {
+      var allChannels = _calculateAvailableChannels();
+      if (allChannels.length > 0) {
+        changeActiveChanel(allChannels.elementAt(0));
+      }
+    }
   }
 
   void dispose() {
