@@ -2,22 +2,24 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter_appirc/models/chat_model.dart';
-import 'package:flutter_appirc/models/thelounge_model.dart';
+import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/provider.dart';
 import 'package:flutter_appirc/service/log_service.dart';
-import 'package:flutter_appirc/service/thelounge_service.dart';
+import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:rxdart/rxdart.dart';
 
 const String _logTag = "ChatBloc";
 
 class ChatBloc extends Providable {
-  final TheLoungeService lounge;
+  final LoungeService lounge;
 
 
-  StreamSubscription<NetworksTheLoungeResponseBody> _networksSubscription;
-  StreamSubscription<JoinTheLoungeResponseBody> _joinSubscription;
+  StreamSubscription<NetworksLoungeResponseBody> _networksSubscription;
+  StreamSubscription<JoinLoungeResponseBody> _joinSubscription;
 
   ChatBloc(this.lounge) {
+
+    logi(_logTag, "start creating");
 
     _networksSubscription = lounge.outNetworks.listen((event) {
       var newNetworks = Set<Network>();
@@ -47,6 +49,8 @@ class ChatBloc extends Providable {
       changeActiveChanel(newChannel);
 
     });
+
+    logi(_logTag, "stop creating");
   }
 
 
@@ -61,8 +65,8 @@ class ChatBloc extends Providable {
 
   Set<Network> _networks = Set<Network>();
 
-  void newNetwork(ChannelsConnectionInfo channelConnectionInfo) =>
-      lounge.newNetwork(channelConnectionInfo);
+  newNetwork(IRCConnectionInfo channelConnectionInfo) async =>
+      await lounge.sendNewNetworkRequest(channelConnectionInfo);
 
   BehaviorSubject<List<Network>> _networkController =
       new BehaviorSubject<List<Network>>(seedValue: []);
@@ -107,7 +111,7 @@ class ChatBloc extends Providable {
     _activeChannel = newActiveChannel;
     _activeChannelController.sink.add(newActiveChannel);
 
-    lounge.open(newActiveChannel);
-    lounge.names(newActiveChannel);
+    lounge.sendOpenRequest(newActiveChannel);
+    lounge.sendNamesRequest(newActiveChannel);
   }
 }

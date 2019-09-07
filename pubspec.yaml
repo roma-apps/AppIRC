@@ -35,6 +35,8 @@ dependencies:
   logger_flutter: ^0.7.1
   # bloc provider streams
   rxdart: ^0.18.1
+  # loading indicator
+  loading: ^1.0.1
 
 
 dev_dependencies:

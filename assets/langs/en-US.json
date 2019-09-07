@@ -1,5 +1,26 @@
 {
-  "new_connection": {
+  "lounge_connection": {
+    "title": "Lounge connection",
+    "settings": "Settings",
+    "host": "Host",
+    "connect": "Connect",
+    "dialog": {
+      "already_connected": {
+        "title": "Already connected",
+        "content": "Disconnect from current Lounge server and try again"
+      },
+      "connection_timeout": {
+        "title": "Connection timeout",
+        "content": "Check your network and try again"
+      },
+      "connection_error": {
+        "title": "Connection error",
+        "content": "Error during connection: {}"
+      }
+    }
+  },
+
+  "irc_connection": {
     "title": "New IRC connection",
     "network_prefs": {
       "title": "Network preferences",
@@ -16,10 +37,6 @@
       "real_name": "Real name",
       "user_name": "User name",
       "channels": "Channels"
-    },
-    "lounge": {
-      "title": "Lounge",
-      "host": "Host"
     },
     "connect": "Connect"
   },

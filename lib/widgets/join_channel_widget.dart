@@ -1,9 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/join_channel_bloc.dart';
 import 'package:flutter_appirc/models/chat_model.dart';
 import 'package:flutter_appirc/provider.dart';
-import 'package:flutter_appirc/service/thelounge_service.dart';
+import 'package:flutter_appirc/service/lounge_service.dart';
+import 'package:flutter_appirc/widgets/loading_button_widget.dart';
 
 import 'form_widgets.dart';
 
@@ -29,8 +31,8 @@ class JoinChannelFormState extends State<JoinChannelFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final TheLoungeService loungeService =
-        Provider.of<TheLoungeService>(context);
+    final LoungeService loungeService =
+        Provider.of<LoungeService>(context);
 
     var joinChannelBloc = JoinChannelBloc(loungeService, network);
 
@@ -40,17 +42,24 @@ class JoinChannelFormState extends State<JoinChannelFormWidget> {
             channelController, (value) {}),
         formTextRow(AppLocalizations.of(context).tr('join_channel.password'),
             passwordController, (value) {}),
-        RaisedButton(
-          child: Text(AppLocalizations.of(context).tr('join_channel.join')),
-          onPressed: () {
-            var password = passwordController.text;
-            var channel = channelController.text;
-
-            joinChannelBloc.joinChannel(channel, password);
-            connectCallback();
-          },
+        Provider<AsyncOperationBloc>(
+          bloc: joinChannelBloc,
+          child: LoadingButtonWidget(
+            child: Text(AppLocalizations.of(context).tr('join_channel.join')),
+            onPressed: () {
+              sendJoinChannelMessage(joinChannelBloc);
+            },
+          ),
         )
       ],
     );
+  }
+
+  void sendJoinChannelMessage(JoinChannelBloc joinChannelBloc) async {
+      var password = passwordController.text;
+    var channel = channelController.text;
+    
+    await joinChannelBloc.sendJoinChannelRequest(channel, password);
+    connectCallback();
   }
 }

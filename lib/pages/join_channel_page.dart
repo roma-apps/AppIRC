@@ -1,9 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appirc/models/chat_model.dart';
-import 'package:flutter_appirc/pages/chat_page.dart';
 import 'package:flutter_appirc/widgets/join_channel_widget.dart';
-import 'package:flutter_appirc/widgets/new_connection_widget.dart';
 
 class JoinChannelPage extends StatefulWidget {
   final Network network;

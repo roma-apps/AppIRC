@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_appirc/models/thelounge_model.dart';
+import 'package:flutter_appirc/models/lounge_model.dart';
 
 class Channel {
   String name;
@@ -52,13 +52,13 @@ class ChannelMessage {
 
 }
 
-class ChannelsConnectionInfo {
+class IRCConnectionInfo {
   NetworkPreferences networkPreferences;
   UserPreferences userPreferences;
   String channels;
-  static const String defaultChannels = "#thelounge-spam";
+  static const String defaultChannels = "#lounge-spam";
 
-  ChannelsConnectionInfo(
+  IRCConnectionInfo(
       {this.networkPreferences, this.userPreferences, this.channels});
 }
 

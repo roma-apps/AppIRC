@@ -2,19 +2,19 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter_appirc/models/chat_model.dart';
-import 'package:flutter_appirc/models/thelounge_model.dart';
+import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/provider.dart';
 import 'package:flutter_appirc/service/log_service.dart';
-import 'package:flutter_appirc/service/thelounge_service.dart';
+import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:rxdart/rxdart.dart';
 
 const String _logTag = "ChannelBloc";
 
 class ChannelTopicBloc extends Providable {
-  final TheLoungeService lounge;
+  final LoungeService lounge;
   final Channel channel;
 
-  StreamSubscription<TopicTheLoungeResponseBody> _topicSubscription;
+  StreamSubscription<TopicLoungeResponseBody> _topicSubscription;
 
   ChannelTopicBloc(this.lounge, this.channel) {
     logi(_logTag, "Create topic bloc for ${channel.name}");
@@ -41,10 +41,10 @@ class ChannelTopicBloc extends Providable {
 }
 
 class ChannelBloc extends Providable {
-  final TheLoungeService lounge;
+  final LoungeService lounge;
   final Channel channel;
 
-  StreamSubscription<MessageTheLoungeResponseBody> _messagesSubscription;
+  StreamSubscription<MessageLoungeResponseBody> _messagesSubscription;
 
 
   ChannelBloc(this.lounge, this.channel) {
@@ -81,5 +81,5 @@ class ChannelBloc extends Providable {
 
   }
 
-  sendMessage(String text) => lounge.sendChatMessage(channel.remoteId, text);
+  sendMessage(String text) => lounge.sendChatMessageRequest(channel.remoteId, text);
 }
