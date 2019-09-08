@@ -1,9 +1,7 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/blocs/lounge_connection_bloc.dart';
+import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
 import 'package:flutter_appirc/provider.dart';
-import 'package:flutter_appirc/service/lounge_service.dart';
 
 import 'form_widgets.dart';
 
@@ -14,21 +12,21 @@ class LoungePreferencesConnectionFormWidget extends StatefulWidget {
 
 class LoungePreferencesConnectionFormState
     extends State<LoungePreferencesConnectionFormWidget> {
-  final hostController =
-  TextEditingController(text: LoungeService.defaultLoungeHost);
+  final hostController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final LoungeConnectionBloc lounge = Provider.of<LoungeConnectionBloc>(context);
+    final NewLoungeConnectionBloc lounge =
+        Provider.of<NewLoungeConnectionBloc>(context);
 
+    hostController.text = lounge.newConnectionPreferences.host;
     return Column(
       children: <Widget>[
         formTitle(context,
             AppLocalizations.of(context).tr('lounge_connection.settings')),
-        formTextRow(
-            AppLocalizations.of(context).tr('lounge_connection.host'),
+        formTextRow(AppLocalizations.of(context).tr('lounge_connection.host'),
             hostController, (value) {
-          lounge.host = value;
+          lounge.newConnectionPreferences.host = value;
         }),
       ],
     );

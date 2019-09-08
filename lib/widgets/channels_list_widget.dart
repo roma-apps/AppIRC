@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appirc/blocs/chat_bloc.dart';
 import 'package:flutter_appirc/models/chat_model.dart';
 import 'package:flutter_appirc/pages/join_channel_page.dart';
-import 'package:flutter_appirc/pages/irc_connection_page.dart';
+import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
 import 'package:flutter_appirc/provider.dart';
 
 class ChannelsListWidget extends StatelessWidget {
@@ -120,7 +120,7 @@ class ChannelsListWidget extends StatelessWidget {
             AppLocalizations.of(context).tr('chat.channels.new_connection')),
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => IRCConnectionPage()));
+              MaterialPageRoute(builder: (context) => IRCNetworksNewConnectionPage()));
         },
       );
 

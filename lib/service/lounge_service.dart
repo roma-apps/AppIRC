@@ -76,7 +76,6 @@ class ConnectionErrorException implements ConnectionException {
 }
 
 class LoungeService extends Providable {
-  static const String defaultLoungeHost = "https://demo.lounge.chat/";
 
   SocketIOManager socketIOManager;
   SocketIOService socketIOService;
@@ -154,23 +153,26 @@ class LoungeService extends Providable {
   _sendCommand(LoungeRequest request) async =>
       await socketIOService.emit(request);
 
-  connect(String host) async {
-    logi(_logTag, "start connecting");
+  Future<bool> connect(LoungePreferences preferences) async {
+    logi(_logTag, "start connecting to $preferences");
     if (isProbablyConnected) {
       throw AlreadyConnectedException();
     }
 
-    socketIOService = SocketIOService(socketIOManager, host);
+    socketIOService = SocketIOService(socketIOManager, preferences.host);
     logi(_logTag, "start init socket service");
     await socketIOService.init();
     _addSubscriptions();
 
+
+    var connected = false;
     var responseReceived = false;
 
     Exception connectionException;
 
     var connectListener = (_) {
       logi(_logTag, "connecting onConnect");
+      connected = true;
       responseReceived = true;
     };
     socketIOService.onConnect(connectListener);
@@ -204,6 +206,8 @@ class LoungeService extends Providable {
     if (connectionException != null) {
       throw connectionException;
     }
+
+    return connected;
   }
 
   disconnect() async {
@@ -239,7 +243,7 @@ class LoungeService extends Providable {
       await _sendCommand(
           LoungeRawRequest(name: "names", body: [channel.remoteId]));
 
-  sendNewNetworkRequest(IRCConnectionInfo channelConnectionInfo) async {
+  sendNewNetworkRequest(IRCNetworkPreferences channelConnectionInfo) async {
     var networkPreferences = channelConnectionInfo.networkPreferences;
     var userPreferences = channelConnectionInfo.userPreferences;
     await _sendCommand(LoungeJsonRequest(
@@ -247,7 +251,7 @@ class LoungeService extends Providable {
         body: NetworkNewLoungeRequestBody(
           username: userPreferences.username,
           nick: userPreferences.nickname,
-          join: channelConnectionInfo.channels,
+          join: channelConnectionInfo.channels.join(" "),
           realname: userPreferences.realName,
           password: userPreferences.password,
           host: networkPreferences.serverHost,

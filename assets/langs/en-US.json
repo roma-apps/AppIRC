@@ -1,4 +1,8 @@
 {
+  "app_name" : "AppIRC",
+  "splash" : {
+    "loading": "Loading"
+  },
   "lounge_connection": {
     "title": "Lounge connection",
     "settings": "Settings",

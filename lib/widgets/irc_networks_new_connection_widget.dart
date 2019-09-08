@@ -1,11 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/blocs/irc_connection_bloc.dart';
-
-import 'package:flutter_appirc/models/chat_model.dart';
+import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
 import 'package:flutter_appirc/provider.dart';
-import 'form_widgets.dart';
 
+import 'form_widgets.dart';
 
 class UserPreferencesConnectionFormWidget extends StatefulWidget {
   @override
@@ -14,22 +12,18 @@ class UserPreferencesConnectionFormWidget extends StatefulWidget {
 
 class UserPreferencesConnectionFormState
     extends State<UserPreferencesConnectionFormWidget> {
-  final nicknameController =
-      TextEditingController(text: UserPreferences.defaultNick);
-  final channelsController =
-      TextEditingController(text: IRCConnectionInfo.defaultChannels);
+  final nicknameController = TextEditingController();
+  final channelsController = TextEditingController();
   final passwordController = TextEditingController();
-  final realNameController =
-      TextEditingController(text: UserPreferences.defaultRealName);
-  final userNameController =
-      TextEditingController(text: UserPreferences.defaultUserName);
+  final realNameController = TextEditingController();
+  final userNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final IRCConnectionBloc ircConnectionBloc =
-        Provider.of<IRCConnectionBloc>(context);
+    final IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc =
+        Provider.of<IRCNetworksNewConnectionBloc>(context);
 
-    fillPreferences(ircConnectionBloc);
+    fillPreferencesToUI(ircNetworksNewConnectionBloc);
 
     return Column(
       children: <Widget>[
@@ -38,45 +32,53 @@ class UserPreferencesConnectionFormState
         formTextRow(
             AppLocalizations.of(context).tr('irc_connection.user_prefs.nick'),
             nicknameController,
-            (value) => fillPreferences(ircConnectionBloc)),
+            (value) => fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         formTextRow(
             AppLocalizations.of(context)
                 .tr('irc_connection.user_prefs.password'),
             passwordController,
-            (value) => fillPreferences(ircConnectionBloc)),
+            (value) => fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         formTextRow(
             AppLocalizations.of(context)
                 .tr('irc_connection.user_prefs.real_name'),
             realNameController,
-            (value) => fillPreferences(ircConnectionBloc)),
+            (value) => fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         formTextRow(
             AppLocalizations.of(context)
                 .tr('irc_connection.user_prefs.user_name'),
             userNameController,
-            (value) => fillPreferences(ircConnectionBloc)),
+            (value) => fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         formTextRow(
             AppLocalizations.of(context)
                 .tr('irc_connection.user_prefs.channels'),
             channelsController,
-            (value) => fillPreferences(ircConnectionBloc))
+            (value) => fillPreferencesFromUI(ircNetworksNewConnectionBloc))
       ],
     );
   }
 
-  void fillPreferences(IRCConnectionBloc ircConnectionBloc) {
-    final IRCConnectionBloc ircConnectionBloc =
-        Provider.of<IRCConnectionBloc>(context);
-
-    var connection = ircConnectionBloc.connection;
+  void fillPreferencesFromUI(
+      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc) {
+    var connection = ircNetworksNewConnectionBloc.newConnectionPreferences;
     var preferences = connection.userPreferences;
     preferences.password = passwordController.text;
     preferences.nickname = nicknameController.text;
-    connection.channels = channelsController.text;
+    connection.channels = channelsController.text.split(" ");
     preferences.realName = realNameController.text;
     preferences.username = userNameController.text;
   }
-}
 
+  void fillPreferencesToUI(
+      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc) {
+    var connection = ircNetworksNewConnectionBloc.newConnectionPreferences;
+    var preferences = connection.userPreferences;
+    passwordController.text = preferences.password;
+    nicknameController.text = preferences.nickname;
+    channelsController.text = connection.channels.join(" ");
+    realNameController.text = preferences.realName;
+    userNameController.text = preferences.username;
+  }
+}
 
 class NetworkPreferencesConnectionFormWidget extends StatefulWidget {
   @override
@@ -86,21 +88,17 @@ class NetworkPreferencesConnectionFormWidget extends StatefulWidget {
 
 class NetworkPreferencesConnectionFormState
     extends State<NetworkPreferencesConnectionFormWidget> {
-  final nameController =
-      TextEditingController(text: NetworkPreferences.defaultName);
-  final serverController =
-      TextEditingController(text: NetworkPreferences.defaultHost);
-  final portController =
-      TextEditingController(text: NetworkPreferences.defaultPort);
-  bool tlsEnabled = NetworkPreferences.defaultUseTls;
-  bool onlyTrustedCertificatesEnabled =
-      NetworkPreferences.defaultUseOnlyTrustedCertificates;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController serverController = TextEditingController();
+  final TextEditingController portController = TextEditingController();
+  bool tlsEnabled;
+  bool onlyTrustedCertificatesEnabled;
 
   @override
   Widget build(BuildContext context) {
-    final IRCConnectionBloc ircConnectionBloc =
-        Provider.of<IRCConnectionBloc>(context);
-    fillPreferences(ircConnectionBloc);
+    final IRCNetworksNewConnectionBloc ircConnectionBloc =
+        Provider.of<IRCNetworksNewConnectionBloc>(context);
+    fillPreferencesToUI(ircConnectionBloc);
     return Column(
       children: <Widget>[
         formTitle(
@@ -111,24 +109,24 @@ class NetworkPreferencesConnectionFormState
             AppLocalizations.of(context)
                 .tr('irc_connection.network_prefs.name'),
             nameController,
-            (newValue) => fillPreferences(ircConnectionBloc)),
+            (newValue) => fillPreferencesFromUI(ircConnectionBloc)),
         formTextRow(
             AppLocalizations.of(context)
                 .tr('irc_connection.network_prefs.server_host'),
             serverController,
-            (newValue) => fillPreferences(ircConnectionBloc)),
+            (newValue) => fillPreferencesFromUI(ircConnectionBloc)),
         formTextRow(
             AppLocalizations.of(context)
                 .tr('irc_connection.network_prefs.server_port'),
             portController,
-            (newValue) => fillPreferences(ircConnectionBloc)),
+            (newValue) => fillPreferencesFromUI(ircConnectionBloc)),
         formBooleanRow(
             AppLocalizations.of(context)
                 .tr('irc_connection.network_prefs.use_tls'),
             tlsEnabled, (newValue) {
           setState(() {
             tlsEnabled = newValue;
-            fillPreferences(ircConnectionBloc);
+            fillPreferencesFromUI(ircConnectionBloc);
           });
         }),
         formBooleanRow(
@@ -137,19 +135,32 @@ class NetworkPreferencesConnectionFormState
             onlyTrustedCertificatesEnabled, (newValue) {
           setState(() {
             onlyTrustedCertificatesEnabled = newValue;
-            fillPreferences(ircConnectionBloc);
+            fillPreferencesFromUI(ircConnectionBloc);
           });
         })
       ],
     );
   }
 
-  void fillPreferences(IRCConnectionBloc ircConnectionBloc) {
-    var preferences = ircConnectionBloc.connection.networkPreferences;
+  void fillPreferencesFromUI(
+      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc) {
+    var preferences = ircNetworksNewConnectionBloc
+        .newConnectionPreferences.networkPreferences;
     preferences.useOnlyTrustedCertificates = onlyTrustedCertificatesEnabled;
     preferences.useTls = tlsEnabled;
     preferences.serverPort = portController.text;
     preferences.serverHost = serverController.text;
     preferences.name = nameController.text;
+  }
+
+  void fillPreferencesToUI(
+      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc) {
+    var preferences = ircNetworksNewConnectionBloc
+        .newConnectionPreferences.networkPreferences;
+    onlyTrustedCertificatesEnabled = preferences.useOnlyTrustedCertificates;
+    tlsEnabled = preferences.useTls;
+    portController.text = preferences.serverPort;
+    serverController.text = preferences.serverHost;
+    nameController.text = preferences.name;
   }
 }

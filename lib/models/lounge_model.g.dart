@@ -6,6 +6,17 @@ part of 'lounge_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+LoungePreferences _$LoungePreferencesFromJson(Map<String, dynamic> json) {
+  return LoungePreferences(
+    host: json['host'] as String,
+  );
+}
+
+Map<String, dynamic> _$LoungePreferencesToJson(LoungePreferences instance) =>
+    <String, dynamic>{
+      'host': instance.host,
+    };
+
 InputLoungeRequestBody _$InputLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return InputLoungeRequestBody(
@@ -58,8 +69,7 @@ MessageLoungeResponseBody _$MessageLoungeResponseBodyFromJson(
     json['chan'] as int,
     json['msg'] == null
         ? null
-        : MsgLoungeResponseBody.fromJson(
-            json['msg'] as Map<String, dynamic>),
+        : MsgLoungeResponseBody.fromJson(json['msg'] as Map<String, dynamic>),
   );
 }
 
@@ -107,8 +117,8 @@ Map<String, dynamic> _$NetworkStatusLoungeResponseBodyToJson(
       'secure': instance.secure,
     };
 
-NetworkOptionsLoungeResponseBody
-    _$NetworkOptionsLoungeResponseBodyFromJson(Map<String, dynamic> json) {
+NetworkOptionsLoungeResponseBody _$NetworkOptionsLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
   return NetworkOptionsLoungeResponseBody(
     json['network'] as String,
     json['serverOptions'] as Map<String, dynamic>,

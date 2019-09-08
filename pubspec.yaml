@@ -36,7 +36,11 @@ dependencies:
   # bloc provider streams
   rxdart: ^0.18.1
   # loading indicator
-  loading: ^1.0.1
+  flutter_spinkit: "^4.0.0"
+
+  # shared_preferences lib and rx wrapper for shared_preferences
+  # used for connection/channels settings
+  streaming_shared_preferences: ^1.0.1
 
 
 dev_dependencies:

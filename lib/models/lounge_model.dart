@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_appirc/models/preferences_model.dart';
 import 'package:flutter_appirc/models/socketio_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -6,6 +7,24 @@ part 'lounge_model.g.dart';
 
 const String loungeOn = "on";
 const String loungeOff = "off";
+
+@JsonSerializable()
+class LoungePreferences extends Preferences {
+  String host;
+
+  LoungePreferences({@required this.host});
+
+  @override
+  String toString() {
+    return 'LoungeConnectionPreferences{host: $host}';
+  }
+
+  @override
+  Map<String, dynamic> toJson() => _$LoungePreferencesToJson(this);
+
+  factory LoungePreferences.fromJson(Map<String, dynamic> json) =>
+      _$LoungePreferencesFromJson(json);
+}
 
 abstract class LoungeRequest extends SocketIOCommand {
   String name;
@@ -46,8 +65,7 @@ class LoungeJsonRequest extends LoungeRequest {
 class LoungeRawRequest extends LoungeRequest {
   List<dynamic> body;
 
-  LoungeRawRequest({@required String name, this.body = const []})
-      : super(name);
+  LoungeRawRequest({@required String name, this.body = const []}) : super(name);
 
   @override
   List<dynamic> getBody() => body;
@@ -126,13 +144,11 @@ class MessageLoungeResponseBody extends LoungeResponseBody {
       _$MessageLoungeResponseBodyFromJson(json);
 }
 
-
 @JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {
   ChannelLoungeResponseBody chan;
   int index;
   String network;
-
 
   JoinLoungeResponseBody(this.chan, this.index, this.network);
 
@@ -145,16 +161,13 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
       _$JoinLoungeResponseBodyFromJson(json);
 }
 
-
 @JsonSerializable()
 class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
   bool connected;
   String network;
   bool secure;
 
-
   NetworkStatusLoungeResponseBody(this.connected, this.network, this.secure);
-
 
   @override
   String toString() {
@@ -165,37 +178,29 @@ class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
       _$NetworkStatusLoungeResponseBodyFromJson(json);
 }
 
-
-
 @JsonSerializable()
 class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
-
   String network;
   Map<String, dynamic> serverOptions;
 
-
   NetworkOptionsLoungeResponseBody(this.network, this.serverOptions);
-
 
   @override
   String toString() {
     return 'NetworkOptionsLoungeResponseBody{network: $network, serverOptions: $serverOptions}';
   }
 
-  factory NetworkOptionsLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+  factory NetworkOptionsLoungeResponseBody.fromJson(
+          Map<String, dynamic> json) =>
       _$NetworkOptionsLoungeResponseBodyFromJson(json);
 }
 
-
 @JsonSerializable()
 class ChannelStateLoungeResponseBody extends LoungeResponseBody {
-
   int chan;
   int state;
 
-
   ChannelStateLoungeResponseBody(this.chan, this.state);
-
 
   @override
   String toString() {
@@ -206,15 +211,10 @@ class ChannelStateLoungeResponseBody extends LoungeResponseBody {
       _$ChannelStateLoungeResponseBodyFromJson(json);
 }
 
-
-
-
-
 @JsonSerializable()
 class UsersLoungeResponseBody extends LoungeResponseBody {
   int chan;
   dynamic msg;
-
 
   UsersLoungeResponseBody(this.chan, this.msg);
 
@@ -235,17 +235,8 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
   List<dynamic> previews;
   int id;
 
-  MsgLoungeResponseBody(
-      this.from,
-      this.type,
-      this.time,
-      this.text,
-      this.self,
-      this.highlight,
-      this.showInActive,
-      this.users,
-      this.previews,
-      this.id);
+  MsgLoungeResponseBody(this.from, this.type, this.time, this.text, this.self,
+      this.highlight, this.showInActive, this.users, this.previews, this.id);
 
   @override
   String toString() {
@@ -288,11 +279,20 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
   String version;
   List<dynamic> themes;
 
-
-  ConfigurationLoungeResponseBody(this.defaultTheme, this.defaults,
-      this.displayNetwork, this.fileUpload, this.ldapEnabled, this.lockNetwork,
-      this.prefetch, this.public, this.useHexIp, this.fileUploadMaxSize,
-      this.gitCommit, this.version, this.themes);
+  ConfigurationLoungeResponseBody(
+      this.defaultTheme,
+      this.defaults,
+      this.displayNetwork,
+      this.fileUpload,
+      this.ldapEnabled,
+      this.lockNetwork,
+      this.prefetch,
+      this.public,
+      this.useHexIp,
+      this.fileUploadMaxSize,
+      this.gitCommit,
+      this.version,
+      this.themes);
 
   factory ConfigurationLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ConfigurationLoungeResponseBodyFromJson(json);
@@ -305,9 +305,8 @@ class InitLoungeResponseBody extends LoungeResponseBody {
   String token;
   List<NetworkLoungeResponseBody> networks;
 
-
-  InitLoungeResponseBody(this.active, this.applicationServerKey, this.token,
-      this.networks);
+  InitLoungeResponseBody(
+      this.active, this.applicationServerKey, this.token, this.networks);
 
   factory InitLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$InitLoungeResponseBodyFromJson(json);
@@ -318,19 +317,16 @@ class NamesLoungeResponseBody extends LoungeResponseBody {
   int id;
   List<UserLoungeResponseBodyPart> users;
 
-
   NamesLoungeResponseBody(this.id, this.users);
 
   factory NamesLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NamesLoungeResponseBodyFromJson(json);
 }
 
-
 @JsonSerializable()
 class TopicLoungeResponseBody extends LoungeResponseBody {
   int chan;
   String topic;
-
 
   @override
   String toString() {
@@ -349,7 +345,6 @@ class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
   String mode;
   String nick;
 
-
   UserLoungeResponseBodyPart(this.lastMessage, this.mode, this.nick);
 
   factory UserLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
@@ -358,7 +353,6 @@ class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class NetworksLoungeResponseBody extends LoungeResponseBody {
-
   List<NetworkLoungeResponseBody> networks;
 
   @override

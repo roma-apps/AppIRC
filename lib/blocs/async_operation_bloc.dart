@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -15,8 +16,10 @@ abstract class AsyncOperationBloc extends Providable {
   Stream<bool> get outInProgress => _inProgressController.stream;
 
 
+  @protected
   void onOperationStarted() => _newInProgressValue(true);
 
+  @protected
   void onOperationFinished() => _newInProgressValue(false);
 
   @override

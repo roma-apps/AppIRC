@@ -65,7 +65,7 @@ class ChatBloc extends Providable {
 
   Set<Network> _networks = Set<Network>();
 
-  newNetwork(IRCConnectionInfo channelConnectionInfo) async =>
+  newNetwork(IRCNetworkPreferences channelConnectionInfo) async =>
       await lounge.sendNewNetworkRequest(channelConnectionInfo);
 
   BehaviorSubject<List<Network>> _networkController =
