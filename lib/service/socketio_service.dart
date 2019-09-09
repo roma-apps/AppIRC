@@ -65,7 +65,7 @@ class SocketIOService {
 
 
   void offConnecting(SocketEventListener listener) =>
-      _socketIO.off(SocketIO.DISCONNECT,listener);
+      _socketIO.off(SocketIO.CONNECTING,listener);
 
   void offConnectError(SocketEventListener listener) =>
       _socketIO.off(SocketIO.CONNECT_ERROR,listener);
