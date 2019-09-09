@@ -26,40 +26,42 @@ class LoungeConnectionState extends State<LoungeNewConnectionPage> {
         preferencesBloc: Provider.of<LoungePreferencesBloc>(context),
         newLoungePreferences: createDefaultLoungePreferences());
 
-    return Provider<LoungeNewConnectionBloc>(
-      bloc: loungeConnectionBloc,
-      child: PlatformScaffold(
-        iosContentBottomPadding: true,
-        iosContentPadding: true,
-        appBar: PlatformAppBar(
-          title:
-              Text(AppLocalizations.of(context).tr('lounge_connection.title')),
-        ),
-        body: Column(
-          children: <Widget>[
-            Provider<LoungeNewConnectionBloc>(
-              bloc: loungeConnectionBloc,
-              child: LoungeNewConnectionWidget(),
-            ),
-            Provider<AsyncOperationBloc>(
-              bloc: loungeConnectionBloc,
-              child: ButtonLoadingWidget(
-                child: Text(AppLocalizations.of(context)
-                    .tr('lounge_connection.connect')),
-                onPressed: () => connectToLounge(context, loungeConnectionBloc)
-                    .then((connected) {
-                      if(connected) {
-                        Navigator.pushReplacement(
-                            context,
-                            platformPageRoute(
-                                builder: (context) => IRCNetworksNewConnectionPage(
-                                    isOpenedFromAppStart: true)));
-                      }
-
-                }),
+    return SafeArea(
+      child: Provider<LoungeNewConnectionBloc>(
+        bloc: loungeConnectionBloc,
+        child: PlatformScaffold(
+          iosContentBottomPadding: true,
+          iosContentPadding: true,
+          appBar: PlatformAppBar(
+            title:
+                Text(AppLocalizations.of(context).tr('lounge_connection.title')),
+          ),
+          body: Column(
+            children: <Widget>[
+              Provider<LoungeNewConnectionBloc>(
+                bloc: loungeConnectionBloc,
+                child: LoungeNewConnectionWidget(),
               ),
-            )
-          ],
+              Provider<AsyncOperationBloc>(
+                bloc: loungeConnectionBloc,
+                child: ButtonLoadingWidget(
+                  child: Text(AppLocalizations.of(context)
+                      .tr('lounge_connection.connect')),
+                  onPressed: () => connectToLounge(context, loungeConnectionBloc)
+                      .then((connected) {
+                        if(connected) {
+                          Navigator.pushReplacement(
+                              context,
+                              platformPageRoute(
+                                  builder: (context) => IRCNetworksNewConnectionPage(
+                                      isOpenedFromAppStart: true)));
+                        }
+
+                  }),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

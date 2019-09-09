@@ -32,7 +32,7 @@ class IRCNetworksListState extends State<IRCNetworksListPage> {
           appBar: PlatformAppBar(
             title: Text(AppLocalizations.of(context).tr('networks_list.title')),
           ),
-          body: IRCNetworksListWidget()
+          body: SafeArea(child: IRCNetworksListWidget())
       );
 
 }

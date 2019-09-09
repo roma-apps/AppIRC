@@ -39,22 +39,24 @@ class SplashScreenState extends State<SplashPage> {
     return PlatformScaffold(
         appBar: PlatformAppBar(title: Text(appLocalizations.tr("app_name"))),
         body: Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(appLocalizations.tr("splash.loading")),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SpinKitRotatingCircle(
-                    color: uiSkin.appSkin.accentColor,
-                    size: 50.0,
+          child: SafeArea(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(appLocalizations.tr("splash.loading")),
                   ),
-                )
-              ]),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SpinKitRotatingCircle(
+                      color: uiSkin.appSkin.accentColor,
+                      size: 50.0,
+                    ),
+                  )
+                ]),
+          ),
         ));
   }
 

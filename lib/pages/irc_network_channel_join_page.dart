@@ -26,20 +26,22 @@ class IRCNetworkChannelJoinPageState extends State<IRCNetworkChannelJoinPage> {
       appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('join_channel.title')),
       ),
-      body: ListView.builder(
-        itemCount: 1,
-        itemBuilder: (BuildContext context, int index) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: IRCNetworkChannelJoinWidget(network, () {
-                    Navigator.pop(context);
-                  })),
-            ],
-          );
-        },
+      body: SafeArea(
+        child: ListView.builder(
+          itemCount: 1,
+          itemBuilder: (BuildContext context, int index) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: IRCNetworkChannelJoinWidget(network, () {
+                      Navigator.pop(context);
+                    })),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
