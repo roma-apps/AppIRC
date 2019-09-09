@@ -16,7 +16,7 @@ class LoungeNewConnectionBloc extends AsyncOperationBloc {
       @required this.preferencesBloc,
       @required this.newLoungePreferences});
 
-  connect() async {
+  Future<bool> connect() async {
     onOperationStarted();
     var result = await loungeService.connect(newLoungePreferences);
     if (result) {

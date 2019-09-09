@@ -48,11 +48,14 @@ class LoungeConnectionState extends State<LoungeNewConnectionPage> {
                     .tr('lounge_connection.connect')),
                 onPressed: () => connectToLounge(context, loungeConnectionBloc)
                     .then((connected) {
-                  Navigator.pushReplacement(
-                      context,
-                      platformPageRoute(
-                          builder: (context) => IRCNetworksNewConnectionPage(
-                              isOpenedFromAppStart: true)));
+                      if(connected) {
+                        Navigator.pushReplacement(
+                            context,
+                            platformPageRoute(
+                                builder: (context) => IRCNetworksNewConnectionPage(
+                                    isOpenedFromAppStart: true)));
+                      }
+
                 }),
               ),
             )

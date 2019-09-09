@@ -148,13 +148,17 @@ class LoungeService extends Providable {
       await Future.delayed(_timeBetweenCheckingConnectionResponse);
     }
 
-    _logger.i(() => "finish connecting");
+    _logger.i(() => "finish connecting connected = $connected");
+
 
     socketIOService.offConnect(connectListener);
     socketIOService.offConnectTimeout(connectTimeoutListener);
     socketIOService.offConnectError(connectErrorListener);
 
+
+
     if (connectionException != null) {
+      disconnect();
       throw connectionException;
     }
 

@@ -104,10 +104,10 @@ Future<bool> connectToLounge(
     BuildContext context, LoungeNewConnectionBloc loungeConnectionBloc) async {
   _logger.i(() => "Connecting to $loungeConnectionBloc.");
 
-  bool connected = true;
+  bool connected;
   Exception exception;
   try {
-    await loungeConnectionBloc.connect();
+    connected = await loungeConnectionBloc.connect();
   } on Exception catch (e) {
     connected = false;
     exception = e;
@@ -116,6 +116,7 @@ Future<bool> connectToLounge(
 
   if (!connected) {
     showPlatformDialog(
+      androidBarrierDismissible: true,
       context: context,
       builder: (_) => buildLoungeConnectionErrorAlertDialog(context, exception),
     );
