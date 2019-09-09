@@ -1,48 +1,71 @@
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
+const bool logEnabled = true;
 
+/// Wrapper for logger
+/// It uses functions instead of dynamic types for args
+/// It helps avoid memory allocation when log disabled
 class MyLogger {
+  final bool enabled;
+  final String logTag;
+  final int methodCount;
+  final int errorMethodCount;
+  final bool printTime;
+  final bool printEmojis;
+  final bool colors;
+  final int lineLength;
 
-}
+  bool get globalAndLoggerEnabled => enabled && logEnabled;
 
-var _logger = Logger(
-  printer: PrettyPrinter(),
-);
+  Logger _logger;
 
-
-var _loggerNoStackTrace = Logger(
-  printer: PrettyPrinter(methodCount: 0),
-);
-
-
-void logd(String tag, dynamic message, {bool stackTrace = true}) {
-  if(stackTrace) {
-    _logger.d(createMessage(tag, message));
-  } else {
-    _loggerNoStackTrace.d(createMessage(tag, message));
+  MyLogger(
+      {@required this.logTag,
+      @required this.enabled,
+      this.methodCount = 0,
+      this.errorMethodCount = 8,
+      this.printTime = true,
+      this.printEmojis = true,
+      this.colors = true,
+      this.lineLength = 120}) {
+    if (globalAndLoggerEnabled) {
+      _logger = Logger(
+          printer: PrettyPrinter(
+              methodCount: methodCount,
+              errorMethodCount: errorMethodCount,
+              lineLength: lineLength,
+              colors: colors,
+              printEmojis: printEmojis,
+              printTime: printTime));
+    }
   }
 
-}
+  void i(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+    if (globalAndLoggerEnabled) {
+      _logger.i(message(), error != null ? error() : null,
+          stackTrace != null ? stackTrace() : null);
+    }
+  }
 
-String createMessage(String tag, message) => "$tag: $message";
-void logi(String tag, dynamic message, {bool stackTrace = false}) {
-  if(stackTrace) {
-    _logger.i(createMessage(tag, message));
-  } else {
-    _loggerNoStackTrace.i(createMessage(tag, message));
+  void d(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+    if (globalAndLoggerEnabled) {
+      _logger.d(message(), error != null ? error() : null,
+          stackTrace != null ? stackTrace() : null);
+    }
   }
-}
-void logw(String tag, dynamic message, {bool stackTrace = true}) {
-  if(stackTrace) {
-    _logger.w(createMessage(tag, message));
-  } else {
-    _loggerNoStackTrace.w(createMessage(tag, message));
+
+  void w(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+    if (globalAndLoggerEnabled) {
+      _logger.w(message(), error != null ? error() : null,
+          stackTrace != null ? stackTrace() : null);
+    }
   }
-}
-void loge(String tag, dynamic message, {bool stackTrace = false}) {
-  if(stackTrace) {
-    _logger.e(createMessage(tag, message));
-  } else {
-    _loggerNoStackTrace.e(createMessage(tag, message));
+
+  void e(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+    if (globalAndLoggerEnabled) {
+      _logger.e(message(), error != null ? error() : null,
+          stackTrace != null ? stackTrace() : null);
+    }
   }
 }

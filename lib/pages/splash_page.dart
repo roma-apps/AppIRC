@@ -4,19 +4,19 @@ import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
+import 'package:flutter_appirc/helpers/logger.dart';
+import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
 import 'package:flutter_appirc/pages/lounge_new_connection_page.dart';
-import 'package:flutter_appirc/helpers/provider.dart';
-import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
 import 'package:flutter_appirc/widgets/lounge_new_connection_widget.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:logger_flutter/logger_flutter.dart';
 
-var _logTag = "SplashPage";
+var _logger = MyLogger(logTag: "SplashPage", enabled: true);
+
 
 class SplashPage extends StatefulWidget {
   @override
@@ -62,7 +62,6 @@ class SplashScreenState extends State<SplashPage> {
     var preferencesService = Provider.of<PreferencesService>(context);
 
     await preferencesService.init();
-    LogConsole.init(bufferSize: 100);
 
     var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
     var ircNetworksPreferencesBloc =
@@ -71,7 +70,7 @@ class SplashScreenState extends State<SplashPage> {
     var isSavedLoungePreferenceExist =
         loungePreferencesBloc.isSavedPreferenceExist;
 
-    logi(_logTag,
+    _logger.i(() =>
         "init isSavedLoungePreferenceExist $isSavedLoungePreferenceExist");
 
     Widget nextPage;
@@ -85,14 +84,13 @@ class SplashScreenState extends State<SplashPage> {
             newLoungePreferences: loungePreferencesBloc.preferenceOrDefault),
       );
 
-      logi(_logTag, "init connectedLounge $connected");
+      _logger.i(() =>"init connectedLounge $connected");
 
       if (connected) {
         var isSavedIRCNetworksPreferenceExist =
             ircNetworksPreferencesBloc.isSavedPreferenceExist;
 
-        logi(
-            _logTag,
+        _logger.i(() =>
             "init isSavedIRCNetworksPreferenceExist"
             " $isSavedIRCNetworksPreferenceExist");
 

@@ -3,15 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/models/lounge_model.dart';
-import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
-import 'package:flutter_appirc/helpers/logger.dart';
+import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/widgets/button_loading_widget.dart';
 import 'package:flutter_appirc/widgets/lounge_new_connection_widget.dart';
-
-const _logTag = "LoungeConnectionPage";
 
 class LoungeNewConnectionPage extends StatefulWidget {
   @override

@@ -1,38 +1,38 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter_appirc/helpers/logger.dart';
+import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_channel_model.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/models/lounge_model.dart';
-import 'package:flutter_appirc/helpers/provider.dart';
-import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:rxdart/rxdart.dart';
 
-const String _logTag = "IRCChatBloc";
+var _logger = MyLogger(logTag: "IRCChatBloc", enabled: true);
 
 class IRCChatBloc extends Providable {
   final LoungeService _lounge;
 
-
   final Set<IRCNetwork> _networks = Set<IRCNetwork>();
 
   final BehaviorSubject<List<IRCNetwork>> _networksController =
-  new BehaviorSubject<List<IRCNetwork>>(seedValue: []);
+      new BehaviorSubject<List<IRCNetwork>>(seedValue: []);
 
   Stream<List<IRCNetwork>> get networksStream => _networksController.stream;
 
   IRCNetworkChannel _activeChannel;
   final BehaviorSubject<IRCNetworkChannel> _activeChannelController =
-  new BehaviorSubject<IRCNetworkChannel>();
+      new BehaviorSubject<IRCNetworkChannel>();
 
-  Stream<IRCNetworkChannel> get activeChannelStream => _activeChannelController.stream;
+  Stream<IRCNetworkChannel> get activeChannelStream =>
+      _activeChannelController.stream;
 
   StreamSubscription<NetworksLoungeResponseBody> _networksSubscription;
   StreamSubscription<JoinLoungeResponseBody> _joinSubscription;
 
   IRCChatBloc(this._lounge) {
-    logi(_logTag, "start creating");
+    _logger.i(() => "start creating");
 
     _networksSubscription = _lounge.networksStream.listen((event) {
       var newNetworks = Set<IRCNetwork>();
@@ -41,8 +41,8 @@ class IRCChatBloc extends Providable {
         List<IRCNetworkChannel> newChannels = List();
         var newNetwork = IRCNetwork(network.name, network.uuid, newChannels);
         for (var loungeChannel in network.channels) {
-          newChannels.add(
-              IRCNetworkChannel(name: loungeChannel.name, remoteId: loungeChannel.id));
+          newChannels.add(IRCNetworkChannel(
+              name: loungeChannel.name, remoteId: loungeChannel.id));
         }
         newNetworks.add(newNetwork);
       }
@@ -62,7 +62,7 @@ class IRCChatBloc extends Providable {
       changeActiveChanel(newChannel);
     });
 
-    logi(_logTag, "stop creating");
+    _logger.i(() => "stop creating");
   }
 
   List<IRCNetworkChannel> _calculateAvailableChannels() {
@@ -74,9 +74,8 @@ class IRCChatBloc extends Providable {
     return allChannels;
   }
 
-
   void _onNetworksListChanged() {
-    logi(_logTag, "_onNetworksListChanged $_networks");
+    _logger.i(() => "_onNetworksListChanged $_networks");
     _networksController.sink.add(UnmodifiableListView(_networks));
 
     if (_activeChannel == null) {
@@ -96,12 +95,12 @@ class IRCChatBloc extends Providable {
     _joinSubscription.cancel();
   }
 
-   changeActiveChanel(IRCNetworkChannel newActiveChannel) async {
+  changeActiveChanel(IRCNetworkChannel newActiveChannel) async {
     if (_activeChannel == newActiveChannel) {
       return;
     }
 
-    logi(_logTag, "changeActiveChanel $changeActiveChanel");
+    _logger.i(() =>"changeActiveChanel $changeActiveChanel");
     _activeChannel = newActiveChannel;
     _activeChannelController.sink.add(newActiveChannel);
 

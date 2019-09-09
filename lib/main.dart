@@ -9,11 +9,8 @@ import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
-import 'package:logger_flutter/logger_flutter.dart';
 
 import 'blocs/irc_chat_bloc.dart';
-
-var _logTag = "Main";
 
 var socketIOManager = SocketIOManager();
 

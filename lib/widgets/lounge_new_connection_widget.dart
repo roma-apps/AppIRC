@@ -7,7 +7,7 @@ import 'package:flutter_appirc/helpers/provider.dart';
 
 import 'form_widgets.dart';
 
-var _logTag = "LoungeNewConnectionWidget";
+var _logger = MyLogger(logTag: "LoungeNewConnectionWidget", enabled: true);
 
 class LoungeNewConnectionWidget extends StatefulWidget {
   @override
@@ -101,7 +101,7 @@ AlertDialog buildLoungeConnectionErrorAlertDialog(
 
 Future<bool> connectToLounge(
     BuildContext context, LoungeNewConnectionBloc loungeConnectionBloc) async {
-  logi(_logTag, "Connecting to $loungeConnectionBloc.");
+  _logger.i(() => "Connecting to $loungeConnectionBloc.");
 
   bool connected = true;
   Exception exception;
@@ -111,7 +111,7 @@ Future<bool> connectToLounge(
     connected = false;
     exception = e;
   }
-  logi(_logTag, "Connected = $connected ");
+  _logger.i(() => "Connected = $connected ");
 
   if (!connected) {
     showDialog(

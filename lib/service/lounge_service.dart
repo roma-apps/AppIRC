@@ -11,7 +11,6 @@ import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/service/socketio_service.dart';
 import 'package:rxdart/rxdart.dart';
 
-const String _logTag = "LoungeService";
 
 const String _networkLoungeEvent = "network";
 const String _msgLoungeEvent = "msg";
@@ -26,6 +25,7 @@ const String _networkStatusLoungeEvent = "network:status";
 const String _networkOptionsLoungeEvent = "network:options";
 const String _channelStateOptionsLoungeEvent = "channel:state";
 
+var _logger = MyLogger(logTag: "LoungeService", enabled: true);
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
 
 class LoungeService extends Providable {
@@ -106,13 +106,13 @@ class LoungeService extends Providable {
       await socketIOService.emit(request);
 
   Future<bool> connect(LoungePreferences preferences) async {
-    logi(_logTag, "start connecting to $preferences");
+    _logger.i(() => "start connecting to $preferences");
     if (isProbablyConnected) {
       throw AlreadyConnectedLoungeException();
     }
 
     socketIOService = SocketIOService(socketIOManager, preferences.host);
-    logi(_logTag, "start init socket service");
+    _logger.i(() => "start init socket service");
     await socketIOService.init();
     _addSubscriptions();
 
@@ -122,33 +122,33 @@ class LoungeService extends Providable {
     Exception connectionException;
 
     var connectListener = (_) {
-      logi(_logTag, "connecting onConnect");
+      _logger.i(() => "connecting onConnect");
       connected = true;
       responseReceived = true;
     };
     socketIOService.onConnect(connectListener);
 
     var connectErrorListener = (value) {
-      loge(_logTag, "connecting onConnectError $value");
+      _logger.e(() => "connecting onConnectError $value");
       connectionException = ConnectionErrorLoungeException(value);
       responseReceived = true;
     };
     socketIOService.onConnectError(connectErrorListener);
     var connectTimeoutListener = (value) {
-      loge(_logTag, "connecting onConnectTimeout $value");
+      _logger.e(() => "connecting onConnectTimeout $value");
       connectionException = ConnectionTimeoutLoungeException();
       responseReceived = true;
     };
     socketIOService.onConnectTimeout(connectTimeoutListener);
 
-    logi(_logTag, "start socket connect");
+    _logger.i(() => "start socket connect");
     await socketIOService.connect();
 
     while (!responseReceived) {
       await Future.delayed(_timeBetweenCheckingConnectionResponse);
     }
 
-    logi(_logTag, "finish connecting");
+    _logger.i(() => "finish connecting");
 
     socketIOService.offConnect(connectListener);
     socketIOService.offConnectTimeout(connectTimeoutListener);
@@ -254,13 +254,13 @@ class LoungeService extends Providable {
   }
 
   void _onTopicResponse(raw) {
-    logi(_logTag, "_onTopicResponse $raw");
+    _logger.i(() =>"_onTopicResponse $raw");
     var data = TopicLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _topicController.sink.add(data);
   }
 
   void _onMessageResponse(raw) {
-    logi(_logTag, raw);
+    _logger.i(() => "_onMessageResponse $raw");
     var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _messagesController.sink.add(data);
   }
@@ -276,6 +276,7 @@ class LoungeService extends Providable {
   }
 
   void _onCommandResponse(raw) {
+    _logger.i(() => "_onCommandResponse $raw");
 //    var parsed = raw;
 //    _commandsController.sink.add(parsed);
   }
@@ -315,7 +316,7 @@ class LoungeService extends Providable {
 
   void _onNetworkResponse(raw) {
     var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
-    logi(_logTag, "_onNetworkResponse parsed $parsed");
+    _logger.i(() => "_onNetworkResponse parsed $parsed");
     _networksController.sink.add(parsed);
   }
 
@@ -332,7 +333,7 @@ class LoungeService extends Providable {
       }
     }
 
-    logi(_logTag, "_preProcessRawData json = $isJsonData converted $newRaw");
+    _logger.i(() => "_preProcessRawData json = $isJsonData converted $newRaw");
     return newRaw;
   }
 
