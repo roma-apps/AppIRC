@@ -59,6 +59,10 @@
     "empty_chat": "This channel doesn't have any messages yet",
     "channels": {
       "new_connection": "New connection"
+    },
+    "users": {
+      "title": "Channel users",
+      "loading": "Loading"
     }
   }
 }

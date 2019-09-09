@@ -102,8 +102,10 @@ class LoungeService extends Providable {
   bool get isProbablyConnected =>
       socketIOService != null && socketIOService.isProbablyConnected;
 
-  _sendCommand(LoungeRequest request) async =>
-      await socketIOService.emit(request);
+  _sendCommand(LoungeRequest request) async {
+    _logger.d(()=>"_sendCommand $request");
+    return await socketIOService.emit(request);
+  }
 
   Future<bool> connect(LoungePreferences preferences) async {
     _logger.i(() => "start connecting to $preferences");
@@ -194,7 +196,7 @@ class LoungeService extends Providable {
       LoungeRawRequest(name: "open", body: [channel.remoteId]));
 
   sendNamesRequest(IRCNetworkChannel channel) async => await _sendCommand(
-      LoungeRawRequest(name: "names", body: [channel.remoteId]));
+      LoungeJsonRequest(name: "names", body: NamesLoungeRequestBody(target: channel.remoteId)));
 
   sendNewNetworkRequest(IRCNetworkPreferences channelConnectionInfo) async {
     var networkPreferences = channelConnectionInfo.serverPreferences;

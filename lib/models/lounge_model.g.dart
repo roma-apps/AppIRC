@@ -32,6 +32,19 @@ Map<String, dynamic> _$InputLoungeRequestBodyToJson(
       'text': instance.text,
     };
 
+NamesLoungeRequestBody _$NamesLoungeRequestBodyFromJson(
+    Map<String, dynamic> json) {
+  return NamesLoungeRequestBody(
+    target: json['target'] as int,
+  );
+}
+
+Map<String, dynamic> _$NamesLoungeRequestBodyToJson(
+        NamesLoungeRequestBody instance) =>
+    <String, dynamic>{
+      'target': instance.target,
+    };
+
 NetworkNewLoungeRequestBody _$NetworkNewLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return NetworkNewLoungeRequestBody(

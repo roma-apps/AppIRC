@@ -58,7 +58,7 @@ class LoungeJsonRequest extends LoungeRequest {
 
   @override
   String toString() {
-    return 'LoungeJsonRequest{body: $body}';
+    return 'LoungeJsonRequest{name: $name, body: $body}';
   }
 }
 
@@ -72,7 +72,7 @@ class LoungeRawRequest extends LoungeRequest {
 
   @override
   String toString() {
-    return 'LoungeRawRequest{body: $body}';
+    return 'LoungeRawRequest{name: $name, body: $body}';
   }
 }
 
@@ -98,6 +98,22 @@ class InputLoungeRequestBody extends LoungeRequestBody {
 
   @override
   Map<String, dynamic> toJson() => _$InputLoungeRequestBodyToJson(this);
+}
+
+
+@JsonSerializable()
+class NamesLoungeRequestBody extends LoungeRequestBody {
+  final int target;
+
+  @override
+  String toString() {
+    return 'NamesLoungeRequestBody{target: $target}';
+  }
+
+  NamesLoungeRequestBody({@required this.target});
+
+  @override
+  Map<String, dynamic> toJson() => _$NamesLoungeRequestBodyToJson(this);
 }
 
 @JsonSerializable()
@@ -168,6 +184,7 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
   factory JoinLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$JoinLoungeResponseBodyFromJson(json);
 }
+
 
 @JsonSerializable()
 class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
