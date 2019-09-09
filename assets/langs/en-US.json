@@ -3,6 +3,9 @@
   "splash" : {
     "loading": "Loading"
   },
+  "networks_list": {
+    "title": "Networks list"
+  },
   "lounge_connection": {
     "title": "Lounge connection",
     "settings": "Settings",

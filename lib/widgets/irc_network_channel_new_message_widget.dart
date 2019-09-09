@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_new_message_bloc.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworkChannelNewMessageWidget extends StatefulWidget {
   @override
@@ -25,16 +26,16 @@ class IRCNetworkChannelNewMessageState
     return Row(
       children: <Widget>[
         Flexible(
-          child: TextFormField(
+          child: PlatformTextField(
             controller: _messageController,
-            textInputAction: TextInputAction.send,
-            onFieldSubmitted: (term) {
+            onSubmitted: (term) {
               _sendMessage(newMessageBloc);
             },
           ),
         ),
-        IconButton(
-            icon: new Icon(Icons.message),
+        PlatformIconButton(
+            androidIcon: new Icon(Icons.message),
+            iosIcon: new Icon(Icons.message),
             onPressed: () {
               _sendMessage(newMessageBloc);
             }),

@@ -1,14 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
-import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/widgets/button_loading_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_server_preferences_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_user_preferences_widget.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworksNewConnectionPage extends StatefulWidget {
   final bool isOpenedFromAppStart;
@@ -27,8 +28,6 @@ class IRCNetworksNewConnectionState
 
   IRCNetworksNewConnectionState(this.isOpenedFromAppStart);
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
     final LoungeService loungeService = Provider.of<LoungeService>(context);
@@ -37,21 +36,20 @@ class IRCNetworksNewConnectionState
         preferencesBloc: Provider.of<IRCNetworksPreferencesBloc>(context),
         newConnectionPreferences: createDefaultIRCNetworkPreferences());
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
+    return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
+      appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('irc_connection.title')),
       ),
       body: Column(
         children: <Widget>[
           Provider<IRCNetworksNewConnectionBloc>(
             bloc: ircNetworksNewConnectionBloc,
-            child: Expanded(
-              child: ListView(shrinkWrap: true, children: [
-                IRCNetworkServerPreferencesWidget(),
-                IRCNetworkUserPreferencesWidget()
-              ]),
-            ),
+            child: ListView(shrinkWrap: true, children: [
+              IRCNetworkServerPreferencesWidget(),
+              IRCNetworkUserPreferencesWidget()
+            ]),
           ),
           Provider<AsyncOperationBloc>(
             bloc: ircNetworksNewConnectionBloc,
@@ -74,7 +72,7 @@ class IRCNetworksNewConnectionState
     await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
     if (isOpenedFromAppStart) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => IRCChatPage()));
+          context, platformPageRoute(builder: (context) => IRCChatPage()));
     } else {
       Navigator.pop(context);
     }

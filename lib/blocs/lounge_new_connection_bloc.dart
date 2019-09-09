@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/models/lounge_model.dart';
@@ -25,8 +25,6 @@ class LoungeNewConnectionBloc extends AsyncOperationBloc {
     onOperationFinished();
     return result;
   }
-
-
 
   @override
   void dispose() {

@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/widgets/irc_network_channel_join_widget.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworkChannelJoinPage extends StatefulWidget {
   final IRCNetwork network;
@@ -19,13 +20,10 @@ class IRCNetworkChannelJoinPageState extends State<IRCNetworkChannelJoinPage> {
 
   IRCNetworkChannelJoinPageState(this.network);
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('join_channel.title')),
       ),
       body: ListView.builder(

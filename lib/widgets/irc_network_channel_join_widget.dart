@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_join_bloc.dart';
-import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/widgets/button_loading_widget.dart';
 
@@ -31,8 +31,7 @@ class IRCNetworkChannelJoinState extends State<IRCNetworkChannelJoinWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final LoungeService loungeService =
-        Provider.of<LoungeService>(context);
+    final LoungeService loungeService = Provider.of<LoungeService>(context);
 
     var joinChannelBloc = IRCNetworkChannelJoinBloc(loungeService, network);
 
@@ -57,9 +56,9 @@ class IRCNetworkChannelJoinState extends State<IRCNetworkChannelJoinWidget> {
   }
 
   _sendJoinChannelMessage(IRCNetworkChannelJoinBloc joinChannelBloc) async {
-      var password = _passwordController.text;
+    var password = _passwordController.text;
     var channel = _channelController.text;
-    
+
     await joinChannelBloc.sendJoinChannelRequest(channel, password);
     _connectCallback();
   }

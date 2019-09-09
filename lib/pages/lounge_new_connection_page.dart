@@ -1,5 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
@@ -8,6 +8,7 @@ import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/widgets/button_loading_widget.dart';
 import 'package:flutter_appirc/widgets/lounge_new_connection_widget.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class LoungeNewConnectionPage extends StatefulWidget {
   @override
@@ -17,8 +18,6 @@ class LoungeNewConnectionPage extends StatefulWidget {
 }
 
 class LoungeConnectionState extends State<LoungeNewConnectionPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
     final LoungeService lounge = Provider.of<LoungeService>(context);
@@ -29,9 +28,10 @@ class LoungeConnectionState extends State<LoungeNewConnectionPage> {
 
     return Provider<LoungeNewConnectionBloc>(
       bloc: loungeConnectionBloc,
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
+      child: PlatformScaffold(
+        iosContentBottomPadding: true,
+        iosContentPadding: true,
+        appBar: PlatformAppBar(
           title:
               Text(AppLocalizations.of(context).tr('lounge_connection.title')),
         ),
@@ -50,7 +50,7 @@ class LoungeConnectionState extends State<LoungeNewConnectionPage> {
                     .then((connected) {
                   Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
+                      platformPageRoute(
                           builder: (context) => IRCNetworksNewConnectionPage(
                               isOpenedFromAppStart: true)));
                 }),

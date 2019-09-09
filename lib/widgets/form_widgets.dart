@@ -1,4 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Divider;
+import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/widgets/platform_aware_widgets.dart';
+import 'package:flutter_appirc/skin/ui_skin.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 typedef void BooleanCallback(bool);
 
@@ -7,7 +11,7 @@ buildFormTitle(BuildContext context, String title) => Padding(
         children: <Widget>[
           Text(
             title,
-            style: Theme.of(context).textTheme.title,
+            style: UISkin.of(context).appSkin.formRowLabelTextStyle,
           ),
           Divider()
         ],
@@ -27,7 +31,7 @@ buidFormTextRow(String title, TextEditingController controller,
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: TextField(
+              child: PlatformTextField(
                 controller: controller,
                 onChanged: callback,
               ),
@@ -45,7 +49,7 @@ buildFormBooleanRow(String title, bool startValue, BooleanCallback callback) =>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(title),
-          Checkbox(
+          buildPlatformAwareCheckBox(
             value: startValue,
             onChanged: callback,
           ),

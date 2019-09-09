@@ -1,5 +1,5 @@
 import 'package:easy_localization/easy_localization_delegate.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
@@ -13,10 +13,11 @@ import 'package:flutter_appirc/pages/lounge_new_connection_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
 import 'package:flutter_appirc/widgets/lounge_new_connection_widget.dart';
+import 'package:flutter_appirc/skin/ui_skin.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 var _logger = MyLogger(logTag: "SplashPage", enabled: true);
-
 
 class SplashPage extends StatefulWidget {
   @override
@@ -32,9 +33,11 @@ class SplashScreenState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar:
-            AppBar(title: Text(AppLocalizations.of(context).tr("app_name"))),
+    var appLocalizations = AppLocalizations.of(context);
+    var uiSkin = Provider.of<UISkin>(context);
+
+    return PlatformScaffold(
+        appBar: PlatformAppBar(title: Text(appLocalizations.tr("app_name"))),
         body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -42,13 +45,12 @@ class SplashScreenState extends State<SplashPage> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child:
-                      Text(AppLocalizations.of(context).tr("splash.loading")),
+                  child: Text(appLocalizations.tr("splash.loading")),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SpinKitRotatingCircle(
-                    color: Colors.red,
+                    color: uiSkin.appSkin.accentColor,
                     size: 50.0,
                   ),
                 )
@@ -84,14 +86,13 @@ class SplashScreenState extends State<SplashPage> {
             newLoungePreferences: loungePreferencesBloc.preferenceOrDefault),
       );
 
-      _logger.i(() =>"init connectedLounge $connected");
+      _logger.i(() => "init connectedLounge $connected");
 
       if (connected) {
         var isSavedIRCNetworksPreferenceExist =
             ircNetworksPreferencesBloc.isSavedPreferenceExist;
 
-        _logger.i(() =>
-            "init isSavedIRCNetworksPreferenceExist"
+        _logger.i(() => "init isSavedIRCNetworksPreferenceExist"
             " $isSavedIRCNetworksPreferenceExist");
 
         if (isSavedIRCNetworksPreferenceExist) {
@@ -119,6 +120,6 @@ class SplashScreenState extends State<SplashPage> {
     }
 
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => nextPage));
+        context, platformPageRoute(builder: (context) => nextPage, maintainState: false));
   }
 }

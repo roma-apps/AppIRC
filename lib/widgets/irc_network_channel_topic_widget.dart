@@ -1,15 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_bloc.dart';
-import 'package:flutter_appirc/blocs/irc_chat_bloc.dart';
-import 'package:flutter_appirc/blocs/irc_network_channel_messages_bloc.dart';
-import 'package:flutter_appirc/blocs/irc_network_channel_new_message_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_topic_bloc.dart';
-import 'package:flutter_appirc/models/irc_network_channel_message_model.dart';
-import 'package:flutter_appirc/models/irc_network_channel_model.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
+import 'package:flutter_appirc/skin/ui_skin.dart';
 
 class IRCNetworkChannelTopicTitleWidget extends StatelessWidget {
   @override
@@ -26,8 +20,7 @@ class IRCNetworkChannelTopicTitleWidget extends StatelessWidget {
         if (topic == null || topic.isEmpty) {
           return Text(channelName);
         } else {
-          var captionStyle = Theme.of(context).textTheme.caption;
-          var topicStyle = captionStyle.copyWith(color: Colors.white);
+          var topicStyle = UISkin.of(context).appSkin.topicTextStyle;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,

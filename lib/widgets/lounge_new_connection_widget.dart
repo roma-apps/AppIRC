@@ -1,9 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
 import 'package:flutter_appirc/helpers/logger.dart';
-import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/models/lounge_model.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'form_widgets.dart';
 
@@ -42,7 +43,7 @@ class LoungeNewConnectionState extends State<LoungeNewConnectionWidget> {
   }
 }
 
-AlertDialog buildLoungeConnectionErrorAlertDialog(
+PlatformAlertDialog buildLoungeConnectionErrorAlertDialog(
     BuildContext context, Exception e) {
   var appLocalizations = AppLocalizations.of(context);
 
@@ -96,7 +97,7 @@ AlertDialog buildLoungeConnectionErrorAlertDialog(
         .tr('lounge_connection.dialog.connection_error.content');
   }
 
-  return AlertDialog(title: Text(title), content: Text(content));
+  return PlatformAlertDialog(title: Text(title), content: Text(content));
 }
 
 Future<bool> connectToLounge(
@@ -114,7 +115,7 @@ Future<bool> connectToLounge(
   _logger.i(() => "Connected = $connected ");
 
   if (!connected) {
-    showDialog(
+    showPlatformDialog(
       context: context,
       builder: (_) => buildLoungeConnectionErrorAlertDialog(context, exception),
     );

@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
-import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/models/irc_network_model.dart';
 
 import 'form_widgets.dart';
 
@@ -29,30 +29,26 @@ class IRCNetworkUserPreferencesState
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       children: <Widget>[
-        buildFormTitle(context,
-            appLocalizations.tr('irc_connection.user_prefs.title')),
+        buildFormTitle(
+            context, appLocalizations.tr('irc_connection.user_prefs.title')),
         buidFormTextRow(
             appLocalizations.tr('irc_connection.user_prefs.nick'),
             _nicknameController,
             (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         buidFormTextRow(
-            appLocalizations
-                .tr('irc_connection.user_prefs.password'),
+            appLocalizations.tr('irc_connection.user_prefs.password'),
             _passwordController,
             (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         buidFormTextRow(
-            appLocalizations
-                .tr('irc_connection.user_prefs.real_name'),
+            appLocalizations.tr('irc_connection.user_prefs.real_name'),
             _realNameController,
             (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         buidFormTextRow(
-            appLocalizations
-                .tr('irc_connection.user_prefs.user_name'),
+            appLocalizations.tr('irc_connection.user_prefs.user_name'),
             _userNameController,
             (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
         buidFormTextRow(
-            appLocalizations
-                .tr('irc_connection.user_prefs.channels'),
+            appLocalizations.tr('irc_connection.user_prefs.channels'),
             _channelsController,
             (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc))
       ],
@@ -61,7 +57,6 @@ class IRCNetworkUserPreferencesState
 
   void _fillPreferencesFromUI(
       IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc) {
-
     ircNetworksNewConnectionBloc
         .setNewUserPreferences(IRCNetworkUserPreferences(
       username: _userNameController.text,

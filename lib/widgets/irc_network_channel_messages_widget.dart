@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_messages_bloc.dart';
-import 'package:flutter_appirc/models/irc_network_channel_message_model.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/models/irc_network_channel_message_model.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
+import 'package:flutter_appirc/skin/ui_skin.dart';
 
 class IRCNetworkChannelMessagesWidget extends StatelessWidget {
   @override
@@ -38,11 +38,13 @@ class IRCNetworkChannelMessagesWidget extends StatelessWidget {
                       message.author = "";
                     }
 
+                    var uiSkin = UISkin.of(context);
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Container(
                         decoration: BoxDecoration(
-                            border: Border.all(color: Colors.red)),
+                            border:
+                                Border.all(color: uiSkin.appSkin.accentColor)),
                         child: Container(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,14 +57,15 @@ class IRCNetworkChannelMessagesWidget extends StatelessWidget {
                                   children: <Widget>[
                                     Text(
                                       message.author,
-                                      style: Theme.of(context).textTheme.body2,
+                                      style: uiSkin
+                                          .appSkin.channelMessagesNickTextStyle,
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
                                         message.date.toString(),
-                                        style:
-                                            Theme.of(context).textTheme.body2,
+                                        style: uiSkin.appSkin
+                                            .channelMessagesDateTextStyle,
                                       ),
                                     ),
                                   ],

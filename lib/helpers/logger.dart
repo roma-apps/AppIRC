@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
 
 const bool logEnabled = true;

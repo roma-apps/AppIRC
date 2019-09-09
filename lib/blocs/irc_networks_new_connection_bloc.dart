@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
@@ -38,7 +38,6 @@ class IRCNetworksNewConnectionBloc extends AsyncOperationBloc {
   void setNewNetworkPreferences(IRCNetworkServerPreferences serverPreferences) {
     newConnectionPreferences.serverPreferences = serverPreferences;
   }
-
 
   void setNewUserPreferences(IRCNetworkUserPreferences userPreferences) {
     newConnectionPreferences.userPreferences = userPreferences;

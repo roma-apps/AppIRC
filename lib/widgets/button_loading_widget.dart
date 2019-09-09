@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ButtonLoadingWidget extends StatelessWidget {
   final Widget child;
@@ -20,9 +21,9 @@ class ButtonLoadingWidget extends StatelessWidget {
               data == null ? AsyncOperationBloc.defaultValue : data;
 
           if (inProgress) {
-            return RaisedButton(child: child, onPressed: onPressed);
+            return PlatformButton(child: child, onPressed: onPressed);
           } else {
-            return RaisedButton(child: child, onPressed: onPressed);
+            return PlatformButton(child: child, onPressed: onPressed);
           }
         });
   }
