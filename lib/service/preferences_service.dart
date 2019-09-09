@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/preferences_model.dart';
-import 'package:flutter_appirc/provider.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
-
 
 const String emptyString = "";
 
@@ -31,23 +30,26 @@ class PreferencesService extends Providable {
           String key, Preferences preferencesObject) async =>
       await setJsonObjectAsString(key, preferencesObject.toJson());
 
-
   bool isPreferencesExist(String key) => isJsonValueExist(key);
 
-
-
   T getPreferences<T extends Preferences>(
-          String key, T jsonConverter(Map<String, dynamic> jsonData),
-          {@required T defaultValue}) =>
-      jsonConverter(getJsonObjectAsString(key,
-          defaultValue:
-              defaultValue != null ? defaultValue.toJson() : defaultValue));
+      String key, T jsonConverter(Map<String, dynamic> jsonData),
+      {@required T defaultValue}) {
+    var jsonObjectAsString = getJsonObjectAsString(key,
+        defaultValue:
+            defaultValue != null ? defaultValue.toJson() : defaultValue);
+    return jsonObjectAsString != null
+        ? jsonConverter(jsonObjectAsString)
+        : null;
+  }
 
   Stream<T> getPreferencesStream<T>(
       String key, T jsonConverter(Map<String, dynamic> jsonData),
       {@required Preferences defaultValue}) {
     return getJsonStream(key, defaultValue: defaultValue.toJson())
-        .map((jsonObject) => jsonConverter(jsonObject));
+        .map((jsonObject) {
+      return jsonObject != null ? jsonConverter(jsonObject) : null;
+    });
   }
 
   Stream<Map<String, dynamic>> getJsonStream<T>(String key,

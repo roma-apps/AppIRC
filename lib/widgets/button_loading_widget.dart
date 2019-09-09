@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
-import 'package:flutter_appirc/provider.dart';
+import 'package:flutter_appirc/helpers/provider.dart';
 
-class LoadingButtonWidget extends StatelessWidget {
+class ButtonLoadingWidget extends StatelessWidget {
   final Widget child;
   final VoidCallback onPressed;
 
-  const LoadingButtonWidget({this.child, this.onPressed});
+  const ButtonLoadingWidget({this.child, this.onPressed});
 
   @override
   Widget build(BuildContext context) {

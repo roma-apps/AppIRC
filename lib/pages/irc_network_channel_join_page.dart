@@ -1,28 +1,25 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/models/chat_model.dart';
-import 'package:flutter_appirc/widgets/join_channel_widget.dart';
+import 'package:flutter_appirc/models/irc_network_model.dart';
+import 'package:flutter_appirc/widgets/irc_network_channel_join_widget.dart';
 
-class JoinChannelPage extends StatefulWidget {
-  final Network network;
+class IRCNetworkChannelJoinPage extends StatefulWidget {
+  final IRCNetwork network;
 
-
-  JoinChannelPage(this.network);
+  IRCNetworkChannelJoinPage(this.network);
 
   @override
   State<StatefulWidget> createState() {
-    return JoinChannelPageState(network);
+    return IRCNetworkChannelJoinPageState(network);
   }
 }
 
-class JoinChannelPageState extends State<JoinChannelPage> {
-  Network network;
+class IRCNetworkChannelJoinPageState extends State<IRCNetworkChannelJoinPage> {
+  final IRCNetwork network;
 
-
-  JoinChannelPageState(this.network);
+  IRCNetworkChannelJoinPageState(this.network);
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +36,8 @@ class JoinChannelPageState extends State<JoinChannelPage> {
             children: <Widget>[
               Container(
                   margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: JoinChannelFormWidget(network, () {
-                      Navigator.pop(context);
+                  child: IRCNetworkChannelJoinWidget(network, () {
+                    Navigator.pop(context);
                   })),
             ],
           );

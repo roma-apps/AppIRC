@@ -1,5 +1,10 @@
 import 'package:logger/logger.dart';
 
+
+class MyLogger {
+
+}
+
 var _logger = Logger(
   printer: PrettyPrinter(),
 );

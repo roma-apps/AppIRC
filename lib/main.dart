@@ -1,24 +1,24 @@
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/blocs/chat_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
-import 'package:flutter_appirc/pages/lounge_connection_page.dart';
 import 'package:flutter_appirc/pages/splash_page.dart';
-import 'package:flutter_appirc/provider.dart';
-import 'package:flutter_appirc/service/log_service.dart';
+import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
 import 'package:logger_flutter/logger_flutter.dart';
+
+import 'blocs/irc_chat_bloc.dart';
 
 var _logTag = "Main";
 
 var socketIOManager = SocketIOManager();
 
 var loungeService = LoungeService(socketIOManager);
-var chatBloc = ChatBloc(loungeService);
+var chatBloc = IRCChatBloc(loungeService);
 var preferencesService = PreferencesService();
 
 Future main() async {
@@ -28,14 +28,12 @@ Future main() async {
 class AppIRC extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var data = EasyLocalizationProvider
-        .of(context)
-        .data;
+    var data = EasyLocalizationProvider.of(context).data;
 
     var loungeConnectionPreferencesBloc =
-    LoungePreferencesBloc(preferencesService);
+        LoungePreferencesBloc(preferencesService);
     var ircNetworksPreferencesBloc =
-    IRCNetworksPreferencesBloc(preferencesService);
+        IRCNetworksPreferencesBloc(preferencesService);
     return Provider(
       bloc: preferencesService,
       child: Provider<LoungePreferencesBloc>(
@@ -46,7 +44,7 @@ class AppIRC extends StatelessWidget {
             bloc: loungeService,
             child: EasyLocalizationProvider(
               data: data,
-              child: Provider<ChatBloc>(
+              child: Provider<IRCChatBloc>(
                   bloc: chatBloc,
                   child: MaterialApp(
                       title: "AppIRC",
@@ -60,8 +58,7 @@ class AppIRC extends StatelessWidget {
                       theme: ThemeData(
                         primarySwatch: Colors.red,
                       ),
-                      home: SplashPage()
-                  )),
+                      home: SplashPage())),
             ),
           ),
         ),

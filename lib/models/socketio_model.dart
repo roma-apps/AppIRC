@@ -3,5 +3,3 @@ abstract class SocketIOCommand {
 
   List<dynamic> getBody();
 }
-
-class SocketIOResponseBloc {}

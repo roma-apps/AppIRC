@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:adhara_socket_io/adhara_socket_io.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_appirc/models/chat_model.dart';
+import 'package:flutter_appirc/helpers/logger.dart';
+import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/models/irc_network_channel_model.dart';
+import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/models/lounge_model.dart';
-import 'package:flutter_appirc/provider.dart';
-import 'package:flutter_appirc/service/log_service.dart';
 import 'package:flutter_appirc/service/socketio_service.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -28,109 +28,61 @@ const String _channelStateOptionsLoungeEvent = "channel:state";
 
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
 
-abstract class ConnectionException implements Exception {
-  String alertDialogTitle(BuildContext context);
-
-  String alertDialogContent(BuildContext context);
-}
-
-class AlreadyConnectedException implements ConnectionException {
-  @override
-  String alertDialogContent(BuildContext context) =>
-      AppLocalizations.of(context)
-          .tr('lounge_connection.dialog.already_connected.content');
-
-  @override
-  String alertDialogTitle(BuildContext context) =>
-      AppLocalizations.of(context)
-          .tr('lounge_connection.dialog.already_connected.title');
-}
-
-class ConnectionTimeoutException implements ConnectionException {
-  @override
-  String alertDialogContent(BuildContext context) =>
-      AppLocalizations.of(context)
-          .tr('lounge_connection.dialog.connection_timeout.content');
-
-  @override
-  String alertDialogTitle(BuildContext context) =>
-      AppLocalizations.of(context)
-          .tr('lounge_connection.dialog.connection_timeout.title');
-}
-
-class ConnectionErrorException implements ConnectionException {
-  final dynamic data;
-
-  ConnectionErrorException(this.data);
-
-  @override
-  String alertDialogContent(BuildContext context) =>
-      AppLocalizations.of(context).tr(
-          'lounge_connection.dialog.connection_error.content',
-          args: [data]);
-
-  @override
-  String alertDialogTitle(BuildContext context) =>
-      AppLocalizations.of(context)
-          .tr('lounge_connection.dialog.connection_error.title');
-}
-
 class LoungeService extends Providable {
-
   SocketIOManager socketIOManager;
   SocketIOService socketIOService;
 
   LoungeService(this.socketIOManager);
 
   ReplaySubject<MessageLoungeResponseBody> _messagesController =
-  new ReplaySubject<MessageLoungeResponseBody>();
+      new ReplaySubject<MessageLoungeResponseBody>();
 
-  Stream<MessageLoungeResponseBody> get outMessages =>
+  Stream<MessageLoungeResponseBody> get messagesStream =>
       _messagesController.stream;
 
   BehaviorSubject<NetworksLoungeResponseBody> _networksController =
-  new BehaviorSubject<NetworksLoungeResponseBody>();
+      new BehaviorSubject<NetworksLoungeResponseBody>();
 
-  Stream<NetworksLoungeResponseBody> get outNetworks =>
+  Stream<NetworksLoungeResponseBody> get networksStream =>
       _networksController.stream;
 
   BehaviorSubject<ConfigurationLoungeResponseBody> _configurationController =
-  new BehaviorSubject<ConfigurationLoungeResponseBody>();
+      new BehaviorSubject<ConfigurationLoungeResponseBody>();
 
-  Stream<ConfigurationLoungeResponseBody> get outConfiguration =>
+  Stream<ConfigurationLoungeResponseBody> get configurationStream =>
       _configurationController.stream;
 
   BehaviorSubject<NamesLoungeResponseBody> _namesController =
-  new BehaviorSubject<NamesLoungeResponseBody>();
+      new BehaviorSubject<NamesLoungeResponseBody>();
 
-  Stream<NamesLoungeResponseBody> get outNames => _namesController.stream;
+  Stream<NamesLoungeResponseBody> get namesStream => _namesController.stream;
 
   BehaviorSubject<UsersLoungeResponseBody> _usersController =
-  new BehaviorSubject<UsersLoungeResponseBody>();
+      new BehaviorSubject<UsersLoungeResponseBody>();
 
-  Stream<UsersLoungeResponseBody> get outUsers => _usersController.stream;
+  Stream<UsersLoungeResponseBody> get usersStream => _usersController.stream;
 
   BehaviorSubject<JoinLoungeResponseBody> _joinController =
-  new BehaviorSubject<JoinLoungeResponseBody>();
+      new BehaviorSubject<JoinLoungeResponseBody>();
 
-  Stream<JoinLoungeResponseBody> get outJoin => _joinController.stream;
+  Stream<JoinLoungeResponseBody> get joinStream => _joinController.stream;
 
   BehaviorSubject<NetworkStatusLoungeResponseBody> _networkStatusController =
-  new BehaviorSubject<NetworkStatusLoungeResponseBody>();
+      new BehaviorSubject<NetworkStatusLoungeResponseBody>();
 
-  Stream<NetworkStatusLoungeResponseBody> get outNetworkStatus =>
+  Stream<NetworkStatusLoungeResponseBody> get networkStatusStream =>
       _networkStatusController.stream;
 
   BehaviorSubject<NetworkOptionsLoungeResponseBody> _networkOptionsController =
-  new BehaviorSubject<NetworkOptionsLoungeResponseBody>();
+      new BehaviorSubject<NetworkOptionsLoungeResponseBody>();
 
-  Stream<NetworkOptionsLoungeResponseBody> get outNetworkOptions =>
+  Stream<NetworkOptionsLoungeResponseBody> get networkOptionsStream =>
       _networkOptionsController.stream;
 
   BehaviorSubject<ChannelStateLoungeResponseBody> _channelStateController =
-  new BehaviorSubject<ChannelStateLoungeResponseBody>();
+      new BehaviorSubject<ChannelStateLoungeResponseBody>();
 
-  Stream<ChannelStateLoungeResponseBody> get outChannelState =>
+  Stream<ChannelStateLoungeResponseBody> get channelStateStream =>
       _channelStateController.stream;
 
   BehaviorSubject _authorizedController = new BehaviorSubject();
@@ -138,14 +90,14 @@ class LoungeService extends Providable {
   Stream get outAuthorized => _configurationController.stream;
 
   BehaviorSubject<List<String>> _commandsController =
-  new BehaviorSubject<List<String>>();
+      new BehaviorSubject<List<String>>();
 
-  Stream<List<String>> get outCommands => _commandsController.stream;
+  Stream<List<String>> get commandsStream => _commandsController.stream;
 
   BehaviorSubject<TopicLoungeResponseBody> _topicController =
-  new BehaviorSubject<TopicLoungeResponseBody>();
+      new BehaviorSubject<TopicLoungeResponseBody>();
 
-  Stream<TopicLoungeResponseBody> get outTopic => _topicController.stream;
+  Stream<TopicLoungeResponseBody> get topicStream => _topicController.stream;
 
   bool get isProbablyConnected =>
       socketIOService != null && socketIOService.isProbablyConnected;
@@ -156,14 +108,13 @@ class LoungeService extends Providable {
   Future<bool> connect(LoungePreferences preferences) async {
     logi(_logTag, "start connecting to $preferences");
     if (isProbablyConnected) {
-      throw AlreadyConnectedException();
+      throw AlreadyConnectedLoungeException();
     }
 
     socketIOService = SocketIOService(socketIOManager, preferences.host);
     logi(_logTag, "start init socket service");
     await socketIOService.init();
     _addSubscriptions();
-
 
     var connected = false;
     var responseReceived = false;
@@ -179,13 +130,13 @@ class LoungeService extends Providable {
 
     var connectErrorListener = (value) {
       loge(_logTag, "connecting onConnectError $value");
-      connectionException = ConnectionErrorException(value);
+      connectionException = ConnectionErrorLoungeException(value);
       responseReceived = true;
     };
     socketIOService.onConnectError(connectErrorListener);
     var connectTimeoutListener = (value) {
       loge(_logTag, "connecting onConnectTimeout $value");
-      connectionException = ConnectionTimeoutException();
+      connectionException = ConnectionTimeoutLoungeException();
       responseReceived = true;
     };
     socketIOService.onConnectTimeout(connectTimeoutListener);
@@ -235,23 +186,21 @@ class LoungeService extends Providable {
     disconnect();
   }
 
-  sendOpenRequest(Channel channel) async =>
-      await _sendCommand(
-          LoungeRawRequest(name: "open", body: [channel.remoteId]));
+  sendOpenRequest(IRCNetworkChannel channel) async => await _sendCommand(
+      LoungeRawRequest(name: "open", body: [channel.remoteId]));
 
-  sendNamesRequest(Channel channel) async =>
-      await _sendCommand(
-          LoungeRawRequest(name: "names", body: [channel.remoteId]));
+  sendNamesRequest(IRCNetworkChannel channel) async => await _sendCommand(
+      LoungeRawRequest(name: "names", body: [channel.remoteId]));
 
   sendNewNetworkRequest(IRCNetworkPreferences channelConnectionInfo) async {
-    var networkPreferences = channelConnectionInfo.networkPreferences;
+    var networkPreferences = channelConnectionInfo.serverPreferences;
     var userPreferences = channelConnectionInfo.userPreferences;
     await _sendCommand(LoungeJsonRequest(
         name: "network:new",
         body: NetworkNewLoungeRequestBody(
           username: userPreferences.username,
           nick: userPreferences.nickname,
-          join: channelConnectionInfo.channels.join(" "),
+          join: userPreferences.channels.join(" "),
           realname: userPreferences.realName,
           password: userPreferences.password,
           host: networkPreferences.serverHost,
@@ -317,7 +266,8 @@ class LoungeService extends Providable {
   }
 
   void _onConfigurationResponse(raw) {
-    var parsed = ConfigurationLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    var parsed =
+        ConfigurationLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _configurationController.sink.add(parsed);
   }
 
@@ -346,32 +296,27 @@ class LoungeService extends Providable {
   }
 
   void _onNetworkStatusResponse(raw) {
-    var parsed = NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    var parsed =
+        NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _networkStatusController.sink.add(parsed);
   }
 
   void _onNetworkOptionsResponse(raw) {
-    var parsed = NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    var parsed =
+        NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _networkOptionsController.sink.add(parsed);
   }
 
   void _onChannelStateResponse(raw) {
-    var parsed = ChannelStateLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    var parsed =
+        ChannelStateLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _channelStateController.sink.add(parsed);
   }
 
   void _onNetworkResponse(raw) {
-    try {
-//      raw = _preProcessRawData(raw);
-//    print("_onNetworkResponse" + raw);
-//      logi(_logTag, "_onNetworkResponse raw $newRaw");
-      var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
-      logi(_logTag, "_onNetworkResponse parsed $parsed");
-      _networksController.sink.add(parsed);
-    } on Exception catch (e) {
-      loge(_logTag, "_onNetworkResponse error $e");
-      throw e;
-    }
+    var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    logi(_logTag, "_onNetworkResponse parsed $parsed");
+    _networksController.sink.add(parsed);
   }
 
   dynamic _preProcessRawData(raw, {bool isJsonData = true}) {
@@ -386,7 +331,6 @@ class LoungeService extends Providable {
         newRaw = json.decode(jsonData);
       }
     }
-
 
     logi(_logTag, "_preProcessRawData json = $isJsonData converted $newRaw");
     return newRaw;

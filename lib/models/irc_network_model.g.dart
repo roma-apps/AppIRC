@@ -1,50 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat_model.dart';
+part of 'irc_network_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
-
-IRCNetworksPreferences _$IRCNetworksPreferencesFromJson(
-    Map<String, dynamic> json) {
-  return IRCNetworksPreferences(
-    (json['networks'] as List)
-        ?.map((e) => e == null
-            ? null
-            : IRCNetworkPreferences.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-  );
-}
-
-Map<String, dynamic> _$IRCNetworksPreferencesToJson(
-        IRCNetworksPreferences instance) =>
-    <String, dynamic>{
-      'networks': instance.networks,
-    };
-
-IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(
-    Map<String, dynamic> json) {
-  return IRCNetworkPreferences(
-    networkPreferences: json['networkPreferences'] == null
-        ? null
-        : IRCNetworkServerPreferences.fromJson(
-            json['networkPreferences'] as Map<String, dynamic>),
-    userPreferences: json['userPreferences'] == null
-        ? null
-        : IRCNetworkUserPreferences.fromJson(
-            json['userPreferences'] as Map<String, dynamic>),
-    channels: (json['channels'] as List)?.map((e) => e as String)?.toList(),
-  );
-}
-
-Map<String, dynamic> _$IRCNetworkPreferencesToJson(
-        IRCNetworkPreferences instance) =>
-    <String, dynamic>{
-      'networkPreferences': instance.networkPreferences,
-      'userPreferences': instance.userPreferences,
-      'channels': instance.channels,
-    };
 
 IRCNetworkServerPreferences _$IRCNetworkServerPreferencesFromJson(
     Map<String, dynamic> json) {
@@ -74,6 +34,7 @@ IRCNetworkUserPreferences _$IRCNetworkUserPreferencesFromJson(
     password: json['password'] as String,
     realName: json['realName'] as String,
     username: json['username'] as String,
+    channels: (json['channels'] as List)?.map((e) => e as String)?.toList(),
   );
 }
 
@@ -84,4 +45,26 @@ Map<String, dynamic> _$IRCNetworkUserPreferencesToJson(
       'username': instance.username,
       'password': instance.password,
       'realName': instance.realName,
+      'channels': instance.channels,
+    };
+
+IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(
+    Map<String, dynamic> json) {
+  return IRCNetworkPreferences(
+    serverPreferences: json['serverPreferences'] == null
+        ? null
+        : IRCNetworkServerPreferences.fromJson(
+            json['serverPreferences'] as Map<String, dynamic>),
+    userPreferences: json['userPreferences'] == null
+        ? null
+        : IRCNetworkUserPreferences.fromJson(
+            json['userPreferences'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$IRCNetworkPreferencesToJson(
+        IRCNetworkPreferences instance) =>
+    <String, dynamic>{
+      'serverPreferences': instance.serverPreferences,
+      'userPreferences': instance.userPreferences,
     };

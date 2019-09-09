@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 typedef void BooleanCallback(bool);
 
-formTitle(BuildContext context, String title) => Padding(
+buildFormTitle(BuildContext context, String title) => Padding(
       child: Column(
         children: <Widget>[
           Text(
@@ -15,7 +15,7 @@ formTitle(BuildContext context, String title) => Padding(
       padding: const EdgeInsets.all(4.0),
     );
 
-formTextRow(String title, TextEditingController controller,
+buidFormTextRow(String title, TextEditingController controller,
         ValueChanged<String> callback) =>
     Padding(
       padding: const EdgeInsets.all(2.0),
@@ -37,7 +37,7 @@ formTextRow(String title, TextEditingController controller,
       ),
     );
 
-formBooleanRow(String title, bool startValue, BooleanCallback callback) =>
+buildFormBooleanRow(String title, bool startValue, BooleanCallback callback) =>
     Padding(
       padding: const EdgeInsets.all(2.0),
       child: Row(

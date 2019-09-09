@@ -4,28 +4,32 @@ import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 
-class NewLoungeConnectionBloc extends AsyncOperationBloc {
+class LoungeNewConnectionBloc extends AsyncOperationBloc {
   final LoungeService loungeService;
 
   final LoungePreferencesBloc preferencesBloc;
 
-  final LoungePreferences newConnectionPreferences;
+  LoungePreferences newLoungePreferences;
 
-  NewLoungeConnectionBloc(
+  LoungeNewConnectionBloc(
       {@required this.loungeService,
       @required this.preferencesBloc,
-      @required this.newConnectionPreferences});
+      @required this.newLoungePreferences});
 
   connect() async {
     onOperationStarted();
-    var result = await loungeService.connect(newConnectionPreferences);
+    var result = await loungeService.connect(newLoungePreferences);
     if (result) {
-      preferencesBloc.setNewPreferenceValue(newConnectionPreferences);
+      preferencesBloc.setNewPreferenceValue(newLoungePreferences);
     }
     onOperationFinished();
     return result;
   }
 
+
+
   @override
-  void dispose() {}
+  void dispose() {
+    super.dispose();
+  }
 }

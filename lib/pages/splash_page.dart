@@ -4,14 +4,15 @@ import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/models/chat_model.dart';
-import 'package:flutter_appirc/pages/chat_page.dart';
+import 'package:flutter_appirc/models/irc_network_model.dart';
+import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
-import 'package:flutter_appirc/pages/lounge_connection_page.dart';
-import 'package:flutter_appirc/provider.dart';
-import 'package:flutter_appirc/service/log_service.dart';
+import 'package:flutter_appirc/pages/lounge_new_connection_page.dart';
+import 'package:flutter_appirc/helpers/provider.dart';
+import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
+import 'package:flutter_appirc/widgets/lounge_new_connection_widget.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:logger_flutter/logger_flutter.dart';
 
@@ -33,7 +34,7 @@ class SplashScreenState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar:
-        AppBar(title: Text(AppLocalizations.of(context).tr("app_name"))),
+            AppBar(title: Text(AppLocalizations.of(context).tr("app_name"))),
         body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -42,7 +43,7 @@ class SplashScreenState extends State<SplashPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child:
-                  Text(AppLocalizations.of(context).tr("splash.loading")),
+                      Text(AppLocalizations.of(context).tr("splash.loading")),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -55,19 +56,17 @@ class SplashScreenState extends State<SplashPage> {
         ));
   }
 
-
   Future init(BuildContext context) async {
     var loungeService = Provider.of<LoungeService>(context);
 
     var preferencesService = Provider.of<PreferencesService>(context);
 
     await preferencesService.init();
-//  preferencesService.clear();
     LogConsole.init(bufferSize: 100);
 
     var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
     var ircNetworksPreferencesBloc =
-    Provider.of<IRCNetworksPreferencesBloc>(context);
+        Provider.of<IRCNetworksPreferencesBloc>(context);
 
     var isSavedLoungePreferenceExist =
         loungePreferencesBloc.isSavedPreferenceExist;
@@ -80,11 +79,10 @@ class SplashScreenState extends State<SplashPage> {
     if (isSavedLoungePreferenceExist) {
       var connected = await connectToLounge(
         context,
-        NewLoungeConnectionBloc(
+        LoungeNewConnectionBloc(
             loungeService: loungeService,
             preferencesBloc: loungePreferencesBloc,
-            newConnectionPreferences: loungePreferencesBloc
-                .preferenceOrDefault),
+            newLoungePreferences: loungePreferencesBloc.preferenceOrDefault),
       );
 
       logi(_logTag, "init connectedLounge $connected");
@@ -93,15 +91,17 @@ class SplashScreenState extends State<SplashPage> {
         var isSavedIRCNetworksPreferenceExist =
             ircNetworksPreferencesBloc.isSavedPreferenceExist;
 
-        logi(_logTag,
-            "init isSavedIRCNetworksPreferenceExist $isSavedIRCNetworksPreferenceExist");
+        logi(
+            _logTag,
+            "init isSavedIRCNetworksPreferenceExist"
+            " $isSavedIRCNetworksPreferenceExist");
 
         if (isSavedIRCNetworksPreferenceExist) {
           var networksPreferences =
               ircNetworksPreferencesBloc.preferenceOrDefault;
 
           for (IRCNetworkPreferences networkPreferences
-          in networksPreferences.networks) {
+              in networksPreferences.networks) {
             var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
                 loungeService: loungeService,
                 preferencesBloc: ircNetworksPreferencesBloc,
@@ -109,15 +109,15 @@ class SplashScreenState extends State<SplashPage> {
             await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
           }
 
-          nextPage = ChatPage();
+          nextPage = IRCChatPage();
         } else {
           nextPage = IRCNetworksNewConnectionPage(isOpenedFromAppStart: true);
         }
       } else {
-        nextPage = ChatPage();
+        nextPage = IRCChatPage();
       }
     } else {
-      nextPage = LoungeConnectionPage();
+      nextPage = LoungeNewConnectionPage();
     }
 
     Navigator.pushReplacement(
