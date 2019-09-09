@@ -20,19 +20,23 @@ class IRCNetworkChannelMessagesWidget extends StatelessWidget {
         stream: messagesBloc.messagesStream,
         builder: (BuildContext context,
             AsyncSnapshot<List<IRCNetworkChannelMessage>> snapshot) {
-          if (snapshot.data == null || snapshot.data.length == 0) {
+          var messages = snapshot.data;
+          if (messages != null) {
+            messages = messages
+                .where((message) =>
+                    message.text != null && message.text.isNotEmpty)
+                .toList();
+          }
+
+          if (messages == null || messages.length == 0) {
             return Text(AppLocalizations.of(context).tr("chat.empty_chat"));
           } else {
             return Padding(
               padding: const EdgeInsets.all(10.0),
               child: ListView.builder(
-                  itemCount: snapshot.data.length,
+                  itemCount: messages.length,
                   itemBuilder: (BuildContext context, int index) {
-                    var message = snapshot.data[index];
-
-                    if (message.text == null || message.text.isEmpty) {
-                      return Container();
-                    }
+                    var message = messages[index];
 
                     if (message.author == null) {
                       message.author = "";
