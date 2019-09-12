@@ -66,7 +66,7 @@ class IRCNetworksListWidget extends StatelessWidget {
         builder:
             (BuildContext context, AsyncSnapshot<IRCNetworkChannel> snapshot) {
           var activeChannel = snapshot.data;
-          var isChannelActive = activeChannel.remoteId == channel.remoteId;
+          var isChannelActive = activeChannel?.remoteId == channel.remoteId;
 
           return _buildNetworkRow(context, ircChatActiveChannelBloc, network,
               channel, lounge, isChannelActive);
