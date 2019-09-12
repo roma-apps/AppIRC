@@ -5,18 +5,55 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'irc_network_model.g.dart';
 
+
+
+class IRCNetworkStatus {
+  final bool connected;
+
+  IRCNetworkStatus(this.connected);
+
+  @override
+  String toString() {
+    return 'IRCNetworkStatus{connected: $connected}';
+  }
+
+
+}
+
 class IRCNetwork {
   final String name;
   final String remoteId;
 
+  final IRCNetworkStatus status;
+
   final List<IRCNetworkChannel> channels;
 
-  IRCNetwork(this.name, this.remoteId, this.channels);
+  List<IRCNetworkChannel> get channelsWithoutLobby =>
+      channels.where((channel) => !channel.isLobby).toList();
+
+
+  IRCNetworkChannel get lobbyChannel =>
+      channels.firstWhere((channel) => channel.isLobby);
+
+  IRCNetwork(this.name, this.remoteId, this.channels, this.status);
+
+  static IRCNetworkChannel calculateChannelForCommand(IRCNetwork network) =>
+      network != null && network.channels != null && network.channels.isNotEmpty
+          ? network.channels[0]
+          : null;
 
   @override
   String toString() {
-    return 'IRCNetwork{name: $name, remoteId: $remoteId, channels: $channels}';
+    return 'IRCNetwork{name: $name, remoteId: $remoteId, status: $status, channels: $channels}';
   }
+
+}
+
+class IRCNetworkSettingsWrapper {
+  final IRCNetwork ircNetwork;
+  final bool collapsed;
+
+  IRCNetworkSettingsWrapper(this.ircNetwork, this.collapsed);
 }
 
 @JsonSerializable()
@@ -27,12 +64,11 @@ class IRCNetworkServerPreferences extends Preferences {
   final bool useTls;
   final bool useOnlyTrustedCertificates;
 
-  IRCNetworkServerPreferences(
-      {@required this.name,
-      @required this.serverHost,
-      @required this.serverPort,
-      @required this.useTls,
-      @required this.useOnlyTrustedCertificates});
+  IRCNetworkServerPreferences({@required this.name,
+    @required this.serverHost,
+    @required this.serverPort,
+    @required this.useTls,
+    @required this.useOnlyTrustedCertificates});
 
   @override
   String toString() {
@@ -57,13 +93,11 @@ class IRCNetworkUserPreferences extends Preferences {
 
   String get channelsString => channels.join(channelsSeparator);
 
-  IRCNetworkUserPreferences(
-      {@required this.nickname,
-      this.password,
-      @required this.realName,
-      @required this.username,
-      @required this.channels});
-
+  IRCNetworkUserPreferences({@required this.nickname,
+    this.password,
+    @required this.realName,
+    @required this.username,
+    @required this.channels});
 
   @override
   String toString() {
@@ -84,8 +118,7 @@ class IRCNetworkPreferences extends Preferences {
   IRCNetworkUserPreferences userPreferences;
 
   IRCNetworkPreferences(
-      {@required this.serverPreferences,
-      @required this.userPreferences});
+      {@required this.serverPreferences, @required this.userPreferences});
 
   @override
   String toString() {

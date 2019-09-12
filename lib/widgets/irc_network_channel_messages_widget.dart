@@ -4,17 +4,23 @@ import 'package:flutter_appirc/blocs/irc_network_channel_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_messages_bloc.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_channel_message_model.dart';
+import 'package:flutter_appirc/models/irc_network_channel_model.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/skin/ui_skin.dart';
 
 class IRCNetworkChannelMessagesWidget extends StatelessWidget {
+
+  final IRCNetworkChannel channel;
+
+
+  IRCNetworkChannelMessagesWidget(this.channel);
+
   @override
   Widget build(BuildContext context) {
-    var channelBloc = Provider.of<IRCNetworkChannelBloc>(context);
     var loungeService = Provider.of<LoungeService>(context);
 
     var messagesBloc =
-        IRCNetworkChannelMessagesBloc(loungeService, channelBloc.channel);
+        IRCNetworkChannelMessagesBloc(loungeService, channel);
 
     return StreamBuilder<List<IRCNetworkChannelMessage>>(
         stream: messagesBloc.messagesStream,

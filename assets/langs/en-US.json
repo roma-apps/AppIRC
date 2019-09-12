@@ -1,10 +1,26 @@
 {
-  "app_name" : "AppIRC",
-  "splash" : {
+  "app_name": "AppIRC",
+  "splash": {
     "loading": "Loading"
   },
-  "networks_list": {
-    "title": "Networks list"
+  "settings": {
+    "title": "Settings",
+    "channel_dropdown_menu": {
+      "leave": "Leave",
+      "close": "Close",
+      "list_banned": "List banned users",
+      "topic": "Topic",
+      "user_information": "User information"
+    },
+    "network_dropdown_menu": {
+      "join_channel": "Join channel",
+      "edit": "Edit",
+      "list_all_channels": "List all channels",
+      "list_ignored_users": "List ignored users",
+      "disconnect": "Disconnect",
+      "connect": "Connect",
+      "exit": "Exit"
+    }
   },
   "lounge_connection": {
     "title": "Lounge connection",
@@ -26,7 +42,6 @@
       }
     }
   },
-
   "irc_connection": {
     "title": "New IRC connection",
     "network_prefs": {
@@ -45,7 +60,8 @@
       "user_name": "User name",
       "channels": "Channels"
     },
-    "connect": "Connect"
+    "connect": "Connect",
+    "save": "Save"
   },
   "join_channel": {
     "title": "Join channel",
@@ -55,11 +71,8 @@
   },
   "chat": {
     "title": "Chat",
-    "no_active_chat": "Active chat not selected",
-    "empty_chat": "This channel doesn't have any messages yet",
-    "channels": {
-      "new_connection": "New connection"
-    },
+    "no_active_channel": "Active channel not selected",
+    "empty_channel": "This channel doesn't have any messages yet",
     "users": {
       "title": "Channel users",
       "loading": "Loading"

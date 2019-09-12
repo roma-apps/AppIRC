@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
-import 'package:flutter_appirc/widgets/irc_network_channel_join_widget.dart';
+import 'package:flutter_appirc/widgets/irc_network_command_join_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworkChannelJoinPage extends StatefulWidget {
