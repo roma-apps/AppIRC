@@ -26,10 +26,16 @@ dependencies:
   # socket io protocol implementation for lounge
   adhara_socket_io: ^0.3.5
   easy_localization: ^1.3.1
+  # date formatter & locales
+  intl: ^0.15.8
   # for lounge commands serialization & local settings serialization
   json_annotation: ^3.0.0
   logger: ^0.7.0+2
   rxdart: ^0.18.1
+  # support links in messages
+  flutter_linkify: ^2.1.0
+  url_launcher: ^5.1.2
+
 
   # Platform aware widgets wrapper for iOS & Android
   flutter_platform_widgets: ^0.12.0

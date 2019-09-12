@@ -154,14 +154,19 @@ class NetworkNewLoungeRequestBody extends LoungeRequestBody {
 @JsonSerializable()
 class MessageLoungeResponseBody extends LoungeResponseBody {
   final int chan;
+  final int highlight;
+  final int unread;
   final MsgLoungeResponseBody msg;
+
+
+  MessageLoungeResponseBody(this.chan, this.highlight, this.unread, this.msg);
+
 
   @override
   String toString() {
-    return 'MessageLoungeResponseBody{chan: $chan, msg: $msg}';
+    return 'MessageLoungeResponseBody{chan: $chan, '
+        'highlight: $highlight, unread: $unread, msg: $msg}';
   }
-
-  MessageLoungeResponseBody(this.chan, this.msg);
 
   factory MessageLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$MessageLoungeResponseBodyFromJson(json);
@@ -261,17 +266,19 @@ class ChannelStateLoungeResponseBody extends LoungeResponseBody {
 class UsersLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final int unread;
+  final int highlight;
   final dynamic msg;
 
-  UsersLoungeResponseBody(this.chan, this.unread, this.msg);
+  UsersLoungeResponseBody(this.chan, this.unread, this.msg, this.highlight);
 
   factory UsersLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$UsersLoungeResponseBodyFromJson(json);
 
   @override
   String toString() {
-    return 'UsersLoungeResponseBody{chan: $chan, msg: $msg}';
+    return 'UsersLoungeResponseBody{chan: $chan, unread: $unread, highlight: $highlight, msg: $msg}';
   }
+
 }
 
 @JsonSerializable()

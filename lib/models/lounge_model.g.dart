@@ -80,6 +80,8 @@ MessageLoungeResponseBody _$MessageLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MessageLoungeResponseBody(
     json['chan'] as int,
+    json['highlight'] as int,
+    json['unread'] as int,
     json['msg'] == null
         ? null
         : MsgLoungeResponseBody.fromJson(json['msg'] as Map<String, dynamic>),
@@ -90,6 +92,8 @@ Map<String, dynamic> _$MessageLoungeResponseBodyToJson(
         MessageLoungeResponseBody instance) =>
     <String, dynamic>{
       'chan': instance.chan,
+      'highlight': instance.highlight,
+      'unread': instance.unread,
       'msg': instance.msg,
     };
 
@@ -186,6 +190,7 @@ UsersLoungeResponseBody _$UsersLoungeResponseBodyFromJson(
     json['chan'] as int,
     json['unread'] as int,
     json['msg'],
+    json['highlight'] as int,
   );
 }
 
@@ -194,6 +199,7 @@ Map<String, dynamic> _$UsersLoungeResponseBodyToJson(
     <String, dynamic>{
       'chan': instance.chan,
       'unread': instance.unread,
+      'highlight': instance.highlight,
       'msg': instance.msg,
     };
 

@@ -18,6 +18,7 @@ class AppSkin {
   final TextStyle networksListChannelTextStyle;
   final TextStyle networksListActiveChannelTextStyle;
   final TextStyle topicTextStyle;
+  final TextStyle channelMessagesBodyTextStyle;
 
   AppSkin(
       {@required this.accentColor,
@@ -29,6 +30,7 @@ class AppSkin {
       @required this.networksListChannelTextStyle,
       @required this.enterMessageTextStyle,
       @required this.networksListActiveChannelTextStyle,
+      @required this.channelMessagesBodyTextStyle,
       @required this.topicTextStyle});
 }
 
@@ -48,23 +50,25 @@ class UISkin extends Providable {
           formRowLabelTextStyle: iosTextTheme.navTitleTextStyle,
           networksListNetworkTextStyle: iosTextTheme.navTitleTextStyle,
           channelMessagesNickTextStyle: iosTextTheme.navTitleTextStyle,
-          channelMessagesDateTextStyle: iosTextTheme.textStyle,
+          channelMessagesDateTextStyle: iosTextTheme.navTitleTextStyle,
           networksListChannelTextStyle: iosTextTheme.textStyle,
-          topicTextStyle: iosTextTheme.textStyle,
+          topicTextStyle: iosTextTheme.textStyle.copyWith(color: Colors.white),
           networksListActiveChannelTextStyle: iosTextTheme.navTitleTextStyle,
           networksListActiveNetworkTextStyle: iosTextTheme.navTitleTextStyle,
-          enterMessageTextStyle: iosTextTheme.textStyle.copyWith(color: Colors.white));
+          enterMessageTextStyle: iosTextTheme.textStyle.copyWith(color: Colors.white),
+          channelMessagesBodyTextStyle:  iosTextTheme.textStyle);
     } else if (Platform.isAndroid) {
       appSkin = AppSkin(
           accentColor: androidTheme.accentColor,
           formRowLabelTextStyle: androidTextTheme.title,
           networksListNetworkTextStyle: androidTheme.textTheme.title,
-          channelMessagesNickTextStyle: androidTheme.textTheme.subtitle,
-          channelMessagesDateTextStyle: androidTheme.textTheme.subtitle,
+          channelMessagesNickTextStyle: androidTheme.textTheme.body1.copyWith(fontWeight: FontWeight.bold),
+          channelMessagesDateTextStyle: androidTheme.textTheme.caption,
           networksListChannelTextStyle: androidTheme.textTheme.body2,
-          topicTextStyle: androidTheme.textTheme.body1,
+          topicTextStyle: androidTheme.textTheme.headline.copyWith(color: Colors.white),
           networksListActiveChannelTextStyle: androidTheme.textTheme.title,
           networksListActiveNetworkTextStyle: androidTextTheme.title,
+          channelMessagesBodyTextStyle:  androidTheme.textTheme.body1.copyWith(height: 1.5),
           enterMessageTextStyle: androidTheme.textTheme.body1.copyWith(color: Colors.white));
     } else {
       Future.error("UISkin Platform ${Platform.operatingSystem} not supported");

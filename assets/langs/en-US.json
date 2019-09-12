@@ -76,6 +76,22 @@
     "enter_message": {
       "hint": "Enter message..."
     },
+    "sub_message": {
+      "mode_short": "mode {}",
+      "mode_long": "mode",
+      "notice": "notice",
+      "join": "joined",
+      "motd": "motd: {}",
+      "who_is": "(who is)",
+      "away": "away",
+      "back": "back",
+      "error": "error",
+      "topic_set_by": "set topic",
+      "topic": "Topic",
+      "unknown": "unknown",
+      "quit": "quit",
+      "channel_mode": "Channel mode: {}"
+    },
     "users": {
       "title": "Channel users",
       "loading": "Loading"
