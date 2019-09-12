@@ -13,6 +13,7 @@ import 'package:rxdart/rxdart.dart';
 
 
 const String _networkLoungeEvent = "network";
+const String _nickLoungeEvent = "nick";
 const String _msgLoungeEvent = "msg";
 const String _configurationLoungeEvent = "configuration";
 const String _authorizedLoungeEvent = "authorized";
@@ -36,6 +37,9 @@ class LoungeService extends Providable {
 
   ReplaySubject<MessageLoungeResponseBody> _messagesController =
       new ReplaySubject<MessageLoungeResponseBody>();
+
+  BehaviorSubject<NickLoungeResponseBody> _nickController =
+      new BehaviorSubject<NickLoungeResponseBody>();
 
   Stream<MessageLoungeResponseBody> get messagesStream =>
       _messagesController.stream;
@@ -188,6 +192,7 @@ class LoungeService extends Providable {
     _networkOptionsController.close();
     _networkStatusController.close();
     _channelStateController.close();
+    _nickController.close();
 
     disconnect();
   }
@@ -230,6 +235,7 @@ class LoungeService extends Providable {
 
     socketIOService.on(_networkLoungeEvent, _onNetworkResponse);
     socketIOService.on(_msgLoungeEvent, _onMessageResponse);
+    socketIOService.on(_nickLoungeEvent, _onNickResponse);
     socketIOService.on(_topicLoungeEvent, _onTopicResponse);
     socketIOService.on(_configurationLoungeEvent, _onConfigurationResponse);
     socketIOService.on(_authorizedLoungeEvent, _onAuthorizedResponse);
@@ -246,6 +252,7 @@ class LoungeService extends Providable {
   void _removeSubscriptions() {
     socketIOService.off(_networkLoungeEvent, _onNetworkResponse);
     socketIOService.off(_msgLoungeEvent, _onMessageResponse);
+    socketIOService.off(_nickLoungeEvent, _onNickResponse);
     socketIOService.off(_topicLoungeEvent, _onTopicResponse);
     socketIOService.off(_configurationLoungeEvent, _onConfigurationResponse);
     socketIOService.off(_authorizedLoungeEvent, _onAuthorizedResponse);
@@ -269,6 +276,13 @@ class LoungeService extends Providable {
     _logger.i(() => "_onMessageResponse $raw");
     var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _messagesController.sink.add(data);
+  }
+
+
+  void _onNickResponse(raw) {
+    _logger.i(() => "_onNickResponse $raw");
+    var data = NickLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    _nickController.sink.add(data);
   }
 
   void _onConfigurationResponse(raw) {

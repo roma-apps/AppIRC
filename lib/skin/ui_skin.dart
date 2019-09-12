@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart'
     show CupertinoThemeData, CupertinoTextThemeData;
-import 'package:flutter/material.dart' show ThemeData, TextTheme;
+import 'package:flutter/material.dart' show Colors, TextTheme, ThemeData;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 
@@ -14,6 +14,7 @@ class AppSkin {
   final TextStyle networksListActiveNetworkTextStyle;
   final TextStyle channelMessagesNickTextStyle;
   final TextStyle channelMessagesDateTextStyle;
+  final TextStyle enterMessageTextStyle;
   final TextStyle networksListChannelTextStyle;
   final TextStyle networksListActiveChannelTextStyle;
   final TextStyle topicTextStyle;
@@ -26,6 +27,7 @@ class AppSkin {
       @required this.channelMessagesNickTextStyle,
       @required this.channelMessagesDateTextStyle,
       @required this.networksListChannelTextStyle,
+      @required this.enterMessageTextStyle,
       @required this.networksListActiveChannelTextStyle,
       @required this.topicTextStyle});
 }
@@ -50,7 +52,8 @@ class UISkin extends Providable {
           networksListChannelTextStyle: iosTextTheme.textStyle,
           topicTextStyle: iosTextTheme.textStyle,
           networksListActiveChannelTextStyle: iosTextTheme.navTitleTextStyle,
-          networksListActiveNetworkTextStyle: iosTextTheme.navTitleTextStyle);
+          networksListActiveNetworkTextStyle: iosTextTheme.navTitleTextStyle,
+          enterMessageTextStyle: iosTextTheme.textStyle.copyWith(color: Colors.white));
     } else if (Platform.isAndroid) {
       appSkin = AppSkin(
           accentColor: androidTheme.accentColor,
@@ -61,7 +64,8 @@ class UISkin extends Providable {
           networksListChannelTextStyle: androidTheme.textTheme.body2,
           topicTextStyle: androidTheme.textTheme.body1,
           networksListActiveChannelTextStyle: androidTheme.textTheme.title,
-          networksListActiveNetworkTextStyle: androidTextTheme.title);
+          networksListActiveNetworkTextStyle: androidTextTheme.title,
+          enterMessageTextStyle: androidTheme.textTheme.body1.copyWith(color: Colors.white));
     } else {
       Future.error("UISkin Platform ${Platform.operatingSystem} not supported");
     }

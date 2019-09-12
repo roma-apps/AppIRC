@@ -21,16 +21,10 @@ class IRCNetworkChannelMessagesBloc extends Providable {
     _messagesSubscription = _lounge.messagesStream.listen((loungeMessage) {
       if (loungeMessage.chan == channel.remoteId) {
         var msg = loungeMessage.msg;
-        var channelMessage = IRCNetworkChannelMessage(
-            text: msg.text,
-            author: msg.from.nick,
-            date: DateTime.parse(msg.time),
-            type: msg.type,
-            realName: "");
-        _logger.i(() =>
-            "new msg for ${channel.name}: $loungeMessage \n"
-                " converted to $channelMessage");
-        _messages.add(channelMessage);
+        var ircMessage = toIRCMessage(msg);
+        _logger.i(() => "new msg for ${channel.name}: $loungeMessage \n"
+            " converted to $ircMessage");
+        _messages.add(ircMessage);
         _messagesController.sink.add(UnmodifiableListView(_messages));
       }
     });
