@@ -21,7 +21,12 @@ class ButtonLoadingWidget extends StatelessWidget {
               data == null ? AsyncOperationBloc.defaultValue : data;
 
           if (inProgress) {
-            return PlatformButton(child: child, onPressed: onPressed);
+            return PlatformButton(child: Row(
+              children: <Widget>[
+                PlatformCircularProgressIndicator(),
+                child,
+              ],
+            ), onPressed: onPressed);
           } else {
             return PlatformButton(child: child, onPressed: onPressed);
           }

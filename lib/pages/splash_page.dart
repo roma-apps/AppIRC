@@ -15,7 +15,6 @@ import 'package:flutter_appirc/service/preferences_service.dart';
 import 'package:flutter_appirc/widgets/lounge_new_connection_widget.dart';
 import 'package:flutter_appirc/skin/ui_skin.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 var _logger = MyLogger(logTag: "SplashPage", enabled: true);
 
@@ -50,10 +49,7 @@ class SplashScreenState extends State<SplashPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: SpinKitRotatingCircle(
-                      color: uiSkin.appSkin.accentColor,
-                      size: 50.0,
-                    ),
+                    child: PlatformCircularProgressIndicator(),
                   )
                 ]),
           ),

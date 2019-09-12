@@ -30,8 +30,6 @@ dependencies:
   json_annotation: ^3.0.0
   logger: ^0.7.0+2
   rxdart: ^0.18.1
-  # loading indicator
-  flutter_spinkit: "^4.0.0"
 
   # Platform aware widgets wrapper for iOS & Android
   flutter_platform_widgets: ^0.12.0

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' show Divider;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/widgets/platform_aware_widgets.dart';
 import 'package:flutter_appirc/skin/ui_skin.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -49,7 +48,7 @@ buildFormBooleanRow(String title, bool startValue, BooleanCallback callback) =>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(title),
-          buildPlatformAwareCheckBox(
+          PlatformSwitch(
             value: startValue,
             onChanged: callback,
           ),
