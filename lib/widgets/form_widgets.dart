@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' show Divider;
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/skin/ui_skin.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';

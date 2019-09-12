@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/blocs/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
 import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
@@ -8,31 +9,51 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'form_widgets.dart';
 
-var _logger = MyLogger(logTag: "LoungeNewConnectionWidget", enabled: true);
+var _logger = MyLogger(logTag: "LoungePreferencesWidget", enabled: true);
 
-class LoungeNewConnectionWidget extends StatefulWidget {
+class LoungePreferencesWidget extends StatefulWidget {
+
+  final LoungePreferences preferences;
+
+
+  LoungePreferencesWidget(this.preferences);
+
   @override
-  State<StatefulWidget> createState() => LoungeNewConnectionState();
+  State<StatefulWidget> createState() => LoungePreferencesWidgetState(preferences);
 }
 
-class LoungeNewConnectionState extends State<LoungeNewConnectionWidget> {
-  final _hostController = TextEditingController();
+class LoungePreferencesWidgetState extends State<LoungePreferencesWidget> {
+
+
+  final LoungePreferences preferences;
+
+
+  TextEditingController _hostController;
+  LoungePreferencesWidgetState(this.preferences) {
+    _hostController = TextEditingController(text:preferences.host);
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final LoungeNewConnectionBloc lounge =
-        Provider.of<LoungeNewConnectionBloc>(context);
+    final LoungeConnectionBloc loungeConnectionBloc =
+        Provider.of<LoungeConnectionBloc>(context);
 
-    _hostController.text = lounge.newLoungePreferences.host;
+
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       children: <Widget>[
         buildFormTitle(
-            context, appLocalizations.tr('lounge_connection.settings')),
+            context, appLocalizations.tr('lounge.connection.settings')),
         buidFormTextRow(
-            appLocalizations.tr('lounge_connection.host'), _hostController,
+            appLocalizations.tr('lounge.connection.host'), _hostController,
             (value) {
-          _fillPreferencesFromUI(lounge);
+          _fillPreferencesFromUI(loungeConnectionBloc);
         }),
       ],
     );
@@ -57,44 +78,44 @@ PlatformAlertDialog buildLoungeConnectionErrorAlertDialog(
       switch (connectionException.runtimeType) {
         case AlreadyConnectedLoungeException:
           title = appLocalizations
-              .tr('lounge_connection.dialog.already_connected.title');
+              .tr('lounge.connection.dialog.already_connected.title');
           content = appLocalizations
-              .tr('lounge_connection.dialog.already_connected.content');
+              .tr('lounge.connection.dialog.already_connected.content');
           break;
         case ConnectionTimeoutLoungeException:
           title = appLocalizations
-              .tr('lounge_connection.dialog.connection_timeout.title');
+              .tr('lounge.connection.dialog.connection_timeout.title');
           content = appLocalizations
-              .tr('lounge_connection.dialog.connection_timeout.content');
+              .tr('lounge.connection.dialog.connection_timeout.content');
           break;
         case ConnectionErrorLoungeException:
           var connectionErrorException =
               connectionException as ConnectionErrorLoungeException;
           title = appLocalizations
-              .tr('lounge_connection.dialog.connection_error.title');
+              .tr('lounge.connection.dialog.connection_error.title');
           content = appLocalizations.tr(
-              'lounge_connection.dialog.connection_error.content',
+              'lounge.connection.dialog.connection_error.content',
               args: [connectionErrorException.data]);
           break;
         default:
           title = appLocalizations
-              .tr('lounge_connection.dialog.connection_error.title');
+              .tr('lounge.connection.dialog.connection_error.title');
           content = appLocalizations.tr(
-              'lounge_connection.dialog.connection_error.content',
+              'lounge.connection.dialog.connection_error.content',
               args: [e.toString()]);
       }
     } else {
       title = appLocalizations
-          .tr('lounge_connection.dialog.connection_error.title');
+          .tr('lounge.connection.dialog.connection_error.title');
       content = appLocalizations.tr(
-          'lounge_connection.dialog.connection_error.content',
+          'lounge.connection.dialog.connection_error.content',
           args: [e.toString()]);
     }
   } else {
     title =
-        appLocalizations.tr('lounge_connection.dialog.connection_error.title');
+        appLocalizations.tr('lounge.connection.dialog.connection_error.title');
     content = appLocalizations
-        .tr('lounge_connection.dialog.connection_error.content');
+        .tr('lounge.connection.dialog.connection_error.content');
   }
 
   return PlatformAlertDialog(title: Text(title), content: Text(content));

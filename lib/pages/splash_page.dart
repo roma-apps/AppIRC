@@ -12,7 +12,7 @@ import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
 import 'package:flutter_appirc/pages/lounge_new_connection_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
-import 'package:flutter_appirc/widgets/lounge_new_connection_widget.dart';
+import 'package:flutter_appirc/widgets/lounge_preferences_widget.dart';
 import 'package:flutter_appirc/skin/ui_skin.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 

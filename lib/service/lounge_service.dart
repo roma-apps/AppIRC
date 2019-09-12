@@ -11,7 +11,6 @@ import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/service/socketio_service.dart';
 import 'package:rxdart/rxdart.dart';
 
-
 const String _networkLoungeEvent = "network";
 const String _nickLoungeEvent = "nick";
 const String _msgLoungeEvent = "msg";
@@ -34,6 +33,12 @@ class LoungeService extends Providable {
   SocketIOService socketIOService;
 
   LoungeService(this.socketIOManager);
+
+  BehaviorSubject<LoungePreferences> _loungePreferencesController =
+      new BehaviorSubject<LoungePreferences>();
+
+  Stream<LoungePreferences> get loungePreferencesStream =>
+      _loungePreferencesController.stream;
 
   ReplaySubject<MessageLoungeResponseBody> _messagesController =
       new ReplaySubject<MessageLoungeResponseBody>();
@@ -107,7 +112,7 @@ class LoungeService extends Providable {
       socketIOService != null && socketIOService.isProbablyConnected;
 
   _sendCommand(LoungeRequest request) async {
-    _logger.d(()=>"_sendCommand $request");
+    _logger.d(() => "_sendCommand $request");
     return await socketIOService.emit(request);
   }
 
@@ -156,16 +161,17 @@ class LoungeService extends Providable {
 
     _logger.i(() => "finish connecting connected = $connected");
 
-
     socketIOService.offConnect(connectListener);
     socketIOService.offConnectTimeout(connectTimeoutListener);
     socketIOService.offConnectError(connectErrorListener);
 
-
-
     if (connectionException != null) {
       disconnect();
       throw connectionException;
+    }
+
+    if (connected) {
+      _loungePreferencesController.add(preferences);
     }
 
     return connected;
@@ -173,9 +179,14 @@ class LoungeService extends Providable {
 
   disconnect() async {
     _removeSubscriptions();
-    var result = await socketIOService.disconnect();
-    socketIOService = null;
-    return result;
+    if (isProbablyConnected) {
+      var result = await socketIOService.disconnect();
+
+      socketIOService = null;
+      return result;
+    } else {
+      return true;
+    }
   }
 
   @override
@@ -194,14 +205,18 @@ class LoungeService extends Providable {
     _channelStateController.close();
     _nickController.close();
 
+    _loungePreferencesController.close();
+
     disconnect();
   }
 
   sendOpenRequest(IRCNetworkChannel channel) async => await _sendCommand(
       LoungeRawRequest(name: "open", body: [channel.remoteId]));
 
-  sendNamesRequest(IRCNetworkChannel channel) async => await _sendCommand(
-      LoungeJsonRequest(name: "names", body: NamesLoungeRequestBody(target: channel.remoteId)));
+  sendNamesRequest(IRCNetworkChannel channel) async =>
+      await _sendCommand(LoungeJsonRequest(
+          name: "names",
+          body: NamesLoungeRequestBody(target: channel.remoteId)));
 
   sendNewNetworkRequest(IRCNetworkPreferences channelConnectionInfo) async {
     var networkPreferences = channelConnectionInfo.serverPreferences;
@@ -267,7 +282,7 @@ class LoungeService extends Providable {
   }
 
   void _onTopicResponse(raw) {
-    _logger.i(() =>"_onTopicResponse $raw");
+    _logger.i(() => "_onTopicResponse $raw");
     var data = TopicLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _topicController.sink.add(data);
   }
@@ -277,7 +292,6 @@ class LoungeService extends Providable {
     var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _messagesController.sink.add(data);
   }
-
 
   void _onNickResponse(raw) {
     _logger.i(() => "_onNickResponse $raw");

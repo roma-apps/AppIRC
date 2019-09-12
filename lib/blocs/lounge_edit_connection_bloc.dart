@@ -1,26 +1,33 @@
+import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 
 import 'lounge_connection_bloc.dart';
 
-class LoungeNewConnectionBloc extends LoungeConnectionBloc {
-  final LoungeService loungeService;
+class LoungeEditConnectionBloc extends LoungeConnectionBloc {
+  final SocketIOManager socketIOManager;
 
   final LoungePreferencesBloc preferencesBloc;
 
-  LoungeNewConnectionBloc(
-      {@required this.loungeService,
+  LoungeEditConnectionBloc(
+      {@required this.socketIOManager,
       @required this.preferencesBloc,
       @required newLoungePreferences})
       : super(newLoungePreferences: newLoungePreferences);
 
-  Future<bool> connect() async {
+  Future<bool> checkPreferences() async {
     onOperationStarted();
+
+    var loungeService = LoungeService(socketIOManager);
+
     var result = await loungeService.connect(newLoungePreferences);
+
     if (result) {
-      preferencesBloc.setNewPreferenceValue(newLoungePreferences);
+      loungeService.disconnect();
     }
+    loungeService.dispose();
+
     onOperationFinished();
     return result;
   }

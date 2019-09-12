@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
+import 'package:flutter_appirc/pages/lounge_edit_connection_page.dart';
 import 'package:flutter_appirc/pages/lounge_new_connection_page.dart';
 import 'package:flutter_appirc/widgets/irc_networks_list_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -20,10 +21,10 @@ class IRCChatSettingsWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: _buildNewNetworkButton(context),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildLoungeSettingsButton(context),
-            )
+//            Padding(
+//              padding: const EdgeInsets.all(8.0),
+//              child: _buildLoungeSettingsButton(context),
+//            )
           ],
         ),
       ],
@@ -46,7 +47,7 @@ class IRCChatSettingsWidget extends StatelessWidget {
           Navigator.push(
               context,
               platformPageRoute(
-                  builder: (context) => LoungeNewConnectionPage()));
+                  builder: (context) => LoungeEditConnectionPage()));
         },
         androidIcon: Icon(Icons.settings),
         iosIcon: Icon(CupertinoIcons.settings),

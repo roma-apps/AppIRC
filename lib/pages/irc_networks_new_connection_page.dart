@@ -42,27 +42,25 @@ class IRCNetworksNewConnectionState
       appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('irc_connection.title')),
       ),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Provider<IRCNetworksNewConnectionBloc>(
-              bloc: ircNetworksNewConnectionBloc,
-              child: ListView(shrinkWrap: true, children: [
-                IRCNetworkServerPreferencesWidget(),
-                IRCNetworkUserPreferencesWidget()
-              ]),
-            ),
-            Provider<AsyncOperationBloc>(
-              bloc: ircNetworksNewConnectionBloc,
-              child: ButtonLoadingWidget(
-                child: Text(
-                    AppLocalizations.of(context).tr('irc_connection.connect')),
-                onPressed: () {
-                  _sendNetworkRequest(ircNetworksNewConnectionBloc, context);
-                },
-              ),
-            )
-          ],
+      body: Provider<IRCNetworksNewConnectionBloc>(
+        bloc: ircNetworksNewConnectionBloc,
+        child: SafeArea(
+          child: ListView(
+            children: <Widget>[
+              IRCNetworkServerPreferencesWidget(),
+              IRCNetworkUserPreferencesWidget(),
+              Provider<AsyncOperationBloc>(
+                bloc: ircNetworksNewConnectionBloc,
+                child: ButtonLoadingWidget(
+                  child: Text(AppLocalizations.of(context)
+                      .tr('irc_connection.connect')),
+                  onPressed: () {
+                    _sendNetworkRequest(ircNetworksNewConnectionBloc, context);
+                  },
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

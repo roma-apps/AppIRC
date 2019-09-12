@@ -2,7 +2,7 @@ import 'package:flutter_appirc/blocs/preferences_bloc.dart';
 import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
 
-const _preferencesStorageKey = "lounge_connection";
+const _preferencesStorageKey = "lounge.connection";
 
 LoungePreferences createDefaultLoungePreferences() =>
     LoungePreferences(host: "https://demo.thelounge.chat/");

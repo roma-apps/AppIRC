@@ -22,25 +22,42 @@
       "exit": "Exit"
     }
   },
-  "lounge_connection": {
-    "title": "Lounge connection",
-    "settings": "Settings",
-    "host": "Host",
-    "connect": "Connect",
-    "dialog": {
-      "already_connected": {
-        "title": "Already connected",
-        "content": "Disconnect from current Lounge server and try again"
+  "lounge": {
+    "connection": {
+      "settings": "Settings",
+      "host": "Host",
+
+
+      "dialog": {
+        "already_connected": {
+          "title": "Already connected",
+          "content": "Disconnect from current Lounge server and try again"
+        },
+        "connection_timeout": {
+          "title": "Connection timeout",
+          "content": "Check your network and try again"
+        },
+        "connection_error": {
+          "title": "Connection error",
+          "content": "Error during connection: {}"
+        }
       },
-      "connection_timeout": {
-        "title": "Connection timeout",
-        "content": "Check your network and try again"
+      "new": {
+        "title": "New lounge connection",
+        "connect": "Connect"
       },
-      "connection_error": {
-        "title": "Connection error",
-        "content": "Error during connection: {}"
+      "edit": {
+        "title": "Change lounge connection",
+        "change": "Change",
+        "confirm_dialog": {
+          "title": "Are you sure?",
+          "content": "You will be disconnected from current Lounge server and all local history will be cleared",
+          "save_reload": "Save & Reload",
+          "cancel": "Cancel"
+        }
       }
     }
+
   },
   "irc_connection": {
     "title": "New IRC connection",
