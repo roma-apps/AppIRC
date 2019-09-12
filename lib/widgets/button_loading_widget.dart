@@ -13,23 +13,21 @@ class ButtonLoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var asyncBloc = Provider.of<AsyncOperationBloc>(context);
 
-    return StreamBuilder<bool>(
-        stream: asyncBloc.outInProgress,
-        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          var data = snapshot.data;
-          var inProgress =
-              data == null ? AsyncOperationBloc.defaultValue : data;
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: StreamBuilder<bool>(
+          stream: asyncBloc.outInProgress,
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            var data = snapshot.data;
+            var inProgress =
+                data == null ? AsyncOperationBloc.defaultValue : data;
 
-          if (inProgress) {
-            return PlatformButton(child: Row(
-              children: <Widget>[
-                PlatformCircularProgressIndicator(),
-                child,
-              ],
-            ), onPressed: onPressed);
-          } else {
-            return PlatformButton(child: child, onPressed: onPressed);
-          }
-        });
+            if (inProgress) {
+              return PlatformCircularProgressIndicator();
+            } else {
+              return PlatformButton(child: child, onPressed: onPressed);
+            }
+          }),
+    );
   }
 }
