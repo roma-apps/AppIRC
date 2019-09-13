@@ -19,21 +19,33 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 var _logger = MyLogger(logTag: "SplashPage", enabled: true);
 
 class SplashPage extends StatefulWidget {
+  Function(BuildContext context) init;
+
+
+  SplashPage(this.init);
+
   @override
-  State<StatefulWidget> createState() => SplashScreenState();
+  State<StatefulWidget> createState() => SplashScreenState(init);
 }
 
 class SplashScreenState extends State<SplashPage> {
-  @override
-  void initState() {
-    super.initState();
-    init(context);
-  }
+  Function(BuildContext context) init;
+
+  bool isAlreadyInit = false;
+
+  SplashScreenState(this.init);
 
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
     var uiSkin = Provider.of<UISkin>(context);
+
+    if(!isAlreadyInit) {
+      Future.delayed(Duration(milliseconds: 100), () {
+        init(context);
+      });
+    }
+    isAlreadyInit = true;
 
     return PlatformScaffold(
         appBar: PlatformAppBar(title: Text(appLocalizations.tr("app_name"))),
@@ -56,68 +68,4 @@ class SplashScreenState extends State<SplashPage> {
         ));
   }
 
-  Future init(BuildContext context) async {
-    var loungeService = Provider.of<LoungeService>(context);
-
-    var preferencesService = Provider.of<PreferencesService>(context);
-
-    await preferencesService.init();
-
-    var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
-    var ircNetworksPreferencesBloc =
-        Provider.of<IRCNetworksPreferencesBloc>(context);
-
-    var isSavedLoungePreferenceExist =
-        loungePreferencesBloc.isSavedPreferenceExist;
-
-    _logger.i(() =>
-        "init isSavedLoungePreferenceExist $isSavedLoungePreferenceExist");
-
-    Widget nextPage;
-
-    if (isSavedLoungePreferenceExist) {
-      var connected = await connectToLounge(
-        context,
-        LoungeNewConnectionBloc(
-            loungeService: loungeService,
-            preferencesBloc: loungePreferencesBloc,
-            newLoungePreferences: loungePreferencesBloc.preferenceOrDefault),
-      );
-
-      _logger.i(() => "init connectedLounge $connected");
-
-      if (connected) {
-        var isSavedIRCNetworksPreferenceExist =
-            ircNetworksPreferencesBloc.isSavedPreferenceExist;
-
-        _logger.i(() => "init isSavedIRCNetworksPreferenceExist"
-            " $isSavedIRCNetworksPreferenceExist");
-
-        if (isSavedIRCNetworksPreferenceExist) {
-          var networksPreferences =
-              ircNetworksPreferencesBloc.preferenceOrDefault;
-
-          for (IRCNetworkPreferences networkPreferences
-              in networksPreferences.networks) {
-            var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
-                loungeService: loungeService,
-                preferencesBloc: ircNetworksPreferencesBloc,
-                newConnectionPreferences: networkPreferences);
-            await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
-          }
-
-          nextPage = IRCChatPage();
-        } else {
-          nextPage = IRCNetworksNewConnectionPage(isOpenedFromAppStart: true);
-        }
-      } else {
-        nextPage = IRCChatPage();
-      }
-    } else {
-      nextPage = LoungeNewConnectionPage();
-    }
-
-    Navigator.pushReplacement(
-        context, platformPageRoute(builder: (context) => nextPage, maintainState: false));
-  }
 }

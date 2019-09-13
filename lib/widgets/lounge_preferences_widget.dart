@@ -33,12 +33,6 @@ class LoungePreferencesWidgetState extends State<LoungePreferencesWidget> {
     _hostController = TextEditingController(text:preferences.host);
   }
 
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final LoungeConnectionBloc loungeConnectionBloc =

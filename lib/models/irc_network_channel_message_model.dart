@@ -195,6 +195,9 @@ IRCNetworkChannelMessageType detectIRCNetworkChannelMessageType(
     case "quit":
       type = IRCNetworkChannelMessageType.QUIT;
       break;
+    case "raw":
+      type = IRCNetworkChannelMessageType.RAW;
+      break;
 
     default:
       type = IRCNetworkChannelMessageType.UNKNOWN;
@@ -217,6 +220,7 @@ enum IRCNetworkChannelMessageType {
   ERROR,
   AWAY,
   BACK,
+  RAW,
   MODE_CHANNEL,
   QUIT,
 }

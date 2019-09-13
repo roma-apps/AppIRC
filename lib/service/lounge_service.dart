@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adhara_socket_io/adhara_socket_io.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_channel_model.dart';
@@ -27,8 +28,14 @@ const String _channelStateOptionsLoungeEvent = "channel:state";
 
 var _logger = MyLogger(logTag: "LoungeService", enabled: true);
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
+const _timeoutForRequestsWithResponse = Duration(seconds: 10);
+const _timeBetweenCheckResultForRequestsWithResponse =
+    Duration(milliseconds: 100);
+const _timeBetweenCheckAnotherRequestInProgress = Duration(milliseconds: 100);
 
 class LoungeService extends Providable {
+  bool requestWithResultInProgress = false;
+
   SocketIOManager socketIOManager;
   SocketIOService socketIOService;
 
@@ -49,10 +56,13 @@ class LoungeService extends Providable {
   Stream<MessageLoungeResponseBody> get messagesStream =>
       _messagesController.stream;
 
-  BehaviorSubject<NetworksLoungeResponseBody> _networksController =
-      new BehaviorSubject<NetworksLoungeResponseBody>();
+  var _networksController = new BehaviorSubject<
+      LoungeResultForRequest<LoungeJsonRequest<NetworkNewLoungeRequestBody>,
+          NetworksLoungeResponseBody>>();
 
-  Stream<NetworksLoungeResponseBody> get networksStream =>
+  Stream<
+      LoungeResultForRequest<LoungeJsonRequest<NetworkNewLoungeRequestBody>,
+          NetworksLoungeResponseBody>> get networksStream =>
       _networksController.stream;
 
   BehaviorSubject<ConfigurationLoungeResponseBody> _configurationController =
@@ -111,9 +121,60 @@ class LoungeService extends Providable {
   bool get isProbablyConnected =>
       socketIOService != null && socketIOService.isProbablyConnected;
 
-  _sendCommand(LoungeRequest request) async {
+  _sendRequest(LoungeRequest request) async {
     _logger.d(() => "_sendCommand $request");
     return await socketIOService.emit(request);
+  }
+
+  Future<K> _sendRequestWithResult<T extends LoungeRequest, K>(
+      {@required T request,
+      String resultEventName,
+      @required K resultParser(dynamic),
+      Duration timeout = _timeoutForRequestsWithResponse}) async {
+    _logger.d(() => "_sendCommandWithResult start $request"
+        " resultEventName $resultEventName"
+        " requestWithResultInProgress = $requestWithResultInProgress");
+
+    var timeout = false;
+
+    // setup timeout
+    Future.delayed(_timeoutForRequestsWithResponse, () {
+      timeout = true;
+    });
+
+    // avoid several requests with result in one time
+    while (requestWithResultInProgress && !timeout) {
+      await Future.delayed(_timeBetweenCheckAnotherRequestInProgress, () {});
+    }
+    var resultRaw;
+
+
+    if (!timeout) {
+      var resultHandler = (raw) {
+        _logger.d(() => "resultHandler $raw");
+        resultRaw = raw;
+
+
+      };
+
+      socketIOService.on(resultEventName, resultHandler);
+
+      await socketIOService.emit(request);
+
+      // wait for response or timeout
+      while (timeout != true && resultRaw == null) {
+        await Future.delayed(
+            _timeBetweenCheckResultForRequestsWithResponse, () {});
+      }
+
+      socketIOService.off(resultEventName, resultHandler);
+    }
+
+    if (timeout == true) {
+      throw RequestWithResultTimeoutLoungeException(request);
+    } else {
+      return resultParser(resultRaw);
+    }
   }
 
   Future<bool> connect(LoungePreferences preferences) async {
@@ -210,23 +271,31 @@ class LoungeService extends Providable {
     disconnect();
   }
 
-  sendOpenRequest(IRCNetworkChannel channel) async => await _sendCommand(
+  sendOpenRequest(IRCNetworkChannel channel) async => await _sendRequest(
       LoungeRawRequest(name: "open", body: [channel.remoteId]));
 
   sendNamesRequest(IRCNetworkChannel channel) async =>
-      await _sendCommand(LoungeJsonRequest(
+      await _sendRequest(LoungeJsonRequest(
           name: "names",
           body: NamesLoungeRequestBody(target: channel.remoteId)));
 
-  sendNewNetworkRequest(IRCNetworkPreferences channelConnectionInfo) async {
-    var networkPreferences = channelConnectionInfo.serverPreferences;
-    var userPreferences = channelConnectionInfo.userPreferences;
-    await _sendCommand(LoungeJsonRequest(
+  Future<
+      LoungeResultForRequest<LoungeJsonRequest<NetworkNewLoungeRequestBody>,
+          NetworksLoungeResponseBody>> sendNewNetworkRequest(
+      IRCNetworkPreferences channelConnectionInfo) async {
+    var networkConnectionPreferences =
+        channelConnectionInfo.networkConnectionPreferences;
+
+
+    var networkPreferences = networkConnectionPreferences.serverPreferences;
+    var userPreferences = networkConnectionPreferences.userPreferences;
+
+    var request = LoungeJsonRequest(
         name: "network:new",
         body: NetworkNewLoungeRequestBody(
           username: userPreferences.username,
           nick: userPreferences.nickname,
-          join: userPreferences.channels.join(" "),
+          join: channelConnectionInfo.notLobbyChannelsString,
           realname: userPreferences.realName,
           password: userPreferences.password,
           host: networkPreferences.serverHost,
@@ -235,11 +304,26 @@ class LoungeService extends Providable {
               ? loungeOn
               : loungeOff,
           tls: networkPreferences.useTls ? loungeOn : loungeOff,
-        )));
+          name: networkPreferences.name,
+        ));
+
+    var result = await _sendRequestWithResult(
+        request: request,
+        resultEventName: _networkLoungeEvent,
+        resultParser: (raw) =>
+            NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw)));
+
+    if (result != null) {
+      var loungeResultForRequest = LoungeResultForRequest(request, result);
+      _networksController.add(loungeResultForRequest);
+      return loungeResultForRequest;
+    } else {
+      return null;
+    }
   }
 
   sendChatMessageRequest(int remoteChannelId, String text) async =>
-      await _sendCommand(LoungeJsonRequest(
+      await _sendRequest(LoungeJsonRequest(
           name: "input",
           body: InputLoungeRequestBody(text: text, target: remoteChannelId)));
 
@@ -248,7 +332,7 @@ class LoungeService extends Providable {
       sendSettingsGetRequest();
     });
 
-    socketIOService.on(_networkLoungeEvent, _onNetworkResponse);
+//    socketIOService.on(_networkLoungeEvent, _onNetworkResponse);
     socketIOService.on(_msgLoungeEvent, _onMessageResponse);
     socketIOService.on(_nickLoungeEvent, _onNickResponse);
     socketIOService.on(_topicLoungeEvent, _onTopicResponse);
@@ -265,7 +349,7 @@ class LoungeService extends Providable {
   }
 
   void _removeSubscriptions() {
-    socketIOService.off(_networkLoungeEvent, _onNetworkResponse);
+//    socketIOService.off(_networkLoungeEvent, _onNetworkResponse);
     socketIOService.off(_msgLoungeEvent, _onMessageResponse);
     socketIOService.off(_nickLoungeEvent, _onNickResponse);
     socketIOService.off(_topicLoungeEvent, _onTopicResponse);
@@ -348,11 +432,11 @@ class LoungeService extends Providable {
     _channelStateController.sink.add(parsed);
   }
 
-  void _onNetworkResponse(raw) {
-    var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
-    _logger.i(() => "_onNetworkResponse parsed $parsed");
-    _networksController.sink.add(parsed);
-  }
+//  void _onNetworkResponse(raw) {
+//    var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
+//    _logger.i(() => "_onNetworkResponse parsed $parsed");
+//    _networksController.sink.add(parsed);
+//  }
 
   dynamic _preProcessRawData(raw, {bool isJsonData = true}) {
     // Hack for strange bug on ios
@@ -372,5 +456,5 @@ class LoungeService extends Providable {
   }
 
   sendSettingsGetRequest() async =>
-      await _sendCommand(LoungeRawRequest(name: "setting:get"));
+      await _sendRequest(LoungeRawRequest(name: "setting:get"));
 }

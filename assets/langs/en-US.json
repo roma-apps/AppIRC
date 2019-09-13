@@ -74,9 +74,9 @@
       "nick": "Nickname",
       "password": "Password",
       "real_name": "Real name",
-      "user_name": "User name",
-      "channels": "Channels"
+      "user_name": "User name"
     },
+    "channels": "Channels",
     "connect": "Connect",
     "save": "Save"
   },

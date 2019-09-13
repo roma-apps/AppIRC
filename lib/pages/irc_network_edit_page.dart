@@ -8,6 +8,7 @@ import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/widgets/button_loading_widget.dart';
+import 'package:flutter_appirc/widgets/irc_network_preferences_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_server_preferences_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_user_preferences_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -36,10 +37,11 @@ class IRCNetworksNewConnectionState
   @override
   Widget build(BuildContext context) {
     final LoungeService loungeService = Provider.of<LoungeService>(context);
+    var defaultIRCNetworkPreferences = createDefaultIRCNetworkPreferences();
     var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
         loungeService: loungeService,
         preferencesBloc: Provider.of<IRCNetworksPreferencesBloc>(context),
-        newConnectionPreferences: createDefaultIRCNetworkPreferences());
+        newConnectionPreferences: defaultIRCNetworkPreferences);
 
     return PlatformScaffold(
       iosContentBottomPadding: true,
@@ -48,14 +50,11 @@ class IRCNetworksNewConnectionState
         title: Text(AppLocalizations.of(context).tr('irc_connection.title')),
       ),
       body: SafeArea(
-        child: Column(
+        child: ListView(
           children: <Widget>[
             Provider<IRCNetworksNewConnectionBloc>(
               bloc: ircNetworksNewConnectionBloc,
-              child: ListView(shrinkWrap: true, children: [
-                IRCNetworkServerPreferencesWidget(),
-                IRCNetworkUserPreferencesWidget()
-              ]),
+              child: IRCNetworkPreferencesWidget(defaultIRCNetworkPreferences)
             ),
             Provider<AsyncOperationBloc>(
               bloc: ircNetworksNewConnectionBloc,

@@ -16,21 +16,18 @@ class LoungeEditConnectionBloc extends LoungeConnectionBloc {
       @required newLoungePreferences})
       : super(newLoungePreferences: newLoungePreferences);
 
-  Future<bool> checkPreferences() async {
-    onOperationStarted();
+  Future<bool> checkPreferences() async => doAsyncOperation(() async {
+        var loungeService = LoungeService(socketIOManager);
 
-    var loungeService = LoungeService(socketIOManager);
+        var result = await loungeService.connect(newLoungePreferences);
 
-    var result = await loungeService.connect(newLoungePreferences);
+        if (result) {
+          loungeService.disconnect();
+        }
+        loungeService.dispose();
 
-    if (result) {
-      loungeService.disconnect();
-    }
-    loungeService.dispose();
-
-    onOperationFinished();
-    return result;
-  }
+        return result;
+      });
 
   @override
   void dispose() {

@@ -455,6 +455,8 @@ NetworkLoungeResponseBody _$NetworkLoungeResponseBodyFromJson(
     json['lts'] as String,
     json['userDisconnected'] as bool,
     json['rejectUnauthorized'] as bool,
+    json['isCollapsed'] as bool,
+    json['isJoinChannelShown'] as bool,
     json['nick'] as String,
     json['username'] as String,
     json['realname'] as String,
@@ -464,8 +466,14 @@ NetworkLoungeResponseBody _$NetworkLoungeResponseBodyFromJson(
             ? null
             : ChannelLoungeResponseBody.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    json['serverOptions'] as Map<String, dynamic>,
-    json['status'] as Map<String, dynamic>,
+    json['serverOptions'] == null
+        ? null
+        : ServerOptionsLoungeResponseBodyPart.fromJson(
+            json['serverOptions'] as Map<String, dynamic>),
+    json['status'] == null
+        ? null
+        : NetworkStatusLoungeResponseBody.fromJson(
+            json['status'] as Map<String, dynamic>),
   );
 }
 
@@ -479,6 +487,8 @@ Map<String, dynamic> _$NetworkLoungeResponseBodyToJson(
       'lts': instance.lts,
       'userDisconnected': instance.userDisconnected,
       'rejectUnauthorized': instance.rejectUnauthorized,
+      'isCollapsed': instance.isCollapsed,
+      'isJoinChannelShown': instance.isJoinChannelShown,
       'nick': instance.nick,
       'username': instance.username,
       'realname': instance.realname,
@@ -493,10 +503,20 @@ ChannelLoungeResponseBody _$ChannelLoungeResponseBodyFromJson(
   return ChannelLoungeResponseBody(
     json['name'] as String,
     json['type'] as String,
-    json['id'] as int,
-    json['messages'] as List,
-    json['moreHistoryAvailable'] as bool,
     json['key'] as String,
+    json['pendingMessage'] as String,
+    (json['messages'] as List)
+        ?.map((e) => e == null
+            ? null
+            : MsgLoungeResponseBody.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+    json['inputHistory'] as String,
+    json['inputHistoryPosition'] as int,
+    json['id'] as int,
+    json['moreHistoryAvailable'] as bool,
+    json['historyLoading'] as bool,
+    json['editTopic'] as bool,
+    json['scrolledToBottom'] as bool,
     json['topic'] as String,
     json['state'] as int,
     json['firstUnread'] as int,
@@ -511,10 +531,16 @@ Map<String, dynamic> _$ChannelLoungeResponseBodyToJson(
     <String, dynamic>{
       'name': instance.name,
       'type': instance.type,
-      'id': instance.id,
-      'messages': instance.messages,
-      'moreHistoryAvailable': instance.moreHistoryAvailable,
       'key': instance.key,
+      'pendingMessage': instance.pendingMessage,
+      'messages': instance.messages,
+      'inputHistory': instance.inputHistory,
+      'inputHistoryPosition': instance.inputHistoryPosition,
+      'id': instance.id,
+      'moreHistoryAvailable': instance.moreHistoryAvailable,
+      'historyLoading': instance.historyLoading,
+      'editTopic': instance.editTopic,
+      'scrolledToBottom': instance.scrolledToBottom,
       'topic': instance.topic,
       'state': instance.state,
       'firstUnread': instance.firstUnread,

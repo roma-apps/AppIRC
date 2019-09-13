@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -11,9 +13,16 @@ abstract class AsyncOperationBloc extends Providable {
 
   Stream<bool> get outInProgress => _inProgressController.stream;
 
-  void onOperationStarted() => _newInProgressValue(true);
+  void _onOperationStarted() => _newInProgressValue(true);
 
-  void onOperationFinished() => _newInProgressValue(false);
+  void _onOperationFinished() => _newInProgressValue(false);
+
+  FutureOr<T> doAsyncOperation<T>(FutureOr<T> asyncCode()) async {
+    _onOperationStarted();
+    var result = await asyncCode();
+    _onOperationFinished();
+    return result;
+  }
 
   @override
   void dispose() {

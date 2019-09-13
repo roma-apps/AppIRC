@@ -34,7 +34,6 @@ IRCNetworkUserPreferences _$IRCNetworkUserPreferencesFromJson(
     password: json['password'] as String,
     realName: json['realName'] as String,
     username: json['username'] as String,
-    channels: (json['channels'] as List)?.map((e) => e as String)?.toList(),
   );
 }
 
@@ -45,12 +44,50 @@ Map<String, dynamic> _$IRCNetworkUserPreferencesToJson(
       'username': instance.username,
       'password': instance.password,
       'realName': instance.realName,
-      'channels': instance.channels,
+    };
+
+IRCNetworkChannelPreferences _$IRCNetworkChannelPreferencesFromJson(
+    Map<String, dynamic> json) {
+  return IRCNetworkChannelPreferences(
+    localId: json['localId'] as int,
+    name: json['name'] as String,
+    isLobby: json['isLobby'] as bool,
+  );
+}
+
+Map<String, dynamic> _$IRCNetworkChannelPreferencesToJson(
+        IRCNetworkChannelPreferences instance) =>
+    <String, dynamic>{
+      'localId': instance.localId,
+      'isLobby': instance.isLobby,
+      'name': instance.name,
     };
 
 IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(
     Map<String, dynamic> json) {
   return IRCNetworkPreferences(
+    networkConnectionPreferences: json['networkConnectionPreferences'] == null
+        ? null
+        : IRCNetworkConnectionPreferences.fromJson(
+            json['networkConnectionPreferences'] as Map<String, dynamic>),
+    channels: (json['channels'] as List)
+        ?.map((e) => e == null
+            ? null
+            : IRCNetworkChannelPreferences.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$IRCNetworkPreferencesToJson(
+        IRCNetworkPreferences instance) =>
+    <String, dynamic>{
+      'networkConnectionPreferences': instance.networkConnectionPreferences,
+      'channels': instance.channels,
+    };
+
+IRCNetworkConnectionPreferences _$IRCNetworkConnectionPreferencesFromJson(
+    Map<String, dynamic> json) {
+  return IRCNetworkConnectionPreferences(
     serverPreferences: json['serverPreferences'] == null
         ? null
         : IRCNetworkServerPreferences.fromJson(
@@ -59,12 +96,31 @@ IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(
         ? null
         : IRCNetworkUserPreferences.fromJson(
             json['userPreferences'] as Map<String, dynamic>),
+    localId: json['localId'] as int,
   );
 }
 
-Map<String, dynamic> _$IRCNetworkPreferencesToJson(
-        IRCNetworkPreferences instance) =>
+Map<String, dynamic> _$IRCNetworkConnectionPreferencesToJson(
+        IRCNetworkConnectionPreferences instance) =>
     <String, dynamic>{
+      'localId': instance.localId,
       'serverPreferences': instance.serverPreferences,
       'userPreferences': instance.userPreferences,
+    };
+
+IRCNetworksListPreferences _$IRCNetworksListPreferencesFromJson(
+    Map<String, dynamic> json) {
+  return IRCNetworksListPreferences(
+    networks: (json['networks'] as List)
+        ?.map((e) => e == null
+            ? null
+            : IRCNetworkPreferences.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$IRCNetworksListPreferencesToJson(
+        IRCNetworksListPreferences instance) =>
+    <String, dynamic>{
+      'networks': instance.networks,
     };

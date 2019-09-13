@@ -1,24 +1,24 @@
 import 'package:flutter_appirc/blocs/preferences_bloc.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
-import 'package:flutter_appirc/models/irc_networks_model.dart';
 import 'package:flutter_appirc/service/preferences_service.dart';
 
 const _preferencesStorageKey = "irc_networks";
 
-IRCNetworksPreferences createDefaultIRCNetworksPreferences() =>
-    IRCNetworksPreferences([createDefaultIRCNetworkPreferences()]);
+IRCNetworksListPreferences createDefaultIRCNetworksPreferences() =>
+    IRCNetworksListPreferences(
+        networks: [createDefaultIRCNetworkPreferences()]);
 
 IRCNetworkPreferences createDefaultIRCNetworkPreferences() =>
     IRCNetworkPreferences(
-        serverPreferences: createDefaultNetworkServerPreferences(),
-        userPreferences: createDefaultNetworkUserPreferences());
+        networkConnectionPreferences: IRCNetworkConnectionPreferences(
+          serverPreferences: createDefaultNetworkServerPreferences(),
+          userPreferences: createDefaultNetworkUserPreferences(),
+        ),
+        channels: [IRCNetworkChannelPreferences(name: "#lounge-spam", isLobby: false)]);
 
 IRCNetworkUserPreferences createDefaultNetworkUserPreferences() {
   return IRCNetworkUserPreferences(
-      username: "AppIRC",
-      realName: "AppIRC",
-      nickname: "AppIRC",
-      channels: ["#lounge-spam"]);
+      username: "AppIRC", realName: "AppIRC", nickname: "AppIRC");
 }
 
 IRCNetworkServerPreferences createDefaultNetworkServerPreferences() {
@@ -30,14 +30,14 @@ IRCNetworkServerPreferences createDefaultNetworkServerPreferences() {
       useOnlyTrustedCertificates: true);
 }
 
-IRCNetworksPreferences _jsonConverter(Map<String, dynamic> json) =>
-    IRCNetworksPreferences.fromJson(json);
+IRCNetworksListPreferences _jsonConverter(Map<String, dynamic> json) =>
+    IRCNetworksListPreferences.fromJson(json);
 
 class IRCNetworksPreferencesBloc
-    extends PreferencesBloc<IRCNetworksPreferences> {
+    extends JsonPreferencesBloc<IRCNetworksListPreferences> {
   IRCNetworksPreferencesBloc(PreferencesService preferencesService,
-      {DefaultValueGenerator<IRCNetworksPreferences> defaultValueGenerator =
+      {DefaultValueGenerator<IRCNetworksListPreferences> defaultValueGenerator =
           createDefaultIRCNetworksPreferences})
-      : super(preferencesService, _preferencesStorageKey, _jsonConverter,
+      : super(preferencesService, _preferencesStorageKey, 1, _jsonConverter,
             defaultValueGenerator);
 }

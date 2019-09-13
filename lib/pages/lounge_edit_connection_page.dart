@@ -23,7 +23,7 @@ class LoungeEditConnectionPageState extends State<LoungeEditConnectionPage> {
   Widget build(BuildContext context) {
     final LoungeService lounge = Provider.of<LoungeService>(context);
     var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
-    var loungePreferences = loungePreferencesBloc.preferenceOrDefault;
+    var loungePreferences = loungePreferencesBloc.getPreferenceOrDefault();
     var loungeConnectionBloc = LoungeEditConnectionBloc(
         socketIOManager: lounge.socketIOManager,
         preferencesBloc: loungePreferencesBloc,

@@ -9,6 +9,7 @@ import 'package:flutter_appirc/blocs/irc_network_command_disconnect_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_command_exit_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_command_ignore_list_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_list_bloc.dart';
+import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_channel_model.dart';
@@ -30,10 +31,11 @@ class IRCNetworksListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var lounge = Provider.of<LoungeService>(context);
-    var networksListBloc = IRCNetworksListBloc(lounge);
+    var networksPreferencesBloc = Provider.of<IRCNetworksPreferencesBloc>(context);
+    var networksListBloc = Provider.of<IRCNetworksListBloc>(context);
 
     var networksListWidget = StreamBuilder<List<IRCNetwork>>(
-        stream: networksListBloc.networksStream,
+        stream: networksListBloc.newNetworksStream,
         builder:
             (BuildContext context, AsyncSnapshot<List<IRCNetwork>> snapshot) {
           var listItemCount =

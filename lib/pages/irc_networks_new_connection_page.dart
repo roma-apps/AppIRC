@@ -7,6 +7,7 @@ import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/widgets/button_loading_widget.dart';
+import 'package:flutter_appirc/widgets/irc_network_preferences_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_server_preferences_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_user_preferences_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -18,23 +19,24 @@ class IRCNetworksNewConnectionPage extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return IRCNetworksNewConnectionState(isOpenedFromAppStart);
+    return IRCNetworksNewConnectionPageState(isOpenedFromAppStart);
   }
 }
 
-class IRCNetworksNewConnectionState
+class IRCNetworksNewConnectionPageState
     extends State<IRCNetworksNewConnectionPage> {
   final bool isOpenedFromAppStart;
 
-  IRCNetworksNewConnectionState(this.isOpenedFromAppStart);
+  IRCNetworksNewConnectionPageState(this.isOpenedFromAppStart);
 
   @override
   Widget build(BuildContext context) {
     final LoungeService loungeService = Provider.of<LoungeService>(context);
+    var connectionPreferences = createDefaultIRCNetworkPreferences();
     var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
         loungeService: loungeService,
         preferencesBloc: Provider.of<IRCNetworksPreferencesBloc>(context),
-        newConnectionPreferences: createDefaultIRCNetworkPreferences());
+        newConnectionPreferences: connectionPreferences);
 
     return PlatformScaffold(
       iosContentBottomPadding: true,
@@ -45,10 +47,14 @@ class IRCNetworksNewConnectionState
       body: Provider<IRCNetworksNewConnectionBloc>(
         bloc: ircNetworksNewConnectionBloc,
         child: SafeArea(
-          child: ListView(
+          child: Column(
             children: <Widget>[
-              IRCNetworkServerPreferencesWidget(),
-              IRCNetworkUserPreferencesWidget(),
+              ListView(
+                shrinkWrap: true,
+                children: <Widget>[
+                  IRCNetworkPreferencesWidget(connectionPreferences),
+                ],
+              ),
               Provider<AsyncOperationBloc>(
                 bloc: ircNetworksNewConnectionBloc,
                 child: ButtonLoadingWidget(

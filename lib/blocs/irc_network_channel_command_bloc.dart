@@ -7,19 +7,11 @@ class IRCNetworkChannelCommandBloc extends AsyncOperationBloc {
   final LoungeService lounge;
   final IRCNetworkChannel channel;
 
-  IRCNetworkChannelCommandBloc(
-      {@required this.lounge,
-      @required this.channel});
+  IRCNetworkChannelCommandBloc({@required this.lounge, @required this.channel});
 
-  sendIRCCommand({@required String ircCommand, String args = ""}) async {
-    onOperationStarted();
-
-    var result = await lounge.sendChatMessageRequest(
-        channel.remoteId, "$ircCommand $args");
-    onOperationFinished();
-
-    return result;
-  }
+  sendIRCCommand({@required String ircCommand, String args = ""}) async =>
+      doAsyncOperation(() async => await lounge.sendChatMessageRequest(
+          channel.remoteId, "$ircCommand $args"));
 
   @override
   void dispose() {

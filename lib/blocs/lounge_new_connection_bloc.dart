@@ -15,15 +15,13 @@ class LoungeNewConnectionBloc extends LoungeConnectionBloc {
       @required newLoungePreferences})
       : super(newLoungePreferences: newLoungePreferences);
 
-  Future<bool> connect() async {
-    onOperationStarted();
-    var result = await loungeService.connect(newLoungePreferences);
-    if (result) {
-      preferencesBloc.setNewPreferenceValue(newLoungePreferences);
-    }
-    onOperationFinished();
-    return result;
-  }
+  Future<bool> connect() async => doAsyncOperation(() async {
+        var result = await loungeService.connect(newLoungePreferences);
+        if (result) {
+          preferencesBloc.setNewPreferenceValue(newLoungePreferences);
+        }
+        return result;
+      });
 
   @override
   void dispose() {

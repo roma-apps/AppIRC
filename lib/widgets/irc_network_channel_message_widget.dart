@@ -245,6 +245,9 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
       case IRCNetworkChannelMessageType.QUIT:
         str = appLocalizations.tr("chat.sub_message.quit");
         break;
+      case IRCNetworkChannelMessageType.RAW:
+        str = null;
+        break;
     }
 
     if (str != null) {
@@ -311,6 +314,9 @@ Color _findTitleColorDataForMessage(IRCNetworkChannelMessage message) {
     case IRCNetworkChannelMessageType.QUIT:
       color = Colors.redAccent;
       break;
+    case IRCNetworkChannelMessageType.RAW:
+      color = Colors.grey;
+      break;
   }
   return color;
 }
@@ -363,6 +369,9 @@ IconData _findTitleIconDataForMessage(IRCNetworkChannelMessage message) {
       break;
     case IRCNetworkChannelMessageType.QUIT:
       icon = Icons.exit_to_app;
+      break;
+    case IRCNetworkChannelMessageType.RAW:
+      icon = Icons.info;
       break;
   }
   return icon;

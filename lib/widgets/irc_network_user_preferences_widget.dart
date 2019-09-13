@@ -7,73 +7,67 @@ import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'form_widgets.dart';
 
 class IRCNetworkUserPreferencesWidget extends StatefulWidget {
+  final IRCNetworkUserPreferences preferences;
+
+  IRCNetworkUserPreferencesWidget(this.preferences);
+
   @override
-  State<StatefulWidget> createState() => IRCNetworkUserPreferencesState();
+  State<StatefulWidget> createState() =>
+      IRCNetworkUserPreferencesState(preferences);
 }
 
 class IRCNetworkUserPreferencesState
     extends State<IRCNetworkUserPreferencesWidget> {
-  final _nicknameController = TextEditingController();
-  final _channelsController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _realNameController = TextEditingController();
-  final _userNameController = TextEditingController();
+  final IRCNetworkUserPreferences preferences;
+
+  IRCNetworkUserPreferencesState(this.preferences) {
+    _nicknameController = TextEditingController(text: preferences.nickname);
+    _passwordController = TextEditingController(text: preferences.password);
+    _realNameController = TextEditingController(text: preferences.realName);
+    _userNameController = TextEditingController(text: preferences.username);
+  }
+
+  TextEditingController _nicknameController;
+  TextEditingController _passwordController;
+  TextEditingController _realNameController;
+  TextEditingController _userNameController;
 
   @override
   Widget build(BuildContext context) {
-    final IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc =
-        Provider.of<IRCNetworksNewConnectionBloc>(context);
-
-    _fillPreferencesToUI(ircNetworksNewConnectionBloc);
+    _fillPreferencesToUI();
 
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       children: <Widget>[
         buildFormTitle(
             context, appLocalizations.tr('irc_connection.user_prefs.title')),
-        buidFormTextRow(
-            appLocalizations.tr('irc_connection.user_prefs.nick'),
-            _nicknameController,
-            (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
+        buidFormTextRow(appLocalizations.tr('irc_connection.user_prefs.nick'),
+            _nicknameController, (value) => _fillPreferencesFromUI()),
         buidFormTextRow(
             appLocalizations.tr('irc_connection.user_prefs.password'),
             _passwordController,
-            (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
+            (value) => _fillPreferencesFromUI()),
         buidFormTextRow(
             appLocalizations.tr('irc_connection.user_prefs.real_name'),
             _realNameController,
-            (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
+            (value) => _fillPreferencesFromUI()),
         buidFormTextRow(
             appLocalizations.tr('irc_connection.user_prefs.user_name'),
             _userNameController,
-            (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc)),
-        buidFormTextRow(
-            appLocalizations.tr('irc_connection.user_prefs.channels'),
-            _channelsController,
-            (value) => _fillPreferencesFromUI(ircNetworksNewConnectionBloc))
+            (value) => _fillPreferencesFromUI()),
       ],
     );
   }
 
-  void _fillPreferencesFromUI(
-      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc) {
-    ircNetworksNewConnectionBloc
-        .setNewUserPreferences(IRCNetworkUserPreferences(
-      username: _userNameController.text,
-      nickname: _nicknameController.text,
-      realName: _realNameController.text,
-      channels: _channelsController.text
-          .split(IRCNetworkUserPreferences.channelsSeparator),
-    ));
+  void _fillPreferencesFromUI() {
+    preferences.username = _userNameController.text;
+    preferences.nickname = _nicknameController.text;
+    preferences.realName = _realNameController.text;
   }
 
-  void _fillPreferencesToUI(
-      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc) {
-    var connection = ircNetworksNewConnectionBloc.newConnectionPreferences;
-    var preferences = connection.userPreferences;
+  void _fillPreferencesToUI() {
     _passwordController.text = preferences.password;
     _nicknameController.text = preferences.nickname;
-    _channelsController.text = preferences.channelsString;
     _realNameController.text = preferences.realName;
     _userNameController.text = preferences.username;
   }

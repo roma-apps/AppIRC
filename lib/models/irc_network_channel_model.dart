@@ -1,47 +1,52 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 
- const _lobbyType = "lobby";
- const _specialType = "special";
- const _queryType = "query";
- const _channelType = "channel";
+import 'irc_network_model.dart';
+
+const _lobbyType = "lobby";
+const _specialType = "special";
+const _queryType = "query";
+const _channelType = "channel";
 
 class IRCNetworkChannelStatistics {
   final IRCNetworkChannel channel;
   final int unreadCount;
 
   IRCNetworkChannelStatistics(this.channel, this.unreadCount);
-
-
 }
 
+
 class IRCNetworkChannel {
-  final String name;
+  int get localId => channelPreferences?.localId;
+
+  int get localNetworkId => networkPreferences?.localId;
+
+  final IRCNetworkConnectionPreferences networkPreferences;
+  final IRCNetworkChannelPreferences channelPreferences;
+
+  String get name => channelPreferences.name;
   final IRCNetworkChannelType type;
 
   final int remoteId;
 
   bool isEditTopicPossible;
 
-  bool get isLobby  => type == IRCNetworkChannelType.LOBBY;
-
-
-  @override
-  String toString() {
-    return 'IRCNetworkChannel{name: $name, type: $type, remoteId: $remoteId, isEditTopicPossible: $isEditTopicPossible}';
-  }
+  bool get isLobby => type == IRCNetworkChannelType.LOBBY;
 
   IRCNetworkChannel(
-      {@required this.name, @required this.type, @required this.remoteId, @required this.isEditTopicPossible});
+      {
+        @required this.networkPreferences,
+        @required this.channelPreferences,
 
+        @required this.type,
+        @required this.remoteId,
+        @required this.isEditTopicPossible});
 }
 
-enum IRCNetworkChannelType {
-  LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN
-}
+enum IRCNetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }
 
 IRCNetworkChannelType detectIRCNetworkChannelType(String typeString) {
   var type = IRCNetworkChannelType.UNKNOWN;
-  switch(typeString) {
+  switch (typeString) {
     case _lobbyType:
       type = IRCNetworkChannelType.LOBBY;
       break;

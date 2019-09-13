@@ -46,4 +46,5 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
 }
 
 _isNeedPrint(IRCNetworkChannelMessage message) =>
-    message.type != IRCNetworkChannelMessageType.UNHANDLED;
+    message.type != IRCNetworkChannelMessageType.UNHANDLED &&
+    message.type != IRCNetworkChannelMessageType.RAW;

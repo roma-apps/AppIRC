@@ -1,3 +1,3 @@
-abstract class Preferences {
+abstract class JsonPreferences {
   Map<String, dynamic> toJson();
 }
