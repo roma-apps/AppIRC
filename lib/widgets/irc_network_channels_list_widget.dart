@@ -90,10 +90,12 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
         break;
     }
 
+    var foregroundColor = calculateForegroundColor(isChannelActive);
+
     return Row(children: <Widget>[
       Padding(
         padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
-        child: Icon(iconData),
+        child: Icon(iconData, color: foregroundColor),
       ),
       Expanded(
         child: Padding(
@@ -109,20 +111,20 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
                       child: Text(channel.name,
                           style: UISkin.of(context)
                               .appSkin
-                              .networksListChannelTextStyle))
+                              .networksListChannelTextStyle.copyWith(color: foregroundColor)))
                 ]),
           ),
         ),
       ),
       buildChannelUnreadCountBadge(lounge, channel),
-      _buildPopupMenuButton(lounge, channel, context)
+      _buildPopupMenuButton(lounge, channel, context, foregroundColor)
     ]);
   }
 
   PopupMenuButton<ChannelDropDownAction> _buildPopupMenuButton(
-      LoungeService lounge, IRCNetworkChannel channel, BuildContext context) {
+      LoungeService lounge, IRCNetworkChannel channel, BuildContext context, Color foregroundColor) {
     return PopupMenuButton<ChannelDropDownAction>(
-      icon: Icon(Icons.more_vert),
+      icon: Icon(Icons.more_vert, color: foregroundColor),
       onSelected: (value) async {
         switch (value) {
           case ChannelDropDownAction.LEAVE:
@@ -237,3 +239,4 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
 
 enum ChannelDropDownAction { LEAVE, TOPIC, LIST_BANNED, USER_INFORMATION }
 
+Color calculateForegroundColor(bool isChannelActive) => isChannelActive ? Colors.white : Colors.black;

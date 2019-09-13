@@ -61,7 +61,7 @@ class UISkin extends Providable {
       appSkin = AppSkin(
           accentColor: androidTheme.accentColor,
           formRowLabelTextStyle: androidTextTheme.title,
-          networksListNetworkTextStyle: androidTheme.textTheme.title,
+          networksListNetworkTextStyle: androidTheme.textTheme.title.copyWith(fontWeight: FontWeight.bold),
           channelMessagesNickTextStyle: androidTheme.textTheme.body1.copyWith(fontWeight: FontWeight.bold),
           channelMessagesDateTextStyle: androidTheme.textTheme.caption,
           networksListChannelTextStyle: androidTheme.textTheme.body2,
