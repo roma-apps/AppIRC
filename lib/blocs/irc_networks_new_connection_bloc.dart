@@ -16,11 +16,30 @@ class IRCNetworksNewConnectionBloc extends AsyncOperationBloc {
       @required this.preferencesBloc,
       @required this.newConnectionPreferences});
 
-  sendNewNetworkRequest() async => doAsyncOperation(() async =>
-      await loungeService.sendNewNetworkRequest(newConnectionPreferences));
+  sendNewNetworkRequest() async => doAsyncOperation(() async {
+        var networkListPreferences = preferencesBloc
+            .getPreferenceOrValue(() => IRCNetworksListPreferences());
+
+        var contains = networkListPreferences.networks.firstWhere(
+                (network) =>
+                    network.networkConnectionPreferences.name ==
+                    newConnectionPreferences.networkConnectionPreferences.name,
+                orElse: () => null) !=
+            null;
+
+        // name should be unique
+
+        if (contains) {
+          throw new ServerNameNotUniqueException();
+        }
+        return await loungeService
+            .sendNewNetworkRequest(newConnectionPreferences);
+      });
 
   @override
   void dispose() {
     super.dispose();
   }
 }
+
+class ServerNameNotUniqueException implements Exception {}

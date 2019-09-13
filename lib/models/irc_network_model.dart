@@ -30,11 +30,10 @@ class IRCNetwork {
 
   final List<IRCNetworkChannel> channels;
 
-  IRCNetwork(
-      {@required this.connectionPreferences,
-      @required this.remoteId,
-      @required this.status,
-      @required this.channels});
+  IRCNetwork({@required this.connectionPreferences,
+    @required this.remoteId,
+    @required this.status,
+    @required this.channels});
 
   List<IRCNetworkChannel> get channelsWithoutLobby =>
       channels.where((channel) => !channel.isLobby).toList();
@@ -56,12 +55,11 @@ class IRCNetworkServerPreferences extends JsonPreferences {
   bool useTls;
   bool useOnlyTrustedCertificates;
 
-  IRCNetworkServerPreferences(
-      {@required this.name,
-      @required this.serverHost,
-      @required this.serverPort,
-      @required this.useTls,
-      @required this.useOnlyTrustedCertificates});
+  IRCNetworkServerPreferences({@required this.name,
+    @required this.serverHost,
+    @required this.serverPort,
+    @required this.useTls,
+    @required this.useOnlyTrustedCertificates});
 
   @override
   String toString() {
@@ -82,11 +80,10 @@ class IRCNetworkUserPreferences extends JsonPreferences {
   String password;
   String realName;
 
-  IRCNetworkUserPreferences(
-      {@required this.nickname,
-      this.password,
-      @required this.realName,
-      @required this.username});
+  IRCNetworkUserPreferences({@required this.nickname,
+    this.password,
+    @required this.realName,
+    @required this.username});
 
   @override
   String toString() {
@@ -150,18 +147,21 @@ class IRCNetworkPreferences extends JsonPreferences {
       channels.map((channel) => channel.name).join(channelsSeparator);
 
   @JsonKey(ignore: true)
-  String get notLobbyChannelsString => channels
-      .where((channel) => !channel.isLobby)
-      .map((channel) => channel.name)
-      .join(channelsSeparator);
+  String get notLobbyChannelsString =>
+      channels
+          .where((channel) => !channel.isLobby)
+          .map((channel) => channel.name)
+          .join(channelsSeparator);
 
   @JsonKey(ignore: true)
-  set notLobbyChannelsString(String newValue) => channels = newValue != null
-      ? newValue
+  set notLobbyChannelsString(String newValue) =>
+      channels = newValue != null
+          ? newValue
           .split(channelsSeparator)
-          .map((channelName) => IRCNetworkChannelPreferences(name: channelName, isLobby: false))
+          .map((channelName) =>
+          IRCNetworkChannelPreferences(name: channelName, isLobby: false))
           .toList()
-      : [];
+          : [];
 
   factory IRCNetworkPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkPreferencesFromJson(json);
@@ -177,10 +177,9 @@ class IRCNetworkConnectionPreferences extends JsonPreferences {
   IRCNetworkServerPreferences serverPreferences;
   IRCNetworkUserPreferences userPreferences;
 
-  IRCNetworkConnectionPreferences(
-      {@required this.serverPreferences,
-      @required this.userPreferences,
-      @required this.localId});
+  IRCNetworkConnectionPreferences({@required this.serverPreferences,
+    @required this.userPreferences,
+    @required this.localId});
 
   get name => serverPreferences.name;
 
@@ -210,7 +209,7 @@ class IRCNetworksListPreferences extends JsonPreferences {
     if (_maxNetworkLocalId == null) {
       _maxNetworkLocalId = 0;
       networks.forEach((network) =>
-          _maxNetworkLocalId = max(_maxNetworkLocalId, network.localId));
+      _maxNetworkLocalId = max(_maxNetworkLocalId, network.localId));
     }
     return ++_maxNetworkLocalId;
   }
@@ -218,7 +217,8 @@ class IRCNetworksListPreferences extends JsonPreferences {
   int getNextNetworkChannelLocalId() {
     if (_maxNetworkChannelLocalId == null) {
       _maxNetworkChannelLocalId = 0;
-      networks.forEach((network) => network.channels.forEach((channel) =>
+      networks.forEach((network) =>
+          network.channels.forEach((channel) =>
           _maxNetworkChannelLocalId =
               max(_maxNetworkChannelLocalId, channel.localIdOrUndefined)));
     }
@@ -226,6 +226,7 @@ class IRCNetworksListPreferences extends JsonPreferences {
   }
 
   final List<IRCNetworkPreferences> networks;
+
 
   IRCNetworksListPreferences.name({@required this.networks});
 

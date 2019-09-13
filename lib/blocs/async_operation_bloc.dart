@@ -19,8 +19,14 @@ abstract class AsyncOperationBloc extends Providable {
 
   FutureOr<T> doAsyncOperation<T>(FutureOr<T> asyncCode()) async {
     _onOperationStarted();
-    var result = await asyncCode();
-    _onOperationFinished();
+    FutureOr<T> result;
+    try {
+      result = await asyncCode();
+    } finally {
+      _onOperationFinished();
+    }
+
+
     return result;
   }
 

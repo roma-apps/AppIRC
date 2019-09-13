@@ -8,8 +8,6 @@ import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/widgets/button_loading_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_preferences_widget.dart';
-import 'package:flutter_appirc/widgets/irc_network_server_preferences_widget.dart';
-import 'package:flutter_appirc/widgets/irc_network_user_preferences_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworksNewConnectionPage extends StatefulWidget {
@@ -52,7 +50,7 @@ class IRCNetworksNewConnectionPageState
               ListView(
                 shrinkWrap: true,
                 children: <Widget>[
-                  IRCNetworkPreferencesWidget(connectionPreferences),
+                  IRCNetworkPreferencesWidget(ircNetworksNewConnectionBloc.newConnectionPreferences),
                 ],
               ),
               Provider<AsyncOperationBloc>(
@@ -75,12 +73,26 @@ class IRCNetworksNewConnectionPageState
   void _sendNetworkRequest(
       IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc,
       BuildContext context) async {
-    await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
-    if (isOpenedFromAppStart) {
-      Navigator.pushReplacement(
-          context, platformPageRoute(builder: (context) => IRCChatPage()));
-    } else {
-      Navigator.pop(context);
+    try {
+      await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
+      if (isOpenedFromAppStart) {
+        Navigator.pushReplacement(
+            context, platformPageRoute(builder: (context) => IRCChatPage()));
+      } else {
+        Navigator.pop(context);
+      }
+    } on ServerNameNotUniqueException catch (e) {
+      var appLocalizations = AppLocalizations.of(context);
+
+      showPlatformDialog(
+          androidBarrierDismissible: true,
+          context: context,
+          builder: (_) => PlatformAlertDialog(
+                title: Text(appLocalizations.tr("irc_connection.not_unique_name_dialog.title")),
+                content: Text(appLocalizations.tr("irc_connection.not_unique_name_dialog.content")),
+              ));
     }
+
+
   }
 }

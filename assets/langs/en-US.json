@@ -76,6 +76,10 @@
       "real_name": "Real name",
       "user_name": "User name"
     },
+    "not_unique_name_dialog": {
+      "title": "Name already in use",
+      "content": "Please choose different name"
+    },
     "channels": "Channels",
     "connect": "Connect",
     "save": "Save"
