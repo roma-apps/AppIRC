@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_new_connection_bloc.dart';
@@ -44,8 +45,10 @@ class LoungePreferencesWidgetState extends State<LoungePreferencesWidget> {
       children: <Widget>[
         buildFormTitle(
             context, appLocalizations.tr('lounge.connection.settings')),
-        buidFormTextRow(
-            appLocalizations.tr('lounge.connection.host'), _hostController,
+        buildFormTextRow(
+            appLocalizations.tr('lounge.connection.host'),
+            Icons.cloud,
+            _hostController,
             (value) {
           _fillPreferencesFromUI(loungeConnectionBloc);
         }),

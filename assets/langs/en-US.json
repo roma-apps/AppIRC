@@ -80,7 +80,7 @@
       "title": "Name already in use",
       "content": "Please choose different name"
     },
-    "channels": "Channels",
+    "channels": "#thelounge, #thelounge-spam",
     "connect": "Connect",
     "save": "Save"
   },

@@ -18,7 +18,7 @@ IRCNetworkPreferences createDefaultIRCNetworkPreferences() =>
 
 IRCNetworkUserPreferences createDefaultNetworkUserPreferences() {
   return IRCNetworkUserPreferences(
-      username: "AppIRC", realName: "AppIRC", nickname: "AppIRC");
+      username: "AppIRC User name", realName: "AppIRC Real Name", nickname: "AppIRC Nick");
 }
 
 IRCNetworkServerPreferences createDefaultNetworkServerPreferences() {

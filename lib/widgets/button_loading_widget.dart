@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
@@ -25,7 +26,7 @@ class ButtonLoadingWidget extends StatelessWidget {
             if (inProgress) {
               return PlatformCircularProgressIndicator();
             } else {
-              return PlatformButton(child: child, onPressed: onPressed);
+              return PlatformButton(child: child, onPressed: onPressed, color: Colors.redAccent);
             }
           }),
     );

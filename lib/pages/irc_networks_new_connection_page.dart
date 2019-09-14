@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
@@ -31,6 +32,19 @@ class IRCNetworksNewConnectionPageState
   Widget build(BuildContext context) {
     final LoungeService loungeService = Provider.of<LoungeService>(context);
     var connectionPreferences = createDefaultIRCNetworkPreferences();
+
+    if (!isOpenedFromAppStart) {
+      var ircNetworkConnectionPreferences =
+          connectionPreferences.networkConnectionPreferences;
+      var ircNetworkUserPreferences =
+          ircNetworkConnectionPreferences.userPreferences;
+      ircNetworkUserPreferences.username = "";
+      ircNetworkUserPreferences.nickname = "";
+      ircNetworkUserPreferences.password = "";
+      ircNetworkUserPreferences.realName = "";
+      connectionPreferences.channels = [];
+    }
+
     var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
         loungeService: loungeService,
         preferencesBloc: Provider.of<IRCNetworksPreferencesBloc>(context),
@@ -45,25 +59,28 @@ class IRCNetworksNewConnectionPageState
       body: Provider<IRCNetworksNewConnectionBloc>(
         bloc: ircNetworksNewConnectionBloc,
         child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              ListView(
-                shrinkWrap: true,
-                children: <Widget>[
-                  IRCNetworkPreferencesWidget(ircNetworksNewConnectionBloc.newConnectionPreferences),
-                ],
-              ),
-              Provider<AsyncOperationBloc>(
-                bloc: ircNetworksNewConnectionBloc,
-                child: ButtonLoadingWidget(
-                  child: Text(AppLocalizations.of(context)
-                      .tr('irc_connection.connect')),
-                  onPressed: () {
-                    _sendNetworkRequest(ircNetworksNewConnectionBloc, context);
-                  },
-                ),
-              )
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                IRCNetworkPreferencesWidget(
+                    ircNetworksNewConnectionBloc.newConnectionPreferences),
+                Provider<AsyncOperationBloc>(
+                  bloc: ircNetworksNewConnectionBloc,
+                  child: ButtonLoadingWidget(
+                    child: Text(
+                      AppLocalizations.of(context).tr('irc_connection.connect'),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      _sendNetworkRequest(
+                          ircNetworksNewConnectionBloc, context);
+                    },
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -88,11 +105,11 @@ class IRCNetworksNewConnectionPageState
           androidBarrierDismissible: true,
           context: context,
           builder: (_) => PlatformAlertDialog(
-                title: Text(appLocalizations.tr("irc_connection.not_unique_name_dialog.title")),
-                content: Text(appLocalizations.tr("irc_connection.not_unique_name_dialog.content")),
+                title: Text(appLocalizations
+                    .tr("irc_connection.not_unique_name_dialog.title")),
+                content: Text(appLocalizations
+                    .tr("irc_connection.not_unique_name_dialog.content")),
               ));
     }
-
-
   }
 }

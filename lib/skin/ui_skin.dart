@@ -47,7 +47,7 @@ class UISkin extends Providable {
     if (Platform.isIOS) {
       appSkin = AppSkin(
           accentColor: iosTheme.primaryColor,
-          formRowLabelTextStyle: iosTextTheme.navTitleTextStyle,
+          formRowLabelTextStyle: iosTextTheme.navTitleTextStyle.copyWith(fontWeight: FontWeight.bold),
           networksListNetworkTextStyle: iosTextTheme.navTitleTextStyle,
           channelMessagesNickTextStyle: iosTextTheme.navTitleTextStyle,
           channelMessagesDateTextStyle: iosTextTheme.navTitleTextStyle,
@@ -60,7 +60,7 @@ class UISkin extends Providable {
     } else if (Platform.isAndroid) {
       appSkin = AppSkin(
           accentColor: androidTheme.accentColor,
-          formRowLabelTextStyle: androidTextTheme.title,
+          formRowLabelTextStyle: androidTextTheme.headline.copyWith(fontWeight: FontWeight.bold, fontSize: 20),
           networksListNetworkTextStyle: androidTheme.textTheme.title.copyWith(fontWeight: FontWeight.bold),
           channelMessagesNickTextStyle: androidTheme.textTheme.body1.copyWith(fontWeight: FontWeight.bold),
           channelMessagesDateTextStyle: androidTheme.textTheme.caption,

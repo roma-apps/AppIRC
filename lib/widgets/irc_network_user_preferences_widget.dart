@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_networks_new_connection_bloc.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
+
 
 import 'form_widgets.dart';
 
@@ -41,18 +43,22 @@ class IRCNetworkUserPreferencesState
       children: <Widget>[
         buildFormTitle(
             context, appLocalizations.tr('irc_connection.user_prefs.title')),
-        buidFormTextRow(appLocalizations.tr('irc_connection.user_prefs.nick'),
+        buildFormTextRow(appLocalizations.tr('irc_connection.user_prefs.nick'),
+            Icons.account_circle,
             _nicknameController, (value) => _fillPreferencesFromUI()),
-        buidFormTextRow(
+        buildFormTextRow(
             appLocalizations.tr('irc_connection.user_prefs.password'),
+            Icons.lock,
             _passwordController,
             (value) => _fillPreferencesFromUI()),
-        buidFormTextRow(
+        buildFormTextRow(
             appLocalizations.tr('irc_connection.user_prefs.real_name'),
+            Icons.account_circle,
             _realNameController,
             (value) => _fillPreferencesFromUI()),
-        buidFormTextRow(
+        buildFormTextRow(
             appLocalizations.tr('irc_connection.user_prefs.user_name'),
+            Icons.account_circle,
             _userNameController,
             (value) => _fillPreferencesFromUI()),
       ],

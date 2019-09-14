@@ -8,6 +8,8 @@ typedef void BooleanCallback(bool);
 
 buildFormTitle(BuildContext context, String title) => Padding(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             title,
@@ -19,7 +21,7 @@ buildFormTitle(BuildContext context, String title) => Padding(
       padding: const EdgeInsets.all(4.0),
     );
 
-buidFormTextRow(String title, TextEditingController controller,
+buildFormTextRow(String title, IconData iconData, TextEditingController controller,
         ValueChanged<String> callback) =>
     Padding(
       padding: const EdgeInsets.all(2.0),
@@ -27,11 +29,18 @@ buidFormTextRow(String title, TextEditingController controller,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Center(child: Text(title)),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Icon(iconData),
+          ),
           Flexible(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal:8.0),
               child: PlatformTextField(
+                android: (_) => MaterialTextFieldData(decoration: InputDecoration(
+                    hintText: title,
+                    hintStyle: TextStyle(color: Colors.grey))),
+                ios: (_) => CupertinoTextFieldData(placeholder: title),
                 controller: controller,
                 onChanged: callback,
               ),
@@ -45,7 +54,7 @@ buildFormBooleanRow(String title, bool startValue, BooleanCallback callback) =>
     Padding(
       padding: const EdgeInsets.all(2.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(title),

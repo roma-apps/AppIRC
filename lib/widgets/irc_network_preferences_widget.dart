@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/widgets/irc_network_server_preferences_widget.dart';
@@ -38,8 +39,9 @@ class IRCNetworkPreferencesWidgetState
       children: <Widget>[
         IRCNetworkServerPreferencesWidget(preferences.networkConnectionPreferences.serverPreferences),
         IRCNetworkUserPreferencesWidget(preferences.networkConnectionPreferences.userPreferences),
-        buidFormTextRow(
+        buildFormTextRow(
             appLocalizations.tr('irc_connection.channels'),
+            Icons.list,
             _channelsController,
             (newValue) => _fillPreferencesFromUI()),
 

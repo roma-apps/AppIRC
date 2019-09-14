@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
+
 
 import 'form_widgets.dart';
 
@@ -40,16 +42,19 @@ class IRCNetworkServerPreferencesState
       children: <Widget>[
         buildFormTitle(
             context, appLocalizations.tr('irc_connection.network_prefs.title')),
-        buidFormTextRow(
+        buildFormTextRow(
             appLocalizations.tr('irc_connection.network_prefs.name'),
+            Icons.account_circle,
             _nameController,
             (newValue) => _fillPreferencesFromUI()),
-        buidFormTextRow(
+        buildFormTextRow(
             appLocalizations.tr('irc_connection.network_prefs.server_host'),
+            Icons.cloud,
             _hostController,
             (newValue) => _fillPreferencesFromUI()),
-        buidFormTextRow(
+        buildFormTextRow(
             appLocalizations.tr('irc_connection.network_prefs.server_port'),
+            Icons.cloud,
             _portController,
             (newValue) => _fillPreferencesFromUI()),
         buildFormBooleanRow(

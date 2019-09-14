@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/async_operation_bloc.dart';
 import 'package:flutter_appirc/blocs/lounge_connection_bloc.dart';
@@ -36,82 +37,86 @@ class LoungeEditConnectionPageState extends State<LoungeEditConnectionPage> {
         child: PlatformScaffold(
           iosContentBottomPadding: true,
           iosContentPadding: true,
+
           appBar: PlatformAppBar(
             title: Text(appLocalizations.tr('lounge.connection.edit.title')),
           ),
-          body: Column(
-            children: <Widget>[
-              Provider<LoungeEditConnectionBloc>(
-                bloc: loungeConnectionBloc,
-                child: Provider<LoungeConnectionBloc>(
-                    bloc: loungeConnectionBloc,
-                    child: LoungePreferencesWidget(loungePreferences)),
-              ),
-              Provider<AsyncOperationBloc>(
-                bloc: loungeConnectionBloc,
-                child: ButtonLoadingWidget(
-                    child: Text(
-                        appLocalizations.tr('lounge.connection.edit.change')),
-                    onPressed: () async {
-                      var isPreferencesValid = false;
-                      var exception;
-                      try {
-                        isPreferencesValid =
-                            await loungeConnectionBloc.checkPreferences();
-                      } on Exception catch (e) {
-                        exception = e;
-                      }
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView(
+              children: <Widget>[
+                Provider<LoungeEditConnectionBloc>(
+                  bloc: loungeConnectionBloc,
+                  child: Provider<LoungeConnectionBloc>(
+                      bloc: loungeConnectionBloc,
+                      child: LoungePreferencesWidget(loungePreferences)),
+                ),
+                Provider<AsyncOperationBloc>(
+                  bloc: loungeConnectionBloc,
+                  child: ButtonLoadingWidget(
+                      child: Text(
+                          appLocalizations.tr('lounge.connection.edit.change'),
+                          style: TextStyle(color: Colors.white)),
+                      onPressed: () async {
+                        var isPreferencesValid = false;
+                        var exception;
+                        try {
+                          isPreferencesValid =
+                              await loungeConnectionBloc.checkPreferences();
+                        } on Exception catch (e) {
+                          exception = e;
+                        }
 
-                      if (isPreferencesValid) {
-                        showPlatformDialog(
-                            androidBarrierDismissible: true,
-                            context: context,
-                            builder: (_) => PlatformAlertDialog(
-                                  title: Text(appLocalizations.tr(
-                                      "lounge.connection.edit.confirm_dialog.title")),
-                                  content: Text(appLocalizations.tr(
-                                      "lounge.connection.edit.confirm_dialog.content")),
-                                  actions: <Widget>[
-                                    PlatformDialogAction(
-                                      child: Text(appLocalizations.tr(
-                                          "lounge.connection.edit.confirm_dialog.save_reload")),
-                                      onPressed: () async {
-                                        lounge.disconnect();
+                        if (isPreferencesValid) {
+                          showPlatformDialog(
+                              androidBarrierDismissible: true,
+                              context: context,
+                              builder: (_) => PlatformAlertDialog(
+                                    title: Text(appLocalizations.tr(
+                                        "lounge.connection.edit.confirm_dialog.title")),
+                                    content: Text(appLocalizations.tr(
+                                        "lounge.connection.edit.confirm_dialog.content")),
+                                    actions: <Widget>[
+                                      PlatformDialogAction(
+                                        child: Text(appLocalizations.tr(
+                                            "lounge.connection.edit.confirm_dialog.save_reload")),
+                                        onPressed: () async {
+                                          lounge.disconnect();
 
-                                        await LoungeNewConnectionBloc(
-                                                loungeService: lounge,
-                                                newLoungePreferences:
-                                                    loungeConnectionBloc
-                                                        .newLoungePreferences,
-                                                preferencesBloc:
-                                                    loungePreferencesBloc)
-                                            .connect();
+                                          await LoungeNewConnectionBloc(
+                                                  loungeService: lounge,
+                                                  newLoungePreferences:
+                                                      loungeConnectionBloc
+                                                          .newLoungePreferences,
+                                                  preferencesBloc:
+                                                      loungePreferencesBloc)
+                                              .connect();
 
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                    PlatformDialogAction(
-                                      child: Text(appLocalizations.tr(
-                                          "lounge.connection.edit.confirm_dialog.cancel")),
-                                      onPressed: () async {
-                                        Navigator.pop(context);
-                                      },
-                                    )
-                                  ],
-                                ));
-
-                      } else {
-                        showPlatformDialog(
-                            androidBarrierDismissible: true,
-                            context: context,
-                            builder: (_) =>
-                                buildLoungeConnectionErrorAlertDialog(
-                                    context, exception));
-                      }
-                    }),
-              )
-            ],
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      PlatformDialogAction(
+                                        child: Text(appLocalizations.tr(
+                                            "lounge.connection.edit.confirm_dialog.cancel")),
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                        },
+                                      )
+                                    ],
+                                  ));
+                        } else {
+                          showPlatformDialog(
+                              androidBarrierDismissible: true,
+                              context: context,
+                              builder: (_) =>
+                                  buildLoungeConnectionErrorAlertDialog(
+                                      context, exception));
+                        }
+                      }),
+                )
+              ],
+            ),
           ),
         ),
       ),
