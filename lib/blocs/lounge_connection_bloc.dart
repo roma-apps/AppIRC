@@ -11,4 +11,8 @@ class LoungeConnectionBloc extends AsyncOperationBloc {
   void dispose() {
     super.dispose();
   }
+
+  void changeHost(String text) {
+    newLoungePreferences.host = text;
+  }
 }

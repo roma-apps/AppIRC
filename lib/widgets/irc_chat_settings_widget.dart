@@ -21,10 +21,10 @@ class IRCChatSettingsWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: _buildNewNetworkButton(context),
             ),
-//            Padding(
-//              padding: const EdgeInsets.all(8.0),
-//              child: _buildLoungeSettingsButton(context),
-//            )
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildLoungeSettingsButton(context),
+            )
           ],
         ),
       ],

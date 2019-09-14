@@ -13,6 +13,7 @@ import 'package:flutter_appirc/blocs/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
+import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/pages/irc_chat_page.dart';
 import 'package:flutter_appirc/pages/irc_networks_new_connection_page.dart';
 import 'package:flutter_appirc/pages/lounge_new_connection_page.dart';
@@ -27,16 +28,24 @@ var _logger = MyLogger(logTag: "Main", enabled: true);
 
 var socketIOManager = SocketIOManager();
 
-var loungeService = LoungeService(socketIOManager);
+
 var preferencesService = PreferencesService();
 
 var loungePreferencesBloc = LoungePreferencesBloc(preferencesService);
 var ircNetworksPreferencesBloc = IRCNetworksPreferencesBloc(preferencesService);
 
+var loungeService = LoungeService(socketIOManager);
+
+
 var networksListBloc =
-    IRCNetworksListBloc(loungeService, ircNetworksPreferencesBloc);
+IRCNetworksListBloc(loungeService, ircNetworksPreferencesBloc);
 
 Future main() async {
+  await preferencesService.init();
+
+
+//    preferencesService.clear();
+
   var appIRC = AppIRC();
   runApp(EasyLocalization(child: appIRC));
 }
@@ -44,6 +53,8 @@ Future main() async {
 class AppIRC extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
+
     var accentColor = Colors.red;
     final themeData = new ThemeData(
       primarySwatch: accentColor,
@@ -57,38 +68,40 @@ class AppIRC extends StatelessWidget {
 
     var data = EasyLocalizationProvider.of(context).data;
 
+
+
     return Provider(
       bloc: uiSkin,
-      child: Provider(
-        bloc: preferencesService,
-        child: Provider<LoungePreferencesBloc>(
-          bloc: loungePreferencesBloc,
-          child: Provider<IRCNetworksPreferencesBloc>(
-            bloc: ircNetworksPreferencesBloc,
-            child: Provider(
-              bloc: loungeService,
-              child: EasyLocalizationProvider(
-                data: data,
-                child: Provider<IRCNetworksPreferencesBloc>(
-                  bloc: IRCNetworksPreferencesBloc(preferencesService),
-                  child: Provider<IRCNetworksListBloc>(
-                    bloc: networksListBloc,
-                    child: PlatformApp(
-                        title: "AppIRC",
-                        localizationsDelegates: [
-                          //app-specific localization
-                          EasylocaLizationDelegate(
-                              locale: data.locale, path: 'assets/langs'),
-                        ],
-                        supportedLocales: [Locale('en', 'US')],
-                        locale: data.savedLocale,
-                        android: (_) => MaterialAppData(theme: themeData),
-                        ios: (_) => new CupertinoAppData(theme: cupertinoTheme),
-                        home: SplashPage(init)),
+      child: EasyLocalizationProvider(
+        data: data,
+        child: Provider(
+          bloc: preferencesService,
+          child: Provider<LoungePreferencesBloc>(
+            bloc: loungePreferencesBloc,
+            child: Provider<IRCNetworksPreferencesBloc>(
+                  bloc: ircNetworksPreferencesBloc,
+                  child: Provider(
+                    bloc: loungeService,
+                    child: Provider<IRCNetworksPreferencesBloc>(
+                      bloc: IRCNetworksPreferencesBloc(preferencesService),
+                      child: Provider<IRCNetworksListBloc>(
+                        bloc: networksListBloc,
+                        child: PlatformApp(
+                            title: "AppIRC",
+                            localizationsDelegates: [
+                              //app-specific localization
+                              EasylocaLizationDelegate(
+                                  locale: data.locale, path: 'assets/langs'),
+                            ],
+                            supportedLocales: [Locale('en', 'US')],
+                            locale: data.savedLocale,
+                            android: (_) => MaterialAppData(theme: themeData),
+                            ios: (_) => new CupertinoAppData(theme: cupertinoTheme),
+                            home: SplashPage(init)),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
           ),
         ),
       ),
@@ -99,10 +112,7 @@ class AppIRC extends StatelessWidget {
 init(BuildContext context) async {
   _logger.d(() => "init");
 
-  await preferencesService.init();
-
-//    preferencesService.clear();
-
+var lounge = Provider.of<LoungeService>(context);
   var isSavedLoungePreferenceExist =
       loungePreferencesBloc.isSavedPreferenceExist;
 
@@ -115,7 +125,7 @@ init(BuildContext context) async {
     var connected = await connectToLounge(
       context,
       LoungeNewConnectionBloc(
-          loungeService: loungeService,
+          loungeService: lounge,
           preferencesBloc: loungePreferencesBloc,
           newLoungePreferences: loungePreferencesBloc.getPreferenceOrDefault()),
     );
@@ -141,7 +151,7 @@ init(BuildContext context) async {
           for (IRCNetworkPreferences networkPreferences
               in networksPreferences.networks) {
             var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
-                loungeService: loungeService,
+                loungeService: lounge,
                 preferencesBloc: ircNetworksPreferencesBloc,
                 newConnectionPreferences: networkPreferences);
             await ircNetworksNewConnectionBloc.sendNewNetworkRequest();

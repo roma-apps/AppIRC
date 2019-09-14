@@ -24,6 +24,7 @@ class LoungeEditConnectionPageState extends State<LoungeEditConnectionPage> {
   Widget build(BuildContext context) {
     final LoungeService lounge = Provider.of<LoungeService>(context);
     var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
+
     var loungePreferences = loungePreferencesBloc.getPreferenceOrDefault();
     var loungeConnectionBloc = LoungeEditConnectionBloc(
         socketIOManager: lounge.socketIOManager,
@@ -62,7 +63,7 @@ class LoungeEditConnectionPageState extends State<LoungeEditConnectionPage> {
                         var exception;
                         try {
                           isPreferencesValid =
-                              await loungeConnectionBloc.checkPreferences();
+                          await loungeConnectionBloc.checkPreferences();
                         } on Exception catch (e) {
                           exception = e;
                         }
@@ -71,7 +72,8 @@ class LoungeEditConnectionPageState extends State<LoungeEditConnectionPage> {
                           showPlatformDialog(
                               androidBarrierDismissible: true,
                               context: context,
-                              builder: (_) => PlatformAlertDialog(
+                              builder: (_) =>
+                                  PlatformAlertDialog(
                                     title: Text(appLocalizations.tr(
                                         "lounge.connection.edit.confirm_dialog.title")),
                                     content: Text(appLocalizations.tr(
@@ -83,17 +85,10 @@ class LoungeEditConnectionPageState extends State<LoungeEditConnectionPage> {
                                         onPressed: () async {
                                           lounge.disconnect();
 
-                                          await LoungeNewConnectionBloc(
-                                                  loungeService: lounge,
-                                                  newLoungePreferences:
-                                                      loungeConnectionBloc
-                                                          .newLoungePreferences,
-                                                  preferencesBloc:
-                                                      loungePreferencesBloc)
-                                              .connect();
-
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
+                                          loungePreferencesBloc
+                                              .setNewPreferenceValue(
+                                              loungeConnectionBloc
+                                                  .newLoungePreferences);
                                         },
                                       ),
                                       PlatformDialogAction(

@@ -18,7 +18,7 @@ class LoungeResultForRequest<T extends LoungeRequest,
 
 @JsonSerializable()
 class LoungePreferences extends JsonPreferences {
-  final String host;
+   String host;
 
   LoungePreferences({@required this.host});
 

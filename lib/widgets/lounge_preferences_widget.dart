@@ -14,32 +14,27 @@ var _logger = MyLogger(logTag: "LoungePreferencesWidget", enabled: true);
 
 class LoungePreferencesWidget extends StatefulWidget {
 
-  final LoungePreferences preferences;
+  final LoungePreferences startPreferences;
 
 
-  LoungePreferencesWidget(this.preferences);
+  LoungePreferencesWidget(this.startPreferences);
 
   @override
-  State<StatefulWidget> createState() => LoungePreferencesWidgetState(preferences);
+  State<StatefulWidget> createState() => LoungePreferencesWidgetState(startPreferences);
 }
 
 class LoungePreferencesWidgetState extends State<LoungePreferencesWidget> {
 
 
-  final LoungePreferences preferences;
-
-
   TextEditingController _hostController;
-  LoungePreferencesWidgetState(this.preferences) {
-    _hostController = TextEditingController(text:preferences.host);
+  LoungePreferencesWidgetState(LoungePreferences startPreferences) {
+    _hostController = TextEditingController(text:startPreferences.host);
   }
 
   @override
   Widget build(BuildContext context) {
-    final LoungeConnectionBloc loungeConnectionBloc =
-        Provider.of<LoungeConnectionBloc>(context);
 
-
+    var loungeConnectionBloc = Provider.of<LoungeConnectionBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       children: <Widget>[
@@ -50,15 +45,12 @@ class LoungePreferencesWidgetState extends State<LoungePreferencesWidget> {
             Icons.cloud,
             _hostController,
             (value) {
-          _fillPreferencesFromUI(loungeConnectionBloc);
+              loungeConnectionBloc.changeHost(_hostController.text);
         }),
       ],
     );
   }
 
-  void _fillPreferencesFromUI(LoungeNewConnectionBloc lounge) {
-    lounge.newLoungePreferences = LoungePreferences(host: _hostController.text);
-  }
 }
 
 PlatformAlertDialog buildLoungeConnectionErrorAlertDialog(
