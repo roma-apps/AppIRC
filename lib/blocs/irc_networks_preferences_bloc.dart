@@ -14,7 +14,7 @@ IRCNetworkPreferences createDefaultIRCNetworkPreferences() =>
           serverPreferences: createDefaultNetworkServerPreferences(),
           userPreferences: createDefaultNetworkUserPreferences(),
         ),
-        channels: [IRCNetworkChannelPreferences(name: "#lounge-spam", isLobby: false)]);
+        channels: [IRCNetworkChannelPreferences(name: "#thelounge-spam", isLobby: false)]);
 
 IRCNetworkUserPreferences createDefaultNetworkUserPreferences() {
   return IRCNetworkUserPreferences(
