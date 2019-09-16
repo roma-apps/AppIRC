@@ -15,7 +15,7 @@ class IRCNetworkChannelCommandUserInformationBloc
       {@required LoungeService lounge,
       @required IRCNetworkChannel channel,
       @required this.username})
-      : super(lounge: lounge, lobbyChannel: channel);
+      : super(lounge: lounge, channel: channel);
 
   Future<bool> sendIRCUserInformationCommand() async => await sendIRCCommand(
       ircCommand: _userInformationIRCCommand, args: username);

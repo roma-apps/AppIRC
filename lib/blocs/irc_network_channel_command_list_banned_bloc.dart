@@ -10,7 +10,7 @@ const String _banListIRCCommand = "/banlist";
 class IRCNetworkChannelCommandListBannedBloc extends IRCNetworkChannelCommandBloc {
   IRCNetworkChannelCommandListBannedBloc(
       {@required LoungeService lounge, @required IRCNetworkChannel channel})
-      : super(lounge: lounge, lobbyChannel: channel);
+      : super(lounge: lounge, channel: channel);
 
   Future<bool> sendIRCBanListCommand() async =>
       await sendIRCCommand(ircCommand: _banListIRCCommand);

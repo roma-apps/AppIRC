@@ -8,14 +8,14 @@ import 'package:flutter_appirc/service/lounge_service.dart';
 
 class IRCNetworkCommandBloc extends IRCNetworkChannelCommandBloc {
   final IRCNetwork network;
-  IRCNetworkChannel get lobbyChannel => network.lobbyChannel;
+  IRCNetworkChannel get channel => network.lobbyChannel;
 
   IRCNetworkCommandBloc(LoungeService lounge, this.network)
-      : super(lounge: lounge, lobbyChannel: network.lobbyChannel);
+      : super(lounge: lounge, channel: network.lobbyChannel);
 
   Future<bool> sendNetworkIRCCommand(
       {@required String ircCommand, String args = ""}) async =>
-      lobbyChannel == null
+      channel == null
           ? false
           : await sendIRCCommand(ircCommand: ircCommand, args: args);
 }

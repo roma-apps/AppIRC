@@ -223,4 +223,5 @@ enum IRCNetworkChannelMessageType {
   RAW,
   MODE_CHANNEL,
   QUIT,
+//  PART,
 }

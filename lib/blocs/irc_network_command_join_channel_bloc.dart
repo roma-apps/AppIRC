@@ -14,6 +14,6 @@ class IRCNetworkCommandJoinChannelBloc extends IRCNetworkCommandBloc {
 
   sendJoinIRCCommand(
           {@required String channelName, String password = ""}) async =>
-      await lounge.sendJoinChannelMessageRequest(lobbyChannel,
+      await lounge.sendJoinChannelMessageRequest(channel,
           JoinIRCCommand(channelName: channelName, channelPassword: password));
 }

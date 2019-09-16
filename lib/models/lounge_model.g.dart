@@ -17,6 +17,19 @@ Map<String, dynamic> _$LoungePreferencesToJson(LoungePreferences instance) =>
       'host': instance.host,
     };
 
+ChanLoungeResponseBody _$ChanLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return ChanLoungeResponseBody(
+    json['chan'] as int,
+  );
+}
+
+Map<String, dynamic> _$ChanLoungeResponseBodyToJson(
+        ChanLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'chan': instance.chan,
+    };
+
 NamesLoungeRequestBody _$NamesLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return NamesLoungeRequestBody(

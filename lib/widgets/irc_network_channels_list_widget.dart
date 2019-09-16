@@ -129,7 +129,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
         switch (value) {
           case ChannelDropDownAction.LEAVE:
             IRCNetworkChannelCommandLeaveBloc(lounge: lounge, channel: channel)
-                .sendIRCLeaveCommand();
+                .sendCloseIRCCommand(channelName: channel.name);
             break;
           case ChannelDropDownAction.TOPIC:
             showPlatformDialog(

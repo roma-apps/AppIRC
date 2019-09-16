@@ -23,6 +23,7 @@ class LoungeResponseEventNames {
   static const String names = "names";
   static const String users = "users";
   static const String join = "join";
+  static const String part = "part";
   static const String networkStatus = "network:status";
   static const String networkOptions = "network:options";
   static const String channelStateOptions = "channel:state";
@@ -103,6 +104,18 @@ class LoungeService extends Providable {
           LoungeJsonRequest<InputLoungeRequestBody<JoinIRCCommand>>,
           JoinLoungeResponseBody>> get joinToRequestStream =>
       _joinToRequestController.stream;
+
+  var _closeToRequestController = new BehaviorSubject<
+      LoungeResultForRequest<
+          LoungeJsonRequest<InputLoungeRequestBody<CloseIRCCommand>>,
+          ChanLoungeResponseBody>>();
+
+  Stream<
+      LoungeResultForRequest<
+          LoungeJsonRequest<InputLoungeRequestBody<CloseIRCCommand>>,
+          ChanLoungeResponseBody>> get closeToRequestStream =>
+      _closeToRequestController.stream;
+
 
   BehaviorSubject<NetworkStatusLoungeResponseBody> _networkStatusController =
       new BehaviorSubject<NetworkStatusLoungeResponseBody>();
@@ -280,6 +293,7 @@ class LoungeService extends Providable {
     _networkStatusController.close();
     _channelStateController.close();
     _nickController.close();
+    _closeToRequestController.close();
 
     _loungePreferencesController.close();
 
@@ -499,6 +513,29 @@ class LoungeService extends Providable {
     if (result != null) {
       var loungeResultForRequest = LoungeResultForRequest(request, result);
       _joinToRequestController.add(loungeResultForRequest);
+      return loungeResultForRequest;
+    } else {
+      return null;
+    }
+  }
+
+
+  sendCloseChannelMessageRequest(
+      IRCNetworkChannel targetChannel, CloseIRCCommand ircCommand) async {
+    var request = LoungeJsonRequest(
+        name: LoungeRequestEventNames.input,
+        body: CommandInputLoungeRequestBody(
+            body: ircCommand, target: targetChannel.remoteId));
+
+    var result = await _sendRequestWithResult(
+        request: request,
+        resultEventName: LoungeResponseEventNames.part,
+        resultParser: (raw) =>
+            ChanLoungeResponseBody.fromJson(_preProcessRawData(raw)));
+
+    if (result != null) {
+      var loungeResultForRequest = LoungeResultForRequest(request, result);
+      _closeToRequestController.add(loungeResultForRequest);
       return loungeResultForRequest;
     } else {
       return null;

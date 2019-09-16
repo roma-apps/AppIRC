@@ -27,6 +27,16 @@ class JoinIRCCommand extends IRCCommand {
   String toTextCommand() => "$commandName $channelName $channelPassword";
 }
 
+class CloseIRCCommand extends IRCCommand {
+  final String channelName;
+
+  CloseIRCCommand({@required this.channelName})
+      : super("/close");
+
+  @override
+  String toTextCommand() => "$commandName $channelName";
+}
+
 class LoungeResultForRequest<T extends LoungeRequest,
     K extends LoungeResponseBody> {
   final T request;
@@ -110,6 +120,23 @@ abstract class LoungeRequestBody {
 abstract class LoungeResponseBody extends LoungeResponseBodyPart {}
 
 abstract class LoungeResponseBodyPart {}
+
+@JsonSerializable()
+class ChanLoungeResponseBody extends LoungeResponseBody {
+  int chan;
+
+
+  ChanLoungeResponseBody(this.chan);
+
+
+  @override
+  String toString() {
+    return 'ChanLoungeResponseBody{chan: $chan}';
+  }
+
+  factory ChanLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$ChanLoungeResponseBodyFromJson(json);
+}
 
 abstract class InputLoungeRequestBody<T> extends LoungeRequestBody {
   final int target;
