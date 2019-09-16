@@ -30,8 +30,7 @@ class JoinIRCCommand extends IRCCommand {
 class CloseIRCCommand extends IRCCommand {
   final String channelName;
 
-  CloseIRCCommand({@required this.channelName})
-      : super("/close");
+  CloseIRCCommand({@required this.channelName}) : super("/close");
 
   @override
   String toTextCommand() => "$commandName $channelName";
@@ -125,9 +124,7 @@ abstract class LoungeResponseBodyPart {}
 class ChanLoungeResponseBody extends LoungeResponseBody {
   int chan;
 
-
   ChanLoungeResponseBody(this.chan);
-
 
   @override
   String toString() {
@@ -244,22 +241,20 @@ class MessageLoungeResponseBody extends LoungeResponseBody {
       _$MessageLoungeResponseBodyFromJson(json);
 }
 
-
 @JsonSerializable()
 class MessageSpecialLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final dynamic data;
 
-
   MessageSpecialLoungeResponseBody(this.chan, this.data);
-
 
   @override
   String toString() {
     return 'MessageSpecialLoungeResponseBody{chan: $chan, data: $data}';
   }
 
-  factory MessageSpecialLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+  factory MessageSpecialLoungeResponseBody.fromJson(
+          Map<String, dynamic> json) =>
       _$MessageSpecialLoungeResponseBodyFromJson(json);
 }
 
@@ -280,14 +275,11 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
       _$JoinLoungeResponseBodyFromJson(json);
 }
 
-
 @JsonSerializable()
 class QuitLoungeResponseBody extends LoungeResponseBody {
   final String network;
 
-
   QuitLoungeResponseBody(this.network);
-
 
   @override
   String toString() {
@@ -356,6 +348,9 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class ChannelStateLoungeResponseBody extends LoungeResponseBody {
+  static const int STATE_CONNECTED = 1;
+  static const int STATE_DISCONNECTED = 0;
+
   final int chan;
   final int state;
 

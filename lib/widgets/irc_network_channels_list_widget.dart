@@ -7,13 +7,15 @@ import 'package:flutter_appirc/blocs/irc_chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_command_leave_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_command_list_banned_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_command_user_infromation_bloc.dart';
+import 'package:flutter_appirc/blocs/irc_network_channel_state_bloc.dart';
+import 'package:flutter_appirc/blocs/irc_network_state_bloc.dart';
 import 'package:flutter_appirc/helpers/logger.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_channel_model.dart';
 import 'package:flutter_appirc/models/irc_network_model.dart';
 import 'package:flutter_appirc/service/lounge_service.dart';
 import 'package:flutter_appirc/skin/ui_skin.dart';
-import 'package:flutter_appirc/widgets/irc_network_channel_statistics_widget.dart';
+import 'package:flutter_appirc/widgets/irc_network_channel_unread_count_widget.dart';
 import 'package:flutter_appirc/widgets/irc_network_channel_topic_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -43,24 +45,39 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
       IRCNetwork network, IRCNetworkChannel channel) {
     var ircChatActiveChannelBloc =
         Provider.of<IRCChatActiveChannelBloc>(context);
-    return StreamBuilder<IRCNetworkChannel>(
-        stream: ircChatActiveChannelBloc.activeChannelStream,
-        builder:
-            (BuildContext context, AsyncSnapshot<IRCNetworkChannel> snapshot) {
-          var activeChannel = snapshot.data;
-          var isChannelActive = activeChannel?.remoteId == channel.remoteId;
-          if (isChannelActive) {
-            return Container(
-                decoration: BoxDecoration(
-                    color: UISkin.of(context).appSkin.accentColor),
-                child: _buildChannelRow(context, ircChatActiveChannelBloc,
-                    network, channel, lounge, isChannelActive));
-          } else {
-            return Container(
-                child: _buildChannelRow(context, ircChatActiveChannelBloc,
-                    network, channel, lounge, isChannelActive));
-          }
-        });
+
+    var networkStateBloc =
+    Provider.of<IRCNetworkStateBloc>(context);
+
+    var channelStateBloc = IRCNetworkChannelStateBloc(lounge, networkStateBloc, channel);
+
+    return StreamBuilder(
+      stream: channelStateBloc.channelStateStream,
+       builder: (BuildContext context, AsyncSnapshot snapshot) {
+         var connected = snapshot.data == IRCNetworkState.CONNECTED;
+
+
+         return StreamBuilder<IRCNetworkChannel>(
+            stream: ircChatActiveChannelBloc.activeChannelStream,
+            builder:
+                (BuildContext context, AsyncSnapshot<IRCNetworkChannel> snapshot) {
+              var activeChannel = snapshot.data;
+              var isChannelActive = activeChannel?.remoteId == channel.remoteId;
+              if (isChannelActive) {
+                return Container(
+                    decoration: BoxDecoration(
+                        color: UISkin.of(context).appSkin.accentColor),
+                    child: _buildChannelRow(context, ircChatActiveChannelBloc,
+                        network, channel, lounge, isChannelActive, connected));
+              } else {
+                return Container(
+                    child: _buildChannelRow(context, ircChatActiveChannelBloc,
+                        network, channel, lounge, isChannelActive, connected));
+              }
+            });
+
+    },
+    );
   }
 
   Widget _buildChannelRow(
@@ -69,7 +86,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
       IRCNetwork network,
       IRCNetworkChannel channel,
       LoungeService lounge,
-      bool isChannelActive) {
+      bool isChannelActive, bool connected) {
     var iconData = Icons.message;
 
     switch (channel.type) {
@@ -91,6 +108,8 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
     }
 
     var foregroundColor = calculateForegroundColor(isChannelActive);
+
+
 
     return Row(children: <Widget>[
       Padding(
@@ -117,6 +136,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
         ),
       ),
       buildChannelUnreadCountBadge(lounge, channel),
+      buildConnectionIcon(context, foregroundColor, connected),
       _buildPopupMenuButton(lounge, channel, context, foregroundColor)
     ]);
   }
@@ -240,3 +260,12 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
 enum ChannelDropDownAction { LEAVE, TOPIC, LIST_BANNED, USER_INFORMATION }
 
 Color calculateForegroundColor(bool isChannelActive) => isChannelActive ? Colors.white : Colors.black;
+
+buildConnectionIcon(BuildContext context, Color foregroundColor, bool connected) {
+  if(!connected) {
+    return Icon(Icons.cloud_off, color: foregroundColor);
+  } else {
+    return Container();
+  }
+
+}

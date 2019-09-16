@@ -28,7 +28,7 @@ class LoungeResponseEventNames {
   static const String quit = "quit";
   static const String networkStatus = "network:status";
   static const String networkOptions = "network:options";
-  static const String channelStateOptions = "channel:state";
+  static const String channelState = "channel:state";
 }
 
 class LoungeRequestEventNames {
@@ -94,6 +94,11 @@ class LoungeService extends Providable {
       new BehaviorSubject<NamesLoungeResponseBody>();
 
   Stream<NamesLoungeResponseBody> get namesStream => _namesController.stream;
+
+  BehaviorSubject<IRCNetworkChannel> _openRequestController =
+  new BehaviorSubject<IRCNetworkChannel>();
+
+  Stream<IRCNetworkChannel> get openRequestStream => _openRequestController.stream;
 
   BehaviorSubject<UsersLoungeResponseBody> _usersController =
       new BehaviorSubject<UsersLoungeResponseBody>();
@@ -315,14 +320,18 @@ class LoungeService extends Providable {
 
     _loungePreferencesController.close();
     _quitController.close();
+    _openRequestController.close();
 
     _joinToRequestController.close();
 
     disconnect();
   }
 
-  sendOpenRequest(IRCNetworkChannel channel) async => await _sendRequest(
+  sendOpenRequest(IRCNetworkChannel channel) async {
+    _openRequestController.add(channel);
+    return await _sendRequest(
       LoungeRawRequest(name: "open", body: [channel.remoteId]));
+  }
 
   sendNamesRequest(IRCNetworkChannel channel) async =>
       await _sendRequest(LoungeJsonRequest(
@@ -401,7 +410,7 @@ class LoungeService extends Providable {
     socketIOService.on(
         LoungeResponseEventNames.networkOptions, _onNetworkOptionsResponse);
     socketIOService.on(
-        LoungeResponseEventNames.channelStateOptions, _onChannelStateResponse);
+        LoungeResponseEventNames.channelState, _onChannelStateResponse);
   }
 
   void _removeSubscriptions() {
@@ -424,7 +433,7 @@ class LoungeService extends Providable {
     socketIOService.off(
         LoungeResponseEventNames.networkOptions, _onNetworkOptionsResponse);
     socketIOService.off(
-        LoungeResponseEventNames.channelStateOptions, _onChannelStateResponse);
+        LoungeResponseEventNames.channelState, _onChannelStateResponse);
   }
 
   void _onTopicResponse(raw) {

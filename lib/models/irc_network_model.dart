@@ -7,15 +7,17 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'irc_network_model.g.dart';
 
+enum IRCNetworkState { CONNECTED, DISCONNECTED }
+
 class IRCNetworkStatus {
-  final bool connected;
+
   final bool secure;
 
-  IRCNetworkStatus({@required this.connected, @required this.secure});
+  IRCNetworkStatus({ @required this.secure});
 
   @override
   String toString() {
-    return 'IRCNetworkStatus{connected: $connected, secure: $secure}';
+    return 'IRCNetworkStatus{ secure: $secure}';
   }
 }
 

@@ -265,7 +265,6 @@ class IRCNetworksListBloc extends Providable {
         connectionPreferences: networkConnectionPreferences,
         remoteId: loungeNetwork.uuid,
         status: IRCNetworkStatus(
-            connected: loungeNetworkStatus.connected,
             secure: loungeNetworkStatus.secure),
         channels: channels);
 

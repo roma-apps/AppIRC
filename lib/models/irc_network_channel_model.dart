@@ -7,13 +7,8 @@ const _specialType = "special";
 const _queryType = "query";
 const _channelType = "channel";
 
-class IRCNetworkChannelStatistics {
-  final IRCNetworkChannel channel;
-  final int unreadCount;
 
-  IRCNetworkChannelStatistics(this.channel, this.unreadCount);
-}
-
+enum IRCNetworkChannelState { CONNECTED, DISCONNECTED }
 
 class IRCNetworkChannel {
   int get localId => channelPreferences?.localId;
@@ -33,13 +28,24 @@ class IRCNetworkChannel {
   bool get isLobby => type == IRCNetworkChannelType.LOBBY;
 
   IRCNetworkChannel(
-      {
-        @required this.networkPreferences,
-        @required this.channelPreferences,
+      {@required this.networkPreferences,
+      @required this.channelPreferences,
+      @required this.type,
+      @required this.remoteId,
+      @required this.isEditTopicPossible});
 
-        @required this.type,
-        @required this.remoteId,
-        @required this.isEditTopicPossible});
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is IRCNetworkChannel &&
+              runtimeType == other.runtimeType &&
+              remoteId == other.remoteId;
+
+  @override
+  int get hashCode => remoteId.hashCode;
+
+
+
 }
 
 enum IRCNetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }
