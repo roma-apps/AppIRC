@@ -28,14 +28,16 @@ class IRCNetworksListBloc extends Providable {
   }
 
   final BehaviorSubject<List<IRCNetwork>> _networksController =
-      new BehaviorSubject<List<IRCNetwork>>(seedValue: []);
+  new BehaviorSubject<List<IRCNetwork>>(seedValue: []);
 
   Stream<List<IRCNetwork>> get newNetworksStream => _networksController.stream;
 
   StreamSubscription<
       LoungeResultForRequest<LoungeJsonRequest<NetworkNewLoungeRequestBody>,
           NetworksLoungeResponseBody>> _networksSubscription;
-  StreamSubscription<JoinLoungeResponseBody> _joinSubscription;
+  StreamSubscription<
+      LoungeResultForRequest<LoungeJsonRequest<InputLoungeRequestBody>,
+          JoinLoungeResponseBody>> _joinSubscription;
 
   IRCNetworksListBloc(this.lounge, this.preferencesBloc) {
     _logger.i(() => "start creating");
@@ -45,7 +47,8 @@ class IRCNetworksListBloc extends Providable {
       var result = resultForRequest.result;
 
       var networkToAdd = result.networks.firstWhere(
-          (loungeNetwork) => _isNetworkForNewRequest(request, loungeNetwork));
+              (loungeNetwork) =>
+              _isNetworkForNewRequest(request, loungeNetwork));
 
       if (networkToAdd != null) {
         _addNetwork(request, networkToAdd);
@@ -53,25 +56,44 @@ class IRCNetworksListBloc extends Providable {
         throw Exception(
             "Netowork not found in result $result for request $request");
       }
-
-//
-//      for (var network in event.networks) {
-//        List<IRCNetworkChannel> newChannels = List();
-//        var newNetwork = IRCNetwork(network.name, network.uuid, newChannels,
-//            IRCNetworkStatus(network.status["connected"]));
-//        for (var loungeChannel in network.channels) {
-//          newChannels.add(IRCNetworkChannel(
-//              name: loungeChannel.name,
-//              remoteId: loungeChannel.id,
-//              type: detectIRCNetworkChannelType(loungeChannel.type)));
-//        }
-//        newNetworks.add(newNetwork);
-//      }
-//
-//      _networks.addAll(newNetworks);
     });
 
-    _joinSubscription = lounge.joinStream.listen((event) {
+    _joinSubscription = lounge.joinToRequestStream.listen((resultForRequest) {
+      var request = resultForRequest.request;
+      var result = resultForRequest.result;
+
+      var loungeChannel = result.chan;
+
+      var remoteNetworkId = result.network;
+
+      var networkForJoinedChannel = _networks
+          .firstWhere((network) => network.remoteId == remoteNetworkId);
+
+      var networksListPreferences = preferencesBloc
+          .getPreferenceOrValue(() => IRCNetworksListPreferences());
+
+      var channelLocalId = networksListPreferences.getNextNetworkChannelLocalId();
+      var networkChannelPreferences = IRCNetworkChannelPreferences(
+              password: request.body.content.channelPassword,
+              name: loungeChannel.name,
+              isLobby: false,
+              localId:
+              channelLocalId);
+      networkForJoinedChannel.channels.add(IRCNetworkChannel(
+          networkPreferences: networkForJoinedChannel.connectionPreferences,
+          type: detectIRCNetworkChannelType(loungeChannel.type),
+          isEditTopicPossible: loungeChannel.editTopic,
+          remoteId: loungeChannel.id,
+          channelPreferences: networkChannelPreferences));
+
+      var networkPreferences = networksListPreferences.networks.firstWhere((network) =>
+      network.localId == networkForJoinedChannel.localId);
+
+      networkPreferences.channels.add(networkChannelPreferences);
+
+      _onNetworksListChanged();
+      preferencesBloc.setNewPreferenceValue(networksListPreferences);
+
 //      var networkForChannel =
 //          _networks.firstWhere((network) => network.remoteId == event.network);
 //      var newChannel =
@@ -127,8 +149,8 @@ class IRCNetworksListBloc extends Providable {
 
     // add lobby
     var lobbyLoungeChannel = loungeNetwork.channels.firstWhere(
-        (loungeChannel) =>
-            detectIRCNetworkChannelType(loungeChannel.type) ==
+            (loungeChannel) =>
+        detectIRCNetworkChannelType(loungeChannel.type) ==
             IRCNetworkChannelType.LOBBY);
 
     if (lobbyLoungeChannel == null) {
@@ -153,8 +175,8 @@ class IRCNetworksListBloc extends Providable {
     var channels = loungeNetwork.channels.map((loungeChannel) {
       return IRCNetworkChannel(
           channelPreferences: channelsPreferences.firstWhere(
-              (channelPreference) =>
-                  channelPreference.name == loungeChannel.name),
+                  (channelPreference) =>
+              channelPreference.name == loungeChannel.name),
           remoteId: loungeChannel.id,
           isEditTopicPossible: loungeChannel.editTopic,
           type: detectIRCNetworkChannelType(loungeChannel.type),
@@ -175,6 +197,6 @@ class IRCNetworksListBloc extends Providable {
 
 // We should force unique network names
 bool _isNetworkForNewRequest(
-        LoungeJsonRequest<NetworkNewLoungeRequestBody> request,
-        NetworkLoungeResponseBody network) =>
+    LoungeJsonRequest<NetworkNewLoungeRequestBody> request,
+    NetworkLoungeResponseBody network) =>
     request.body.name == network.name;

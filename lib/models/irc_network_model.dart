@@ -105,9 +105,10 @@ class IRCNetworkChannelPreferences extends JsonPreferences {
   int get localIdOrUndefined => localId != null ? localId : -1;
   final bool isLobby;
   final String name;
+  final String password;
 
   IRCNetworkChannelPreferences(
-      {this.localId, @required this.name, @required this.isLobby});
+      {this.localId, this.password, @required this.name, @required this.isLobby});
 
   @override
   String toString() {

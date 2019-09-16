@@ -8,6 +8,25 @@ part 'lounge_model.g.dart';
 const String loungeOn = "on";
 const String loungeOff = "off";
 
+abstract class IRCCommand {
+  final String commandName;
+
+  IRCCommand(this.commandName);
+
+  String toTextCommand();
+}
+
+class JoinIRCCommand extends IRCCommand {
+  final String channelName;
+  final String channelPassword;
+
+  JoinIRCCommand({@required this.channelName, this.channelPassword = ""})
+      : super("/join");
+
+  @override
+  String toTextCommand() => "$commandName $channelName $channelPassword";
+}
+
 class LoungeResultForRequest<T extends LoungeRequest,
     K extends LoungeResponseBody> {
   final T request;
@@ -18,7 +37,7 @@ class LoungeResultForRequest<T extends LoungeRequest,
 
 @JsonSerializable()
 class LoungePreferences extends JsonPreferences {
-   String host;
+  String host;
 
   LoungePreferences({@required this.host});
 
@@ -92,20 +111,34 @@ abstract class LoungeResponseBody extends LoungeResponseBodyPart {}
 
 abstract class LoungeResponseBodyPart {}
 
-@JsonSerializable()
-class InputLoungeRequestBody extends LoungeRequestBody {
+abstract class InputLoungeRequestBody<T> extends LoungeRequestBody {
   final int target;
-  final String text;
+  final T content;
+
+  InputLoungeRequestBody({@required this.target, @required this.content});
+
+  String contentAsTextCommand();
 
   @override
-  String toString() {
-    return 'InputLoungeRequestBody{target: $target, text: $text}';
-  }
+  Map<String, dynamic> toJson() =>
+      {"target": target, "text": contentAsTextCommand()};
+}
 
-  InputLoungeRequestBody({@required this.target, @required this.text});
+class MessageInputLoungeRequestBody extends InputLoungeRequestBody<String> {
+  MessageInputLoungeRequestBody({@required int target, @required String body})
+      : super(target: target, content: body);
 
   @override
-  Map<String, dynamic> toJson() => _$InputLoungeRequestBodyToJson(this);
+  String contentAsTextCommand() => content;
+}
+
+class CommandInputLoungeRequestBody<T extends IRCCommand>
+    extends InputLoungeRequestBody<T> {
+  CommandInputLoungeRequestBody({@required int target, @required T body})
+      : super(target: target, content: body);
+
+  @override
+  String contentAsTextCommand() => content.toTextCommand();
 }
 
 @JsonSerializable()
@@ -136,9 +169,10 @@ class NetworkNewLoungeRequestBody extends LoungeRequestBody {
   final String tls;
   final String username;
 
-
   bool get isTls => tls == loungeOn;
+
   bool get isRejectUnauthorized => rejectUnauthorized == loungeOn;
+
   String get uri => "$host:$port";
 
   @override
@@ -151,15 +185,15 @@ class NetworkNewLoungeRequestBody extends LoungeRequestBody {
 
   NetworkNewLoungeRequestBody(
       {@required this.host,
-        @required this.join,
-        @required this.name,
-        @required this.nick,
-        @required this.port,
-        @required this.realname,
-        @required this.rejectUnauthorized,
-        @required this.tls,
-        @required this.username,
-        @required this.password});
+      @required this.join,
+      @required this.name,
+      @required this.nick,
+      @required this.port,
+      @required this.realname,
+      @required this.rejectUnauthorized,
+      @required this.tls,
+      @required this.username,
+      @required this.password});
 
   Map<String, dynamic> toJson() => _$NetworkNewLoungeRequestBodyToJson(this);
 }
@@ -622,7 +656,6 @@ class ChannelLoungeResponseBody extends LoungeResponseBodyPart {
   final int highlight;
   final List<dynamic> users;
 
-
   @override
   String toString() {
     return 'ChannelLoungeResponseBody{name: $name, type: $type, key: $key,'
@@ -635,11 +668,25 @@ class ChannelLoungeResponseBody extends LoungeResponseBodyPart {
         'unread: $unread, highlight: $highlight, users: $users}';
   }
 
-  ChannelLoungeResponseBody(this.name, this.type, this.key, this.pendingMessage,
-      this.messages, this.inputHistory, this.inputHistoryPosition, this.id,
-      this.moreHistoryAvailable, this.historyLoading, this.editTopic,
-      this.scrolledToBottom, this.topic, this.state, this.firstUnread,
-      this.unread, this.highlight, this.users);
+  ChannelLoungeResponseBody(
+      this.name,
+      this.type,
+      this.key,
+      this.pendingMessage,
+      this.messages,
+      this.inputHistory,
+      this.inputHistoryPosition,
+      this.id,
+      this.moreHistoryAvailable,
+      this.historyLoading,
+      this.editTopic,
+      this.scrolledToBottom,
+      this.topic,
+      this.state,
+      this.firstUnread,
+      this.unread,
+      this.highlight,
+      this.users);
 
   factory ChannelLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ChannelLoungeResponseBodyFromJson(json);

@@ -12,7 +12,7 @@ IRCNetworkPreferences createDefaultIRCNetworkPreferences() =>
     IRCNetworkPreferences(
         networkConnectionPreferences: IRCNetworkConnectionPreferences(
           serverPreferences: createDefaultNetworkServerPreferences(),
-          userPreferences: createDefaultNetworkUserPreferences(),
+          userPreferences: createDefaultNetworkUserPreferences(), localId: null,
         ),
         channels: [IRCNetworkChannelPreferences(name: "#thelounge-spam", isLobby: false)]);
 

@@ -10,7 +10,7 @@ const String _leaveIRCCommand = "/close";
 class IRCNetworkChannelCommandLeaveBloc extends IRCNetworkChannelCommandBloc {
   IRCNetworkChannelCommandLeaveBloc(
       {@required LoungeService lounge, @required IRCNetworkChannel channel})
-      : super(lounge: lounge, channel: channel);
+      : super(lounge: lounge, lobbyChannel: channel);
 
   Future<bool> sendIRCLeaveCommand() async =>
       await sendIRCCommand(ircCommand: _leaveIRCCommand);

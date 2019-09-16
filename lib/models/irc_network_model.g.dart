@@ -50,6 +50,7 @@ IRCNetworkChannelPreferences _$IRCNetworkChannelPreferencesFromJson(
     Map<String, dynamic> json) {
   return IRCNetworkChannelPreferences(
     localId: json['localId'] as int,
+    password: json['password'] as String,
     name: json['name'] as String,
     isLobby: json['isLobby'] as bool,
   );
@@ -61,6 +62,7 @@ Map<String, dynamic> _$IRCNetworkChannelPreferencesToJson(
       'localId': instance.localId,
       'isLobby': instance.isLobby,
       'name': instance.name,
+      'password': instance.password,
     };
 
 IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(

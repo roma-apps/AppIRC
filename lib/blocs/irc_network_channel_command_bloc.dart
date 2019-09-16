@@ -5,13 +5,13 @@ import 'package:flutter_appirc/service/lounge_service.dart';
 
 class IRCNetworkChannelCommandBloc extends AsyncOperationBloc {
   final LoungeService lounge;
-  final IRCNetworkChannel channel;
+  final IRCNetworkChannel lobbyChannel;
 
-  IRCNetworkChannelCommandBloc({@required this.lounge, @required this.channel});
+  IRCNetworkChannelCommandBloc({@required this.lounge, @required this.lobbyChannel});
 
   sendIRCCommand({@required String ircCommand, String args = ""}) async =>
       doAsyncOperation(() async => await lounge.sendChatMessageRequest(
-          channel.remoteId, "$ircCommand $args"));
+          lobbyChannel.remoteId, "$ircCommand $args"));
 
   @override
   void dispose() {

@@ -12,19 +12,26 @@ import 'package:flutter_appirc/models/lounge_model.dart';
 import 'package:flutter_appirc/service/socketio_service.dart';
 import 'package:rxdart/rxdart.dart';
 
-const String _networkLoungeEvent = "network";
-const String _nickLoungeEvent = "nick";
-const String _msgLoungeEvent = "msg";
-const String _configurationLoungeEvent = "configuration";
-const String _authorizedLoungeEvent = "authorized";
-const String _commandsLoungeEvent = "commands";
-const String _topicLoungeEvent = "topic";
-const String _namesLoungeEvent = "names";
-const String _usersLoungeEvent = "users";
-const String _joinLoungeEvent = "join";
-const String _networkStatusLoungeEvent = "network:status";
-const String _networkOptionsLoungeEvent = "network:options";
-const String _channelStateOptionsLoungeEvent = "channel:state";
+class LoungeResponseEventNames {
+  static const String network = "network";
+  static const String nick = "nick";
+  static const String msg = "msg";
+  static const String configuration = "configuration";
+  static const String authorized = "authorized";
+  static const String commands = "commands";
+  static const String topic = "topic";
+  static const String names = "names";
+  static const String users = "users";
+  static const String join = "join";
+  static const String networkStatus = "network:status";
+  static const String networkOptions = "network:options";
+  static const String channelStateOptions = "channel:state";
+}
+
+class LoungeRequestEventNames {
+  static const String networkNew = "network:new";
+  static const String input = "input";
+}
 
 var _logger = MyLogger(logTag: "LoungeService", enabled: true);
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
@@ -85,6 +92,17 @@ class LoungeService extends Providable {
       new BehaviorSubject<JoinLoungeResponseBody>();
 
   Stream<JoinLoungeResponseBody> get joinStream => _joinController.stream;
+
+  var _joinToRequestController = new BehaviorSubject<
+      LoungeResultForRequest<
+          LoungeJsonRequest<InputLoungeRequestBody<JoinIRCCommand>>,
+          JoinLoungeResponseBody>>();
+
+  Stream<
+      LoungeResultForRequest<
+          LoungeJsonRequest<InputLoungeRequestBody<JoinIRCCommand>>,
+          JoinLoungeResponseBody>> get joinToRequestStream =>
+      _joinToRequestController.stream;
 
   BehaviorSubject<NetworkStatusLoungeResponseBody> _networkStatusController =
       new BehaviorSubject<NetworkStatusLoungeResponseBody>();
@@ -148,13 +166,10 @@ class LoungeService extends Providable {
     }
     var resultRaw;
 
-
     if (!timeout) {
       var resultHandler = (raw) {
         _logger.d(() => "resultHandler $raw");
         resultRaw = raw;
-
-
       };
 
       socketIOService.on(resultEventName, resultHandler);
@@ -268,6 +283,8 @@ class LoungeService extends Providable {
 
     _loungePreferencesController.close();
 
+    _joinToRequestController.close();
+
     disconnect();
   }
 
@@ -286,12 +303,11 @@ class LoungeService extends Providable {
     var networkConnectionPreferences =
         channelConnectionInfo.networkConnectionPreferences;
 
-
     var networkPreferences = networkConnectionPreferences.serverPreferences;
     var userPreferences = networkConnectionPreferences.userPreferences;
 
     var request = LoungeJsonRequest(
-        name: "network:new",
+        name: LoungeRequestEventNames.networkNew,
         body: NetworkNewLoungeRequestBody(
           username: userPreferences.username,
           nick: userPreferences.nickname,
@@ -309,7 +325,7 @@ class LoungeService extends Providable {
 
     var result = await _sendRequestWithResult(
         request: request,
-        resultEventName: _networkLoungeEvent,
+        resultEventName: LoungeResponseEventNames.network,
         resultParser: (raw) =>
             NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw)));
 
@@ -324,45 +340,54 @@ class LoungeService extends Providable {
 
   sendChatMessageRequest(int remoteChannelId, String text) async =>
       await _sendRequest(LoungeJsonRequest(
-          name: "input",
-          body: InputLoungeRequestBody(text: text, target: remoteChannelId)));
+          name: LoungeRequestEventNames.input,
+          body: MessageInputLoungeRequestBody(
+              body: text, target: remoteChannelId)));
 
   void _addSubscriptions() {
     socketIOService.onConnect((_) {
       sendSettingsGetRequest();
     });
 
-//    socketIOService.on(_networkLoungeEvent, _onNetworkResponse);
-    socketIOService.on(_msgLoungeEvent, _onMessageResponse);
-    socketIOService.on(_nickLoungeEvent, _onNickResponse);
-    socketIOService.on(_topicLoungeEvent, _onTopicResponse);
-    socketIOService.on(_configurationLoungeEvent, _onConfigurationResponse);
-    socketIOService.on(_authorizedLoungeEvent, _onAuthorizedResponse);
-    socketIOService.on(_commandsLoungeEvent, _onCommandResponse);
-    socketIOService.on(_namesLoungeEvent, _onNamesResponse);
-    socketIOService.on(_usersLoungeEvent, _onUsersResponse);
-    socketIOService.on(_joinLoungeEvent, _onJoinResponse);
-    socketIOService.on(_networkStatusLoungeEvent, _onNetworkStatusResponse);
-    socketIOService.on(_networkOptionsLoungeEvent, _onNetworkOptionsResponse);
+//    socketIOService.on(LoungeResponseEventNames.network, _onNetworkResponse);
+    socketIOService.on(LoungeResponseEventNames.msg, _onMessageResponse);
+    socketIOService.on(LoungeResponseEventNames.nick, _onNickResponse);
+    socketIOService.on(LoungeResponseEventNames.topic, _onTopicResponse);
     socketIOService.on(
-        _channelStateOptionsLoungeEvent, _onChannelStateResponse);
+        LoungeResponseEventNames.configuration, _onConfigurationResponse);
+    socketIOService.on(
+        LoungeResponseEventNames.authorized, _onAuthorizedResponse);
+    socketIOService.on(LoungeResponseEventNames.commands, _onCommandResponse);
+    socketIOService.on(LoungeResponseEventNames.names, _onNamesResponse);
+    socketIOService.on(LoungeResponseEventNames.users, _onUsersResponse);
+    socketIOService.on(LoungeResponseEventNames.join, _onJoinResponse);
+    socketIOService.on(
+        LoungeResponseEventNames.networkStatus, _onNetworkStatusResponse);
+    socketIOService.on(
+        LoungeResponseEventNames.networkOptions, _onNetworkOptionsResponse);
+    socketIOService.on(
+        LoungeResponseEventNames.channelStateOptions, _onChannelStateResponse);
   }
 
   void _removeSubscriptions() {
-//    socketIOService.off(_networkLoungeEvent, _onNetworkResponse);
-    socketIOService.off(_msgLoungeEvent, _onMessageResponse);
-    socketIOService.off(_nickLoungeEvent, _onNickResponse);
-    socketIOService.off(_topicLoungeEvent, _onTopicResponse);
-    socketIOService.off(_configurationLoungeEvent, _onConfigurationResponse);
-    socketIOService.off(_authorizedLoungeEvent, _onAuthorizedResponse);
-    socketIOService.off(_commandsLoungeEvent, _onCommandResponse);
-    socketIOService.off(_namesLoungeEvent, _onNamesResponse);
-    socketIOService.off(_usersLoungeEvent, _onUsersResponse);
-    socketIOService.off(_joinLoungeEvent, _onJoinResponse);
-    socketIOService.off(_networkStatusLoungeEvent, _onNetworkStatusResponse);
-    socketIOService.off(_networkOptionsLoungeEvent, _onNetworkOptionsResponse);
+//    socketIOService.off(LoungeResponseEventNames.network, _onNetworkResponse);
+    socketIOService.off(LoungeResponseEventNames.msg, _onMessageResponse);
+    socketIOService.off(LoungeResponseEventNames.nick, _onNickResponse);
+    socketIOService.off(LoungeResponseEventNames.topic, _onTopicResponse);
     socketIOService.off(
-        _channelStateOptionsLoungeEvent, _onChannelStateResponse);
+        LoungeResponseEventNames.configuration, _onConfigurationResponse);
+    socketIOService.off(
+        LoungeResponseEventNames.authorized, _onAuthorizedResponse);
+    socketIOService.off(LoungeResponseEventNames.commands, _onCommandResponse);
+    socketIOService.off(LoungeResponseEventNames.names, _onNamesResponse);
+    socketIOService.off(LoungeResponseEventNames.users, _onUsersResponse);
+    socketIOService.off(LoungeResponseEventNames.join, _onJoinResponse);
+    socketIOService.off(
+        LoungeResponseEventNames.networkStatus, _onNetworkStatusResponse);
+    socketIOService.off(
+        LoungeResponseEventNames.networkOptions, _onNetworkOptionsResponse);
+    socketIOService.off(
+        LoungeResponseEventNames.channelStateOptions, _onChannelStateResponse);
   }
 
   void _onTopicResponse(raw) {
@@ -457,4 +482,26 @@ class LoungeService extends Providable {
 
   sendSettingsGetRequest() async =>
       await _sendRequest(LoungeRawRequest(name: "setting:get"));
+
+  sendJoinChannelMessageRequest(
+      IRCNetworkChannel targetChannel, JoinIRCCommand ircCommand) async {
+    var request = LoungeJsonRequest(
+        name: LoungeRequestEventNames.input,
+        body: CommandInputLoungeRequestBody(
+            body: ircCommand, target: targetChannel.remoteId));
+
+    var result = await _sendRequestWithResult(
+        request: request,
+        resultEventName: LoungeResponseEventNames.join,
+        resultParser: (raw) =>
+            JoinLoungeResponseBody.fromJson(_preProcessRawData(raw)));
+
+    if (result != null) {
+      var loungeResultForRequest = LoungeResultForRequest(request, result);
+      _joinToRequestController.add(loungeResultForRequest);
+      return loungeResultForRequest;
+    } else {
+      return null;
+    }
+  }
 }

@@ -17,21 +17,6 @@ Map<String, dynamic> _$LoungePreferencesToJson(LoungePreferences instance) =>
       'host': instance.host,
     };
 
-InputLoungeRequestBody _$InputLoungeRequestBodyFromJson(
-    Map<String, dynamic> json) {
-  return InputLoungeRequestBody(
-    target: json['target'] as int,
-    text: json['text'] as String,
-  );
-}
-
-Map<String, dynamic> _$InputLoungeRequestBodyToJson(
-        InputLoungeRequestBody instance) =>
-    <String, dynamic>{
-      'target': instance.target,
-      'text': instance.text,
-    };
-
 NamesLoungeRequestBody _$NamesLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return NamesLoungeRequestBody(
