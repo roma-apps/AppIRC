@@ -37,7 +37,8 @@ class IRCNetworksListBloc extends Providable {
           NetworksLoungeResponseBody>> _networksSubscription;
   StreamSubscription<
       LoungeResultForRequest<LoungeJsonRequest<InputLoungeRequestBody>,
-          JoinLoungeResponseBody>> _joinSubscription;
+          JoinLoungeResponseBody>> _joinToRequestSubscription;
+  StreamSubscription<JoinLoungeResponseBody> _joinSubscription;
   StreamSubscription<
       LoungeResultForRequest<LoungeJsonRequest<InputLoungeRequestBody>,
           ChanLoungeResponseBody>> _closeSubscription;
@@ -60,7 +61,37 @@ class IRCNetworksListBloc extends Providable {
       }
     });
 
-    _joinSubscription = lounge.joinToRequestStream.listen((resultForRequest) {
+    _joinSubscription = lounge.joinStream.listen((result) {
+
+
+      var loungeChannel = result.chan;
+
+      var remoteNetworkId = result.network;
+
+      var networkForJoinedChannel = _networks
+          .firstWhere((network) => network.remoteId == remoteNetworkId);
+
+      var networksListPreferences = preferencesBloc
+          .getPreferenceOrValue(() => IRCNetworksListPreferences());
+
+      var channelLocalId =
+      networksListPreferences.getNextNetworkChannelLocalId();
+      var networkChannelPreferences = IRCNetworkChannelPreferences(
+          name: loungeChannel.name,
+          isLobby: false,
+          localId: channelLocalId);
+      networkForJoinedChannel.channels.add(IRCNetworkChannel(
+          networkPreferences: networkForJoinedChannel.connectionPreferences,
+          type: detectIRCNetworkChannelType(loungeChannel.type),
+          isEditTopicPossible: loungeChannel.editTopic,
+          remoteId: loungeChannel.id,
+          channelPreferences: networkChannelPreferences));
+
+
+      _onNetworksListChanged();
+    });
+
+    _joinToRequestSubscription = lounge.joinToRequestStream.listen((resultForRequest) {
       var request = resultForRequest.request;
       var result = resultForRequest.result;
 
@@ -94,11 +125,13 @@ class IRCNetworksListBloc extends Providable {
       networkPreferences.channels.add(networkChannelPreferences);
 
       _onNetworksListChanged();
+
+
       preferencesBloc.setNewPreferenceValue(networksListPreferences);
+
     });
 
     _closeSubscription = lounge.closeToRequestStream.listen((resultForRequest) {
-      var request = resultForRequest.request;
       var result = resultForRequest.result;
 
       var loungeChannelId = result.chan;
@@ -137,6 +170,7 @@ class IRCNetworksListBloc extends Providable {
     _networksSubscription.cancel();
     _closeSubscription.cancel();
 
+    _joinToRequestSubscription.cancel();
     _joinSubscription.cancel();
   }
 

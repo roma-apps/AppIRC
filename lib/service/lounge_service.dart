@@ -16,6 +16,7 @@ class LoungeResponseEventNames {
   static const String network = "network";
   static const String nick = "nick";
   static const String msg = "msg";
+  static const String msgSpecial = "msg:special";
   static const String configuration = "configuration";
   static const String authorized = "authorized";
   static const String commands = "commands";
@@ -58,11 +59,20 @@ class LoungeService extends Providable {
   ReplaySubject<MessageLoungeResponseBody> _messagesController =
       new ReplaySubject<MessageLoungeResponseBody>();
 
+  Stream<MessageLoungeResponseBody> get messagesStream =>
+      _messagesController.stream;
+
+
+  var _messagesSpecialController =
+  new ReplaySubject<MessageSpecialLoungeResponseBody>();
+
+  Stream<MessageSpecialLoungeResponseBody> get messagesSpecialStream =>
+      _messagesSpecialController.stream;
+
   BehaviorSubject<NickLoungeResponseBody> _nickController =
       new BehaviorSubject<NickLoungeResponseBody>();
 
-  Stream<MessageLoungeResponseBody> get messagesStream =>
-      _messagesController.stream;
+
 
   var _networksController = new BehaviorSubject<
       LoungeResultForRequest<LoungeJsonRequest<NetworkNewLoungeRequestBody>,
@@ -294,6 +304,7 @@ class LoungeService extends Providable {
     _channelStateController.close();
     _nickController.close();
     _closeToRequestController.close();
+    _messagesSpecialController.close();
 
     _loungePreferencesController.close();
 
@@ -364,6 +375,7 @@ class LoungeService extends Providable {
     });
 
 //    socketIOService.on(LoungeResponseEventNames.network, _onNetworkResponse);
+    socketIOService.on(LoungeResponseEventNames.msgSpecial, _onMessageSpecialResponse);
     socketIOService.on(LoungeResponseEventNames.msg, _onMessageResponse);
     socketIOService.on(LoungeResponseEventNames.nick, _onNickResponse);
     socketIOService.on(LoungeResponseEventNames.topic, _onTopicResponse);
@@ -386,6 +398,7 @@ class LoungeService extends Providable {
   void _removeSubscriptions() {
 //    socketIOService.off(LoungeResponseEventNames.network, _onNetworkResponse);
     socketIOService.off(LoungeResponseEventNames.msg, _onMessageResponse);
+    socketIOService.off(LoungeResponseEventNames.msgSpecial, _onMessageSpecialResponse);
     socketIOService.off(LoungeResponseEventNames.nick, _onNickResponse);
     socketIOService.off(LoungeResponseEventNames.topic, _onTopicResponse);
     socketIOService.off(
@@ -415,6 +428,14 @@ class LoungeService extends Providable {
     var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _messagesController.sink.add(data);
   }
+
+
+  void _onMessageSpecialResponse(raw) {
+    _logger.i(() => "_onMessageSpecialResponse $raw");
+    var data = MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    _messagesSpecialController.sink.add(data);
+  }
+
 
   void _onNickResponse(raw) {
     _logger.i(() => "_onNickResponse $raw");

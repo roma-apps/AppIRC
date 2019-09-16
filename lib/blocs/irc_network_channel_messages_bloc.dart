@@ -16,6 +16,7 @@ class IRCNetworkChannelMessagesBloc extends Providable {
   final IRCNetworkChannel channel;
 
   StreamSubscription<MessageLoungeResponseBody> _messagesSubscription;
+  StreamSubscription<MessageSpecialLoungeResponseBody> _messagesSpecialSubscription;
 
   IRCNetworkChannelMessagesBloc(this._lounge, this.channel) {
     _messagesSubscription = _lounge.messagesStream.listen((loungeMessage) {
@@ -28,19 +29,31 @@ class IRCNetworkChannelMessagesBloc extends Providable {
         _messagesController.sink.add(UnmodifiableListView(_messages));
       }
     });
+
+    _messagesSpecialSubscription = _lounge.messagesSpecialStream.listen((loungeSpecialMessage) {
+      if (loungeSpecialMessage.chan == channel.remoteId) {
+
+        var ircMessage = IRCChatSpecialMessage(loungeSpecialMessage.data);
+        _logger.i(() => "new msg:special for ${channel.name}: $loungeSpecialMessage \n"
+            " converted to $ircMessage");
+        _messages.add(ircMessage);
+        _messagesController.sink.add(UnmodifiableListView(_messages));
+      }
+    });
   }
 
-  final Set<IRCNetworkChannelMessage> _messages =
-      Set<IRCNetworkChannelMessage>();
+  final Set<IRCChatMessage> _messages =
+      Set<IRCChatMessage>();
 
-  final BehaviorSubject<List<IRCNetworkChannelMessage>> _messagesController =
-      new BehaviorSubject<List<IRCNetworkChannelMessage>>(seedValue: []);
+  final BehaviorSubject<List<IRCChatMessage>> _messagesController =
+      new BehaviorSubject<List<IRCChatMessage>>(seedValue: []);
 
-  Stream<List<IRCNetworkChannelMessage>> get messagesStream =>
+  Stream<List<IRCChatMessage>> get messagesStream =>
       _messagesController.stream;
 
   void dispose() {
     _messagesController.close();
+    _messagesSpecialSubscription.cancel();
 
     _messagesSubscription.cancel();
   }

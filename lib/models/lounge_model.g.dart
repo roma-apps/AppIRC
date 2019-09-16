@@ -95,6 +95,21 @@ Map<String, dynamic> _$MessageLoungeResponseBodyToJson(
       'msg': instance.msg,
     };
 
+MessageSpecialLoungeResponseBody _$MessageSpecialLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return MessageSpecialLoungeResponseBody(
+    json['chan'] as int,
+    json['data'],
+  );
+}
+
+Map<String, dynamic> _$MessageSpecialLoungeResponseBodyToJson(
+        MessageSpecialLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'chan': instance.chan,
+      'data': instance.data,
+    };
+
 JoinLoungeResponseBody _$JoinLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return JoinLoungeResponseBody(

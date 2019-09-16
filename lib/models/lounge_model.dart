@@ -244,6 +244,25 @@ class MessageLoungeResponseBody extends LoungeResponseBody {
       _$MessageLoungeResponseBodyFromJson(json);
 }
 
+
+@JsonSerializable()
+class MessageSpecialLoungeResponseBody extends LoungeResponseBody {
+  final int chan;
+  final dynamic data;
+
+
+  MessageSpecialLoungeResponseBody(this.chan, this.data);
+
+
+  @override
+  String toString() {
+    return 'MessageSpecialLoungeResponseBody{chan: $chan, data: $data}';
+  }
+
+  factory MessageSpecialLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$MessageSpecialLoungeResponseBodyFromJson(json);
+}
+
 @JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {
   final ChannelLoungeResponseBody chan;

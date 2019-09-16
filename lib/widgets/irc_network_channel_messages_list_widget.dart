@@ -18,10 +18,10 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
 
     var messagesBloc = IRCNetworkChannelMessagesBloc(loungeService, channel);
 
-    return StreamBuilder<List<IRCNetworkChannelMessage>>(
+    return StreamBuilder<List<IRCChatMessage>>(
         stream: messagesBloc.messagesStream,
         builder: (BuildContext context,
-            AsyncSnapshot<List<IRCNetworkChannelMessage>> snapshot) {
+            AsyncSnapshot<List<IRCChatMessage>> snapshot) {
           var messages = snapshot.data;
           if (messages != null) {
             messages =
@@ -37,14 +37,37 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
               padding: const EdgeInsets.all(10.0),
               child: ListView.builder(
                   itemCount: messages.length,
-                  itemBuilder: (BuildContext context, int index) =>
-                      IRCNetworkChannelMessageWidget(messages[index])),
+                  itemBuilder: (BuildContext context, int index) {
+
+
+                    var message = messages[index];
+
+                    switch(message.chatMessageType) {
+
+                      case IRCChatMessageType.SPECIAL:
+                        var specialMessage = message as IRCChatSpecialMessage;
+                        return Text(specialMessage.data.toString());
+                        break;
+                      case IRCChatMessageType.REGULAR:
+                        return IRCNetworkChannelMessageWidget(message);
+                        break;
+                    }
+
+                    throw Exception("Invalid message type = ${message.chatMessageType}");
+
+                  }),
             );
           }
         });
   }
 }
 
-_isNeedPrint(IRCNetworkChannelMessage message) =>
-    message.type != IRCNetworkChannelMessageType.UNHANDLED &&
-    message.type != IRCNetworkChannelMessageType.RAW;
+_isNeedPrint(IRCChatMessage message) {
+  if(message is IRCNetworkChannelMessage) {
+    return message.type != IRCNetworkChannelMessageType.UNHANDLED &&
+        message.type != IRCNetworkChannelMessageType.RAW;
+  } else {
+    return true;
+  }
+
+}

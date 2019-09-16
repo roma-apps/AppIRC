@@ -2,6 +2,25 @@ import 'package:flutter/foundation.dart';
 
 import 'lounge_model.dart';
 
+abstract class IRCChatMessage {
+  final IRCChatMessageType chatMessageType;
+
+  IRCChatMessage(this.chatMessageType);
+
+
+}
+
+ class IRCChatSpecialMessage extends  IRCChatMessage {
+    final dynamic data;
+
+  IRCChatSpecialMessage(this.data) : super(IRCChatMessageType.SPECIAL);
+}
+
+
+enum IRCChatMessageType {
+  SPECIAL, REGULAR
+}
+
 IRCNetworkChannelMessageFrom toIRCFrom(MsgFromLoungeResponseBodyPart from) =>
     IRCNetworkChannelMessageFrom(mode: from.mode, id: from.id, nick: from.nick);
 
@@ -39,7 +58,7 @@ IRCNetworkChannelMessage toIRCMessage(
         from: msgLoungeResponseBody.from != null ? toIRCFrom(msgLoungeResponseBody.from) : null,
         whois: msgLoungeResponseBody.whois != null ? toIRCWhoIs(msgLoungeResponseBody.whois) : null);
 
-class IRCNetworkChannelMessage {
+class IRCNetworkChannelMessage extends IRCChatMessage {
   final int remoteId;
   final String command;
   final String hostMask;
@@ -70,7 +89,7 @@ class IRCNetworkChannelMessage {
       @required this.users,
       @required this.date,
       @required this.from,
-      @required this.whois});
+      @required this.whois}): super(IRCChatMessageType.REGULAR);
 
   bool get isHaveFrom => from != null && from.nick != null;
 
