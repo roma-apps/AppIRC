@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_messages_bloc.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
@@ -33,17 +34,24 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
                 child: Text(
                     AppLocalizations.of(context).tr("chat.empty_channel")));
           } else {
+            var scrollController = ScrollController();
+
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              scrollController.animateTo(
+                  scrollController.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeOut);
+            });
+
             return Padding(
               padding: const EdgeInsets.all(10.0),
               child: ListView.builder(
                   itemCount: messages.length,
+                  controller: scrollController,
                   itemBuilder: (BuildContext context, int index) {
-
-
                     var message = messages[index];
 
-                    switch(message.chatMessageType) {
-
+                    switch (message.chatMessageType) {
                       case IRCChatMessageType.SPECIAL:
                         var specialMessage = message as IRCChatSpecialMessage;
                         return Text(specialMessage.data.toString());
@@ -53,8 +61,8 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
                         break;
                     }
 
-                    throw Exception("Invalid message type = ${message.chatMessageType}");
-
+                    throw Exception(
+                        "Invalid message type = ${message.chatMessageType}");
                   }),
             );
           }
@@ -63,11 +71,10 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
 }
 
 _isNeedPrint(IRCChatMessage message) {
-  if(message is IRCNetworkChannelMessage) {
+  if (message is IRCNetworkChannelMessage) {
     return message.type != IRCNetworkChannelMessageType.UNHANDLED &&
         message.type != IRCNetworkChannelMessageType.RAW;
   } else {
     return true;
   }
-
 }
