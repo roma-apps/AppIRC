@@ -25,6 +25,7 @@ class LoungeResponseEventNames {
   static const String users = "users";
   static const String join = "join";
   static const String part = "part";
+  static const String quit = "quit";
   static const String networkStatus = "network:status";
   static const String networkOptions = "network:options";
   static const String channelStateOptions = "channel:state";
@@ -103,6 +104,12 @@ class LoungeService extends Providable {
       new BehaviorSubject<JoinLoungeResponseBody>();
 
   Stream<JoinLoungeResponseBody> get joinStream => _joinController.stream;
+
+
+  BehaviorSubject<QuitLoungeResponseBody> _quitController =
+  new BehaviorSubject<QuitLoungeResponseBody>();
+
+  Stream<QuitLoungeResponseBody> get quitStream => _quitController.stream;
 
   var _joinToRequestController = new BehaviorSubject<
       LoungeResultForRequest<
@@ -307,6 +314,7 @@ class LoungeService extends Providable {
     _messagesSpecialController.close();
 
     _loungePreferencesController.close();
+    _quitController.close();
 
     _joinToRequestController.close();
 
@@ -387,6 +395,7 @@ class LoungeService extends Providable {
     socketIOService.on(LoungeResponseEventNames.names, _onNamesResponse);
     socketIOService.on(LoungeResponseEventNames.users, _onUsersResponse);
     socketIOService.on(LoungeResponseEventNames.join, _onJoinResponse);
+    socketIOService.on(LoungeResponseEventNames.quit, _onQuitResponse);
     socketIOService.on(
         LoungeResponseEventNames.networkStatus, _onNetworkStatusResponse);
     socketIOService.on(
@@ -409,6 +418,7 @@ class LoungeService extends Providable {
     socketIOService.off(LoungeResponseEventNames.names, _onNamesResponse);
     socketIOService.off(LoungeResponseEventNames.users, _onUsersResponse);
     socketIOService.off(LoungeResponseEventNames.join, _onJoinResponse);
+    socketIOService.off(LoungeResponseEventNames.quit, _onQuitResponse);
     socketIOService.off(
         LoungeResponseEventNames.networkStatus, _onNetworkStatusResponse);
     socketIOService.off(
@@ -472,6 +482,12 @@ class LoungeService extends Providable {
   void _onJoinResponse(raw) {
     var parsed = JoinLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _joinController.sink.add(parsed);
+  }
+
+
+  void _onQuitResponse(raw) {
+    var parsed = QuitLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    _quitController.sink.add(parsed);
   }
 
   void _onNetworkStatusResponse(raw) {

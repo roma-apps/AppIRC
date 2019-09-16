@@ -61,6 +61,7 @@
   },
   "irc_connection": {
     "title": "New IRC connection",
+    "no_networks": "No networks",
     "network_prefs": {
       "title": "Network preferences",
       "name": "Name",

@@ -280,6 +280,24 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
       _$JoinLoungeResponseBodyFromJson(json);
 }
 
+
+@JsonSerializable()
+class QuitLoungeResponseBody extends LoungeResponseBody {
+  final String network;
+
+
+  QuitLoungeResponseBody(this.network);
+
+
+  @override
+  String toString() {
+    return 'QuitLoungeResponseBody{network: $network}';
+  }
+
+  factory QuitLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$QuitLoungeResponseBodyFromJson(json);
+}
+
 @JsonSerializable()
 class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
   final bool connected;

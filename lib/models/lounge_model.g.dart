@@ -130,6 +130,19 @@ Map<String, dynamic> _$JoinLoungeResponseBodyToJson(
       'network': instance.network,
     };
 
+QuitLoungeResponseBody _$QuitLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return QuitLoungeResponseBody(
+    json['network'] as String,
+  );
+}
+
+Map<String, dynamic> _$QuitLoungeResponseBodyToJson(
+        QuitLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'network': instance.network,
+    };
+
 NetworkStatusLoungeResponseBody _$NetworkStatusLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return NetworkStatusLoungeResponseBody(

@@ -6,7 +6,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/blocs/irc_chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_network_channel_bloc.dart';
 import 'package:flutter_appirc/blocs/irc_networks_list_bloc.dart';
-import 'package:flutter_appirc/blocs/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/helpers/provider.dart';
 import 'package:flutter_appirc/models/irc_network_channel_model.dart';
 import 'package:flutter_appirc/models/lounge_model.dart';
@@ -123,8 +122,15 @@ class IRCChatPage extends StatelessWidget {
                 AsyncSnapshot<IRCNetworkChannel> snapshot) {
               var channel = snapshot.data;
               if (channel == null) {
-                return Text(
-                    AppLocalizations.of(context).tr("chat.no_active_channel"));
+                var networksListBloc =
+                    Provider.of<IRCNetworksListBloc>(context);
+                if (networksListBloc.isHaveAnyNetwork) {
+                  return Text(AppLocalizations.of(context)
+                      .tr("irc_connection.no_networks"));
+                } else {
+                  return Text(AppLocalizations.of(context)
+                      .tr('chat.no_active_channel'));
+                }
               } else {
                 return Provider<IRCNetworkChannelBloc>(
                     bloc: IRCNetworkChannelBloc(lounge, channel),

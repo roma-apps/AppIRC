@@ -243,4 +243,5 @@ enum IRCNetworkChannelMessageType {
   MODE_CHANNEL,
   QUIT,
 //  PART,
+//  NICK,
 }

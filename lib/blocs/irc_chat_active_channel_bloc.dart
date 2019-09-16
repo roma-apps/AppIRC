@@ -45,23 +45,25 @@ class IRCChatActiveChannelBloc extends AsyncOperationBloc {
     if (_activeChannel == null) {
       var allChannels = networksListBloc.allNetworksChannels;
 
-      var savedLocalId =
-          preferenceBloc.getPreferenceOrValue(() => allChannels.first.localId);
-      if (savedLocalId != null) {
-        var filtered =
-            allChannels.where((channel) => channel.localId == savedLocalId);
+      if (allChannels != null && allChannels.isNotEmpty) {
+        var savedLocalId = preferenceBloc
+            .getPreferenceOrValue(() => allChannels.first.localId);
+        if (savedLocalId != null) {
+          var filtered =
+              allChannels.where((channel) => channel.localId == savedLocalId);
 
-        var foundActiveChannel;
-        if (filtered.isNotEmpty) {
-          foundActiveChannel = filtered.first;
-        }
+          var foundActiveChannel;
+          if (filtered.isNotEmpty) {
+            foundActiveChannel = filtered.first;
+          }
 
-        if (foundActiveChannel == null && allChannels.isNotEmpty) {
-          foundActiveChannel = allChannels.first;
-        }
+          if (foundActiveChannel == null && allChannels.isNotEmpty) {
+            foundActiveChannel = allChannels.first;
+          }
 
-        if (foundActiveChannel != null) {
-          changeActiveChanel(foundActiveChannel);
+          if (foundActiveChannel != null) {
+            changeActiveChanel(foundActiveChannel);
+          }
         }
       }
     }

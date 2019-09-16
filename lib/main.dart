@@ -144,20 +144,25 @@ var lounge = Provider.of<LoungeService>(context);
           var networksPreferences =
               ircNetworksPreferencesBloc.getPreferenceOrDefault();
 
-          // delete old value to avoid duplicates
-          // TODO: Refactor
-          ircNetworksPreferencesBloc.deleteValue();
+          if(networksPreferences.networks != null && networksPreferences.networks.isNotEmpty) {
+            // delete old value to avoid duplicates
+            // TODO: Refactor
+            ircNetworksPreferencesBloc.deleteValue();
 
-          for (IRCNetworkPreferences networkPreferences
-              in networksPreferences.networks) {
-            var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
-                loungeService: lounge,
-                preferencesBloc: ircNetworksPreferencesBloc,
-                newConnectionPreferences: networkPreferences);
-            await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
+            for (IRCNetworkPreferences networkPreferences
+            in networksPreferences.networks) {
+              var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
+                  loungeService: lounge,
+                  preferencesBloc: ircNetworksPreferencesBloc,
+                  newConnectionPreferences: networkPreferences);
+              await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
+            }
+            nextPage = IRCChatPage();
+          } else {
+            nextPage = IRCNetworksNewConnectionPage(isOpenedFromAppStart: true);
           }
 
-          nextPage = IRCChatPage();
+
         } else {
           nextPage = IRCNetworksNewConnectionPage(isOpenedFromAppStart: true);
         }

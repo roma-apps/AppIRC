@@ -40,19 +40,23 @@ class IRCNetworksListWidget extends StatelessWidget {
           var listItemCount =
               (snapshot.data == null ? 0 : snapshot.data.length);
 
-          return Container(
-            child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: listItemCount,
-                separatorBuilder: (context, index) => Divider(
-                      color: UISkin.of(context).appSkin.accentColor,
-                    ),
-                itemBuilder: (BuildContext context, int index) {
-                  var network = snapshot.data[index];
+          if (listItemCount > 0) {
+            return Container(
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: listItemCount,
+                  separatorBuilder: (context, index) => Divider(
+                        color: UISkin.of(context).appSkin.accentColor,
+                      ),
+                  itemBuilder: (BuildContext context, int index) {
+                    var network = snapshot.data[index];
 
-                  return _networkItem(context, network);
-                }),
-          );
+                    return _networkItem(context, network);
+                  }),
+            );
+          } else {
+            return Text(AppLocalizations.of(context).tr("irc_connection.no_networks"));
+          }
         });
 
     return networksListWidget;
