@@ -1,8 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_connection_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_new_connection_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/widgets/form_widgets.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
@@ -11,29 +10,17 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "LoungePreferencesWidget", enabled: true);
 
-class LoungePreferencesWidget extends StatefulWidget {
-
-  final LoungePreferences startPreferences;
-
-
-  LoungePreferencesWidget(this.startPreferences);
-
+class LoungePreferencesFormWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => LoungePreferencesWidgetState(startPreferences);
+  State<StatefulWidget> createState() => LoungePreferencesFormWidgetState();
 }
 
-class LoungePreferencesWidgetState extends State<LoungePreferencesWidget> {
-
-
-  TextEditingController _hostController;
-  LoungePreferencesWidgetState(LoungePreferences startPreferences) {
-    _hostController = TextEditingController(text:startPreferences.host);
-  }
-
+class LoungePreferencesFormWidgetState
+    extends State<LoungePreferencesFormWidget> {
   @override
   Widget build(BuildContext context) {
-
-    var loungeConnectionBloc = Provider.of<LoungeConnectionBloc>(context);
+    var loungePreferencesFormBloc =
+        Provider.of<LoungePreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       children: <Widget>[
@@ -41,15 +28,12 @@ class LoungePreferencesWidgetState extends State<LoungePreferencesWidget> {
             context, appLocalizations.tr('lounge.connection.settings')),
         buildFormTextRow(
             appLocalizations.tr('lounge.connection.host'),
+            appLocalizations.tr('form.empty_field_not_valid'),
             Icons.cloud,
-            _hostController,
-            (value) {
-              loungeConnectionBloc.changeHost(_hostController.text);
-        }),
+            loungePreferencesFormBloc.hostFieldBloc)
       ],
     );
   }
-
 }
 
 PlatformAlertDialog buildLoungeConnectionErrorAlertDialog(
@@ -107,28 +91,4 @@ PlatformAlertDialog buildLoungeConnectionErrorAlertDialog(
   }
 
   return PlatformAlertDialog(title: Text(title), content: Text(content));
-}
-
-Future<bool> connectToLounge(
-    BuildContext context, LoungeNewConnectionBloc loungeConnectionBloc) async {
-  _logger.i(() => "Connecting to $loungeConnectionBloc.");
-
-  bool connected;
-  Exception exception;
-  try {
-    connected = await loungeConnectionBloc.connect();
-  } on Exception catch (e) {
-    connected = false;
-    exception = e;
-  }
-  _logger.i(() => "Connected = $connected ");
-
-  if (!connected) {
-    showPlatformDialog(
-      androidBarrierDismissible: true,
-      context: context,
-      builder: (_) => buildLoungeConnectionErrorAlertDialog(context, exception),
-    );
-  }
-  return connected;
 }

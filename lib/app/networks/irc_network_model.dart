@@ -103,8 +103,6 @@ class IRCNetworkUserPreferences extends JsonPreferences {
 @JsonSerializable()
 class IRCNetworkChannelPreferences extends JsonPreferences {
   final int localId;
-
-  int get localIdOrUndefined => localId != null ? localId : -1;
   final bool isLobby;
   final String name;
   final String password;
@@ -199,45 +197,4 @@ class IRCNetworkConnectionPreferences extends JsonPreferences {
   @override
   Map<String, dynamic> toJson() =>
       _$IRCNetworkConnectionPreferencesToJson(this);
-}
-
-@JsonSerializable()
-class IRCNetworksListPreferences extends JsonPreferences {
-  @JsonKey(ignore: true)
-  int _maxNetworkLocalId;
-  @JsonKey(ignore: true)
-  int _maxNetworkChannelLocalId;
-
-  int getNextNetworkLocalId() {
-    if (_maxNetworkLocalId == null) {
-      _maxNetworkLocalId = 0;
-      networks.forEach((network) =>
-      _maxNetworkLocalId = max(_maxNetworkLocalId, network.localId));
-    }
-    return ++_maxNetworkLocalId;
-  }
-
-  int getNextNetworkChannelLocalId() {
-    if (_maxNetworkChannelLocalId == null) {
-      _maxNetworkChannelLocalId = 0;
-      networks.forEach((network) =>
-          network.channels.forEach((channel) =>
-          _maxNetworkChannelLocalId =
-              max(_maxNetworkChannelLocalId, channel.localIdOrUndefined)));
-    }
-    return ++_maxNetworkChannelLocalId;
-  }
-
-  final List<IRCNetworkPreferences> networks;
-
-
-  IRCNetworksListPreferences.name({@required this.networks});
-
-  IRCNetworksListPreferences({this.networks = const []});
-
-  factory IRCNetworksListPreferences.fromJson(Map<String, dynamic> json) =>
-      _$IRCNetworksListPreferencesFromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$IRCNetworksListPreferencesToJson(this);
 }

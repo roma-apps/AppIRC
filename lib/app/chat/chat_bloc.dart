@@ -1,37 +1,80 @@
 import 'dart:async';
-import 'dart:collection';
 
+import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
 import 'package:flutter_appirc/app/networks/irc_network_model.dart';
-import 'package:flutter_appirc/app/networks/irc_networks_preferences_bloc.dart';
-
-import 'package:flutter_appirc/logger/logger.dart';
+import 'package:flutter_appirc/app/networks/irc_networks_new_connection_bloc.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/lounge/lounge_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(logTag: "IRCNetworksListBloc", enabled: true);
 
-class IRCNetworksListBloc extends Providable {
-  final LoungeService lounge;
+typedef ChatPreferencesLoaderOrNull = Future<ChatPreferences> Function();
 
-  final IRCNetworksPreferencesBloc preferencesBloc;
-  final Set<IRCNetwork> _networks = Set<IRCNetwork>();
+class ChatBloc extends Providable {
 
-  bool get isHaveAnyNetwork => _networks != null && _networks.isNotEmpty;
+  final ChatBackendService backendService;
+  final ChatPreferencesLoaderOrNull startPreferencesLoader;
+  ChatBloc(this.backendService, this.startPreferencesLoader);
 
-  List<IRCNetworkChannel> get allNetworksChannels {
+  int _maxNetworkLocalId;
+  int get _nextNetworkLocalId => ++_maxNetworkLocalId;
+  int _maxNetworkChannelLocalId;
+  int get _nextNetworkChannelLocalId => ++_maxNetworkChannelLocalId;
+
+
+  var _backendConnectedController = BehaviorSubject<bool>(seedValue: false);
+  Stream<bool> get backendConnectedStream => _backendConnectedController.stream;
+  Future<bool> get isBackendConnected => _backendConnectedController.last;
+
+  var _networksController = BehaviorSubject<List<IRCNetwork>>(seedValue: []);
+  Stream<List<IRCNetwork>> get networksStream => _networksController.stream;
+
+  Future<List<IRCNetwork>> get networks => _networksController.last;
+  Stream<int> get networksCountStream => networksStream.map((networks) {
+    if(networks != null) {
+      return 0;
+    } else {
+      return networks?.length;
+    }
+  });
+
+  Stream<bool> get networksIsEmptyStream => networksStream.map((networks) {
+    if(networks != null) {
+      return true;
+    } else {
+      return networks.isEmpty;
+    }
+  });
+  Future<bool> get isNetworksEmpty async => (await networks).isEmpty;
+  Future<bool> get isNetworksNotEmpty async => !(await isNetworksEmpty);
+
+  Future<List<IRCNetworkChannel>> get allNetworksChannels async {
     var allChannels = List<IRCNetworkChannel>();
-    _networks.forEach((network) {
+    (await networks).forEach((network) {
       allChannels.addAll(network.channels);
     });
 
     return allChannels;
   }
 
-  final BehaviorSubject<List<IRCNetwork>> _networksController =
-  new BehaviorSubject<List<IRCNetwork>>(seedValue: []);
+
+  @override
+  void dispose() {
+    _networksController.close();
+    _backendConnectedController.close();
+  }
+
+  Future<bool> connectToBackend() {
+
+  }
+
+  ChatNewNetworkBloc createNewChatNetworkBloc(IRCNetworkPreferences startValues) {
+    return ChatNewNetworkBloc();
+  }
+
+
 
   Stream<List<IRCNetwork>> get newNetworksStream => _networksController.stream;
 
@@ -66,7 +109,7 @@ class IRCNetworksListBloc extends Providable {
       }
     });
 
-    _joinSubscription = lounge.joinStream.listen((result) {
+    _joinSubscription = lounge.joinStream.listen((result) async {
       var loungeChannel = result.chan;
 
       var remoteNetworkId = result.network;
@@ -74,8 +117,8 @@ class IRCNetworksListBloc extends Providable {
       var networkForJoinedChannel = _networks
           .firstWhere((network) => network.remoteId == remoteNetworkId);
 
-      var networksListPreferences = preferencesBloc
-          .getPreferenceOrValue(() => IRCNetworksListPreferences());
+      var networksListPreferences = await preferencesBloc
+          .getPreferenceOrValue(IRCNetworksListPreferences());
 
       var channelLocalId =
       networksListPreferences.getNextNetworkChannelLocalId();
@@ -132,7 +175,7 @@ class IRCNetworksListBloc extends Providable {
           _onNetworksListChanged();
 
 
-          preferencesBloc.setNewPreferenceValue(networksListPreferences);
+          preferencesBloc.setValue(networksListPreferences);
         });
 
     _closeSubscription = lounge.closeToRequestStream.listen((resultForRequest) {
@@ -157,7 +200,7 @@ class IRCNetworksListBloc extends Providable {
           .firstWhere((channel) => channel.localId == channelToRemove.localId));
 
       _onNetworksListChanged();
-      preferencesBloc.setNewPreferenceValue(networksListPreferences);
+      preferencesBloc.setValue(networksListPreferences);
     });
 
     _quitSubscription = lounge.quitStream.listen((quitResponse) {
@@ -176,7 +219,7 @@ class IRCNetworksListBloc extends Providable {
       networksListPreferences.networks.remove(networkPreferenceToRemove);
 
       _onNetworksListChanged();
-      preferencesBloc.setNewPreferenceValue(networksListPreferences);
+      preferencesBloc.setValue(networksListPreferences);
     });
 
     _logger.i(() => "stop creating");
@@ -248,7 +291,7 @@ class IRCNetworksListBloc extends Providable {
 
     networksListPreferences.networks.add(networkPreferences);
 
-    preferencesBloc.setNewPreferenceValue(networksListPreferences);
+    preferencesBloc.setValue(networksListPreferences);
 
     var loungeNetworkStatus = loungeNetwork.status;
 
@@ -272,6 +315,7 @@ class IRCNetworksListBloc extends Providable {
     _networks.add(network);
     _onNetworksListChanged();
   }
+
 }
 
 // We should force unique network names

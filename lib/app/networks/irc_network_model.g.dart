@@ -109,20 +109,3 @@ Map<String, dynamic> _$IRCNetworkConnectionPreferencesToJson(
       'serverPreferences': instance.serverPreferences,
       'userPreferences': instance.userPreferences,
     };
-
-IRCNetworksListPreferences _$IRCNetworksListPreferencesFromJson(
-    Map<String, dynamic> json) {
-  return IRCNetworksListPreferences(
-    networks: (json['networks'] as List)
-        ?.map((e) => e == null
-            ? null
-            : IRCNetworkPreferences.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-  );
-}
-
-Map<String, dynamic> _$IRCNetworksListPreferencesToJson(
-        IRCNetworksListPreferences instance) =>
-    <String, dynamic>{
-      'networks': instance.networks,
-    };

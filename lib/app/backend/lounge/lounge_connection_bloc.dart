@@ -1,18 +1,13 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/async/async_operation_bloc.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 
 class LoungeConnectionBloc extends AsyncOperationBloc {
-  LoungePreferences newLoungePreferences;
+  final LoungeBackendService loungeBackendService;
 
-  LoungeConnectionBloc({@required this.newLoungePreferences});
+  LoungeConnectionBloc(this.loungeBackendService);
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void changeHost(String text) {
-    newLoungePreferences.host = text;
-  }
+  Future<bool> tryConnect(LoungePreferences preferences) async =>
+      await doAsyncOperation(
+          () async => await loungeBackendService.tryConnect(preferences));
 }

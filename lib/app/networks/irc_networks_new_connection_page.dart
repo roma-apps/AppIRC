@@ -1,54 +1,40 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/chat/chat_bloc.dart';
 import 'package:flutter_appirc/app/chat/irc_chat_page.dart';
+import 'package:flutter_appirc/app/chat/irc_networks_preferences_bloc.dart';
+import 'package:flutter_appirc/app/networks/irc_network_model.dart';
 import 'package:flutter_appirc/app/networks/irc_network_preferences_widget.dart';
 import 'package:flutter_appirc/app/networks/irc_networks_new_connection_bloc.dart';
-import 'package:flutter_appirc/app/networks/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/async/async_operation_bloc.dart';
 import 'package:flutter_appirc/async/button_loading_widget.dart';
 import 'package:flutter_appirc/lounge/lounge_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class IRCNetworksNewConnectionPage extends StatefulWidget {
-  final bool isOpenedFromAppStart;
+class NewChatNetworkPage extends StatefulWidget {
+  final IRCNetworkPreferences startValues;
+  final VoidCallback successCallback;
 
-  IRCNetworksNewConnectionPage({this.isOpenedFromAppStart = false});
+  NewChatNetworkPage(this.startValues, {this.successCallback});
 
   @override
   State<StatefulWidget> createState() {
-    return IRCNetworksNewConnectionPageState(isOpenedFromAppStart);
+    return NewChatNetworkPageState(startValues,
+        successCallback: successCallback);
   }
 }
 
-class IRCNetworksNewConnectionPageState
-    extends State<IRCNetworksNewConnectionPage> {
-  final bool isOpenedFromAppStart;
+class NewChatNetworkPageState extends State<NewChatNetworkPage> {
+  final IRCNetworkPreferences startValues;
+  final VoidCallback successCallback;
 
-  IRCNetworksNewConnectionPageState(this.isOpenedFromAppStart);
+  NewChatNetworkPageState(this.startValues, {this.successCallback});
 
   @override
   Widget build(BuildContext context) {
-    final LoungeService loungeService = Provider.of<LoungeService>(context);
-    var connectionPreferences = createDefaultIRCNetworkPreferences();
-
-    if (!isOpenedFromAppStart) {
-      var ircNetworkConnectionPreferences =
-          connectionPreferences.networkConnectionPreferences;
-      var ircNetworkUserPreferences =
-          ircNetworkConnectionPreferences.userPreferences;
-      ircNetworkUserPreferences.username = "";
-      ircNetworkUserPreferences.nickname = "";
-      ircNetworkUserPreferences.password = "";
-      ircNetworkUserPreferences.realName = "";
-      connectionPreferences.channels = [];
-    }
-
-    var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
-        loungeService: loungeService,
-        preferencesBloc: Provider.of<IRCNetworksPreferencesBloc>(context),
-        newConnectionPreferences: connectionPreferences);
+    final ChatBloc chatBloc = Provider.of<ChatBloc>(context);
 
     return PlatformScaffold(
       iosContentBottomPadding: true,
@@ -56,8 +42,8 @@ class IRCNetworksNewConnectionPageState
       appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('irc_connection.title')),
       ),
-      body: Provider<IRCNetworksNewConnectionBloc>(
-        bloc: ircNetworksNewConnectionBloc,
+      body: Provider<ChatNewNetworkBloc>(
+        bloc: chatBloc.createNewChatNetworkBloc(startValues),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -74,8 +60,9 @@ class IRCNetworksNewConnectionPageState
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: () {
-                      _sendNetworkRequest(
-                          ircNetworksNewConnectionBloc, context);
+//                      var newChatNetworkBloc = Provider.of<NewChatNetworkBloc>(context);
+//                      _sendNetworkRequest(
+//                          ircNetworksNewConnectionBloc, context);
                     },
                   ),
                 )
@@ -88,13 +75,13 @@ class IRCNetworksNewConnectionPageState
   }
 
   void _sendNetworkRequest(
-      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc,
+      ChatNewNetworkBloc ircNetworksNewConnectionBloc,
       BuildContext context) async {
     try {
       await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
       if (isOpenedFromAppStart) {
         Navigator.pushReplacement(
-            context, platformPageRoute(builder: (context) => IRCChatPage()));
+            context, platformPageRoute(builder: (context) => ChatPage()));
       } else {
         Navigator.pop(context);
       }

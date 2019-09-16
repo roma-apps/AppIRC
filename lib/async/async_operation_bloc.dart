@@ -18,6 +18,9 @@ abstract class AsyncOperationBloc extends Providable {
   void _onOperationFinished() => _newInProgressValue(false);
 
   FutureOr<T> doAsyncOperation<T>(FutureOr<T> asyncCode()) async {
+
+    // TODO: add timeout & block several parallel operations in same type
+
     _onOperationStarted();
     FutureOr<T> result;
     try {

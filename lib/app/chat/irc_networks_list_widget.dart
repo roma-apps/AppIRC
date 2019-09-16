@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channels/irc_network_channel_join_page.dart';
 import 'package:flutter_appirc/app/channels/info/irc_network_channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/channels/irc_network_channels_list_widget.dart';
+import 'package:flutter_appirc/app/chat/chat_bloc.dart';
 import 'package:flutter_appirc/app/chat/irc_chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/irc_chat_network_expand_state_bloc.dart';
 import 'package:flutter_appirc/app/chat/menu_widgets.dart';
@@ -17,7 +18,6 @@ import 'package:flutter_appirc/app/networks/irc_network_command_ignore_list_bloc
 import 'package:flutter_appirc/app/networks/irc_network_edit_page.dart';
 import 'package:flutter_appirc/app/networks/irc_network_model.dart';
 import 'package:flutter_appirc/app/networks/irc_network_state_bloc.dart';
-import 'package:flutter_appirc/app/networks/irc_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -32,7 +32,7 @@ class IRCNetworksListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var networksListBloc = Provider.of<IRCNetworksListBloc>(context);
+    var networksListBloc = Provider.of<ChatBloc>(context);
 
     var networksListWidget = StreamBuilder<List<IRCNetwork>>(
         stream: networksListBloc.newNetworksStream,

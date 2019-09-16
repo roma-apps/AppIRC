@@ -80,3 +80,17 @@ class UISkin extends Providable {
   @override
   void dispose() {}
 }
+
+
+UISkin createDefaultUISkin() {
+  var accentColor = Colors.red;
+  final themeData = new ThemeData(
+    primarySwatch: accentColor,
+  );
+
+  final cupertinoTheme = new CupertinoThemeData(
+    primaryColor: accentColor,
+  );
+
+  return UISkin(themeData, cupertinoTheme);
+}

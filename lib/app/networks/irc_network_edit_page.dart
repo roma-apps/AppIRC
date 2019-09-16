@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/networks/irc_network_model.dart';
 import 'package:flutter_appirc/app/networks/irc_network_preferences_widget.dart';
 import 'package:flutter_appirc/app/networks/irc_networks_new_connection_bloc.dart';
-import 'package:flutter_appirc/app/networks/irc_networks_preferences_bloc.dart';
 import 'package:flutter_appirc/async/async_operation_bloc.dart';
 import 'package:flutter_appirc/async/button_loading_widget.dart';
 
@@ -32,8 +31,8 @@ class IRCNetworksNewConnectionState extends State<IRCNetworkEditPage> {
   Widget build(BuildContext context) {
     final LoungeService loungeService = Provider.of<LoungeService>(context);
     var defaultIRCNetworkPreferences = createDefaultIRCNetworkPreferences();
-    var ircNetworksNewConnectionBloc = IRCNetworksNewConnectionBloc(
-        loungeService: loungeService,
+    var ircNetworksNewConnectionBloc = ChatNewNetworkBloc(
+        backendService: loungeService,
         preferencesBloc: Provider.of<IRCNetworksPreferencesBloc>(context),
         newConnectionPreferences: defaultIRCNetworkPreferences);
 
@@ -47,7 +46,7 @@ class IRCNetworksNewConnectionState extends State<IRCNetworkEditPage> {
       body: SafeArea(
         child: ListView(
           children: <Widget>[
-            Provider<IRCNetworksNewConnectionBloc>(
+            Provider<ChatNewNetworkBloc>(
                 bloc: ircNetworksNewConnectionBloc,
                 child:
                     IRCNetworkPreferencesWidget(defaultIRCNetworkPreferences)),
@@ -70,7 +69,7 @@ class IRCNetworksNewConnectionState extends State<IRCNetworkEditPage> {
   }
 
   void _saveNetworkSettings(
-      IRCNetworksNewConnectionBloc ircNetworksNewConnectionBloc,
+      ChatNewNetworkBloc ircNetworksNewConnectionBloc,
       BuildContext context) async {
 //    await ircNetworksNewConnectionBloc.sendNewNetworkRequest();
 

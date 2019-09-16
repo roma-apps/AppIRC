@@ -1,5 +1,8 @@
 {
   "app_name": "AppIRC",
+  "form": {
+    "empty_field_not_valid": "Field should be not empty"
+  },
   "splash": {
     "loading": "Loading"
   },
