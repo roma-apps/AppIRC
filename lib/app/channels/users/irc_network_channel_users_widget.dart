@@ -2,9 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channels/users/irc_network_channel_users_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
-
-import 'package:flutter_appirc/lounge/lounge_service.dart';
 import 'package:flutter_appirc/app/users/irc_network_channel_user_model.dart';
+import 'package:flutter_appirc/lounge/lounge_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class IRCNetworkChannelUsersWidget extends StatefulWidget {

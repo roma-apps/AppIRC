@@ -2,22 +2,22 @@ import 'package:easy_localization/easy_localization_delegate.dart';
 import 'package:flutter/material.dart'
     show Colors, Divider, Icons, PopupMenuButton, PopupMenuEntry;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/channels/irc_network_channel_join_page.dart';
 import 'package:flutter_appirc/app/channels/info/irc_network_channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/channels/irc_network_channels_list_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_defaults.dart';
 import 'package:flutter_appirc/app/chat/irc_chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/irc_chat_network_expand_state_bloc.dart';
 import 'package:flutter_appirc/app/chat/menu_widgets.dart';
+import 'package:flutter_appirc/app/networks/irc_network_channel_join_page.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
 import 'package:flutter_appirc/app/networks/irc_network_command_channels_list_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_command_connect_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_command_disconnect_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_command_exit_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_command_ignore_list_bloc.dart';
-import 'package:flutter_appirc/app/networks/irc_network_edit_page.dart';
 import 'package:flutter_appirc/app/networks/irc_network_model.dart';
-import 'package:flutter_appirc/app/networks/irc_network_state_bloc.dart';
+import 'package:flutter_appirc/app/networks/irc_network_preferences_page.dart';
 import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -35,23 +35,19 @@ class IRCNetworksListWidget extends StatelessWidget {
     var networksListBloc = Provider.of<ChatBloc>(context);
 
     var networksListWidget = StreamBuilder<List<IRCNetwork>>(
-        stream: networksListBloc.newNetworksStream,
+        stream: networksListBloc.networksStream,
         builder:
             (BuildContext context, AsyncSnapshot<List<IRCNetwork>> snapshot) {
           var listItemCount =
-          (snapshot.data == null ? 0 : snapshot.data.length);
+              (snapshot.data == null ? 0 : snapshot.data.length);
 
           if (listItemCount > 0) {
             return Container(
               child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: listItemCount,
-                  separatorBuilder: (context, index) =>
-                      Divider(
-                        color: UISkin
-                            .of(context)
-                            .appSkin
-                            .accentColor,
+                  separatorBuilder: (context, index) => Divider(
+                        color: UISkin.of(context).appSkin.accentColor,
                       ),
                   itemBuilder: (BuildContext context, int index) {
                     var network = snapshot.data[index];
@@ -71,7 +67,7 @@ class IRCNetworksListWidget extends StatelessWidget {
   Widget _networkItem(BuildContext context, IRCNetwork network) {
     var preferencesService = Provider.of<PreferencesService>(context);
     var ircChatActiveChannelBloc =
-    Provider.of<IRCChatActiveChannelBloc>(context);
+        Provider.of<IRCChatActiveChannelBloc>(context);
     var lounge = Provider.of<LoungeService>(context);
     var channel = network.lobbyChannel;
     var expandBloc = IRCChatNetworkExpandStateBloc(preferencesService, network);
@@ -88,8 +84,8 @@ class IRCNetworksListWidget extends StatelessWidget {
               builder: (BuildContext context,
                   AsyncSnapshot<IRCNetworkChannel> snapshot) {
                 var activeChannel = snapshot.data;
-                var isChannelActive = activeChannel?.remoteId ==
-                    channel.remoteId;
+                var isChannelActive =
+                    activeChannel?.remoteId == channel.remoteId;
 
                 return _buildNetworkRow(
                     context,
@@ -106,7 +102,8 @@ class IRCNetworksListWidget extends StatelessWidget {
     );
   }
 
-  _buildNetworkRow(BuildContext context,
+  _buildNetworkRow(
+      BuildContext context,
       IRCChatActiveChannelBloc ircChatActiveChannelBloc,
       IRCNetwork network,
       IRCNetworkChannel channel,
@@ -126,8 +123,8 @@ class IRCNetworksListWidget extends StatelessWidget {
     var networkStateBloc = Provider.of<IRCNetworkStateBloc>(context);
     var row = StreamBuilder<IRCNetworkState>(
         stream: networkStateBloc.stateStream,
-        builder: (BuildContext context,
-            AsyncSnapshot<IRCNetworkState> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<IRCNetworkState> snapshot) {
           var connected = snapshot.data == IRCNetworkState.CONNECTED;
 
           return Row(
@@ -150,8 +147,7 @@ class IRCNetworksListWidget extends StatelessWidget {
                     ircChatActiveChannelBloc.changeActiveChanel(channel);
                   },
                   child: Text(network.name,
-                      style: UISkin
-                          .of(context)
+                      style: UISkin.of(context)
                           .appSkin
                           .networksListNetworkTextStyle
                           .copyWith(color: foregroundColor)),
@@ -167,7 +163,9 @@ class IRCNetworksListWidget extends StatelessWidget {
                       Navigator.push(
                           context,
                           platformPageRoute(
-                              builder: (_) => IRCNetworkEditPage(network)));
+                              builder: (_) => EditChatNetworkPage(
+                                  createDefaultIRCNetworkPreferences(
+                                      context))));
                       break;
                     case NetworkDropDownAction.JOIN_CHANNEL:
                       Navigator.push(
@@ -214,14 +212,12 @@ class IRCNetworksListWidget extends StatelessWidget {
                         iconData: Icons.add),
                     buildDropdownMenuItemRow(
                         value: NetworkDropDownAction.LIST_ALL_CHANNELS,
-                        text: appLocalizations
-                            .tr(
+                        text: appLocalizations.tr(
                             "settings.network_dropdown_menu.list_all_channels"),
                         iconData: Icons.list),
                     buildDropdownMenuItemRow(
                         value: NetworkDropDownAction.LIST_IGNORED_USERS,
-                        text: appLocalizations
-                            .tr(
+                        text: appLocalizations.tr(
                             "settings.network_dropdown_menu.list_ignored_users"),
                         iconData: Icons.list),
                     buildDropdownMenuItemRow(
@@ -249,16 +245,12 @@ class IRCNetworksListWidget extends StatelessWidget {
               )
             ],
           );
-        }
-    );
+        });
     var rowContainer;
     if (isChannelActive) {
       rowContainer = Container(
           decoration:
-          BoxDecoration(color: UISkin
-              .of(context)
-              .appSkin
-              .accentColor),
+              BoxDecoration(color: UISkin.of(context).appSkin.accentColor),
           child: row);
     } else {
       rowContainer = Container(child: row);
@@ -276,7 +268,6 @@ class IRCNetworksListWidget extends StatelessWidget {
       return rowContainer;
     }
   }
-
 }
 
 enum NetworkDropDownAction {

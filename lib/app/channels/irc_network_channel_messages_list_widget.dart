@@ -2,11 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channels/irc_network_channel_messages_bloc.dart';
+import 'package:flutter_appirc/app/messages/irc_network_channel_message_model.dart';
 import 'package:flutter_appirc/app/messages/irc_network_channel_message_widget.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
-
 import 'package:flutter_appirc/lounge/lounge_service.dart';
-import 'package:flutter_appirc/app/messages/irc_network_channel_message_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class IRCNetworkChannelMessagesListWidget extends StatelessWidget {

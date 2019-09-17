@@ -44,6 +44,13 @@ const _timeBetweenCheckResultForRequestsWithResponse =
 const _timeBetweenCheckAnotherRequestInProgress = Duration(milliseconds: 100);
 
 class LoungeService extends Providable {
+  Stream<bool> get connectedStream => _connectedController.stream;
+
+  bool get isConnected  => _connectedController.value;
+
+  BehaviorSubject<bool>  _connectedController =
+      BehaviorSubject<bool>(seedValue: false);
+
   bool requestWithResultInProgress = false;
 
   SocketIOManager socketIOManager;
@@ -51,29 +58,20 @@ class LoungeService extends Providable {
 
   LoungeService(this.socketIOManager);
 
-  BehaviorSubject<LoungePreferences> _loungePreferencesController =
-      new BehaviorSubject<LoungePreferences>();
-
-  Stream<LoungePreferences> get loungePreferencesStream =>
-      _loungePreferencesController.stream;
-
   ReplaySubject<MessageLoungeResponseBody> _messagesController =
       new ReplaySubject<MessageLoungeResponseBody>();
 
   Stream<MessageLoungeResponseBody> get messagesStream =>
       _messagesController.stream;
 
-
   var _messagesSpecialController =
-  new ReplaySubject<MessageSpecialLoungeResponseBody>();
+      new ReplaySubject<MessageSpecialLoungeResponseBody>();
 
   Stream<MessageSpecialLoungeResponseBody> get messagesSpecialStream =>
       _messagesSpecialController.stream;
 
   BehaviorSubject<NickLoungeResponseBody> _nickController =
       new BehaviorSubject<NickLoungeResponseBody>();
-
-
 
   var _networksController = new BehaviorSubject<
       LoungeResultForRequest<LoungeJsonRequest<NetworkNewLoungeRequestBody>,
@@ -96,9 +94,10 @@ class LoungeService extends Providable {
   Stream<NamesLoungeResponseBody> get namesStream => _namesController.stream;
 
   BehaviorSubject<IRCNetworkChannel> _openRequestController =
-  new BehaviorSubject<IRCNetworkChannel>();
+      new BehaviorSubject<IRCNetworkChannel>();
 
-  Stream<IRCNetworkChannel> get openRequestStream => _openRequestController.stream;
+  Stream<IRCNetworkChannel> get openRequestStream =>
+      _openRequestController.stream;
 
   BehaviorSubject<UsersLoungeResponseBody> _usersController =
       new BehaviorSubject<UsersLoungeResponseBody>();
@@ -110,9 +109,8 @@ class LoungeService extends Providable {
 
   Stream<JoinLoungeResponseBody> get joinStream => _joinController.stream;
 
-
   BehaviorSubject<QuitLoungeResponseBody> _quitController =
-  new BehaviorSubject<QuitLoungeResponseBody>();
+      new BehaviorSubject<QuitLoungeResponseBody>();
 
   Stream<QuitLoungeResponseBody> get quitStream => _quitController.stream;
 
@@ -137,7 +135,6 @@ class LoungeService extends Providable {
           LoungeJsonRequest<InputLoungeRequestBody<CloseIRCCommand>>,
           ChanLoungeResponseBody>> get closeToRequestStream =>
       _closeToRequestController.stream;
-
 
   BehaviorSubject<NetworkStatusLoungeResponseBody> _networkStatusController =
       new BehaviorSubject<NetworkStatusLoungeResponseBody>();
@@ -281,27 +278,24 @@ class LoungeService extends Providable {
       throw connectionException;
     }
 
-    if (connected) {
-      _loungePreferencesController.add(preferences);
-    }
-
     return connected;
   }
 
   disconnect() async {
-    _removeSubscriptions();
+    var result;
     if (isProbablyConnected) {
-      var result = await socketIOService.disconnect();
-
-      socketIOService = null;
-      return result;
+      result = await socketIOService.disconnect();
     } else {
-      return true;
+      result = true;
     }
+    _removeSubscriptions();
+    return result;
   }
 
   @override
   void dispose() {
+    _connectedController.close();
+
     _topicController.close();
     _messagesController.close();
     _networksController.close();
@@ -318,7 +312,6 @@ class LoungeService extends Providable {
     _closeToRequestController.close();
     _messagesSpecialController.close();
 
-    _loungePreferencesController.close();
     _quitController.close();
     _openRequestController.close();
 
@@ -330,7 +323,7 @@ class LoungeService extends Providable {
   sendOpenRequest(IRCNetworkChannel channel) async {
     _openRequestController.add(channel);
     return await _sendRequest(
-      LoungeRawRequest(name: "open", body: [channel.remoteId]));
+        LoungeRawRequest(name: "open", body: [channel.remoteId]));
   }
 
   sendNamesRequest(IRCNetworkChannel channel) async =>
@@ -387,12 +380,12 @@ class LoungeService extends Providable {
               body: text, target: remoteChannelId)));
 
   void _addSubscriptions() {
-    socketIOService.onConnect((_) {
-      sendSettingsGetRequest();
-    });
+    socketIOService.onConnect(_connectedCallback);
+    socketIOService.onDisconnect(_disconnectedCallback);
 
 //    socketIOService.on(LoungeResponseEventNames.network, _onNetworkResponse);
-    socketIOService.on(LoungeResponseEventNames.msgSpecial, _onMessageSpecialResponse);
+    socketIOService.on(
+        LoungeResponseEventNames.msgSpecial, _onMessageSpecialResponse);
     socketIOService.on(LoungeResponseEventNames.msg, _onMessageResponse);
     socketIOService.on(LoungeResponseEventNames.nick, _onNickResponse);
     socketIOService.on(LoungeResponseEventNames.topic, _onTopicResponse);
@@ -413,10 +406,22 @@ class LoungeService extends Providable {
         LoungeResponseEventNames.channelState, _onChannelStateResponse);
   }
 
+  void _connectedCallback(_) {
+    sendSettingsGetRequest();
+  }
+
+  void _disconnectedCallback(_) {
+    sendSettingsGetRequest();
+  }
+
   void _removeSubscriptions() {
+    socketIOService.offConnect(_connectedCallback);
+    socketIOService.offDisconnect(_disconnectedCallback);
+
 //    socketIOService.off(LoungeResponseEventNames.network, _onNetworkResponse);
     socketIOService.off(LoungeResponseEventNames.msg, _onMessageResponse);
-    socketIOService.off(LoungeResponseEventNames.msgSpecial, _onMessageSpecialResponse);
+    socketIOService.off(
+        LoungeResponseEventNames.msgSpecial, _onMessageSpecialResponse);
     socketIOService.off(LoungeResponseEventNames.nick, _onNickResponse);
     socketIOService.off(LoungeResponseEventNames.topic, _onTopicResponse);
     socketIOService.off(
@@ -448,13 +453,12 @@ class LoungeService extends Providable {
     _messagesController.sink.add(data);
   }
 
-
   void _onMessageSpecialResponse(raw) {
     _logger.i(() => "_onMessageSpecialResponse $raw");
-    var data = MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    var data =
+        MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _messagesSpecialController.sink.add(data);
   }
-
 
   void _onNickResponse(raw) {
     _logger.i(() => "_onNickResponse $raw");
@@ -492,7 +496,6 @@ class LoungeService extends Providable {
     var parsed = JoinLoungeResponseBody.fromJson(_preProcessRawData(raw));
     _joinController.sink.add(parsed);
   }
-
 
   void _onQuitResponse(raw) {
     var parsed = QuitLoungeResponseBody.fromJson(_preProcessRawData(raw));
@@ -564,7 +567,6 @@ class LoungeService extends Providable {
       return null;
     }
   }
-
 
   sendCloseChannelMessageRequest(
       IRCNetworkChannel targetChannel, CloseIRCCommand ircCommand) async {

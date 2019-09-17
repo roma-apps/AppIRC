@@ -1,20 +1,17 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_appirc/form/form_bloc.dart';
-import 'package:flutter_appirc/form/form_field_bloc.dart';
+import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 
 class LoungePreferencesFormBloc extends FormBloc {
-  TextEditingController _hostController;
-  FormNotEmptyTextFieldBloc hostFieldBloc;
+  FormValueFieldBloc<String> hostFieldBloc;
 
   LoungePreferencesFormBloc(LoungePreferences loungePreferences) {
-    _hostController = TextEditingController(text: loungePreferences.host);
-    hostFieldBloc = FormNotEmptyTextFieldBloc(_hostController);
+    hostFieldBloc = FormValueFieldBloc<String>(loungePreferences.host,
+        validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
   }
 
   @override
-  List<FormTextFieldBloc> get fieldBlocs => [hostFieldBloc];
+  List<FormFieldBloc> get children => [hostFieldBloc];
 
   LoungePreferences extractData() =>
-      LoungePreferences(host: _hostController.text);
+      LoungePreferences(host: hostFieldBloc.value);
 }

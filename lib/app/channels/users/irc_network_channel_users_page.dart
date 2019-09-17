@@ -1,10 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channels/users/irc_network_channel_users_widget.dart';
-import 'package:flutter_appirc/app/networks/irc_network_command_join_widget.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
-
-
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworkChannelUsersPage extends StatefulWidget {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channels/info/irc_network_channel_unread_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
-
 import 'package:flutter_appirc/lounge/lounge_service.dart';
 
 Widget _buildChannelUnreadBadgeCount(BuildContext context, int unreadCount) {

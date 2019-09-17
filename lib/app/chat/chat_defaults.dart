@@ -1,4 +1,3 @@
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/networks/irc_network_model.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
@@ -6,29 +5,27 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 LoungePreferences createDefaultLoungePreferences(BuildContext context) =>
 //    LoungePreferences(host: "https://demo.thelounge.chat/");
 //LoungePreferences(host: "https://irc.pleroma.social");
-LoungePreferences(host: "http://192.168.0.103:9000/");
+    LoungePreferences(host: "http://192.168.0.103:9000/");
 //LoungePreferences(host: "http://192.168.1.103:9000/");
 
-
-
 IRCNetworkPreferences createDefaultIRCNetworkPreferences(
-    BuildContext context) =>
+        BuildContext context) =>
     IRCNetworkPreferences(
-        networkConnectionPreferences: IRCNetworkConnectionPreferences(
+        IRCNetworkConnectionPreferences(
           serverPreferences: createDefaultNetworkServerPreferences(context),
           userPreferences: createDefaultNetworkUserPreferences(context),
           localId: null,
         ),
-        channels: [
+        [
           IRCNetworkChannelPreferences(name: "#thelounge-spam", isLobby: false)
         ]);
 
 IRCNetworkUserPreferences createDefaultNetworkUserPreferences(
-    BuildContext context) =>
+        BuildContext context) =>
     IRCNetworkUserPreferences(
         username: "AppIRC User name",
         realName: "AppIRC Real Name",
-        nickname: "AppIRC Nick");
+        nickname: "AppIRCNick");
 
 IRCNetworkServerPreferences createDefaultNetworkServerPreferences(
     BuildContext context) {

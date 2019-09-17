@@ -68,11 +68,11 @@ Map<String, dynamic> _$IRCNetworkChannelPreferencesToJson(
 IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(
     Map<String, dynamic> json) {
   return IRCNetworkPreferences(
-    networkConnectionPreferences: json['networkConnectionPreferences'] == null
+    json['networkConnectionPreferences'] == null
         ? null
         : IRCNetworkConnectionPreferences.fromJson(
             json['networkConnectionPreferences'] as Map<String, dynamic>),
-    channels: (json['channels'] as List)
+    (json['channels'] as List)
         ?.map((e) => e == null
             ? null
             : IRCNetworkChannelPreferences.fromJson(e as Map<String, dynamic>))

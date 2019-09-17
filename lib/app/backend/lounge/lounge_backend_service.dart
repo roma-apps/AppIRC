@@ -7,21 +7,35 @@ class LoungeBackendService extends ChatBackendService {
   final SocketIOManager socketIOManager;
   final LoungePreferences loungePreferences;
 
-  LoungeBackendService(this.socketIOManager, this.loungePreferences);
+  Stream<bool> get connectedStream => lounge.connectedStream;
+
+  bool get isConnected  =>  lounge.isConnected;
+
+
+  LoungeService lounge;
+
+  LoungeBackendService(this.socketIOManager, this.loungePreferences)
+  {
+    lounge = LoungeService(socketIOManager);
+  }
 
 
   @override
   void dispose() {
+    lounge.dispose();
 
   }
 
   Future<bool> tryConnect(LoungePreferences preferences) async {
     var loungeService = LoungeService(socketIOManager);
-    var connected = await loungeService.connect(loungePreferences);
+    var connected = await loungeService.connect(preferences);
 
     loungeService.disconnect();
 
     return connected;
   }
+
+  Future<bool> connect() => lounge.connect(loungePreferences);
+
 
 }

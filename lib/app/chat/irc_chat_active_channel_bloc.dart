@@ -4,17 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/chat/chat_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
 import 'package:flutter_appirc/app/networks/irc_network_model.dart';
-import 'package:flutter_appirc/async/async_operation_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_service.dart';
+import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _preferenceKey = "chat.activeChannel";
 var _logger = MyLogger(logTag: "IRCChatActiveChannelBloc", enabled: true);
 
-class IRCChatActiveChannelBloc extends AsyncOperationBloc {
+class IRCChatActiveChannelBloc extends Providable {
   final LoungeService lounge;
 
   final ChatBloc networksListBloc;
@@ -35,7 +35,7 @@ class IRCChatActiveChannelBloc extends AsyncOperationBloc {
       @required this.networksListBloc}) {
     _logger.i(() => "start creating");
 
-    _networksSubscription = networksListBloc.newNetworksStream
+    _networksSubscription = networksListBloc.networksStream
         .listen((newNetworks) async => _onNetworksListChanged());
 
     _logger.i(() => "stop creating");
@@ -70,25 +70,23 @@ class IRCChatActiveChannelBloc extends AsyncOperationBloc {
   }
 
   void dispose() {
-    super.dispose();
     _activeChannelController.close();
     _networksSubscription.cancel();
   }
 
-  changeActiveChanel(IRCNetworkChannel newActiveChannel) async =>
-      doAsyncOperation(() async {
-        if (_activeChannel == newActiveChannel) {
-          return;
-        }
+  changeActiveChanel(IRCNetworkChannel newActiveChannel) async {
+    if (_activeChannel == newActiveChannel) {
+      return;
+    }
 
-        _logger.i(() => "changeActiveChanel $changeActiveChanel");
-        _activeChannel = newActiveChannel;
-        preferenceBloc.setValue(newActiveChannel.localId);
-        _activeChannelController.sink.add(newActiveChannel);
+    _logger.i(() => "changeActiveChanel $changeActiveChanel");
+    _activeChannel = newActiveChannel;
+    preferenceBloc.setValue(newActiveChannel.localId);
+    _activeChannelController.sink.add(newActiveChannel);
 
-        await lounge.sendOpenRequest(newActiveChannel);
-        await lounge.sendNamesRequest(newActiveChannel);
-      });
+    await lounge.sendOpenRequest(newActiveChannel);
+    await lounge.sendNamesRequest(newActiveChannel);
+  }
 }
 
 IntPreferencesBloc createActiveChannelPreferenceBloc(

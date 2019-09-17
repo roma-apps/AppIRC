@@ -1,7 +1,9 @@
 {
   "app_name": "AppIRC",
   "form": {
-    "empty_field_not_valid": "Field should be not empty"
+    "empty_field_not_valid": "Field should be not empty",
+    "no_whitespace": "Field should not have whitespaces",
+    "not_unique": "Should be unique"
   },
   "splash": {
     "loading": "Loading"
@@ -28,7 +30,8 @@
   "lounge": {
     "connection": {
       "settings": "Settings",
-      "host": "Host",
+      "host_label": "Host",
+      "host_hint": "https://demo.thelounge.chat",
 
 
       "dialog": {
@@ -67,31 +70,41 @@
     "no_networks": "No networks",
     "network_prefs": {
       "title": "Network preferences",
-      "name": "Name",
-      "server_host": "Host",
-      "server_port": "Port",
+      "name_label": "Name",
+      "name_hint": "Freenode",
+      "server_host_label": "Host",
+      "server_host_hint": "chat.freenode.net",
+      "server_port_label": "Port",
+      "server_port_hint": "6697",
       "use_tls": "Use TLS",
       "trusted_only": "Only allow trusted certificates"
     },
     "user_prefs": {
       "title": "User preferences",
-      "nick": "Nickname",
-      "password": "Password",
-      "real_name": "Real name",
-      "user_name": "User name"
+      "nick_label": "Nickname",
+      "nick_hint": "Superhero",
+      "password_label": "Password",
+      "password_hint": "(optional)",
+      "real_name_label": "Real name",
+      "real_name_hint": "https://demo.thelounge.chat/",
+      "user_name_hint": "User name",
+      "user_name_label": "User name"
     },
     "not_unique_name_dialog": {
       "title": "Name already in use",
       "content": "Please choose different name"
     },
-    "channels": "#thelounge, #thelounge-spam",
+    "channels_title": "Channels",
+    "channels_hint": "#thelounge, #thelounge-spam",
     "connect": "Connect",
     "save": "Save"
   },
   "join_channel": {
     "title": "Join channel",
-    "channel": "Channel",
-    "password": "Password (optional)",
+    "channel_label": "Channel",
+    "channel_hint": "#thelounge",
+    "password_label": "Password",
+    "password_hint": "(optional)",
     "join": "Join"
   },
   "chat": {

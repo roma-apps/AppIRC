@@ -34,6 +34,8 @@ class IRCNetworkChannel {
       @required this.remoteId,
       @required this.isEditTopicPossible});
 
+  bool get isConnected => null;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

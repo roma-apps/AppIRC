@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart' show CupertinoNavigationBar;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons, AppBar, Drawer;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channels/info/irc_network_channel_topic_widget.dart';
 import 'package:flutter_appirc/app/channels/info/irc_network_channel_widget.dart';
 import 'package:flutter_appirc/app/channels/irc_network_channel_bloc.dart';
@@ -13,7 +14,6 @@ import 'package:flutter_appirc/app/chat/irc_chat_settings_page.dart';
 import 'package:flutter_appirc/app/chat/irc_chat_settings_widget.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
-import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -26,16 +26,14 @@ class ChatPage extends StatelessWidget {
     var networksListBloc = Provider.of<ChatBloc>(context);
 
     return Provider<IRCChatActiveChannelBloc>(
-      bloc: IRCChatActiveChannelBloc(
-          lounge: lounge,
-          networksListBloc: networksListBloc,
-          preferenceBloc:
-              createActiveChannelPreferenceBloc(preferencesService)),
-      child: StreamBuilder<LoungePreferences>(
-          stream: lounge.loungePreferencesStream,
-          builder: (context, snapshot) {
-            return PlatformScaffold(
-                android: (context) => MaterialScaffoldData(
+        bloc: IRCChatActiveChannelBloc(
+            lounge: lounge,
+            networksListBloc: networksListBloc,
+            preferenceBloc:
+            createActiveChannelPreferenceBloc(preferencesService)),
+        child: PlatformScaffold(
+            android: (context) =>
+                MaterialScaffoldData(
                     appBar: AppBar(
                       title: _buildAppBarChild(context),
                       actions: <Widget>[
@@ -44,7 +42,8 @@ class ChatPage extends StatelessWidget {
                     ),
                     drawer: Drawer(child: IRCChatSettingsWidget()),
                     body: _buildBody(context)),
-                ios: (context) => CupertinoPageScaffoldData(
+            ios: (context) =>
+                CupertinoPageScaffoldData(
                     resizeToAvoidBottomInset: true,
                     body: _buildBody(context),
                     navigationBar: CupertinoNavigationBar(
@@ -60,8 +59,7 @@ class ChatPage extends StatelessWidget {
                       ),
                       trailing: buildMembersButton(context),
                       middle: _buildAppBarChild(context),
-                    )));
-          }),
+                    )))
     );
   }
 
@@ -92,7 +90,7 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildAppBarChild(BuildContext context) {
-    var lounge = Provider.of<LoungeService>(context);
+    var backendService = Provider.of<ChatBackendService>(context);
 
     var activeChannelBloc = Provider.of<IRCChatActiveChannelBloc>(context);
 
@@ -105,7 +103,7 @@ class ChatPage extends StatelessWidget {
           return Text(AppLocalizations.of(context).tr('chat.title'));
         } else {
           return Provider<IRCNetworkChannelBloc>(
-              bloc: IRCNetworkChannelBloc(lounge, activeChannel),
+              bloc: IRCNetworkChannelBloc(backendService, activeChannel),
               child: IRCNetworkChannelTopicTitleWidget());
         }
       },
@@ -114,7 +112,7 @@ class ChatPage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     var activeChannelBloc = Provider.of<IRCChatActiveChannelBloc>(context);
-    var lounge = Provider.of<LoungeService>(context);
+    var backendService = Provider.of<ChatBackendService>(context);
     return SafeArea(
         child: StreamBuilder<IRCNetworkChannel>(
             stream: activeChannelBloc.activeChannelStream,
@@ -138,7 +136,7 @@ class ChatPage extends StatelessWidget {
                 );
               } else {
                 return Provider<IRCNetworkChannelBloc>(
-                    bloc: IRCNetworkChannelBloc(lounge, channel),
+                    bloc: IRCNetworkChannelBloc(backendService, channel),
                     child: IRCNetworkChannelWidget(channel));
               }
             }));

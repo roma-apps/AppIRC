@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_model.dart';
@@ -10,10 +8,9 @@ part 'irc_network_model.g.dart';
 enum IRCNetworkState { CONNECTED, DISCONNECTED }
 
 class IRCNetworkStatus {
-
   final bool secure;
 
-  IRCNetworkStatus({ @required this.secure});
+  IRCNetworkStatus({@required this.secure});
 
   @override
   String toString() {
@@ -32,10 +29,11 @@ class IRCNetwork {
 
   final List<IRCNetworkChannel> channels;
 
-  IRCNetwork({@required this.connectionPreferences,
-    @required this.remoteId,
-    @required this.status,
-    @required this.channels});
+  IRCNetwork(
+      {@required this.connectionPreferences,
+      @required this.remoteId,
+      @required this.status,
+      @required this.channels});
 
   List<IRCNetworkChannel> get channelsWithoutLobby =>
       channels.where((channel) => !channel.isLobby).toList();
@@ -57,11 +55,12 @@ class IRCNetworkServerPreferences extends JsonPreferences {
   bool useTls;
   bool useOnlyTrustedCertificates;
 
-  IRCNetworkServerPreferences({@required this.name,
-    @required this.serverHost,
-    @required this.serverPort,
-    @required this.useTls,
-    @required this.useOnlyTrustedCertificates});
+  IRCNetworkServerPreferences(
+      {@required this.name,
+      @required this.serverHost,
+      @required this.serverPort,
+      @required this.useTls,
+      @required this.useOnlyTrustedCertificates});
 
   @override
   String toString() {
@@ -82,10 +81,11 @@ class IRCNetworkUserPreferences extends JsonPreferences {
   String password;
   String realName;
 
-  IRCNetworkUserPreferences({@required this.nickname,
-    this.password,
-    @required this.realName,
-    @required this.username});
+  IRCNetworkUserPreferences(
+      {@required this.nickname,
+      this.password,
+      @required this.realName,
+      @required this.username});
 
   @override
   String toString() {
@@ -108,7 +108,10 @@ class IRCNetworkChannelPreferences extends JsonPreferences {
   final String password;
 
   IRCNetworkChannelPreferences(
-      {this.localId, this.password, @required this.name, @required this.isLobby});
+      {this.localId,
+      this.password,
+      @required this.name,
+      @required this.isLobby});
 
   @override
   String toString() {
@@ -135,7 +138,7 @@ class IRCNetworkPreferences extends JsonPreferences {
   List<IRCNetworkChannelPreferences> channels;
 
   IRCNetworkPreferences(
-      {@required this.networkConnectionPreferences, @required this.channels});
+      this.networkConnectionPreferences, this.channels);
 
   @override
   String toString() {
@@ -148,21 +151,19 @@ class IRCNetworkPreferences extends JsonPreferences {
       channels.map((channel) => channel.name).join(channelsSeparator);
 
   @JsonKey(ignore: true)
-  String get notLobbyChannelsString =>
-      channels
-          .where((channel) => !channel.isLobby)
-          .map((channel) => channel.name)
-          .join(channelsSeparator);
+  String get notLobbyChannelsString => channels
+      .where((channel) => !channel.isLobby)
+      .map((channel) => channel.name)
+      .join(channelsSeparator);
 
   @JsonKey(ignore: true)
-  set notLobbyChannelsString(String newValue) =>
-      channels = newValue != null
-          ? newValue
+  set notLobbyChannelsString(String newValue) => channels = newValue != null
+      ? newValue
           .split(channelsSeparator)
           .map((channelName) =>
-          IRCNetworkChannelPreferences(name: channelName, isLobby: false))
+              IRCNetworkChannelPreferences(name: channelName, isLobby: false))
           .toList()
-          : [];
+      : [];
 
   factory IRCNetworkPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkPreferencesFromJson(json);
@@ -173,14 +174,15 @@ class IRCNetworkPreferences extends JsonPreferences {
 
 @JsonSerializable()
 class IRCNetworkConnectionPreferences extends JsonPreferences {
-  final int localId;
+  int localId;
 
   IRCNetworkServerPreferences serverPreferences;
   IRCNetworkUserPreferences userPreferences;
 
-  IRCNetworkConnectionPreferences({@required this.serverPreferences,
-    @required this.userPreferences,
-    @required this.localId});
+  IRCNetworkConnectionPreferences(
+      {@required this.serverPreferences,
+      @required this.userPreferences,
+      this.localId});
 
   get name => serverPreferences.name;
 

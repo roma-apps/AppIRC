@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
-import 'package:flutter_appirc/app/networks/irc_network_state_bloc.dart';
-
-
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';

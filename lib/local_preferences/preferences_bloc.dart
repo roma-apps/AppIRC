@@ -1,8 +1,8 @@
-import 'package:flutter_appirc/async/async_operation_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
+import 'package:flutter_appirc/provider/provider.dart';
 
-abstract class PreferencesBloc<T> extends AsyncOperationBloc {
+abstract class PreferencesBloc<T> extends Providable {
   final PreferencesService _preferencesService;
   final String key;
 
@@ -13,12 +13,16 @@ abstract class PreferencesBloc<T> extends AsyncOperationBloc {
 
   Future<bool> clearValue() => _preferencesService.clearValue(key);
 
-  Future<T> getValue(T defaultValue) =>
-      doAsyncOperation(() => valueStream(defaultValue).last);
+  Future<T> getValue(T defaultValue);
 
   Future<bool> setValue(T newValue);
 
   Stream<T> valueStream(T defaultValue);
+
+
+  @override
+  void dispose() {
+  }
 
 }
 
@@ -31,11 +35,14 @@ class JsonPreferencesBloc<T extends JsonPreferences>
       this.schemaVersion, this.jsonConverter)
       : super(preferencesService, "$key.$schemaVersion");
 
-  Future<bool> setValue(T newValue) async => doAsyncOperation(
-      () async => await _preferencesService.setJsonPreferences(key, newValue));
+  Future<bool> setValue(T newValue) async =>  await _preferencesService.setJsonPreferences(key, newValue);
 
   Stream<T> valueStream(T defaultValue) => _preferencesService
       .getJsonPreferencesStream(key, jsonConverter, defaultValue: defaultValue);
+
+  Future<T> getValue(T defaultValue) async =>
+      await _preferencesService
+          .getJsonPreferences(key, jsonConverter, defaultValue: defaultValue);
 }
 
 abstract class SimplePreferencesBloc<T> extends PreferencesBloc<T> {
@@ -47,20 +54,30 @@ class IntPreferencesBloc extends SimplePreferencesBloc<int> {
   IntPreferencesBloc(PreferencesService preferencesService, String key)
       : super(preferencesService, key);
 
-  Future<bool> setValue(int newValue) async => doAsyncOperation(() async =>
-      await _preferencesService.setIntPreferenceValue(key, newValue));
+  Future<bool> setValue(int newValue) async =>
+      await _preferencesService.setIntPreferenceValue(key, newValue);
 
   Stream<int> valueStream(int defaultValue) => _preferencesService
       .getIntPreferenceStream(key, defaultValue: defaultValue);
+
+
+  Future<int> getValue(int defaultValue) async =>
+      _preferencesService
+          .getIntPreference(key, defaultValue: defaultValue);
+
 }
 
 class BoolPreferencesBloc extends SimplePreferencesBloc<bool> {
   BoolPreferencesBloc(PreferencesService preferencesService, String key)
       : super(preferencesService, key);
 
-  Future<bool> setValue(bool newValue) async => doAsyncOperation(() async =>
-      await _preferencesService.setBoolPreferenceValue(key, newValue));
+  Future<bool> setValue(bool newValue) async =>
+      await _preferencesService.setBoolPreferenceValue(key, newValue);
 
   Stream<bool> valueStream(bool defaultValue) => _preferencesService
       .getBoolPreferenceStream(key, defaultValue: defaultValue);
+
+  Future<bool> getValue(bool defaultValue) async =>
+      _preferencesService
+          .getBoolPreference(key, defaultValue: defaultValue);
 }

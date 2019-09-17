@@ -7,15 +7,12 @@ class AppSkinBloc extends Providable {
   final PreferencesService preferencesService;
 
 
-  AppSkinBloc(this.preferencesService);
+  AppSkinBloc(this.preferencesService, UISkin startSkin) {
+    _skinController = BehaviorSubject<UISkin>(seedValue: startSkin);
+  }
 
-  //
-//
-//  AppSkinBloc(UISkin startSkin) {
-//    _skinController = BehaviorSubject<UISkin>(seedValue: startSkin);
-//  }
 
-  BehaviorSubject<UISkin> _skinController;
+  BehaviorSubject<UISkin> _skinController ;
 
   Stream<UISkin> get skinStream => _skinController.stream;
 

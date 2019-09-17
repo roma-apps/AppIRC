@@ -3,8 +3,11 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/local_preferences/preferences_model.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
+
+var _logger = MyLogger(logTag: "PreferencesService", enabled: true);
 
 class PreferencesService extends Providable {
   StreamingSharedPreferences _preferences;
@@ -22,8 +25,13 @@ class PreferencesService extends Providable {
     _preferences.clear();
   }
 
-  Future<bool> isKeyExist(String key) async =>
-      _preferences.getKeys().contains(key);
+  Future<bool> isKeyExist(String key) async {
+    Set<String> keys = _preferences.getKeys().getValue();
+    _logger.d(() => "isKeyExist $keys");
+    var contains = keys.contains(key);
+    _logger.d(() => "isKeyExist $key => $contains");
+    return contains;
+  }
 
   Future<bool> clearValue(String key) async => _preferences.remove(key);
 
@@ -45,15 +53,21 @@ class PreferencesService extends Providable {
           {@required bool defaultValue}) =>
       _preferences.getBool(key, defaultValue: defaultValue);
 
+  bool getBoolPreference(String key, {@required bool defaultValue}) =>
+      _preferences.getBool(key, defaultValue: defaultValue).getValue();
+
+  String getStringPreference(String key, {@required String defaultValue}) =>
+      _preferences.getString(key, defaultValue: defaultValue).getValue();
+
+  int getIntPreference(String key, {@required int defaultValue}) =>
+      _preferences.getInt(key, defaultValue: defaultValue).getValue();
+
   Future<bool> setBoolPreferenceValue(String key, bool value) async =>
       await _preferences.setBool(key, value);
-
 
   Future<bool> setJsonPreferences(
           String key, JsonPreferences preferencesObject) async =>
       await setJsonObjectAsString(key, preferencesObject.toJson());
-
-
 
   Stream<T> getJsonPreferencesStream<T>(
       String key, T jsonConverter(Map<String, dynamic> jsonData),
@@ -64,6 +78,15 @@ class PreferencesService extends Providable {
     });
   }
 
+  T getJsonPreferences<T>(
+      String key, T jsonConverter(Map<String, dynamic> jsonData),
+      {@required JsonPreferences defaultValue}) {
+    var stringPreference = getStringPreference(key,
+        defaultValue: json.encode(defaultValue.toJson()));
+    var jsonObject = json.decode(stringPreference);
+    return jsonObject != null ? jsonConverter(jsonObject) : null;
+  }
+
   Stream<Map<String, dynamic>> getJsonStream<T>(String key,
           {@required Map<String, dynamic> defaultValue}) =>
       getStringPreferenceStream(key, defaultValue: jsonEncode(defaultValue))
@@ -72,6 +95,4 @@ class PreferencesService extends Providable {
   Future<bool> setJsonObjectAsString(
           String key, Map<String, dynamic> jsonObject) async =>
       await setStringValue(key, json.encode(jsonObject));
-
-
 }

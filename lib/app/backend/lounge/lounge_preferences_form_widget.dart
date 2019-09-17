@@ -2,21 +2,36 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
-import 'package:flutter_appirc/app/widgets/form_widgets.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-var _logger = MyLogger(logTag: "LoungePreferencesWidget", enabled: true);
-
 class LoungePreferencesFormWidget extends StatefulWidget {
+  final LoungePreferences startValues;
+
+  LoungePreferencesFormWidget(this.startValues);
+
   @override
-  State<StatefulWidget> createState() => LoungePreferencesFormWidgetState();
+  State<StatefulWidget> createState() =>
+      LoungePreferencesFormWidgetState(startValues);
 }
 
 class LoungePreferencesFormWidgetState
     extends State<LoungePreferencesFormWidget> {
+  final LoungePreferences startValues;
+  TextEditingController _hostController;
+
+  LoungePreferencesFormWidgetState(this.startValues) {
+    _hostController = TextEditingController(text: startValues.host);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _hostController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var loungePreferencesFormBloc =
@@ -27,10 +42,11 @@ class LoungePreferencesFormWidgetState
         buildFormTitle(
             context, appLocalizations.tr('lounge.connection.settings')),
         buildFormTextRow(
-            appLocalizations.tr('lounge.connection.host'),
-            appLocalizations.tr('form.empty_field_not_valid'),
+            appLocalizations.tr('lounge.connection.host_label'),
+            appLocalizations.tr('lounge.connection.host_hint'),
             Icons.cloud,
-            loungePreferencesFormBloc.hostFieldBloc)
+            loungePreferencesFormBloc.hostFieldBloc,
+            _hostController)
       ],
     );
   }

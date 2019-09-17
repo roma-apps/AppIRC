@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:collection';
 
-
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
+import 'package:flutter_appirc/app/users/irc_network_channel_user_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_service.dart';
-import 'package:flutter_appirc/app/users/irc_network_channel_user_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 

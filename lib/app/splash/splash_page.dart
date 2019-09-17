@@ -1,8 +1,6 @@
 import 'package:easy_localization/easy_localization_delegate.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "SplashPage", enabled: true);
@@ -27,8 +25,6 @@ class SplashScreenState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
-    var uiSkin = Provider.of<UISkin>(context);
-
     if(!isAlreadyInit) {
       Future.delayed(Duration(milliseconds: 100), () {
         init(context);

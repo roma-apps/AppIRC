@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/channels/irc_network_channel_bloc.dart';
 import 'package:flutter_appirc/app/channels/irc_network_channel_new_message_bloc.dart';
 import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
 import 'package:flutter_appirc/app/skin/ui_skin.dart';
-
 import 'package:flutter_appirc/lounge/lounge_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
