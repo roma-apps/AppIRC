@@ -7,6 +7,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_page.dart';
+import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
@@ -27,6 +28,7 @@ Future main() async {
   var preferencesService = PreferencesService();
 
   await preferencesService.init();
+  preferencesService.clear();
   runApp(EasyLocalization(
       child: Provider(providable: preferencesService, child: AppIRC())));
 }
@@ -50,94 +52,130 @@ class AppIRC extends StatelessWidget {
               builder: (context, snapshot) {
                 var loungePreferences = snapshot.data;
 
-                var data = EasyLocalizationProvider.of(context).data;
-
-                return StreamBuilder<UISkin>(
-                    stream: appSkinBloc.skinStream,
-                    initialData: defaultUISkin,
-                    builder: (context, snapshot) {
-                      var uiSkin = snapshot.data;
-                      return Provider(
-                        providable: uiSkin,
-                        child: PlatformApp(
-                            title: "AppIRC",
-                            localizationsDelegates: [
-                              //app-specific localization
-                              EasylocaLizationDelegate(
-                                  locale: data.locale, path: 'assets/langs'),
-                            ],
-                            supportedLocales: [Locale('en', 'US')],
-                            locale: data.savedLocale,
-                            android: (_) =>
-                                MaterialAppData(theme: uiSkin.androidTheme),
-                            ios: (_) =>
-                                CupertinoAppData(theme: uiSkin.iosTheme),
-                            home: buildChatApp(loungePreferences, context)),
-                      );
-                    });
-              }),
-        ));
-  }
-
-  Widget buildChatApp(
-      LoungeConnectionPreferences loungePreferences, BuildContext context) {
-    var isHaveSavedPreferences =
-        loungePreferences == LoungeConnectionPreferences.empty;
-    if (isHaveSavedPreferences) {
-      return NewLoungePreferencesPage(createDefaultLoungePreferences(context));
-    } else {
-      var loungeBackendService =
-          LoungeBackendService(socketIOManager, loungePreferences);
-
-      return SplashPage((context) async {
-        await loungeBackendService.init();
-
-        var preferencesService = Provider.of<PreferencesService>(context);
-
-        var chatPreferencesBloc = ChatPreferencesLoaderBloc(preferencesService);
-
-        var networksListBloc = ChatNetworksListBloc(
-          loungeBackendService,
-          nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
-          nextChannelIdGenerator:
-              chatPreferencesBloc.getNextNetworkChannelLocalId,
-        );
-
-        var networkStatesBloc = ChatNetworksStateBloc(loungeBackendService, networksListBloc);
-        var channelsStatesBloc = ChatNetworkChannelsStateBloc(loungeBackendService, networksListBloc);
+                var loungeBackendService =
+                LoungeBackendService(socketIOManager, loungePreferences);
 
 
-        Navigator.pushReplacement(
-            context,
-            platformPageRoute(
-                builder: (_) => Provider<LoungeBackendService>(
+                var data = EasyLocalizationProvider
+                    .of(context)
+                    .data;
+
+
+                var preferencesService = Provider.of<PreferencesService>(
+                    context);
+
+                var chatPreferencesBloc = ChatPreferencesLoaderBloc(
+                    preferencesService);
+
+                var networksListBloc = ChatNetworksListBloc(
+                  loungeBackendService,
+                  nextNetworkIdGenerator: chatPreferencesBloc
+                      .getNextNetworkLocalId,
+                  nextChannelIdGenerator:
+                  chatPreferencesBloc.getNextNetworkChannelLocalId,
+                );
+
+                var connectionBloc = ChatConnectionBloc(loungeBackendService);
+                var networkStatesBloc = ChatNetworksStateBloc(
+                    loungeBackendService, networksListBloc);
+                var channelsStatesBloc = ChatNetworkChannelsStateBloc(
+                    loungeBackendService, networksListBloc);
+
+
+                return Provider<LoungeBackendService>(
+                  providable: loungeBackendService,
+                  child: Provider<ChatInputOutputBackendService>(
+                    providable: loungeBackendService,
+                    child: Provider<ChatOutputBackendService>(
                       providable: loungeBackendService,
-                      child: Provider<ChatInputOutputBackendService>(
+                      child: Provider<ChatInputBackendService>(
                         providable: loungeBackendService,
-                        child: Provider<ChatOutputBackendService>(
-                          providable: loungeBackendService,
-                          child: Provider<ChatInputBackendService>(
-                            providable: loungeBackendService,
+                        child: Provider(
+                          providable: chatPreferencesBloc,
+                          child: Provider(
+                            providable: connectionBloc,
                             child: Provider(
-                              providable: chatPreferencesBloc,
+                              providable: networksListBloc,
                               child: Provider(
-                                providable: networksListBloc,
+                                providable: networkStatesBloc,
                                 child: Provider(
-                                  providable: networkStatesBloc,
+                                  providable: channelsStatesBloc,
                                   child: Provider(
-                                    providable: channelsStatesBloc,
-                                    child: Provider(
-                                        providable: ChatPreferencesSaverBloc(
-                                            preferencesService, networksListBloc),
-                                        child: ChatPage()),
-                                  ),
+                                      providable: ChatPreferencesSaverBloc(
+                                          preferencesService, networksListBloc),
+                                      child: StreamBuilder<UISkin>(
+                                          stream: appSkinBloc.skinStream,
+                                          initialData: defaultUISkin,
+                                          builder: (context, snapshot) {
+                                            var uiSkin = snapshot.data;
+                                            return Provider(
+                                              providable: uiSkin,
+                                              child: PlatformApp(
+                                                  title: "AppIRC",
+                                                  localizationsDelegates: [
+                                                    //app-specific localization
+                                                    EasylocaLizationDelegate(
+                                                        locale: data.locale,
+                                                        path: 'assets/langs'),
+                                                  ],
+                                                  supportedLocales: [
+                                                    Locale('en', 'US')
+                                                  ],
+                                                  locale: data.savedLocale,
+                                                  android: (_) =>
+                                                      MaterialAppData(
+                                                          theme: uiSkin
+                                                              .androidTheme),
+                                                  ios: (_) =>
+                                                      CupertinoAppData(
+                                                          theme: uiSkin
+                                                              .iosTheme),
+                                                  home: buildChatApp(
+                                                      loungePreferences,
+                                                      context)),
+                                            );
+                                          })),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    )));
+                    ),
+                  ),
+                );
+              }),
+        ));
+  }
+
+  Widget buildChatApp(LoungeConnectionPreferences loungePreferences,
+      BuildContext context) {
+
+
+    var isHaveSavedPreferences =
+        loungePreferences != LoungeConnectionPreferences.empty;
+    if (!isHaveSavedPreferences) {
+      return NewLoungePreferencesPage(createDefaultLoungePreferences(context));
+    } else {
+      return SplashPage((context) async {
+
+
+
+        await  Provider.of<LoungeBackendService>(context).init();
+
+        await Provider.of<ChatPreferencesLoaderBloc>(context).init();
+
+        await Provider.of<ChatNetworksListBloc>(context).init();
+
+        await Provider.of<ChatConnectionBloc>(context).init();
+        await Provider.of<ChatNetworksStateBloc>(context).init();
+        await Provider.of<ChatNetworkChannelsStateBloc>(context).init();
+
+
+        Navigator.pushReplacement(
+            context,
+            platformPageRoute(
+                builder: (_) => ChatPage()));
       });
     }
   }

@@ -12,10 +12,7 @@ class ChatConnectionBloc extends Providable {
   final ChatInputOutputBackendService backendService;
 
   ChatConnectionBloc(this.backendService) {
-    addDisposable(
-        timer: Timer.periodic(reconnectDuration, (_) => _reconnectIfNeeded()));
 
-    _reconnectIfNeeded();
   }
 
   bool get isConnected => backendService.isConnected;
@@ -51,5 +48,12 @@ class ChatConnectionBloc extends Providable {
         backendService.connectChat();
       }
     }
+  }
+
+  Future init() async {
+    addDisposable(
+        timer: Timer.periodic(reconnectDuration, (_) => _reconnectIfNeeded()));
+
+    _reconnectIfNeeded();
   }
 }

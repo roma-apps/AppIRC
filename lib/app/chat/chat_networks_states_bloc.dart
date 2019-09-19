@@ -13,19 +13,7 @@ class ChatNetworksStateBloc extends Providable {
       Map<Network, BehaviorSubject<NetworkState>>();
 
   ChatNetworksStateBloc(this.backendService, this.networksListBloc) {
-    addDisposable(streamSubscription:
-        networksListBloc.lastJoinedNetworkStream.listen((network) {
-      _states[network] = BehaviorSubject<NetworkState>(seedValue: NetworkState.empty);
-      addDisposable(
-          disposable: backendService.listenForNetworkState(network, (state) {
-        _states[network].add(state);
-      }));
 
-      addDisposable(
-          disposable: backendService.listenForNetworkExit(network, () {
-        _states.remove(network).close();
-      }));
-    }));
   }
 
   Stream<NetworkState> getNetworkStateStream(Network network) =>
@@ -33,5 +21,21 @@ class ChatNetworksStateBloc extends Providable {
 
   NetworkState getNetworkState(Network network) =>
       _states[network].value;
+
+  Future init() async {
+    addDisposable(streamSubscription:
+    networksListBloc.lastJoinedNetworkStream.listen((network) {
+      _states[network] = BehaviorSubject<NetworkState>(seedValue: NetworkState.empty);
+      addDisposable(
+          disposable: backendService.listenForNetworkState(network,()=> _states[network].value, (state) {
+            _states[network].add(state);
+          }));
+
+      addDisposable(
+          disposable: backendService.listenForNetworkExit(network, () {
+            _states.remove(network).close();
+          }));
+    }));
+  }
 
 }

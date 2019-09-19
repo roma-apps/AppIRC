@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons, AppBar, Drawer;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
@@ -91,7 +92,7 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildAppBarChild(BuildContext context) {
-    var backendService = Provider.of<ChatBackendService>(context);
+    var backendService = Provider.of<LoungeBackendService>(context);
 
     var activeChannelBloc = Provider.of<IRCChatActiveChannelBloc>(context);
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
@@ -206,7 +207,7 @@ class ChatPage extends StatelessWidget {
               );
               break;
             case ChatConnectionState.CONNECTING:
-              return Text("Connecting to server");
+              return Center(child: Text("Connecting to server"));
               break;
             case ChatConnectionState.DISCONNECTED:
               return Center(

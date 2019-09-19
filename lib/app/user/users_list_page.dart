@@ -30,7 +30,7 @@ class IRCNetworkChannelUsersPageState
 
   @override
   Widget build(BuildContext context) {
-    var backendService = Provider.of<ChatInputBackendService>(context);
+    var backendService = Provider.of<ChatInputOutputBackendService>(context);
     var channelsStateBloc = Provider.of<ChatNetworkChannelsStateBloc>(context);
 
     var channelBloc =

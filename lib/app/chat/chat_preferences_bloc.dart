@@ -46,6 +46,8 @@ class ChatPreferencesLoaderBloc extends ChatPreferencesBloc {
     }
     return ++_maxNetworkChannelLocalId;
   }
+
+  Future init() async {}
 }
 
 class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
@@ -82,7 +84,7 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
   }
 }
 
-_isNeedSave(NetworkChannel channel) => channel.isLobby != true;
+_isNeedSave(NetworkChannel channel) => channel.type == IRCNetworkChannelType.CHANNEL;
 
 ChatPreferences _jsonConverter(Map<String, dynamic> json) =>
     ChatPreferences.fromJson(json);

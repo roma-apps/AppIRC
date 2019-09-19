@@ -17,7 +17,10 @@ class Network {
 
   final List<NetworkChannel> channels;
 
-  Network(
+
+  Network(this.connectionPreferences, this.remoteId, this.channels);
+
+  Network.name(
       {@required this.connectionPreferences,
       @required this.remoteId,
       @required this.channels});

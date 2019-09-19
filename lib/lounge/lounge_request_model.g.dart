@@ -9,7 +9,7 @@ part of 'lounge_request_model.dart';
 NamesLoungeRequestBody _$NamesLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return NamesLoungeRequestBody(
-    target: json['target'] as int,
+    json['target'] as int,
   );
 }
 

@@ -25,6 +25,17 @@ class LoungeConnectionPreferences extends JsonPreferences {
   static LoungeConnectionPreferences empty =
       LoungeConnectionPreferences(host: null);
 
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is LoungeConnectionPreferences &&
+              runtimeType == other.runtimeType &&
+              host == other.host;
+
+  @override
+  int get hashCode => host.hashCode;
+
   @override
   String toString() {
     return 'LoungeConnectionPreferences{host: $host}';

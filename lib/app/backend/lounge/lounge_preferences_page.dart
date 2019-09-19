@@ -1,6 +1,8 @@
+import 'package:adhara_socket_io/manager.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
@@ -187,13 +189,14 @@ Future tryConnect(BuildContext context, LoungeConnectionPreferences preferences,
     Future connectCallback(bool connected),
     Future exceptionCallback(Exception e)) async =>
     await doAsyncOperationWithDialog(context, () async {
-      var lounge = Provider.of<LoungeBackendService>(context);
+      var lounge = LoungeBackendService(SocketIOManager(), preferences);
 
-      var connected;
+      bool connected;
 
       Exception exception;
       try {
-        connected = await lounge.tryConnectWithDifferentPreferences(preferences);
+        var requestResult = await lounge.tryConnectWithDifferentPreferences(preferences);
+        connected = requestResult.result;
       } on Exception catch (e) {
         connected = false;
         exception = e;

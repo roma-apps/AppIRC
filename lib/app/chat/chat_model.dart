@@ -48,4 +48,10 @@ class ChannelUserInfo {
       this.connectedTo,
       this.connectedAt,
       this.idleSince);
+
+  ChannelUserInfo.name({this.nick, this.hostMask, this.realName, this.channels,
+      this.secureConnection, this.connectedTo, this.connectedAt, this.idleSince,
+      this.mode});
+
+
 }

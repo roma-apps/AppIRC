@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
-import 'package:flutter_appirc/app/chat/chat_drawer_page.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -14,7 +13,7 @@ typedef NetworkListener(Network network);
 typedef NetworkStateListener(NetworkState networkState);
 typedef NetworkChannelListener(NetworkChannel channel);
 typedef NetworkChannelStateListener(NetworkChannelState channelState);
-typedef NetworkChannelMessageListener(NetworkChannelMessage message);
+typedef NetworkChannelMessageListener(IRCChatMessage message);
 
 abstract class ChatBackendService implements Providable {
   Stream<ChatConnectionState> get connectionStateStream;
@@ -31,28 +30,30 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 
   ChatConnectionState get connectionState;
 
-  Disposable listenForNewNetworksList(NetworksListListener listener);
 
   Disposable listenForNetworkState(
-      Network network, NetworkStateListener listener);
+      Network network,
+      NetworkState Function() currentStateExtractor,
+      NetworkStateListener listener);
 
-  Disposable listenForNetworkEnter(
-      NetworkListener listener);
+  Disposable listenForNetworkEnter(NetworkListener listener);
 
-  Disposable listenForNetworkExit(Network network,
-       VoidCallback listener);
+  Disposable listenForNetworkExit(Network network, VoidCallback listener);
 
   Disposable listenForNetworkChannelJoin(
       Network network, NetworkChannelListener listener);
 
-  Disposable listenForNetworkChannelState(Network network,
-      NetworkChannel channel, NetworkChannelStateListener listener);
+  Disposable listenForNetworkChannelState(
+      Network network,
+      NetworkChannel channel,
+      NetworkChannelState Function() currentStateExtractor,
+      NetworkChannelStateListener listener);
 
   Disposable listenForNetworkChannelLeave(
       Network network, NetworkChannel channel, VoidCallback listener);
 
-  Disposable listenForNetworkChannelUsers(
-      Network network, NetworkChannel channel, Function(List<ChannelUserInfo>) listener);
+  Disposable listenForNetworkChannelUsers(Network network,
+      NetworkChannel channel, Function(List<ChannelUserInfo>) listener);
 
   Disposable listenForMessages(Network network, NetworkChannel channel,
       NetworkChannelMessageListener listener);

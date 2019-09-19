@@ -91,7 +91,9 @@ class NamesLoungeRequestBody extends LoungeRequestBody {
     return 'NamesLoungeRequestBody{target: $target}';
   }
 
-  NamesLoungeRequestBody({@required this.target});
+  NamesLoungeRequestBody(this.target);
+
+  NamesLoungeRequestBody.name({@required this.target});
 
   @override
   Map<String, dynamic> toJson() => _$NamesLoungeRequestBodyToJson(this);
