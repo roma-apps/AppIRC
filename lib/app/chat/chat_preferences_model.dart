@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter_appirc/app/networks/irc_network_model.dart';
+import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -18,16 +18,16 @@ class ChatPreferences extends JsonPreferences {
   int get maxNetworkChannelLocalId {
     var maxNetworkChannelLocalId = 0;
     networks.forEach((network) => network.channels.forEach((channel) =>
-    maxNetworkChannelLocalId =
-        max(maxNetworkChannelLocalId, channel.localId)));
+        maxNetworkChannelLocalId =
+            max(maxNetworkChannelLocalId, channel.localId)));
     return maxNetworkChannelLocalId;
   }
+
+  static final empty = ChatPreferences([]);
 
   final List<IRCNetworkPreferences> networks;
 
   ChatPreferences(this.networks);
-
-  ChatPreferences.name({this.networks = const []});
 
   factory ChatPreferences.fromJson(Map<String, dynamic> json) =>
       _$ChatPreferencesFromJson(json);

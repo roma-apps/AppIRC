@@ -52,7 +52,7 @@ class UISkin extends Providable {
           channelMessagesNickTextStyle: iosTextTheme.navTitleTextStyle,
           channelMessagesDateTextStyle: iosTextTheme.navTitleTextStyle,
           networksListChannelTextStyle: iosTextTheme.textStyle,
-          topicTextStyle: iosTextTheme.textStyle.copyWith(color: Colors.white),
+          topicTextStyle: iosTextTheme.textStyle.copyWith(color: Colors.white, fontSize: 12, fontWeight: FontWeight.normal),
           networksListActiveChannelTextStyle: iosTextTheme.navTitleTextStyle,
           networksListActiveNetworkTextStyle: iosTextTheme.navTitleTextStyle,
           enterMessageTextStyle: iosTextTheme.textStyle.copyWith(color: Colors.white),
@@ -65,7 +65,7 @@ class UISkin extends Providable {
           channelMessagesNickTextStyle: androidTheme.textTheme.body1.copyWith(fontWeight: FontWeight.bold),
           channelMessagesDateTextStyle: androidTheme.textTheme.caption,
           networksListChannelTextStyle: androidTheme.textTheme.body2,
-          topicTextStyle: androidTheme.textTheme.headline.copyWith(color: Colors.white),
+          topicTextStyle: androidTheme.textTheme.headline.copyWith(color: Colors.white, fontSize: 12, fontWeight: FontWeight.normal),
           networksListActiveChannelTextStyle: androidTheme.textTheme.title,
           networksListActiveNetworkTextStyle: androidTextTheme.title,
           channelMessagesBodyTextStyle:  androidTheme.textTheme.body1.copyWith(height: 1.5),
@@ -77,8 +77,6 @@ class UISkin extends Providable {
 
   static UISkin of(BuildContext context) => Provider.of<UISkin>(context);
 
-  @override
-  void dispose() {}
 }
 
 

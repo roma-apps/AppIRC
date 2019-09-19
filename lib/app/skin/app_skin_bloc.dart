@@ -9,15 +9,14 @@ class AppSkinBloc extends Providable {
 
   AppSkinBloc(this.preferencesService, UISkin startSkin) {
     _skinController = BehaviorSubject<UISkin>(seedValue: startSkin);
+    addDisposable(subject: _skinController);
   }
 
 
+  // ignore: close_sinks
   BehaviorSubject<UISkin> _skinController ;
 
   Stream<UISkin> get skinStream => _skinController.stream;
 
-  @override
-  void dispose() {
-    _skinController.close();
-  }
+
 }

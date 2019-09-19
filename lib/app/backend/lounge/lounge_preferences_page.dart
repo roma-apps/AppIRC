@@ -11,10 +11,10 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 typedef PreferencesActionCallback = void Function(
-    BuildContext context, LoungePreferences preferences);
+    BuildContext context, LoungeConnectionPreferences preferences);
 
 class NewLoungePreferencesPage extends LoungePreferencesPage {
-  NewLoungePreferencesPage(LoungePreferences startPreferencesValues)
+  NewLoungePreferencesPage(LoungeConnectionPreferences startPreferencesValues)
       : super(startPreferencesValues, (context, preferences) async {
     return await _newPreferencesCallback(
         context, preferences, startPreferencesValues);
@@ -22,7 +22,7 @@ class NewLoungePreferencesPage extends LoungePreferencesPage {
 }
 
 class EditLoungePreferencesPage extends LoungePreferencesPage {
-  EditLoungePreferencesPage(LoungePreferences startPreferencesValues)
+  EditLoungePreferencesPage(LoungeConnectionPreferences startPreferencesValues)
       : super(startPreferencesValues, (context, preferences) async {
     return await _editPreferencesCallback(
         context, preferences, startPreferencesValues);
@@ -30,12 +30,12 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
 }
 
 void savePreferences(BuildContext context,
-    LoungePreferences startPreferencesValues) {
+    LoungeConnectionPreferences startPreferencesValues) {
   Provider.of<LoungePreferencesBloc>(context).setValue(startPreferencesValues);
 }
 
 class LoungePreferencesPage extends StatefulWidget {
-  final LoungePreferences startPreferencesValues;
+  final LoungeConnectionPreferences startPreferencesValues;
   final PreferencesActionCallback actionCallback;
 
   LoungePreferencesPage(this.startPreferencesValues, this.actionCallback);
@@ -48,7 +48,7 @@ class LoungePreferencesPage extends StatefulWidget {
 
 class LoungePreferencesPageState extends State<LoungePreferencesPage> {
   final PreferencesActionCallback actionCallback;
-  final LoungePreferences startPreferencesValues;
+  final LoungeConnectionPreferences startPreferencesValues;
   LoungePreferencesFormBloc loungePreferencesFormBloc;
 
 
@@ -84,7 +84,7 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Provider<LoungePreferencesFormBloc>(
-            bloc: loungePreferencesFormBloc,
+            providable: loungePreferencesFormBloc,
             child: Column(
               children: <Widget>[
                 LoungePreferencesFormWidget(startPreferencesValues),
@@ -126,8 +126,8 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
 
 
 Future _editPreferencesCallback(BuildContext context,
-    LoungePreferences preferences,
-    LoungePreferences startPreferencesValues) async =>
+    LoungeConnectionPreferences preferences,
+    LoungeConnectionPreferences startPreferencesValues) async =>
     await tryConnect(context, preferences, (connected) async {
       if (connected) {
         var appLocalizations = AppLocalizations.of(context);
@@ -168,8 +168,8 @@ Future _editPreferencesCallback(BuildContext context,
     });
 
 Future _newPreferencesCallback(BuildContext context,
-    LoungePreferences preferences,
-    LoungePreferences startPreferencesValues) async =>
+    LoungeConnectionPreferences preferences,
+    LoungeConnectionPreferences startPreferencesValues) async =>
     await tryConnect(context, preferences, (connected) async {
       if (connected) {
         savePreferences(context, startPreferencesValues);
@@ -183,7 +183,7 @@ Future _newPreferencesCallback(BuildContext context,
       );
     });
 
-Future tryConnect(BuildContext context, LoungePreferences preferences,
+Future tryConnect(BuildContext context, LoungeConnectionPreferences preferences,
     Future connectCallback(bool connected),
     Future exceptionCallback(Exception e)) async =>
     await doAsyncOperationWithDialog(context, () async {
@@ -193,7 +193,7 @@ Future tryConnect(BuildContext context, LoungePreferences preferences,
 
       Exception exception;
       try {
-        connected = await lounge.tryConnect(preferences);
+        connected = await lounge.tryConnectWithDifferentPreferences(preferences);
       } on Exception catch (e) {
         connected = false;
         exception = e;

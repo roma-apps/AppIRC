@@ -16,11 +16,6 @@ class PreferencesService extends Providable {
     _preferences = await StreamingSharedPreferences.instance;
   }
 
-  @override
-  void dispose() {
-    _preferences = null;
-  }
-
   void clear() {
     _preferences.clear();
   }
@@ -53,15 +48,6 @@ class PreferencesService extends Providable {
           {@required bool defaultValue}) =>
       _preferences.getBool(key, defaultValue: defaultValue);
 
-  bool getBoolPreference(String key, {@required bool defaultValue}) =>
-      _preferences.getBool(key, defaultValue: defaultValue).getValue();
-
-  String getStringPreference(String key, {@required String defaultValue}) =>
-      _preferences.getString(key, defaultValue: defaultValue).getValue();
-
-  int getIntPreference(String key, {@required int defaultValue}) =>
-      _preferences.getInt(key, defaultValue: defaultValue).getValue();
-
   Future<bool> setBoolPreferenceValue(String key, bool value) async =>
       await _preferences.setBool(key, value);
 
@@ -78,6 +64,26 @@ class PreferencesService extends Providable {
     });
   }
 
+  Stream<Map<String, dynamic>> getJsonStream<T>(String key,
+          {@required Map<String, dynamic> defaultValue}) =>
+      getStringPreferenceStream(key, defaultValue: jsonEncode(defaultValue))
+          .map((stringJson) => json.decode(stringJson));
+
+  Future<bool> setJsonObjectAsString(
+          String key, Map<String, dynamic> jsonObject) async =>
+      await setStringValue(key, json.encode(jsonObject));
+
+
+  bool getBoolPreference(String key, {@required bool defaultValue}) =>
+      _preferences.getBool(key, defaultValue: defaultValue).getValue();
+
+  String getStringPreference(String key, {@required String defaultValue}) =>
+      _preferences.getString(key, defaultValue: defaultValue).getValue();
+
+  int getIntPreference(String key, {@required int defaultValue}) =>
+      _preferences.getInt(key, defaultValue: defaultValue).getValue();
+
+
   T getJsonPreferences<T>(
       String key, T jsonConverter(Map<String, dynamic> jsonData),
       {@required JsonPreferences defaultValue}) {
@@ -87,12 +93,5 @@ class PreferencesService extends Providable {
     return jsonObject != null ? jsonConverter(jsonObject) : null;
   }
 
-  Stream<Map<String, dynamic>> getJsonStream<T>(String key,
-          {@required Map<String, dynamic> defaultValue}) =>
-      getStringPreferenceStream(key, defaultValue: jsonEncode(defaultValue))
-          .map((stringJson) => json.decode(stringJson));
 
-  Future<bool> setJsonObjectAsString(
-          String key, Map<String, dynamic> jsonObject) async =>
-      await setStringValue(key, json.encode(jsonObject));
 }

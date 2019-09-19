@@ -62,6 +62,7 @@ abstract class FormFieldBloc<T> extends Providable {
   BehaviorSubject<ValidationError>(seedValue: null);
 
   Stream<ValidationError> get errorStream => _validationErrorController.stream;
+
   ValidationError get error => _validationErrorController.value;
 
   Stream<bool> get dataValidStream =>
@@ -71,13 +72,14 @@ abstract class FormFieldBloc<T> extends Providable {
 
   final List<Validator<T>> validators;
 
-  FormFieldBloc(this.validators);
+  FormFieldBloc(this.validators) {
+    addDisposable(subject: _validationErrorController);
+  }
 
   void onNewError(ValidationError newError) {
-    if(error != newError) {
+    if (error != newError) {
       _validationErrorController.add(newError);
     }
-
   }
 
   Future<ValidationError> validate() async {
@@ -92,23 +94,17 @@ abstract class FormFieldBloc<T> extends Providable {
     return error;
   }
 
-  @override
-  void dispose() {
-    _validationErrorController.close();
-  }
 }
 
 abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
   var listeners = <StreamSubscription>[];
-  
-  FormBloc() : super([FormFieldValidator()]) {
 
-    Future.delayed(Duration(milliseconds: 1),() {
+  FormBloc() : super([FormFieldValidator()]) {
+    Future.delayed(Duration(milliseconds: 1), () {
       children.forEach((child) {
-        listeners.add(child.errorStream.listen((_) => onDataChanged()) );
+        listeners.add(child.errorStream.listen((_) => onDataChanged()));
       });
     });
-
   }
 
   List<FormFieldBloc> get children;
@@ -118,31 +114,28 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
 
   @override
   void dispose() {
+    super.dispose();
     children.forEach((bloc) => bloc.dispose());
     listeners.forEach((listener) => listener.cancel());
   }
 
   onDataChanged() {
-
     var error;
-    for(var child in children) {
+    for (var child in children) {
       error = child.error;
-      if(error != null) {
+      if (error != null) {
         break;
       }
     }
 
     onNewError(error);
-
   }
 }
-
 
 
 class FormValueFieldBloc<T> extends FormFieldBloc<T> {
   T _currentValue;
 
-  StreamSubscription<T> _listener;
 
   BehaviorSubject<T> _valueController = BehaviorSubject<T>();
 
@@ -152,23 +145,19 @@ class FormValueFieldBloc<T> extends FormFieldBloc<T> {
 
   FormValueFieldBloc(T startValue, {List<Validator<T>> validators = const []})
       : super(validators) {
-    _listener = valueStream.listen((newValue) async => onNewError(await validate()));
+    addDisposable(streamSubscription: valueStream.listen((newValue) async =>
+        onNewError(await validate())));
+    addDisposable(subject: _valueController);
     onNewValue(startValue);
   }
 
   void onNewValue(T newValue) {
-    if(_currentValue != newValue) {
+    if (_currentValue != newValue) {
       _currentValue = newValue;
       _valueController.add(newValue);
     }
   }
 
-
-  @override
-  void dispose() {
-    _listener.cancel();
-    _valueController.close();
-  }
 }
 
 class NotEmptyTextValidator extends Validator<String> {

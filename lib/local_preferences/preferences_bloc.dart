@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/local_preferences/preferences_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -13,16 +14,12 @@ abstract class PreferencesBloc<T> extends Providable {
 
   Future<bool> clearValue() => _preferencesService.clearValue(key);
 
-  Future<T> getValue(T defaultValue);
+  Future<T> getValue({@required T defaultValue});
 
   Future<bool> setValue(T newValue);
 
-  Stream<T> valueStream(T defaultValue);
+  Stream<T> valueStream({@required T defaultValue});
 
-
-  @override
-  void dispose() {
-  }
 
 }
 
@@ -37,10 +34,10 @@ class JsonPreferencesBloc<T extends JsonPreferences>
 
   Future<bool> setValue(T newValue) async =>  await _preferencesService.setJsonPreferences(key, newValue);
 
-  Stream<T> valueStream(T defaultValue) => _preferencesService
+  Stream<T> valueStream({@required T defaultValue}) => _preferencesService
       .getJsonPreferencesStream(key, jsonConverter, defaultValue: defaultValue);
 
-  Future<T> getValue(T defaultValue) async =>
+  Future<T> getValue({@required T defaultValue}) async =>
       await _preferencesService
           .getJsonPreferences(key, jsonConverter, defaultValue: defaultValue);
 }
@@ -57,11 +54,11 @@ class IntPreferencesBloc extends SimplePreferencesBloc<int> {
   Future<bool> setValue(int newValue) async =>
       await _preferencesService.setIntPreferenceValue(key, newValue);
 
-  Stream<int> valueStream(int defaultValue) => _preferencesService
+  Stream<int> valueStream({@required int defaultValue}) => _preferencesService
       .getIntPreferenceStream(key, defaultValue: defaultValue);
 
 
-  Future<int> getValue(int defaultValue) async =>
+  Future<int> getValue({@required int defaultValue}) async =>
       _preferencesService
           .getIntPreference(key, defaultValue: defaultValue);
 
@@ -74,10 +71,10 @@ class BoolPreferencesBloc extends SimplePreferencesBloc<bool> {
   Future<bool> setValue(bool newValue) async =>
       await _preferencesService.setBoolPreferenceValue(key, newValue);
 
-  Stream<bool> valueStream(bool defaultValue) => _preferencesService
+  Stream<bool> valueStream({@required bool defaultValue}) => _preferencesService
       .getBoolPreferenceStream(key, defaultValue: defaultValue);
 
-  Future<bool> getValue(bool defaultValue) async =>
+  Future<bool> getValue({@required bool defaultValue}) async =>
       _preferencesService
           .getBoolPreference(key, defaultValue: defaultValue);
 }

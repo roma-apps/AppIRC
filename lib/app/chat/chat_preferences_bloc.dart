@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter_appirc/app/chat/chat_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
+import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
-import 'package:flutter_appirc/app/networks/irc_network_channel_model.dart';
-import 'package:flutter_appirc/app/networks/irc_network_model.dart';
+import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 
@@ -25,7 +25,7 @@ class ChatPreferencesLoaderBloc extends ChatPreferencesBloc {
 
   Future<int> getNextNetworkLocalId() async {
     if (_maxNetworkLocalId == null) {
-      var preferences = (await getValue(_emptyPreferences));
+      var preferences = (await getValue(defaultValue: _emptyPreferences));
       var localIds = preferences.networks.map((network) => network.localId);
       _maxNetworkLocalId = 0;
       localIds.forEach(
@@ -36,7 +36,7 @@ class ChatPreferencesLoaderBloc extends ChatPreferencesBloc {
 
   Future<int> getNextNetworkChannelLocalId() async {
     if (_maxNetworkChannelLocalId == null) {
-      var preferences = (await getValue(_emptyPreferences));
+      var preferences = (await getValue(defaultValue: _emptyPreferences));
       var localIds = <int>[];
       preferences.networks.forEach((network) =>
           network.channels.forEach((channel) => localIds.add(channel.localId)));
@@ -49,9 +49,9 @@ class ChatPreferencesLoaderBloc extends ChatPreferencesBloc {
 }
 
 class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
-  final ChatBloc chatBloc;
+  final ChatNetworksListBloc chatBloc;
 
-  StreamSubscription<List<IRCNetwork>> networksSubscription;
+  StreamSubscription<List<Network>> networksSubscription;
 
   ChatPreferencesSaverBloc(PreferencesService preferencesService, this.chatBloc)
       : super(preferencesService) {
@@ -82,7 +82,7 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
   }
 }
 
-_isNeedSave(IRCNetworkChannel channel) => channel.isLobby != true;
+_isNeedSave(NetworkChannel channel) => channel.isLobby != true;
 
 ChatPreferences _jsonConverter(Map<String, dynamic> json) =>
     ChatPreferences.fromJson(json);

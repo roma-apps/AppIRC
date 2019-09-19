@@ -6,10 +6,10 @@ const _preferencesStorageKey = "lounge.connection";
 
 
 
-LoungePreferences _jsonConverter(Map<String, dynamic> json) =>
-    LoungePreferences.fromJson(json);
+LoungeConnectionPreferences _jsonConverter(Map<String, dynamic> json) =>
+    LoungeConnectionPreferences.fromJson(json);
 
-class LoungePreferencesBloc extends JsonPreferencesBloc<LoungePreferences> {
+class LoungePreferencesBloc extends JsonPreferencesBloc<LoungeConnectionPreferences> {
   LoungePreferencesBloc(PreferencesService preferencesService)
       : super(preferencesService, _preferencesStorageKey, 1, _jsonConverter);
 }

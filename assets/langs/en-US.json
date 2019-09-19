@@ -114,6 +114,11 @@
     "enter_message": {
       "hint": "Enter message..."
     },
+    "connection": {
+      "connected": "Connected to server",
+      "connecting": "Connecting to server",
+      "disconnected": "Not connected to server"
+    },
     "sub_message": {
       "mode_short": "mode {}",
       "mode_long": "mode",

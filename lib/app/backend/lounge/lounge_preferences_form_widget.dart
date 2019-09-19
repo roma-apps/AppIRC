@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class LoungePreferencesFormWidget extends StatefulWidget {
-  final LoungePreferences startValues;
+  final LoungeConnectionPreferences startValues;
 
   LoungePreferencesFormWidget(this.startValues);
 
@@ -19,7 +20,7 @@ class LoungePreferencesFormWidget extends StatefulWidget {
 
 class LoungePreferencesFormWidgetState
     extends State<LoungePreferencesFormWidget> {
-  final LoungePreferences startValues;
+  final LoungeConnectionPreferences startValues;
   TextEditingController _hostController;
 
   LoungePreferencesFormWidgetState(this.startValues) {
@@ -64,12 +65,6 @@ PlatformAlertDialog buildLoungeConnectionErrorAlertDialog(
 
     if (connectionException != null) {
       switch (connectionException.runtimeType) {
-        case AlreadyConnectedLoungeException:
-          title = appLocalizations
-              .tr('lounge.connection.dialog.already_connected.title');
-          content = appLocalizations
-              .tr('lounge.connection.dialog.already_connected.content');
-          break;
         case ConnectionTimeoutLoungeException:
           title = appLocalizations
               .tr('lounge.connection.dialog.connection_timeout.title');
