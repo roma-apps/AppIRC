@@ -247,13 +247,16 @@ class LoungeBackendService extends Providable
     var networkPreferences =
         preferences.networkConnectionPreferences.serverPreferences;
 
+    var channelsWithoutPassword = preferences.channelsWithoutPassword;
+    var channelNames = channelsWithoutPassword.map((channel) => channel.name);
+    String join = channelNames
+              .join(LoungeConstants.channelsNamesSeparator);
     var request = LoungeJsonRequest(
         name: LoungeRequestEventNames.networkNew,
         body: NetworkNewLoungeRequestBody(
           username: userPreferences.username,
           nick: userPreferences.nickname,
-          join: preferences.channelsWithoutPassword.map((channel) => channel.name)
-              .join(LoungeConstants.channelsNamesSeparator),
+          join: join,
           realname: userPreferences.realName,
           password: userPreferences.password,
           host: networkPreferences.serverHost,

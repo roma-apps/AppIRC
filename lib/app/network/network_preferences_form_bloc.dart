@@ -21,7 +21,7 @@ class IRCNetworkPreferencesFormBloc extends FormBloc {
         preferences.networkConnectionPreferences.userPreferences);
 
     channelsFieldBloc = FormValueFieldBloc<String>(
-        preferences.channelsWithoutPassword.join(channelsNamesSeparator),
+        preferences.channelsWithoutPassword.map((channel) => channel.name).join(channelsNamesSeparator),
         validators: [NotEmptyTextValidator()]);
   }
 

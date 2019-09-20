@@ -63,15 +63,14 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
       if (initBloc.initStarted) {
         var newNetworksSettings = networks.map((network) {
           var connectionPreferences = network.connectionPreferences;
-          var channels = <IRCNetworkChannelPreferences>[];
 
           assert(connectionPreferences.localId != null);
-          network.channels
+          var channels = network.channels
               .where((channel) => _isNeedSave(channel))
               .map((channel) {
             assert(channel.channelPreferences.localId != null);
             return channel.channelPreferences;
-          });
+          }).toList();
           return IRCNetworkPreferences(connectionPreferences, channels);
         }).toList();
         var newPreferences = ChatPreferences(newNetworksSettings);

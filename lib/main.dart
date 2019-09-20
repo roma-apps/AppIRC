@@ -82,8 +82,8 @@ class AppIRCState extends State<AppIRC> {
       return _buildApp(SplashPage());
     } else {
       if (loungeConnectionPreferences == null) {
-        return _buildApp(SplashPage());
-//        return _buildAppForStartLoungePreferences();
+
+        return _buildAppForStartLoungePreferences();
       } else {
 
         if (loungeBackendService == null) {

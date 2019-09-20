@@ -31,6 +31,7 @@ class IRCNetworkPreferencesFormWidgetState
   IRCNetworkPreferencesFormWidgetState(this.startValues, this.callback) {
     _channelsController = TextEditingController(
         text: startValues.channelsWithoutPassword
+            .map((channel) => channel.name)
             .join(IRCNetworkPreferencesFormBloc.channelsNamesSeparator));
   }
 
