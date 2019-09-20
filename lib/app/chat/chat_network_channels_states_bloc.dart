@@ -25,7 +25,10 @@ class ChatNetworkChannelsStateBloc extends Providable {
       _messagesBlocs[channel];
 
   ChatNetworkChannelsStateBloc(this.backendService, this.networksListBloc) {
-
+    addDisposable(streamSubscription:
+    networksListBloc.lastJoinedNetworkStream.listen((network) {
+      onNetworkJoined(network);
+    }));
   }
 
   void onNetworkJoined(Network network) {
@@ -88,10 +91,5 @@ class ChatNetworkChannelsStateBloc extends Providable {
           Network network, NetworkChannel networkChannel) =>
       _states[network][networkChannel].value;
 
-  Future init() async {
-    addDisposable(streamSubscription:
-    networksListBloc.lastJoinedNetworkStream.listen((network) {
-      onNetworkJoined(network);
-    }));
-  }
+
 }

@@ -34,4 +34,11 @@ class ChatPreferences extends JsonPreferences {
 
   @override
   Map<String, dynamic> toJson() => _$ChatPreferencesToJson(this);
+
+  @override
+  String toString() {
+    return 'ChatPreferences{networks: $networks}';
+  }
+
+
 }

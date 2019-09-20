@@ -23,15 +23,11 @@ abstract class ChatBackendService implements Providable {
   ChatConnectionState get connectionState;
 
   ChatConfig get chatConfig;
+
+  bool get isReadyToConnect;
 }
 
 abstract class ChatOutputBackendService implements ChatBackendService {
-  Stream<ChatConnectionState> get connectionStateStream;
-
-  bool get isConnected;
-
-  ChatConnectionState get connectionState;
-
 
   Disposable listenForNetworkState(
       Network network,
@@ -62,11 +58,7 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 }
 
 abstract class ChatInputBackendService implements ChatBackendService {
-  Stream<ChatConnectionState> get connectionStateStream;
 
-  bool get isConnected;
-
-  ChatConnectionState get connectionState;
 
   Future<RequestResult<bool>> connectChat();
 
@@ -129,4 +121,6 @@ abstract class ChatInputBackendService implements ChatBackendService {
 }
 
 abstract class ChatInputOutputBackendService
-    implements ChatInputBackendService, ChatOutputBackendService {}
+    implements ChatInputBackendService, ChatOutputBackendService {
+
+}

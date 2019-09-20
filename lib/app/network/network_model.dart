@@ -17,7 +17,6 @@ class Network {
 
   final List<NetworkChannel> channels;
 
-
   Network(this.connectionPreferences, this.remoteId, this.channels);
 
   Network.name(
@@ -136,17 +135,17 @@ class IRCNetworkPreferences extends JsonPreferences {
         'channels: $channels}';
   }
 
-  String get channelsString =>
-      channels.map((channel) => channel.name).join(channelsSeparator);
+  @JsonKey(ignore: true)
+  List<IRCNetworkChannelPreferences> get channelsWithoutPassword => channels
+      .where(
+          (channel) => (channel.password == null || channel.password.isEmpty))
+      .toList();
 
   @JsonKey(ignore: true)
-  set channelsString(String newValue) => channels = newValue != null
-      ? newValue
-          .split(channelsSeparator)
-          .map((channelName) => IRCNetworkChannelPreferences.name(
-              name: channelName, password: ""))
-          .toList()
-      : [];
+  List<IRCNetworkChannelPreferences> get channelsWithPassword => channels
+      .where((channel) =>
+          (channel.password != null && channel.password.isNotEmpty))
+      .toList();
 
   factory IRCNetworkPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkPreferencesFromJson(json);

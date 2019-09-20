@@ -75,7 +75,7 @@ IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(
             ? null
             : IRCNetworkChannelPreferences.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-  )..channelsString = json['channelsString'] as String;
+  );
 }
 
 Map<String, dynamic> _$IRCNetworkPreferencesToJson(
@@ -83,7 +83,6 @@ Map<String, dynamic> _$IRCNetworkPreferencesToJson(
     <String, dynamic>{
       'networkConnectionPreferences': instance.networkConnectionPreferences,
       'channels': instance.channels,
-      'channelsString': instance.channelsString,
     };
 
 IRCNetworkConnectionPreferences _$IRCNetworkConnectionPreferencesFromJson(

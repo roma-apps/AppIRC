@@ -10,6 +10,7 @@ import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "LoungePreferencesPage", enabled: true);
@@ -21,7 +22,7 @@ class NewLoungePreferencesPage extends LoungePreferencesPage {
   NewLoungePreferencesPage(LoungeConnectionPreferences startPreferencesValues)
       : super(startPreferencesValues, (context, preferences) async {
     return await _newPreferencesCallback(
-        context, preferences, startPreferencesValues);
+        context, preferences);
   });
 }
 
@@ -29,14 +30,10 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
   EditLoungePreferencesPage(LoungeConnectionPreferences startPreferencesValues)
       : super(startPreferencesValues, (context, preferences) async {
     return await _editPreferencesCallback(
-        context, preferences, startPreferencesValues);
+        context, preferences);
   });
 }
 
-void savePreferences(BuildContext context,
-    LoungeConnectionPreferences startPreferencesValues) {
-  Provider.of<LoungePreferencesBloc>(context).setValue(startPreferencesValues);
-}
 
 class LoungePreferencesPage extends StatefulWidget {
   final LoungeConnectionPreferences startPreferencesValues;
@@ -125,14 +122,16 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
 
 
 _editPreferencesCallback(BuildContext context,
-    LoungeConnectionPreferences preferences,
-    LoungeConnectionPreferences startPreferencesValues) async {
+    LoungeConnectionPreferences preferences) async {
 
   try {
     bool connected = await doAsyncOperationWithDialog(
         context, () async => await tryConnect(context, preferences));
 
     if (connected) {
+      var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
+
+
       var appLocalizations = AppLocalizations.of(context);
       showPlatformDialog(
           androidBarrierDismissible: true,
@@ -148,7 +147,11 @@ _editPreferencesCallback(BuildContext context,
                     child: Text(appLocalizations.tr(
                         "lounge.connection.edit.confirm_dialog.save_reload")),
                     onPressed: () async {
-                      savePreferences(context, startPreferencesValues);
+                      // exit dialog
+                      Navigator.pop(context);
+                      // exit edit page
+                      Navigator.pop(context);
+                      loungePreferencesBloc.setValue(preferences);
                     },
                   ),
                   PlatformDialogAction(
@@ -193,8 +196,7 @@ void _showInvalidResponseDialog(BuildContext context, InvalidConnectionResponseE
 }
 
 _newPreferencesCallback(BuildContext context,
-    LoungeConnectionPreferences preferences,
-    LoungeConnectionPreferences startPreferencesValues) async {
+    LoungeConnectionPreferences preferences) async {
 
 
   try {
@@ -202,7 +204,7 @@ _newPreferencesCallback(BuildContext context,
         context, () async => await tryConnect(context, preferences));
 
     if (connected) {
-      savePreferences(context, startPreferencesValues);
+      Provider.of<LoungePreferencesBloc>(context).setValue(preferences);
     } else {
       _showErrorDialog(context);
     }
@@ -215,7 +217,10 @@ _newPreferencesCallback(BuildContext context,
 
 Future<bool> tryConnect(BuildContext context,
     LoungeConnectionPreferences preferences) async {
-  var lounge = Provider.of<LoungeBackendService>(context);
+
+
+  var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
+  var lounge = LoungeBackendService(socketManagerProvider.manager, preferences);
 
   bool connected;
 

@@ -29,8 +29,9 @@ class IRCNetworkPreferencesFormWidgetState
   TextEditingController _channelsController;
 
   IRCNetworkPreferencesFormWidgetState(this.startValues, this.callback) {
-    _channelsController =
-        TextEditingController(text: startValues.channelsString);
+    _channelsController = TextEditingController(
+        text: startValues.channelsWithoutPassword
+            .join(IRCNetworkPreferencesFormBloc.channelsNamesSeparator));
   }
 
   @override

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_appirc/app/channel/channel_model.dart';
+import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -47,44 +48,42 @@ class ChatPreferencesLoaderBloc extends ChatPreferencesBloc {
     return ++_maxNetworkChannelLocalId;
   }
 
-  Future init() async {}
 }
 
 class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
   final ChatNetworksListBloc chatBloc;
+  final ChatInitBloc initBloc;
 
-  StreamSubscription<List<Network>> networksSubscription;
 
-  ChatPreferencesSaverBloc(PreferencesService preferencesService, this.chatBloc)
+  ChatPreferencesSaverBloc(PreferencesService preferencesService, this.chatBloc, this.initBloc)
       : super(preferencesService) {
-    networksSubscription = chatBloc.networksStream.listen((networks) async {
-      var newNetworksSettings = networks.map((network) {
-        var connectionPreferences = network.connectionPreferences;
-        var channels = <IRCNetworkChannelPreferences>[];
+    addDisposable(streamSubscription: chatBloc.networksStream.listen((networks) async {
 
-        assert(connectionPreferences.localId != null);
-        network.channels
-            .where((channel) => _isNeedSave(channel))
-            .map((channel) {
-          assert(channel.channelPreferences.localId != null);
-          return channel.channelPreferences;
-        });
-        return IRCNetworkPreferences(connectionPreferences, channels);
-      }).toList();
-      var newPreferences = ChatPreferences(newNetworksSettings);
+      // don't save empty networks before init data was sent
+      if (initBloc.initStarted) {
+        var newNetworksSettings = networks.map((network) {
+          var connectionPreferences = network.connectionPreferences;
+          var channels = <IRCNetworkChannelPreferences>[];
 
-      setValue(newPreferences);
-    });
-  }
+          assert(connectionPreferences.localId != null);
+          network.channels
+              .where((channel) => _isNeedSave(channel))
+              .map((channel) {
+            assert(channel.channelPreferences.localId != null);
+            return channel.channelPreferences;
+          });
+          return IRCNetworkPreferences(connectionPreferences, channels);
+        }).toList();
+        var newPreferences = ChatPreferences(newNetworksSettings);
 
-  @override
-  void dispose() {
-    super.dispose();
-    networksSubscription.cancel();
+        setValue(newPreferences);
+      }
+    }));
   }
 }
 
-_isNeedSave(NetworkChannel channel) => channel.type == IRCNetworkChannelType.CHANNEL;
+_isNeedSave(NetworkChannel channel) =>
+    channel.type == IRCNetworkChannelType.CHANNEL;
 
 ChatPreferences _jsonConverter(Map<String, dynamic> json) =>
     ChatPreferences.fromJson(json);

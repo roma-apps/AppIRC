@@ -20,7 +20,7 @@ class PreferencesService extends Providable {
     _preferences.clear();
   }
 
-  Future<bool> isKeyExist(String key) async {
+  bool isKeyExist(String key)  {
     Set<String> keys = _preferences.getKeys().getValue();
     _logger.d(() => "isKeyExist $keys");
     var contains = keys.contains(key);

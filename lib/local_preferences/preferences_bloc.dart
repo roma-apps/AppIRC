@@ -9,18 +9,16 @@ abstract class PreferencesBloc<T> extends Providable {
 
   PreferencesBloc(this._preferencesService, this.key);
 
-  Future<bool> get isSavedPreferenceExist async =>
-      await _preferencesService.isKeyExist(key);
+  bool get isSavedPreferenceExist  =>
+       _preferencesService.isKeyExist(key);
 
   Future<bool> clearValue() => _preferencesService.clearValue(key);
 
-  Future<T> getValue({@required T defaultValue});
+  T getValue({@required T defaultValue});
 
   Future<bool> setValue(T newValue);
 
   Stream<T> valueStream({@required T defaultValue});
-
-
 }
 
 class JsonPreferencesBloc<T extends JsonPreferences>
@@ -32,14 +30,20 @@ class JsonPreferencesBloc<T extends JsonPreferences>
       this.schemaVersion, this.jsonConverter)
       : super(preferencesService, "$key.$schemaVersion");
 
-  Future<bool> setValue(T newValue) async =>  await _preferencesService.setJsonPreferences(key, newValue);
+  Future<bool> setValue(T newValue) async {
+
+      return await _preferencesService.setJsonPreferences(key, newValue);
+
+
+
+  }
 
   Stream<T> valueStream({@required T defaultValue}) => _preferencesService
       .getJsonPreferencesStream(key, jsonConverter, defaultValue: defaultValue);
 
-  Future<T> getValue({@required T defaultValue}) async =>
-      await _preferencesService
-          .getJsonPreferences(key, jsonConverter, defaultValue: defaultValue);
+  T getValue({@required T defaultValue})  =>
+      _preferencesService.getJsonPreferences(key, jsonConverter,
+          defaultValue: defaultValue);
 }
 
 abstract class SimplePreferencesBloc<T> extends PreferencesBloc<T> {
@@ -55,13 +59,11 @@ class IntPreferencesBloc extends SimplePreferencesBloc<int> {
       await _preferencesService.setIntPreferenceValue(key, newValue);
 
   Stream<int> valueStream({@required int defaultValue}) => _preferencesService
-      .getIntPreferenceStream(key, defaultValue: defaultValue);
+      .getIntPreferenceStream(key, defaultValue: defaultValue)
+      .distinct();
 
-
-  Future<int> getValue({@required int defaultValue}) async =>
-      _preferencesService
-          .getIntPreference(key, defaultValue: defaultValue);
-
+  int getValue({@required int defaultValue})  =>
+      _preferencesService.getIntPreference(key, defaultValue: defaultValue);
 }
 
 class BoolPreferencesBloc extends SimplePreferencesBloc<bool> {
@@ -72,9 +74,9 @@ class BoolPreferencesBloc extends SimplePreferencesBloc<bool> {
       await _preferencesService.setBoolPreferenceValue(key, newValue);
 
   Stream<bool> valueStream({@required bool defaultValue}) => _preferencesService
-      .getBoolPreferenceStream(key, defaultValue: defaultValue);
+      .getBoolPreferenceStream(key, defaultValue: defaultValue)
+      .distinct();
 
-  Future<bool> getValue({@required bool defaultValue}) async =>
-      _preferencesService
-          .getBoolPreference(key, defaultValue: defaultValue);
+  bool getValue({@required bool defaultValue})  =>
+      _preferencesService.getBoolPreference(key, defaultValue: defaultValue);
 }

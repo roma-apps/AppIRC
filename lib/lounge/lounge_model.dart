@@ -7,6 +7,8 @@ part 'lounge_model.g.dart';
 class LoungeConstants {
   static const String on = "on";
   static const String off = "off";
+  static const String channelsNamesSeparator = " ";
+
 }
 
 class LoungeChannelTypeConstants {

@@ -1,26 +1,28 @@
-
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_server_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_user_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_blocs.dart';
 
 class IRCNetworkPreferencesFormBloc extends FormBloc {
-
-   Validator<String> networkValidator;
+  static const channelsNamesSeparator = " ";
+  Validator<String> networkValidator;
   IRCNetworkServerPreferencesFormBloc serverFormBloc;
   IRCNetworkUserPreferencesFormBloc userFormBloc;
 
-  FormValueFieldBloc<String>  channelsFieldBloc;
+  FormValueFieldBloc<String> channelsFieldBloc;
 
   IRCNetworkPreferencesFormBloc(
-      IRCNetworkPreferences preferences,) {
+    IRCNetworkPreferences preferences,
+  ) {
     serverFormBloc = IRCNetworkServerPreferencesFormBloc(
         preferences.networkConnectionPreferences.serverPreferences,
         networkValidator);
     userFormBloc = IRCNetworkUserPreferencesFormBloc(
         preferences.networkConnectionPreferences.userPreferences);
 
-    channelsFieldBloc = FormValueFieldBloc<String> (preferences.channelsString, validators: [NotEmptyTextValidator()]);
+    channelsFieldBloc = FormValueFieldBloc<String>(
+        preferences.channelsWithoutPassword.join(channelsNamesSeparator),
+        validators: [NotEmptyTextValidator()]);
   }
 
   @override
@@ -33,5 +35,6 @@ class IRCNetworkPreferencesFormBloc extends FormBloc {
       channelsFieldBloc.value
           .split(IRCNetworkPreferences.channelsSeparator)
           .map((channelName) => IRCNetworkChannelPreferences.name(
-              name: channelName, password: "")).toList());
+              name: channelName, password: ""))
+          .toList());
 }
