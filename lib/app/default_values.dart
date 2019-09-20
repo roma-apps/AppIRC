@@ -4,10 +4,10 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 
 LoungeConnectionPreferences createDefaultLoungePreferences(
         BuildContext context) =>
-//    LoungePreferences(host: "https://demo.thelounge.chat/");
+    LoungeConnectionPreferences(host: "https://demo.thelounge.chat/");
 //LoungePreferences(host: "https://irc.pleroma.social");
 //    LoungeConnectionPreferences(host: "http://192.168.0.103:9000/");
-    LoungeConnectionPreferences(host: "http://192.168.0.103:9000/");
+//    LoungeConnectionPreferences(host: "http://192.168.0.103:9000/");
 //LoungePreferences(host: "http://192.168.1.103:9000/");
 
 IRCNetworkPreferences createDefaultIRCNetworkPreferences(

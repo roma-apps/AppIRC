@@ -28,7 +28,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "Main", enabled: true);
 
-
 Future main() async {
   var preferencesService = PreferencesService();
   var socketIOManager = SocketIOManager();
@@ -36,11 +35,11 @@ Future main() async {
   var loungePreferencesBloc = LoungePreferencesBloc(preferencesService);
   runApp(EasyLocalization(
       child: Provider(
-        providable: SocketIOManagerProvider(socketIOManager),
-        child: Provider(
-            child: Provider(providable: preferencesService, child: AppIRC()),
-            providable: loungePreferencesBloc),
-      )));
+    providable: SocketIOManagerProvider(socketIOManager),
+    child: Provider(
+        child: Provider(providable: preferencesService, child: AppIRC()),
+        providable: loungePreferencesBloc),
+  )));
 }
 
 class AppIRC extends StatefulWidget {
@@ -53,6 +52,7 @@ class AppIRCState extends State<AppIRC> {
   bool isInitSuccess = false;
   LoungeBackendService loungeBackendService;
   LoungeConnectionPreferences loungeConnectionPreferences;
+  bool isChatBuildOneTime = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,16 +64,13 @@ class AppIRCState extends State<AppIRC> {
         isInitStarted = true;
         Timer.run(() async {
           await preferencesService.init();
+//           preferencesService.clear();
 
-
-          loungePreferencesBloc.valueStream(
-              defaultValue: LoungeConnectionPreferences.empty).listen((
-              newPreferences) {
+          loungePreferencesBloc
+              .valueStream(defaultValue: LoungeConnectionPreferences.empty)
+              .listen((newPreferences) {
             _onLoungeChanged(context, newPreferences);
           });
-//          _onLoungeChanged(context, loungePreferencesBloc.getValue(
-//              defaultValue: LoungeConnectionPreferences.empty));
-
           isInitSuccess = true;
           setState(() {});
         });
@@ -82,26 +79,27 @@ class AppIRCState extends State<AppIRC> {
       return _buildApp(SplashPage());
     } else {
       if (loungeConnectionPreferences == null) {
-
         return _buildAppForStartLoungePreferences();
       } else {
-
         if (loungeBackendService == null) {
           return _buildAppForStartLoungePreferences();
         } else {
-          return buildChat(context, loungeBackendService, preferencesService);
+          var buildChat2 = buildChat(context, loungeBackendService, preferencesService, isChatBuildOneTime);
+          isChatBuildOneTime = true;
+          return buildChat2;
         }
       }
     }
   }
 
-  void _onLoungeChanged(BuildContext context, LoungeConnectionPreferences newPreferences) async {
+  void _onLoungeChanged(
+      BuildContext context, LoungeConnectionPreferences newPreferences) async {
     if (newPreferences != null &&
         newPreferences != LoungeConnectionPreferences.empty &&
         newPreferences != loungeConnectionPreferences) {
       loungeConnectionPreferences = newPreferences;
 
-      _logger.d(()=>"_onLoungeChanged $newPreferences");
+      _logger.d(() => "_onLoungeChanged $newPreferences");
 
       var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
       var loungeBackendService = LoungeBackendService(
@@ -109,49 +107,45 @@ class AppIRCState extends State<AppIRC> {
 
       loungeBackendService.init().then((_) {
         this.loungeBackendService = loungeBackendService;
-
+        isChatBuildOneTime = false;
         setState(() {});
       });
-
-
     }
   }
 
-  Widget _buildAppForStartLoungePreferences() =>
-      _buildApp(
-          NewLoungePreferencesPage(createDefaultLoungePreferences(context)));
+  Widget _buildAppForStartLoungePreferences() => _buildApp(
+      NewLoungePreferencesPage(createDefaultLoungePreferences(context)));
 
-
-  Widget buildChat(BuildContext context, LoungeBackendService loungeBackendService, PreferencesService preferencesService) {
+  Widget buildChat(
+      BuildContext context,
+      LoungeBackendService loungeBackendService,
+      PreferencesService preferencesService, bool isChatBuildOneTime) {
 //    var loungeBackendService =
 //    Provider.of<LoungeBackendService>(context);
 //    var preferencesService =
 //    Provider.of<PreferencesService>(context);
 
-    var chatPreferencesBloc =
-    ChatPreferencesLoaderBloc(preferencesService);
+    _logger.d(() => "buildChat $isChatBuildOneTime");
+
+    var chatPreferencesBloc = ChatPreferencesLoaderBloc(preferencesService);
 
     var networksListBloc = ChatNetworksListBloc(
       loungeBackendService,
-      nextNetworkIdGenerator:
-      chatPreferencesBloc.getNextNetworkLocalId,
-      nextChannelIdGenerator:
-      chatPreferencesBloc.getNextNetworkChannelLocalId,
+      nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
+      nextChannelIdGenerator: chatPreferencesBloc.getNextNetworkChannelLocalId,
     );
 
     var connectionBloc = ChatConnectionBloc(loungeBackendService);
-    var networkStatesBloc = ChatNetworksStateBloc(
-        loungeBackendService, networksListBloc);
-    var channelsStatesBloc = ChatNetworkChannelsStateBloc(
-        loungeBackendService, networksListBloc);
+    var networkStatesBloc =
+        ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+    var channelsStatesBloc =
+        ChatNetworkChannelsStateBloc(loungeBackendService, networksListBloc);
 
-    var _startPreferences = chatPreferencesBloc.getValue(
-        defaultValue: ChatPreferences.empty);
+    var _startPreferences =
+        chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
 
-
-    var chatInitBloc = ChatInitBloc(
-                            loungeBackendService, connectionBloc,
-                            _startPreferences);
+    var chatInitBloc =
+        ChatInitBloc(loungeBackendService, connectionBloc, _startPreferences, isChatBuildOneTime);
     return Provider<LoungeBackendService>(
       providable: loungeBackendService,
       child: Provider<ChatInputOutputBackendService>(
@@ -174,7 +168,9 @@ class AppIRCState extends State<AppIRC> {
                         providable: chatInitBloc,
                         child: Provider(
                           providable: ChatPreferencesSaverBloc(
-                                preferencesService, networksListBloc, chatInitBloc),
+                              preferencesService,
+                              networksListBloc,
+                              chatInitBloc),
                           child: _buildApp(ChatPage()),
                         ),
                       ),
@@ -189,7 +185,6 @@ class AppIRCState extends State<AppIRC> {
     );
   }
 
-
   Widget _buildApp(Widget child) {
     var preferencesService = Provider.of<PreferencesService>(context);
 
@@ -201,9 +196,7 @@ class AppIRCState extends State<AppIRC> {
           stream: appSkinBloc.skinStream,
           initialData: defaultUISkin,
           builder: (context, snapshot) {
-            var data = EasyLocalizationProvider
-                .of(context)
-                .data;
+            var data = EasyLocalizationProvider.of(context).data;
 
             var uiSkin = snapshot.data;
             return Provider(
@@ -213,27 +206,17 @@ class AppIRCState extends State<AppIRC> {
                   localizationsDelegates: [
                     //app-specific localization
                     EasylocaLizationDelegate(
-                        locale: data.locale,
-                        path: 'assets/langs'),
+                        locale: data.locale, path: 'assets/langs'),
                   ],
-                  supportedLocales: [
-                    Locale('en', 'US')
-                  ],
+                  supportedLocales: [Locale('en', 'US')],
                   locale: data.savedLocale,
-                  android: (_) =>
-                      MaterialAppData(
-                          theme: uiSkin
-                              .androidTheme),
-                  ios: (_) =>
-                      CupertinoAppData(
-                          theme: uiSkin
-                              .iosTheme),
+                  android: (_) => MaterialAppData(theme: uiSkin.androidTheme),
+                  ios: (_) => CupertinoAppData(theme: uiSkin.iosTheme),
                   home: child),
             );
           }),
     );
   }
-
 }
 
 //class AppIRC2 extends StatelessWidget {

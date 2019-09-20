@@ -8,6 +8,10 @@ import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
+import 'package:flutter_appirc/logger/logger.dart';
+
+
+var _logger = MyLogger(logTag: "ChatPreferencesBloc", enabled: true);
 
 var _emptyPreferences = ChatPreferences([]);
 
@@ -75,6 +79,7 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
         }).toList();
         var newPreferences = ChatPreferences(newNetworksSettings);
 
+        _logger.d(() => "save new chat preferences $newPreferences");
         setValue(newPreferences);
       }
     }));
