@@ -35,17 +35,17 @@
 
 
       "dialog": {
-        "already_connected": {
-          "title": "Already connected",
-          "content": "Disconnect from current Lounge server and try again"
-        },
-        "connection_timeout": {
-          "title": "Connection timeout",
-          "content": "Check your network and try again"
-        },
         "connection_error": {
           "title": "Connection error",
-          "content": "Error during connection: {}"
+          "content": "Can't connect to host"
+        },
+        "invalid_response_error": {
+          "title": "Invalid server response",
+          "content": "Connected to host but correct response not received. Maybe remote server have unsupported Lounge version."
+        },
+        "private_not_supported_error": {
+          "title": "Not supported",
+          "content": "Private servers not supported yet"
         }
       },
       "new": {

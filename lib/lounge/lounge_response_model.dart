@@ -1,11 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_appirc/local_preferences/preferences_model.dart';
-import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'lounge_response_model.g.dart';
-
 
 class LoungeResponseEventNames {
   static const String network = "network";
@@ -14,6 +10,7 @@ class LoungeResponseEventNames {
   static const String msgSpecial = "msg:special";
   static const String configuration = "configuration";
   static const String authorized = "authorized";
+  static const String auth = "auth";
   static const String commands = "commands";
   static const String topic = "topic";
   static const String names = "names";
@@ -24,8 +21,8 @@ class LoungeResponseEventNames {
   static const String networkStatus = "network:status";
   static const String networkOptions = "network:options";
   static const String channelState = "channel:state";
+  static const String init = "init";
 }
-
 
 abstract class LoungeRequestBody {
   Map<String, dynamic> toJson();
@@ -49,8 +46,6 @@ class ChanLoungeResponseBody extends LoungeResponseBody {
   factory ChanLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ChanLoungeResponseBodyFromJson(json);
 }
-
-
 
 @JsonSerializable()
 class MessageLoungeResponseBody extends LoungeResponseBody {
@@ -89,6 +84,85 @@ class MessageSpecialLoungeResponseBody extends LoungeResponseBody {
 }
 
 @JsonSerializable()
+class DefaultsLoungeResponseBodyPart extends LoungeResponseBodyPart {
+  final String host;
+  final int port;
+  final String join;
+  final String name;
+  final String nick;
+  final String password;
+  final String realname;
+  final bool rejectUnathorized;
+  final bool tls;
+  final String username;
+
+  DefaultsLoungeResponseBodyPart(this.host, this.port, this.join,
+      this.name, this.nick, this.password, this.realname,
+      this.rejectUnathorized, this.tls, this.username);
+
+  @override
+  String toString() {
+    return 'DefaultsLoungeResponseBodyPart{host: $host,'
+        ' port: $port, join: $join, name: $name, nick: $nick,'
+        ' password: $password, realname: $realname,'
+        ' rejectUnathorized: $rejectUnathorized,'
+        ' tls: $tls, username: $username}';
+  }
+  factory DefaultsLoungeResponseBodyPart.fromJson(
+      Map<String, dynamic> json) =>
+      _$DefaultsLoungeResponseBodyPartFromJson(json);
+
+}
+
+@JsonSerializable()
+class ConfigurationLoungeResponseBody extends LoungeResponseBody {
+  final String defaultTheme;
+  final DefaultsLoungeResponseBodyPart defaults;
+  final bool displayNetwork;
+  final bool fileUpload;
+  final bool ldapEnabled;
+  final bool lockNetwork;
+  final bool prefetch;
+  final bool public;
+  final bool useHexIp;
+  final List<dynamic> themes;
+  final int fileUploadMaxSize;
+  final String gitCommit;
+  final String version;
+
+  ConfigurationLoungeResponseBody(
+      this.defaultTheme,
+      this.defaults,
+      this.displayNetwork,
+      this.fileUpload,
+      this.ldapEnabled,
+      this.lockNetwork,
+      this.prefetch,
+      this.public,
+      this.useHexIp,
+      this.themes,
+      this.fileUploadMaxSize,
+      this.gitCommit,
+      this.version);
+
+  @override
+  String toString() {
+    return 'ConfigurationLoungeResponseBody{defaultTheme: $defaultTheme,'
+        ' defaults: $defaults, displayNetwork: $displayNetwork,'
+        ' fileUpload: $fileUpload, ldapEnabled: $ldapEnabled,'
+        ' lockNetwork: $lockNetwork, prefetch: $prefetch,'
+        ' public: $public, useHexIp: $useHexIp, themes: $themes,'
+        ' fileUploadMaxSize: $fileUploadMaxSize, '
+        'gitCommit: $gitCommit, version: $version}';
+  }
+
+  factory ConfigurationLoungeResponseBody.fromJson(
+          Map<String, dynamic> json) =>
+      _$ConfigurationLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {
   final ChannelLoungeResponseBody chan;
   final int index;
@@ -104,10 +178,10 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
   factory JoinLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$JoinLoungeResponseBodyFromJson(json);
 }
+
 @JsonSerializable()
 class PartLoungeResponseBody extends LoungeResponseBody {
   final int chan;
-
 
   PartLoungeResponseBody(this.chan);
 
@@ -170,8 +244,10 @@ class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
 class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   // ignore: non_constant_identifier_names
   final List<String> CHANTYPES;
+
   // ignore: non_constant_identifier_names
   final String NETWORK;
+
   // ignore: non_constant_identifier_names
   final List<String> PREFIX;
 
@@ -300,6 +376,7 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final int logonTime;
   final String logon;
   final String nick;
+
   // ignore: non_constant_identifier_names
   final String real_name;
   final bool secure;
@@ -351,52 +428,6 @@ class MsgFromLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   factory MsgFromLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$MsgFromLoungeResponseBodyPartFromJson(json);
-}
-
-@JsonSerializable()
-class ConfigurationLoungeResponseBody extends LoungeResponseBody {
-  final String defaultTheme;
-  final Map<String, dynamic> defaults;
-  final bool displayNetwork;
-  final bool fileUpload;
-  final bool ldapEnabled;
-  final bool lockNetwork;
-  final bool prefetch;
-  final bool public;
-  final bool useHexIp;
-  final int fileUploadMaxSize;
-  final String gitCommit;
-  final String version;
-  final List<dynamic> themes;
-
-  ConfigurationLoungeResponseBody(
-      this.defaultTheme,
-      this.defaults,
-      this.displayNetwork,
-      this.fileUpload,
-      this.ldapEnabled,
-      this.lockNetwork,
-      this.prefetch,
-      this.public,
-      this.useHexIp,
-      this.fileUploadMaxSize,
-      this.gitCommit,
-      this.version,
-      this.themes);
-
-  factory ConfigurationLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$ConfigurationLoungeResponseBodyFromJson(json);
-
-  @override
-  String toString() {
-    return 'ConfigurationLoungeResponseBody{defaultTheme: $defaultTheme,'
-        ' defaults: $defaults, displayNetwork: $displayNetwork,'
-        ' fileUpload: $fileUpload, ldapEnabled: $ldapEnabled,'
-        ' lockNetwork: $lockNetwork, prefetch: $prefetch,'
-        ' public: $public, useHexIp: $useHexIp,'
-        ' fileUploadMaxSize: $fileUploadMaxSize,'
-        ' gitCommit: $gitCommit, version: $version, themes: $themes}';
-  }
 }
 
 @JsonSerializable()

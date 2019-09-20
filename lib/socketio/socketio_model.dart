@@ -3,3 +3,8 @@ abstract class SocketIOCommand {
 
   List<dynamic> getBody();
 }
+
+
+enum SocketConnectionState {
+  CONNECTED, DISCONNECTED, CONNECTING
+}

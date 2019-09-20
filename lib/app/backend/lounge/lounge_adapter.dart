@@ -1,8 +1,35 @@
-
 import 'package:flutter_appirc/app/channel/channel_model.dart';
+import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
+
+ChatConfig toChatConfig(
+        ConfigurationLoungeResponseBody loungeConfig, List<String> commands) =>
+    ChatConfig.name(
+        defaultNetwork: IRCNetworkConnectionPreferences(
+            serverPreferences: IRCNetworkServerPreferences(
+                name: loungeConfig.defaults.name,
+                serverHost: loungeConfig.defaults.host,
+                serverPort: loungeConfig.defaults.port.toString(),
+                useTls: loungeConfig.defaults.tls,
+                useOnlyTrustedCertificates:
+                    loungeConfig.defaults.rejectUnathorized),
+            userPreferences: IRCNetworkUserPreferences(
+                nickname: loungeConfig.defaults.nick,
+                realName: loungeConfig.defaults.realname,
+                username: loungeConfig.defaults.username)),
+        defaultChannels: loungeConfig.defaults.join,
+        displayNetwork: loungeConfig.displayNetwork,
+        fileUpload: loungeConfig.fileUpload,
+        ldapEnabled: loungeConfig.ldapEnabled,
+        lockNetwork: loungeConfig.lockNetwork,
+        prefetch: loungeConfig.prefetch,
+        public: loungeConfig.public,
+        useHexIp: loungeConfig.useHexIp,
+        fileUploadMaxSize: loungeConfig.fileUploadMaxSize,
+        commands: commands);
 
 IRCNetworkChannelMessageFrom toIRCFrom(MsgFromLoungeResponseBodyPart from) =>
     IRCNetworkChannelMessageFrom(mode: from.mode, id: from.id, nick: from.nick);
@@ -24,7 +51,7 @@ IRCNetworkChannelMessageWhoIs toIRCWhoIs(WhoIsLoungeResponseBodyPart whois) =>
         serverInfo: whois.serverInfo);
 
 NetworkChannelMessage toIRCMessage(
-    MsgLoungeResponseBody msgLoungeResponseBody) =>
+        MsgLoungeResponseBody msgLoungeResponseBody) =>
     NetworkChannelMessage(
         remoteId: msgLoungeResponseBody.id,
         command: msgLoungeResponseBody.command,
@@ -38,8 +65,12 @@ NetworkChannelMessage toIRCMessage(
         previews: msgLoungeResponseBody.previews,
         users: msgLoungeResponseBody.users,
         date: DateTime.parse(msgLoungeResponseBody.time),
-        from: msgLoungeResponseBody.from != null ? toIRCFrom(msgLoungeResponseBody.from) : null,
-        whois: msgLoungeResponseBody.whois != null ? toIRCWhoIs(msgLoungeResponseBody.whois) : null);
+        from: msgLoungeResponseBody.from != null
+            ? toIRCFrom(msgLoungeResponseBody.from)
+            : null,
+        whois: msgLoungeResponseBody.whois != null
+            ? toIRCWhoIs(msgLoungeResponseBody.whois)
+            : null);
 
 IRCNetworkChannelType detectIRCNetworkChannelType(String typeString) {
   var type = IRCNetworkChannelType.UNKNOWN;

@@ -14,14 +14,10 @@ Future<T> doAsyncOperationWithDialog<T>(BuildContext context,
   var result;
   try {
     result = await asyncCode();
-  } on Exception catch (e) {
-    _logger.e(() => "error $e");
-    pr.hide();
   } finally {
-    pr.hide();
-  }
+    await pr.hide();
 
-  pr.hide();
+  }
 
   return result;
 }

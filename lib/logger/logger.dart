@@ -43,28 +43,28 @@ class MyLogger {
 
   void i(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
     if (globalAndLoggerEnabled) {
-      _logger.i(message(), error != null ? error() : null,
+      _logger.i("'$logTag': ${message()}", error != null ? error() : null,
           stackTrace != null ? stackTrace() : null);
     }
   }
 
   void d(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
     if (globalAndLoggerEnabled) {
-      _logger.d(message(), error != null ? error() : null,
+      _logger.d("'$logTag': ${message()}", error != null ? error() : null,
           stackTrace != null ? stackTrace() : null);
     }
   }
 
   void w(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
     if (globalAndLoggerEnabled) {
-      _logger.w(message(), error != null ? error() : null,
+      _logger.w("'$logTag': ${message()}", error != null ? error() : null,
           stackTrace != null ? stackTrace() : null);
     }
   }
 
   void e(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
     if (globalAndLoggerEnabled) {
-      _logger.e(message(), error != null ? error() : null,
+      _logger.e("'$logTag': ${message()}", error != null ? error() : null,
           stackTrace != null ? stackTrace() : null);
     }
   }

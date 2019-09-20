@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:adhara_socket_io/manager.dart';
-import 'package:adhara_socket_io/socket.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_adapter.dart';
@@ -19,11 +19,14 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:flutter_appirc/socketio/socketio_service.dart';
-import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "LoungeService", enabled: true);
+
+var _connectTimeout = Duration(seconds: 5);
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
+
 const _timeoutForRequestsWithResponse = Duration(seconds: 10);
 const _timeBetweenCheckResultForRequestsWithResponse =
     Duration(milliseconds: 100);
@@ -34,11 +37,12 @@ class LoungeBackendService extends Providable
   final SocketIOManager socketIOManager;
   SocketIOService _socketIOService;
 
+  @override
+  ChatConfig chatConfig;
+
   final List<LoungeRequest> _oldRequests = [];
 
   LoungeBackendService(this.socketIOManager, this._loungePreferences) {
-    addDisposable(subject: _connectionController);
-
     var host = _loungePreferences.host;
     if (_loungePreferences == LoungeConnectionPreferences.empty) {
       // workaround because socket io requires valid url
@@ -50,149 +54,62 @@ class LoungeBackendService extends Providable
 
   Future init() async {
     await _socketIOService.init();
-    _subscribeConnectionState();
   }
 
-  Disposable listenConnectionState(
-      void Function(ChatConnectionState) listener) {
-    SocketEventListener connectListener =
-        (_) => listener(ChatConnectionState.CONNECTED);
-    SocketEventListener disconnectListener =
-        (_) => listener(ChatConnectionState.DISCONNECTED);
-    SocketEventListener connectErrorListener =
-        (_) => listener(ChatConnectionState.DISCONNECTED);
-    SocketEventListener connectTimeoutListener =
-        (_) => listener(ChatConnectionState.DISCONNECTED);
-    SocketEventListener connectingListener =
-        (_) => listener(ChatConnectionState.CONNECTING);
-    SocketEventListener reconnectListener =
-        (_) => listener(ChatConnectionState.CONNECTED);
-    SocketEventListener reconnectFailedListener =
-        (_) => listener(ChatConnectionState.DISCONNECTED);
-    SocketEventListener reconnectErrorListener =
-        (_) => listener(ChatConnectionState.DISCONNECTED);
-    SocketEventListener reconnectingListener =
-        (_) => listener(ChatConnectionState.CONNECTING);
-    _socketIOService.onConnect(connectListener);
-    _socketIOService.onDisconnect(disconnectListener);
-    _socketIOService.onConnectError(connectErrorListener);
-    _socketIOService.onConnectTimeout(connectTimeoutListener);
-    _socketIOService.onConnecting(connectingListener);
-    _socketIOService.onReconnect(reconnectListener);
-    _socketIOService.onReconnectFailed(reconnectFailedListener);
-    _socketIOService.onReconnectError(reconnectErrorListener);
-    _socketIOService.onReconnecting(reconnectingListener);
-
-    return CustomDisposable(() {
-      _socketIOService.offConnect(connectListener);
-      _socketIOService.offDisconnect(disconnectListener);
-      _socketIOService.offConnectError(connectErrorListener);
-      _socketIOService.offConnectTimeout(connectTimeoutListener);
-      _socketIOService.offConnecting(connectingListener);
-      _socketIOService.offReconnect(reconnectListener);
-      _socketIOService.offReconnectFailed(reconnectFailedListener);
-      _socketIOService.offReconnectError(reconnectErrorListener);
-      _socketIOService.offReconnecting(reconnectingListener);
-    });
-  }
-
-  Stream<ChatConnectionState> get connectedStream =>
-      _connectionController.stream;
-
-  bool get isConnected =>
-      _connectionController.value == ChatConnectionState.CONNECTED;
-
-  var _connectionController = BehaviorSubject<ChatConnectionState>(
-      seedValue: ChatConnectionState.DISCONNECTED);
+  bool get isConnected => connectionState == ChatConnectionState.CONNECTED;
 
   @override
   Stream<ChatConnectionState> get connectionStateStream =>
-      _connectionController.stream;
+      _socketIOService.connectionStateStream.map(mapState);
 
-  ChatConnectionState get connectionState => _connectionController.value;
-
-  void _subscribeConnectionState() {
-    addDisposable(disposable: listenConnectionState((_loungeConnectionState) {
-      _connectionController.add(_loungeConnectionState);
-    }));
-  }
+  ChatConnectionState get connectionState =>
+      mapState(_socketIOService.connectionState);
 
   Future<RequestResult<bool>> tryConnectWithDifferentPreferences(
       LoungeConnectionPreferences preferences) async {
-    // TODO: implement tryConnectWithDifferentPreferences
-    return RequestResult.name(isSentSuccessfully: true, result: true);
+    SocketIOService socketIOService;
+    var connected = false;
+    try {
+      socketIOService = SocketIOService(socketIOManager, preferences.host);
+      await socketIOService.init();
+      var chatConfig =  await _connect(preferences, socketIOService);
+      connected = chatConfig != null;
+    } finally {
+      if (socketIOService != null && connected) {
+        socketIOService.disconnect();
+      }
+    }
+
+    return RequestResult(true, connected);
   }
 
   @override
-  Future<RequestResult<bool>> connectChat({bool waitForResult = false}) async {
-//  void _onConfigurationResponse(raw) {
-//    var parsed =
-//        ConfigurationLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _configurationController.sink.add(parsed);
-//  }
-//
-//  void _onAuthorizedResponse(raw) {
-//    _authorizedController.sink.add(null);
-//  }
-//
-//      _logger.i(() => "_onCommandResponse $raw");
-//    var parsed = raw;
-//    _commandsController.sink.add(parsed);
+  Future<RequestResult<bool>> connectChat() async {
+    assert(_loungePreferences != LoungeConnectionPreferences.empty);
 
-    if (_loungePreferences == LoungeConnectionPreferences.empty) {
-      return RequestResult.name(isSentSuccessfully: false, result: false);
-    }
+    var chatConfig = await _connect(_loungePreferences, _socketIOService);
 
-    _logger.i(() => "start connecting to $_loungePreferences");
-
-    var connected = false;
-    var responseReceived = false;
-
-    Exception connectionException;
-
-    var connectListener = (_) {
-      _logger.i(() => "connecting onConnect");
-      connected = true;
-      responseReceived = true;
-    };
-    _socketIOService.onConnect(connectListener);
-
-    var connectErrorListener = (value) {
-      _logger.e(() => "connecting onConnectError $value");
-      connectionException = ConnectionErrorLoungeException(value);
-      responseReceived = true;
-    };
-    _socketIOService.onConnectError(connectErrorListener);
-    var connectTimeoutListener = (value) {
-      _logger.e(() => "connecting onConnectTimeout $value");
-      connectionException = ConnectionTimeoutLoungeException();
-      responseReceived = true;
-    };
-    _socketIOService.onConnectTimeout(connectTimeoutListener);
-
-    _logger.i(() => "start socket connect");
-    await _socketIOService.connect();
-
-    if (waitForResult) {
-      while (!responseReceived) {
-        await Future.delayed(_timeBetweenCheckingConnectionResponse);
-      }
-
-      _logger.i(() => "finish connecting connected = $connected");
-
-      _socketIOService.offConnect(connectListener);
-      _socketIOService.offConnectTimeout(connectTimeoutListener);
-      _socketIOService.offConnectError(connectErrorListener);
-
-      if (connectionException != null) {
-        connected = false;
-      }
-
-      return RequestResult.name(isSentSuccessfully: true, result: connected);
+    if (chatConfig != null) {
+      this.chatConfig = chatConfig;
+      return RequestResult(true, true);
     } else {
-      return RequestResult.name(isSentSuccessfully: true, result: null);
+      return RequestResult(true, false);
     }
   }
+
+  Disposable listenForConfiguration(
+          Function(ConfigurationLoungeResponseBody) listener) =>
+      _listenForConfiguration(_socketIOService, listener);
+
+  Disposable listenForCommands(Function(List<String>) listener) =>
+      _listenForCommands(_socketIOService, listener);
+
+  Disposable listenForAuthorized(VoidCallback listener) =>
+      _listenForAuthorized(_socketIOService, listener);
+
+  Disposable createEventListenerDisposable(
+          String eventName, Function(dynamic raw) listener) =>
+      _createEventListenerDisposable(_socketIOService, eventName, listener);
 
   @override
   Future<RequestResult<bool>> disconnectChat(
@@ -341,12 +258,6 @@ class LoungeBackendService extends Providable
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
-  Disposable createEventListenerDisposable(
-      String eventName, Function(dynamic raw) listener) {
-    _socketIOService.on(eventName, listener);
-    return CustomDisposable(() => _socketIOService.off(eventName, listener));
-  }
-
   @override
   Disposable listenForMessages(Network network, NetworkChannel channel,
       NetworkChannelMessageListener listener) {
@@ -471,7 +382,7 @@ class LoungeBackendService extends Providable
           listener(channelState);
         }
 
-//            listener(message);
+//          cg  listener(message);
       }
     }));
 
@@ -587,7 +498,6 @@ class LoungeBackendService extends Providable
 //    var parsed =
 //    NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
 //    _networkStatusController.sink.add(parsed);
-    return null;
   }
 
   @override
@@ -664,7 +574,6 @@ class LoungeBackendService extends Providable
 //    var parsed = UsersLoungeResponseBody.fromJson(_preProcessRawData(raw));
 //    _usersController.sink.add(parsed);
 //  }
-    return null;
   }
 
   _sendRequest(LoungeRequest request) async {
@@ -741,28 +650,184 @@ class LoungeBackendService extends Providable
 //  sendSettingsGetRequest() async =>
 //      await _sendRequest(LoungeRawRequest(name: "setting:get"));
 
-  dynamic _preProcessRawData(raw, {bool isJsonData = true}) {
-    // Hack for strange bug on ios
-    // Flutter app throw exception which is not possible to catch
-    // if use raw data without re-encoding
-    // TODO: remove when bug will be fixed in socketio/json libraries
-    var newRaw = raw;
-    if (isJsonData && Platform.isIOS) {
-      if (raw is Map) {
-        var jsonData = json.encode(raw);
-        newRaw = json.decode(jsonData);
-      }
-    }
-
-    _logger.i(() => "_preProcessRawData json = $isJsonData converted $newRaw");
-    return newRaw;
-  }
-
   void _sendInputRequest(
       Network network, NetworkChannel channel, String message) {
     _sendRequest(LoungeJsonRequest(
         name: LoungeRequestEventNames.input,
         body: InputLoungeRequestBody(
             target: channel.remoteId, content: message)));
+  }
+}
+
+ChatConnectionState mapState(SocketConnectionState socketState) {
+  switch (socketState) {
+    case SocketConnectionState.CONNECTED:
+      return ChatConnectionState.CONNECTED;
+      break;
+    case SocketConnectionState.DISCONNECTED:
+      return ChatConnectionState.DISCONNECTED;
+      break;
+    case SocketConnectionState.CONNECTING:
+      return ChatConnectionState.CONNECTING;
+      break;
+  }
+  throw Exception("invalid state $socketState");
+}
+
+Disposable _listenForConfiguration(SocketIOService _socketIOService,
+    Function(ConfigurationLoungeResponseBody) listener) {
+  var disposable = CompositeDisposable([]);
+  disposable.add(_createEventListenerDisposable(
+      _socketIOService, (LoungeResponseEventNames.configuration), (raw) {
+    var parsed =
+        ConfigurationLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+    listener(parsed);
+  }));
+
+  return disposable;
+}
+
+Disposable _listenForCommands(
+    SocketIOService _socketIOService, Function(List<String>) listener) {
+  var disposable = CompositeDisposable([]);
+  disposable.add(_createEventListenerDisposable(
+      _socketIOService, (LoungeResponseEventNames.commands), (raw) {
+
+    var iterable = (raw as Iterable);
+
+
+    var commands = List<String>();
+
+    iterable.forEach((obj) {
+      commands.add(obj.toString());
+    });
+
+    listener(commands);
+  }));
+
+  return disposable;
+}
+
+Disposable _listenForAuthorized(
+    SocketIOService _socketIOService, VoidCallback listener) {
+  var disposable = CompositeDisposable([]);
+  disposable.add(_createEventListenerDisposable(
+      _socketIOService, (LoungeResponseEventNames.authorized), (raw) {
+    listener();
+  }));
+
+  return disposable;
+}
+
+Disposable _listenForAuth(
+    SocketIOService _socketIOService, VoidCallback listener) {
+  var disposable = CompositeDisposable([]);
+  disposable.add(_createEventListenerDisposable(
+      _socketIOService, (LoungeResponseEventNames.auth), (raw) {
+    listener();
+  }));
+
+  return disposable;
+}
+
+Disposable _createEventListenerDisposable(SocketIOService _socketIOService,
+    String eventName, Function(dynamic raw) listener) {
+  _socketIOService.on(eventName, listener);
+  return CustomDisposable(() => _socketIOService.off(eventName, listener));
+}
+
+dynamic _preProcessRawData(raw, {bool isJsonData = true}) {
+  // Hack for strange bug on ios
+  // Flutter app throw exception which is not possible to catch
+  // if use raw data without re-encoding
+  // TODO: remove when bug will be fixed in socketio/json libraries
+  var newRaw = raw;
+  if (isJsonData && Platform.isIOS) {
+    if (raw is Map) {
+      var jsonData = json.encode(raw);
+      newRaw = json.decode(jsonData);
+    }
+  }
+
+  _logger.i(() => "_preProcessRawData json = $isJsonData converted $newRaw");
+  return newRaw;
+}
+
+Future<ChatConfig> _connect(LoungeConnectionPreferences preferences,
+    SocketIOService socketIOService) async {
+
+  _logger.d(()=> "start connect to $preferences");
+  var disposable = CompositeDisposable([]);
+
+  ConfigurationLoungeResponseBody loungeConfig;
+  List<String> loungeCommands;
+  bool authorizedReceived = false;
+  bool authReceived = false;
+  bool timeout = false;
+
+  disposable.add(_listenForConfiguration(
+      socketIOService, (result) => loungeConfig = result));
+  disposable.add(
+      _listenForAuthorized(socketIOService, () => authorizedReceived = true));
+  disposable.add(
+      _listenForAuth(socketIOService, () => authReceived = true));
+  disposable.add(
+      _listenForCommands(socketIOService, (result) => loungeCommands = result));
+
+  Future.delayed(_connectTimeout, () => timeout = true);
+
+  await socketIOService.connect();
+  // lounge don't support connect/connecting callbacks
+  // TODO: should be changed if lounge will start support it
+  var socketConnected = true;
+
+  _logger.d(()=> "_connect socketConnected= $socketConnected");
+
+  if(socketConnected) {
+    while ((loungeCommands == null && loungeConfig == null ||
+        authorizedReceived == false) &&
+        !timeout && authReceived == false) {
+      await Future.delayed(_timeBetweenCheckingConnectionResponse);
+    }
+  }
+
+
+  disposable.dispose();
+
+
+  var commandsReceived = loungeCommands != null;
+  var configReceived = loungeConfig != null;
+
+  _logger.d(()=> "_connect commandsReceived = $commandsReceived "
+      "configReceived = $configReceived authorizedReceived = $authorizedReceived, authReceived = $authReceived");
+
+  if (socketConnected) {
+
+    if(authReceived) {
+      throw PrivateLoungeNotSupportedException(preferences);
+    } else {
+      if (commandsReceived && configReceived && authorizedReceived) {
+        if (loungeConfig.public) {
+          ChatConfig chatConfig = toChatConfig(loungeConfig, loungeCommands);
+          return chatConfig;
+        } else {
+          throw PrivateLoungeNotSupportedException(preferences);
+        }
+      } else {
+        socketIOService.disconnect();
+        if (!commandsReceived && !configReceived && !authorizedReceived) {
+          return null;
+        } else {
+          // something received something not
+          throw InvalidConnectionResponseException(
+              preferences, authorizedReceived, configReceived, commandsReceived);
+        }
+
+
+      }
+    }
+  } else {
+    return null;
   }
 }

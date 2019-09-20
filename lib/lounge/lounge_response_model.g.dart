@@ -55,6 +55,77 @@ Map<String, dynamic> _$MessageSpecialLoungeResponseBodyToJson(
       'data': instance.data,
     };
 
+DefaultsLoungeResponseBodyPart _$DefaultsLoungeResponseBodyPartFromJson(
+    Map<String, dynamic> json) {
+  return DefaultsLoungeResponseBodyPart(
+    json['host'] as String,
+    json['port'] as int,
+    json['join'] as String,
+    json['name'] as String,
+    json['nick'] as String,
+    json['password'] as String,
+    json['realname'] as String,
+    json['rejectUnathorized'] as bool,
+    json['tls'] as bool,
+    json['username'] as String,
+  );
+}
+
+Map<String, dynamic> _$DefaultsLoungeResponseBodyPartToJson(
+        DefaultsLoungeResponseBodyPart instance) =>
+    <String, dynamic>{
+      'host': instance.host,
+      'port': instance.port,
+      'join': instance.join,
+      'name': instance.name,
+      'nick': instance.nick,
+      'password': instance.password,
+      'realname': instance.realname,
+      'rejectUnathorized': instance.rejectUnathorized,
+      'tls': instance.tls,
+      'username': instance.username,
+    };
+
+ConfigurationLoungeResponseBody _$ConfigurationLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return ConfigurationLoungeResponseBody(
+    json['defaultTheme'] as String,
+    json['defaults'] == null
+        ? null
+        : DefaultsLoungeResponseBodyPart.fromJson(
+            json['defaults'] as Map<String, dynamic>),
+    json['displayNetwork'] as bool,
+    json['fileUpload'] as bool,
+    json['ldapEnabled'] as bool,
+    json['lockNetwork'] as bool,
+    json['prefetch'] as bool,
+    json['public'] as bool,
+    json['useHexIp'] as bool,
+    json['themes'] as List,
+    json['fileUploadMaxSize'] as int,
+    json['gitCommit'] as String,
+    json['version'] as String,
+  );
+}
+
+Map<String, dynamic> _$ConfigurationLoungeResponseBodyToJson(
+        ConfigurationLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'defaultTheme': instance.defaultTheme,
+      'defaults': instance.defaults,
+      'displayNetwork': instance.displayNetwork,
+      'fileUpload': instance.fileUpload,
+      'ldapEnabled': instance.ldapEnabled,
+      'lockNetwork': instance.lockNetwork,
+      'prefetch': instance.prefetch,
+      'public': instance.public,
+      'useHexIp': instance.useHexIp,
+      'themes': instance.themes,
+      'fileUploadMaxSize': instance.fileUploadMaxSize,
+      'gitCommit': instance.gitCommit,
+      'version': instance.version,
+    };
+
 JoinLoungeResponseBody _$JoinLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return JoinLoungeResponseBody(
@@ -299,43 +370,6 @@ Map<String, dynamic> _$MsgFromLoungeResponseBodyPartToJson(
       'id': instance.id,
       'mode': instance.mode,
       'nick': instance.nick,
-    };
-
-ConfigurationLoungeResponseBody _$ConfigurationLoungeResponseBodyFromJson(
-    Map<String, dynamic> json) {
-  return ConfigurationLoungeResponseBody(
-    json['defaultTheme'] as String,
-    json['defaults'] as Map<String, dynamic>,
-    json['displayNetwork'] as bool,
-    json['fileUpload'] as bool,
-    json['ldapEnabled'] as bool,
-    json['lockNetwork'] as bool,
-    json['prefetch'] as bool,
-    json['public'] as bool,
-    json['useHexIp'] as bool,
-    json['fileUploadMaxSize'] as int,
-    json['gitCommit'] as String,
-    json['version'] as String,
-    json['themes'] as List,
-  );
-}
-
-Map<String, dynamic> _$ConfigurationLoungeResponseBodyToJson(
-        ConfigurationLoungeResponseBody instance) =>
-    <String, dynamic>{
-      'defaultTheme': instance.defaultTheme,
-      'defaults': instance.defaults,
-      'displayNetwork': instance.displayNetwork,
-      'fileUpload': instance.fileUpload,
-      'ldapEnabled': instance.ldapEnabled,
-      'lockNetwork': instance.lockNetwork,
-      'prefetch': instance.prefetch,
-      'public': instance.public,
-      'useHexIp': instance.useHexIp,
-      'fileUploadMaxSize': instance.fileUploadMaxSize,
-      'gitCommit': instance.gitCommit,
-      'version': instance.version,
-      'themes': instance.themes,
     };
 
 InitLoungeResponseBody _$InitLoungeResponseBodyFromJson(

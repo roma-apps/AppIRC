@@ -21,6 +21,8 @@ abstract class ChatBackendService implements Providable {
   bool get isConnected;
 
   ChatConnectionState get connectionState;
+
+  ChatConfig get chatConfig;
 }
 
 abstract class ChatOutputBackendService implements ChatBackendService {
@@ -66,7 +68,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
 
   ChatConnectionState get connectionState;
 
-  Future<RequestResult<bool>> connectChat({bool waitForResult: false});
+  Future<RequestResult<bool>> connectChat();
 
   Future<RequestResult<bool>> disconnectChat({bool waitForResult: false});
 
