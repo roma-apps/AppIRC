@@ -9,6 +9,7 @@ import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
@@ -62,6 +63,8 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
       Network network,
       NetworkChannel channel,
       bool isChannelActive) {
+    var networkBloc = Provider.of<NetworkBloc>(context);
+
     var iconData = Icons.message;
 
     switch (channel.type) {
@@ -93,9 +96,9 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
       child: StreamBuilder(
           stream: channelBloc.networkChannelStateStream,
           builder: (context, snapshot) {
-            NetworkChannelState state = snapshot.data;
-            if (state == null) {
-              state = NetworkChannelState.empty;
+            NetworkChannelState channelState = snapshot.data;
+            if (channelState == null) {
+              channelState = NetworkChannelState.empty;
             }
 
             return Row(children: <Widget>[
@@ -124,9 +127,19 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              buildConnectionIcon(context, foregroundColor, state.connected),
+              StreamBuilder<NetworkState>(
+                  stream: networkBloc.networkStateStream,
+                  initialData: NetworkState.empty,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<NetworkState> snapshot) {
+                    var networkState = snapshot.data;
+
+                    return buildConnectionIcon(context, foregroundColor,
+                        networkState.connected && channelState.connected);
+                  }),
               buildChannelUnreadCountBadge(context),
-              _buildPopupMenuButton(context, channel, state, foregroundColor)
+              _buildPopupMenuButton(
+                  context, channel, channelState, foregroundColor)
             ]);
           }),
     );

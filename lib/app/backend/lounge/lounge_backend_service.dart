@@ -195,7 +195,7 @@ class LoungeBackendService extends Providable
     if (waitForResult) {
       throw NotImplementedYetException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/disconnect");
+    _sendInputRequest(network, network.lobbyChannel, "/connect");
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -205,7 +205,7 @@ class LoungeBackendService extends Providable
     if (waitForResult) {
       throw NotImplementedYetException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/connect");
+    _sendInputRequest(network, network.lobbyChannel, "/disconnect");
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
