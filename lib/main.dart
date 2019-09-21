@@ -18,7 +18,7 @@ import 'package:flutter_appirc/app/chat/chat_preferences_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/default_values.dart';
-import 'package:flutter_appirc/app/skin/app_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_skin_preference_bloc.dart';
 import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
@@ -27,6 +27,7 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "Main", enabled: true);
 
@@ -89,7 +90,7 @@ class AppIRCState extends State<AppIRC> {
         });
       }
 
-      return _buildApp(SplashPage());
+      return _buildApp(SplashPage(), isPreferencesReady: false);
     } else {
       if (loungeConnectionPreferences == null) {
         return _buildAppForStartLoungePreferences();
@@ -265,36 +266,45 @@ class AppIRCState extends State<AppIRC> {
     );
   }
 
-  Widget _buildApp(Widget child) {
+  Widget _buildApp(Widget child, {bool isPreferencesReady = true}) {
     var preferencesService = Provider.of<PreferencesService>(context);
 
-    var defaultUISkin = createDefaultUISkin();
-    var appSkinBloc = AppSkinBloc(preferencesService, defaultUISkin);
+    var appSkinPreferenceBloc = AppSkinPreferenceBloc(
+        preferencesService, getAvailableSkins(), getDefaultUISkin());
 
-    return EasyLocalization(
-      child: StreamBuilder<UISkin>(
-          stream: appSkinBloc.skinStream,
-          initialData: defaultUISkin,
-          builder: (context, snapshot) {
-            var data = EasyLocalizationProvider.of(context).data;
+    return Provider(
+      providable: appSkinPreferenceBloc,
+      child: EasyLocalization(
+        child: StreamBuilder<AppSkin>(
+            stream: isPreferencesReady
+                ? appSkinPreferenceBloc.appSkinStream
+                : BehaviorSubject<AppSkin>(
+                    seedValue: getDefaultUISkin()),
+            initialData: isPreferencesReady
+                ? appSkinPreferenceBloc.currentAppSkin
+                : getDefaultUISkin(),
+            builder: (context, snapshot) {
+              var appSkin = snapshot.data;
 
-            var uiSkin = snapshot.data;
-            return Provider(
-              providable: uiSkin,
-              child: PlatformApp(
-                  title: "AppIRC",
-                  localizationsDelegates: [
-                    //app-specific localization
-                    EasylocaLizationDelegate(
-                        locale: data.locale, path: 'assets/langs'),
-                  ],
-                  supportedLocales: [Locale('en', 'US')],
-                  locale: data.savedLocale,
-                  android: (_) => MaterialAppData(theme: uiSkin.androidTheme),
-                  ios: (_) => CupertinoAppData(theme: uiSkin.iosTheme),
-                  home: child),
-            );
-          }),
+              var data = EasyLocalizationProvider.of(context).data;
+
+              return Provider(
+                providable: appSkin.uiSkin,
+                child: PlatformApp(
+                    title: "AppIRC",
+                    localizationsDelegates: [
+                      //app-specific localization
+                      EasylocaLizationDelegate(
+                          locale: data.locale, path: 'assets/langs'),
+                    ],
+                    supportedLocales: [Locale('en', 'US')],
+                    locale: data.savedLocale,
+                    android: (_) => MaterialAppData(theme: appSkin.androidTheme),
+                    ios: (_) => CupertinoAppData(theme: appSkin.iosTheme),
+                    home: child),
+              );
+            }),
+      ),
     );
   }
 }

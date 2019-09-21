@@ -74,7 +74,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 
     if (params != null) {
       rows.add(Text("${params.join(", ")}",
-          style: uiSkin.appSkin.channelMessagesBodyTextStyle));
+          style: uiSkin.channelMessagesBodyTextStyle));
     }
 
     if (message.text != null) {
@@ -89,8 +89,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
           }
         },
         text: text,
-        style: uiSkin.appSkin.channelMessagesBodyTextStyle,
-        linkStyle: uiSkin.appSkin.channelMessagesBodyTextStyle
+        style: uiSkin.channelMessagesBodyTextStyle,
+        linkStyle: uiSkin.channelMessagesBodyTextStyle
             .copyWith(color: Colors.blue),
       ));
     }
@@ -171,7 +171,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
       padding: const EdgeInsets.all(4.0),
       child: Text(
         dateString,
-        style: uiSkin.appSkin.channelMessagesDateTextStyle
+        style: uiSkin.channelMessagesDateTextStyle
             .copyWith(color: _findTitleColorDataForMessage(message)),
       ),
     );
@@ -180,7 +180,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
   Text _buildMessageTitleNick(UISkin uiSkin) {
     return Text(
       message.fromNick,
-      style: uiSkin.appSkin.channelMessagesNickTextStyle,
+      style: uiSkin.channelMessagesNickTextStyle,
     );
   }
 
@@ -263,7 +263,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 
     if (str != null) {
       return Text(str,
-          style: uiSkin.appSkin.channelMessagesDateTextStyle
+          style: uiSkin.channelMessagesDateTextStyle
               .copyWith(color: _findTitleColorDataForMessage(message)));
     } else {
       return null;

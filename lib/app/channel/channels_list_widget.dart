@@ -46,7 +46,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
           if (isChannelActive) {
             return Container(
                 decoration: BoxDecoration(
-                    color: UISkin.of(context).appSkin.accentColor),
+                    color: UISkin.of(context).accentColor),
                 child: _buildChannelRow(context, ircChatActiveChannelBloc,
                     network, channel, isChannelActive));
           } else {
@@ -120,7 +120,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
                               margin: EdgeInsets.all(8.0),
                               child: Text(channel.name,
                                   style: UISkin.of(context)
-                                      .appSkin
+
                                       .networksListChannelTextStyle
                                       .copyWith(color: foregroundColor)))
                         ]),

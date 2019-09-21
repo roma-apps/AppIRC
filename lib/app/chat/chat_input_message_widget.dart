@@ -36,10 +36,10 @@ class IRCNetworkChannelNewMessageState
           child: PlatformTextField(
             android: (_) => MaterialTextFieldData(decoration: InputDecoration(
                 hintText: hintStr,
-                hintStyle: uiSkin.appSkin.enterMessageTextStyle.copyWith(color: Colors.white60))),
+                hintStyle: uiSkin.enterMessageTextStyle.copyWith(color: Colors.white60))),
             ios: (_) => CupertinoTextFieldData(placeholder: hintStr),
             cursorColor: Colors.white,
-            style: uiSkin.appSkin.enterMessageTextStyle,
+            style: uiSkin.enterMessageTextStyle,
             controller: _messageController,
             onSubmitted: (term) {
               sendMessage(channelBloc);

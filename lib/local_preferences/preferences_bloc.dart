@@ -80,3 +80,19 @@ class BoolPreferencesBloc extends SimplePreferencesBloc<bool> {
   bool getValue({@required bool defaultValue})  =>
       _preferencesService.getBoolPreference(key, defaultValue: defaultValue);
 }
+
+
+class StringPreferencesBloc extends SimplePreferencesBloc<String> {
+  StringPreferencesBloc(PreferencesService preferencesService, String key)
+      : super(preferencesService, key);
+
+  Future<bool> setValue(String newValue) async =>
+      await _preferencesService.setStringValue(key, newValue);
+
+  Stream<String> valueStream({@required String defaultValue}) => _preferencesService
+      .getStringPreferenceStream(key, defaultValue: defaultValue)
+      .distinct();
+
+  String getValue({@required String defaultValue})  =>
+      _preferencesService.getStringPreference(key, defaultValue: defaultValue);
+}

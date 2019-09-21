@@ -133,7 +133,7 @@ class ChatPage extends StatelessWidget {
                     break;
                 }
 
-                var topicStyle = UISkin.of(context).appSkin.topicTextStyle;
+                var topicStyle = UISkin.of(context).topicTextStyle;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,

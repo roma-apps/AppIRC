@@ -14,7 +14,7 @@ buildFormTitle(BuildContext context, String title) => Padding(
         children: <Widget>[
           Text(
             title,
-            style: UISkin.of(context).appSkin.formRowLabelTextStyle,
+            style: UISkin.of(context).formRowLabelTextStyle,
           ),
           Divider()
         ],

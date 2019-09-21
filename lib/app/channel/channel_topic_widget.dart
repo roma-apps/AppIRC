@@ -50,7 +50,7 @@ class IRCNetworkChannelTopicTitleWidget extends StatelessWidget {
               }
 
               if (subTitleText != null && subTitleText.isNotEmpty) {
-                var topicStyle = UISkin.of(context).appSkin.topicTextStyle;
+                var topicStyle = UISkin.of(context).topicTextStyle;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -103,7 +103,7 @@ class IRCNetworkChannelTopicEditWidgetState
 //        if (topic == null || topic.isEmpty) {
 //          return Text(channelName);
 //        } else {
-//          var topicStyle = UISkin.of(context).appSkin.topicTextStyle;
+//          var topicStyle = UISkin.of(context).topicTextStyle;
 //
 //          return Column(
 //            crossAxisAlignment: CrossAxisAlignment.start,

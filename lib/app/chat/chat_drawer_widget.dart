@@ -7,6 +7,7 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_page.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/network_preferences_page.dart';
 import 'package:flutter_appirc/app/network/networks_list_widget.dart';
+import 'package:flutter_appirc/app/skin/app_skin_day_night_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -26,6 +27,10 @@ class ChatDrawerWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _buildLoungeSettingsButton(context),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AppSkinDayNightIconButton(),
             )
           ],
         ),
