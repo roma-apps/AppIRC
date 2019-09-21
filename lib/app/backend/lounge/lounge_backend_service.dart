@@ -225,7 +225,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<ChannelUserInfo>> getUserInfo(
+  Future<RequestResult<ChannelUserInfo>> printUserInfo(
       Network network, NetworkChannel channel, String userNick,
       {bool waitForResult = false}) async {
     if (waitForResult) {
@@ -249,8 +249,7 @@ class LoungeBackendService extends Providable
 
     var channelsWithoutPassword = preferences.channelsWithoutPassword;
     var channelNames = channelsWithoutPassword.map((channel) => channel.name);
-    String join = channelNames
-              .join(LoungeConstants.channelsNamesSeparator);
+    String join = channelNames.join(LoungeConstants.channelsNamesSeparator);
     var request = LoungeJsonRequest(
         name: LoungeRequestEventNames.networkNew,
         body: NetworkNewLoungeRequestBody(
@@ -426,7 +425,6 @@ class LoungeBackendService extends Providable
       var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
-        var message = toIRCMessage(data.msg);
         if (data.unread != null) {
           var channelState = currentStateExtractor();
           channelState.unreadCount = data.unread;
@@ -444,6 +442,26 @@ class LoungeBackendService extends Providable
       if (channel.remoteId == data.chan) {
         var channelState = currentStateExtractor();
         channelState.topic = data.topic;
+        listener(channelState);
+//        var message = toIRCMessage(data.msg);
+//        listener(message);
+      }
+    }));
+
+    disposable.add(createEventListenerDisposable(
+        LoungeResponseEventNames.channelState, (raw) {
+      var data =
+          ChannelStateLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+      if (channel.remoteId == data.chan) {
+        var channelState = currentStateExtractor();
+        if (data.state == ChannelStateLoungeResponseBody.STATE_CONNECTED) {
+          channelState.connected = true;
+        } else if (data.state ==
+            ChannelStateLoungeResponseBody.STATE_DISCONNECTED) {
+          channelState.connected = false;
+        }
+
         listener(channelState);
 //        var message = toIRCMessage(data.msg);
 //        listener(message);
@@ -481,7 +499,7 @@ class LoungeBackendService extends Providable
         }, orElse: () => null)
             as LoungeJsonRequest<NetworkNewLoungeRequestBody>;
 
-        var loungePreferences = request.body;
+
 
         // todo retreive settings from request
         var connectionPreferences = IRCNetworkConnectionPreferences(
@@ -860,17 +878,14 @@ Future<ChatConfig> _connect(LoungeConnectionPreferences preferences,
           throw PrivateLoungeNotSupportedException(preferences);
         }
       } else {
-
         if (!commandsReceived && !configReceived && !authorizedReceived) {
           return null;
         } else {
-
           try {
             socketIOService.disconnect();
-          } on Exception catch(e) {
+          } on Exception catch (e) {
             _logger.e(() => "Error during disconnecting on fail connect $e");
           }
-
 
           // something received something not
           throw InvalidConnectionResponseException(preferences,

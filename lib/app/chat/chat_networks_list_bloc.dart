@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -35,41 +34,39 @@ class ChatNetworksListBloc extends Providable {
     addDisposable(subject: _lastJoinedNetworkController);
     addDisposable(subject: _lastExitedNetworkController);
 
-
     addDisposable(
         disposable: backendService.listenForNetworkEnter((network) async {
-          if (network.localId == null) {
-            network.localId = await _nextNetworkLocalId;
-          }
-          for (var channel in network.channels) {
-            if (channel.localId == null) {
-              channel.localId = await _nextNetworkChannelLocalId;
-            }
-          }
+      if (network.localId == null) {
+        network.localId = await _nextNetworkLocalId;
+      }
+      for (var channel in network.channels) {
+        if (channel.localId == null) {
+          channel.localId = await _nextNetworkChannelLocalId;
+        }
+      }
 
-          _networksChannelListBlocs[network] = ChatNetworkChannelsListBloc(
-              backendService, network, nextChannelIdGenerator);
+      _networksChannelListBlocs[network] = ChatNetworkChannelsListBloc(
+          backendService, network, nextChannelIdGenerator);
 
-          var networks = _currentNetworks;
+      var networks = _currentNetworks;
 
-          Disposable listenForNetworkExit;
-          listenForNetworkExit = backendService.listenForNetworkExit(network, () {
-            var networks = _currentNetworks;
+      Disposable listenForNetworkExit;
+      listenForNetworkExit = backendService.listenForNetworkExit(network, () {
+        var networks = _currentNetworks;
 
-            _networksChannelListBlocs.remove(network).dispose();
+        _networksChannelListBlocs.remove(network).dispose();
 
-            networks.remove(network);
-            _lastExitedNetworkController.add(network);
-            _onNetworksChanged(networks);
-            listenForNetworkExit.dispose();
-          });
-          addDisposable(disposable: listenForNetworkExit);
+        networks.remove(network);
+        _lastExitedNetworkController.add(network);
+        _onNetworksChanged(networks);
+        listenForNetworkExit.dispose();
+      });
+      addDisposable(disposable: listenForNetworkExit);
 
-          networks.add(network);
-          _lastJoinedNetworkController.add(network);
-          _onNetworksChanged(networks);
-        }));
-
+      networks.add(network);
+      _lastJoinedNetworkController.add(network);
+      _onNetworksChanged(networks);
+    }));
   }
 
   void _onNetworksChanged(List<Network> networks) {
@@ -148,7 +145,6 @@ class ChatNetworksListBloc extends Providable {
       await backendService.leaveNetwork(network, waitForResult: waitForResult);
 
   Network findNetworkWithChannel(NetworkChannel channel) =>
-      networks.firstWhere((network) => network.channels.contains(channel));
-
-
+      networks.firstWhere((network) => network.channels.contains(channel),
+          orElse: () => null);
 }

@@ -15,10 +15,18 @@ class ChatConfig {
   final int fileUploadMaxSize;
   final List<String> commands;
 
-
-  ChatConfig(this.defaultNetwork, this.defaultChannels, this.defaultPassword,
-      this.displayNetwork, this.fileUpload, this.ldapEnabled, this.lockNetwork,
-      this.prefetch, this.public, this.useHexIp, this.fileUploadMaxSize,
+  ChatConfig(
+      this.defaultNetwork,
+      this.defaultChannels,
+      this.defaultPassword,
+      this.displayNetwork,
+      this.fileUpload,
+      this.ldapEnabled,
+      this.lockNetwork,
+      this.prefetch,
+      this.public,
+      this.useHexIp,
+      this.fileUploadMaxSize,
       this.commands);
 
   @override
@@ -50,17 +58,33 @@ class ChatConfig {
 class ServerNameNotUniqueException implements Exception {}
 
 class NetworkState {
-  static final NetworkState empty = NetworkState();
+  static final NetworkState empty = NetworkState.name(connected: false);
 
   bool connected;
+
+  NetworkState(this.connected);
+
+  NetworkState.name({@required this.connected});
 }
 
 class NetworkChannelState {
   String topic;
-
-  static final NetworkChannelState empty = NetworkChannelState();
-
   var unreadCount;
+
+  var editPossible;
+  var connected;
+
+  static final NetworkChannelState empty = NetworkChannelState.name(
+      topic: null, unreadCount: 0, editPossible: false , connected: false);
+
+  NetworkChannelState(
+      this.topic, this.unreadCount, this.editPossible, this.connected);
+
+  NetworkChannelState.name(
+      {@required this.topic,
+      @required this.unreadCount,
+      @required this.editPossible,
+      @required this.connected});
 }
 
 class NetworkChannelInfo {

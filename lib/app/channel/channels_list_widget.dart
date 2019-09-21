@@ -2,12 +2,19 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart'
     show Colors, Icons, PopupMenuButton, PopupMenuEntry, PopupMenuItem;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
+import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
+import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_model.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworkChannelsListWidget extends StatelessWidget {
   final Network network;
@@ -77,77 +84,90 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
     }
 
     var foregroundColor = calculateForegroundColor(isChannelActive);
+    var channelBloc = NetworkChannelBloc(
+        Provider.of<ChatInputOutputBackendService>(context), network,
+        channel,
+        Provider.of<ChatNetworkChannelsStateBloc>(context));
+    return Provider(
+      providable: channelBloc,
+      child: StreamBuilder(
+          stream: channelBloc.networkChannelStateStream,
+          builder: (context, snapshot) {
+            NetworkChannelState state = snapshot.data;
+            if (state == null) {
+              state = NetworkChannelState.empty;
+            }
 
-    return Row(children: <Widget>[
-      Padding(
-        padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
-        child: Icon(iconData, color: foregroundColor),
-      ),
-      Expanded(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: GestureDetector(
-            onTap: () => ircChatActiveChannelBloc.changeActiveChanel(channel),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: Text(channel.name,
-                          style: UISkin.of(context)
-                              .appSkin
-                              .networksListChannelTextStyle
-                              .copyWith(color: foregroundColor)))
-                ]),
-          ),
-        ),
-      ),
-//      buildChannelUnreadCountBadge(context),
-//      buildConnectionIcon(context, foregroundColor, channel.isConnected),
-//      _buildPopupMenuButton(lounge, channel, context, foregroundColor)
-    ]);
+            return Row(children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
+                child: Icon(iconData, color: foregroundColor),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: GestureDetector(
+                    onTap: () =>
+                        ircChatActiveChannelBloc.changeActiveChanel(channel),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                              margin: EdgeInsets.all(8.0),
+                              child: Text(channel.name,
+                                  style: UISkin.of(context)
+                                      .appSkin
+                                      .networksListChannelTextStyle
+                                      .copyWith(color: foregroundColor)))
+                        ]),
+                  ),
+                ),
+              ),
+              buildConnectionIcon(context, foregroundColor, state.connected),
+              buildChannelUnreadCountBadge(context),
+              _buildPopupMenuButton(context, channel, state, foregroundColor)
+            ]);
+          }),
+    );
   }
 
   PopupMenuButton<ChannelDropDownAction> _buildPopupMenuButton(
-      BuildContext context, NetworkChannel channel, Color foregroundColor) {
-//    return PopupMenuButton<ChannelDropDownAction>(
-//      icon: Icon(Icons.more_vert, color: foregroundColor),
-//      onSelected: (value) async {
-//        switch (value) {
-//          case ChannelDropDownAction.LEAVE:
-//            IRCNetworkChannelCommandLeaveBloc(lounge: lounge, channel: channel)
-//                .sendCloseIRCCommand(channelName: channel.name);
-//            break;
-//          case ChannelDropDownAction.TOPIC:
-//            showPlatformDialog(
-//                context: context,
-//                builder: (_) => IRCNetworkChannelTopicEditWidget(channel),
-//                androidBarrierDismissible: true);
-//            break;
-//          case ChannelDropDownAction.LIST_BANNED:
-//            IRCNetworkChannelCommandListBannedBloc(
-//                    lounge: lounge, channel: channel)
-//                .sendIRCBanListCommand();
-//            break;
-//          case ChannelDropDownAction.USER_INFORMATION:
-//            IRCNetworkChannelCommandUserInformationBloc(
-//                    // network name used as user name only in direct messages channels
-//                    lounge: lounge,
-//                    channel: channel,
-//                    username: network.name)
-//                .sendIRCUserInformationCommand();
-//            break;
-//        }
-//      },
-//      itemBuilder: (context) {
-//        return _buildMenuItems(context, channel);
-//      },
-//    );
+      BuildContext context,
+      NetworkChannel channel,
+      NetworkChannelState state,
+      Color foregroundColor) {
+    var channelBloc = Provider.of<NetworkChannelBloc>(context);
+
+    return PopupMenuButton<ChannelDropDownAction>(
+      icon: Icon(Icons.more_vert, color: foregroundColor),
+      onSelected: (value) async {
+        switch (value) {
+          case ChannelDropDownAction.LEAVE:
+            channelBloc.leaveNetworkChannel();
+            break;
+          case ChannelDropDownAction.TOPIC:
+            showPlatformDialog(
+                context: context,
+                builder: (_) => IRCNetworkChannelTopicEditWidget(channel),
+                androidBarrierDismissible: true);
+            break;
+          case ChannelDropDownAction.LIST_BANNED:
+            channelBloc.printNetworkChannelBannedUsers();
+            break;
+          case ChannelDropDownAction.USER_INFORMATION:
+            channelBloc.printUserInfo(network.name);
+            break;
+        }
+      },
+      itemBuilder: (context) {
+        return _buildMenuItems(context, channel, state);
+      },
+    );
   }
 
   List<PopupMenuEntry<ChannelDropDownAction>> _buildMenuItems(
-      BuildContext context, NetworkChannel channel) {
+      BuildContext context, NetworkChannel channel, NetworkChannelState state) {
     List<PopupMenuEntry<ChannelDropDownAction>> menuItems;
 
     var appLocalizations = AppLocalizations.of(context);
@@ -170,14 +190,14 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
         break;
     }
 
-//    if (channel.isEditTopicPossible == true) {
-//      menuItems.insert(
-//          0,
-//          buildDropdownMenuItemRow(
-//              value: ChannelDropDownAction.TOPIC,
-//              text: appLocalizations.tr("settings.channel_dropdown_menu.topic"),
-//              iconData: Icons.edit));
-//    }
+    if (state.editPossible == true) {
+      menuItems.insert(
+          0,
+          buildDropdownMenuItemRow(
+              value: ChannelDropDownAction.TOPIC,
+              text: appLocalizations.tr("settings.channel_dropdown_menu.topic"),
+              iconData: Icons.edit));
+    }
 
     return menuItems;
   }
@@ -233,7 +253,10 @@ Color calculateForegroundColor(bool isChannelActive) =>
 buildConnectionIcon(
     BuildContext context, Color foregroundColor, bool connected) {
   if (!connected) {
-    return Icon(Icons.cloud_off, color: foregroundColor);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal:8.0),
+      child: Icon(Icons.cloud_off, color: foregroundColor),
+    );
   } else {
     return Container();
   }

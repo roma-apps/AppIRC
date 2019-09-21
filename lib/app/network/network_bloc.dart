@@ -50,4 +50,9 @@ class NetworkBloc extends Providable {
           {bool waitForResult: false}) async =>
       await backendService.joinNetworkChannel(network, preferences,
           waitForResult: waitForResult);
+
+  Future<RequestResult<bool>> leaveNetwork(
+      {bool waitForResult: false}) async =>
+      await backendService.leaveNetwork(network,
+          waitForResult: waitForResult);
 }
