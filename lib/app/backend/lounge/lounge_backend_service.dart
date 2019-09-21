@@ -571,18 +571,30 @@ class LoungeBackendService extends Providable
       Network network,
       NetworkState Function() currentStateExtractor,
       NetworkStateListener listener) {
-    // TODO: implement listenForNetworkState
     var disposable = CompositeDisposable([]);
 
+    disposable.add(
+        createEventListenerDisposable((LoungeResponseEventNames.networkOptions), (raw) {
+          var parsed = NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+          if (parsed.network == network.remoteId) {
+            // nothing to change right now
+            var currentState = currentStateExtractor();
+            listener(currentState);
+          }
+        }));
+
+    disposable.add(
+        createEventListenerDisposable((LoungeResponseEventNames.networkStatus), (raw) {
+          var parsed = NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+          if (parsed.network == network.remoteId) {
+            var newState = toNetworkState(parsed);
+            listener(newState);
+          }
+        }));
+
     return disposable;
-
-//    var parsed =
-//    NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _networkOptionsController.sink.add(parsed);
-
-//    var parsed =
-//    NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _networkStatusController.sink.add(parsed);
   }
 
   @override
