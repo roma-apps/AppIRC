@@ -49,7 +49,7 @@ class IRCNetworkChannelTopicTitleWidget extends StatelessWidget {
                   break;
               }
 
-              if (subTitleText != null) {
+              if (subTitleText != null && subTitleText.isNotEmpty) {
                 var topicStyle = UISkin.of(context).appSkin.topicTextStyle;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
