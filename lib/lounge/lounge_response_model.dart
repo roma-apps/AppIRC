@@ -267,8 +267,6 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class ChannelStateLoungeResponseBody extends LoungeResponseBody {
-  static const int STATE_CONNECTED = 1;
-  static const int STATE_DISCONNECTED = 0;
 
   final int chan;
   final int state;

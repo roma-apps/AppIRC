@@ -8,10 +8,9 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-typedef NetworksListListener(List<Network> networks);
-typedef NetworkListener(Network network);
+typedef NetworkListener(NetworkWithState network);
 typedef NetworkStateListener(NetworkState networkState);
-typedef NetworkChannelListener(NetworkChannel channel);
+typedef NetworkChannelListener(NetworkChannelWithState channel);
 typedef NetworkChannelStateListener(NetworkChannelState channelState);
 typedef NetworkChannelMessageListener(IRCChatMessage message);
 
@@ -40,6 +39,7 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 
   Disposable listenForNetworkChannelJoin(
       Network network, NetworkChannelListener listener);
+
 
   Disposable listenForNetworkChannelState(
       Network network,

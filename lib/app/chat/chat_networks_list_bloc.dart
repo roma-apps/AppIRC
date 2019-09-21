@@ -37,7 +37,10 @@ class ChatNetworksListBloc extends Providable {
 
 
     addDisposable(
-        disposable: backendService.listenForNetworkEnter((network) async {
+        disposable: backendService.listenForNetworkEnter((networkWithState) async {
+
+          var network = networkWithState.network;
+
           if (network.localId == null) {
             network.localId = await _nextNetworkLocalId;
           }
@@ -66,7 +69,7 @@ class ChatNetworksListBloc extends Providable {
           addDisposable(disposable: listenForNetworkExit);
 
           networks.add(network);
-          _lastJoinedNetworkController.add(network);
+          _lastJoinedNetworkController.add(networkWithState);
           _onNetworksChanged(networks);
         }));
 
@@ -91,9 +94,9 @@ class ChatNetworksListBloc extends Providable {
   var _networksController = BehaviorSubject<List<Network>>(seedValue: []);
 
   // ignore: close_sinks
-  var _lastJoinedNetworkController = BehaviorSubject<Network>();
+  var _lastJoinedNetworkController = BehaviorSubject<NetworkWithState>();
 
-  Stream<Network> get lastJoinedNetworkStream =>
+  Stream<NetworkWithState> get lastJoinedNetworkStream =>
       _lastJoinedNetworkController.stream;
 
   // ignore: close_sinks

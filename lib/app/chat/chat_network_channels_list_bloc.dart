@@ -11,7 +11,6 @@ class ChatNetworkChannelsListBloc extends Providable {
   final Network network;
   final LocalIdGenerator nextChannelIdGenerator;
 
-
   Future<int> get _nextNetworkChannelLocalId async =>
       await nextChannelIdGenerator();
 
@@ -21,8 +20,9 @@ class ChatNetworkChannelsListBloc extends Providable {
     addDisposable(subject: _lastJoinedNetworkChannelController);
     addDisposable(subject: _lastExitedNetworkChannelController);
 
-    var listenForNetworkChannelJoin =
-        backendService.listenForNetworkChannelJoin(network, (channel) async {
+    var listenForNetworkChannelJoin = backendService
+        .listenForNetworkChannelJoin(network, (channelWithState) async {
+      var channel = channelWithState.channel;
       channel.localId = await _nextNetworkChannelLocalId;
       network.channels.add(channel);
 
@@ -67,5 +67,4 @@ class ChatNetworkChannelsListBloc extends Providable {
 
   Stream<NetworkChannel> get lastExitedNetworkChannelStream =>
       _lastExitedNetworkChannelController.stream;
-
 }

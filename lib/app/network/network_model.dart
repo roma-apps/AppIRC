@@ -182,3 +182,32 @@ class IRCNetworkConnectionPreferences extends JsonPreferences {
   Map<String, dynamic> toJson() =>
       _$IRCNetworkConnectionPreferencesToJson(this);
 }
+
+
+
+class NetworkState {
+  static final NetworkState empty = NetworkState.name(connected: false, secure: false);
+
+
+
+  bool connected;
+  bool secure;
+
+  NetworkState(this.connected, this.secure);
+
+  NetworkState.name({@required this.connected, @required this.secure});
+
+
+}
+
+
+class NetworkWithState {
+  final Network network;
+  final NetworkState state;
+
+  final List<NetworkChannelWithState> channelsWithState;
+
+  NetworkWithState(this.network, this.state, this.channelsWithState);
+
+
+}

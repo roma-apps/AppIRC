@@ -249,8 +249,7 @@ class LoungeBackendService extends Providable
 
     var channelsWithoutPassword = preferences.channelsWithoutPassword;
     var channelNames = channelsWithoutPassword.map((channel) => channel.name);
-    String join = channelNames
-              .join(LoungeConstants.channelsNamesSeparator);
+    String join = channelNames.join(LoungeConstants.channelsNamesSeparator);
     var request = LoungeJsonRequest(
         name: LoungeRequestEventNames.networkNew,
         body: NetworkNewLoungeRequestBody(
@@ -390,8 +389,12 @@ class LoungeBackendService extends Providable
             name: parsed.chan.name, password: "");
 //            }
 
-        listener(NetworkChannel(preferences,
-            detectIRCNetworkChannelType(parsed.chan.type), parsed.chan.id));
+        var loungeChannel = parsed.chan;
+
+        var networkChannel = NetworkChannel(preferences,
+            detectIRCNetworkChannelType(parsed.chan.type), parsed.chan.id);
+        var channelState = toNetworkChannelState(loungeChannel);
+        listener(NetworkChannelWithState(networkChannel, channelState));
       }
     }));
 
@@ -496,17 +499,30 @@ class LoungeBackendService extends Providable
                 realName: loungeNetwork.realname,
                 username: loungeNetwork.username));
 
-        var channels = <NetworkChannel>[];
+        var channelsWithState = <NetworkChannelWithState>[];
 
         for (var loungeChannel in loungeNetwork.channels) {
-          channels.add(NetworkChannel(
+          var channel = NetworkChannel(
               IRCNetworkChannelPreferences.name(
                   name: loungeChannel.name, password: ""),
               detectIRCNetworkChannelType(loungeChannel.type),
-              loungeChannel.id));
+              loungeChannel.id);
+          var channelState = toNetworkChannelState((loungeChannel));
+          channelsWithState.add(NetworkChannelWithState(channel, channelState));
         }
 
-        listener(Network(connectionPreferences, loungeNetwork.uuid, channels));
+        var channels = channelsWithState
+            .map((channelWithState) => channelWithState.channel)
+            .toList();
+
+        var network =
+            Network(connectionPreferences, loungeNetwork.uuid, channels);
+
+        var loungeNetworkStatus = loungeNetwork.status;
+
+        var networkState = toNetworkState(loungeNetworkStatus);
+
+        listener(NetworkWithState(network, networkState, channelsWithState));
       }
     }));
 
@@ -566,7 +582,7 @@ class LoungeBackendService extends Providable
     if (waitForResult) {
       throw NotImplementedYetException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/channellist");
+    _sendInputRequest(network, network.lobbyChannel, "/list");
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -577,7 +593,7 @@ class LoungeBackendService extends Providable
     if (waitForResult) {
       throw NotImplementedYetException();
     }
-    _sendInputRequest(network, channel, "/ignorelist");
+    _sendInputRequest(network, channel, "/banlist");
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -860,17 +876,14 @@ Future<ChatConfig> _connect(LoungeConnectionPreferences preferences,
           throw PrivateLoungeNotSupportedException(preferences);
         }
       } else {
-
         if (!commandsReceived && !configReceived && !authorizedReceived) {
           return null;
         } else {
-
           try {
             socketIOService.disconnect();
-          } on Exception catch(e) {
+          } on Exception catch (e) {
             _logger.e(() => "Error during disconnecting on fail connect $e");
           }
-
 
           // something received something not
           throw InvalidConnectionResponseException(preferences,

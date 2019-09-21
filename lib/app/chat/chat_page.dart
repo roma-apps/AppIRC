@@ -34,33 +34,35 @@ class ChatPage extends StatelessWidget {
     return Provider<IRCChatActiveChannelBloc>(
         providable:
             IRCChatActiveChannelBloc(networksListBloc, preferencesService),
-        child: PlatformScaffold(
-            android: (context) => MaterialScaffoldData(
-                appBar: AppBar(
-                  title: _buildAppBarChild(context),
-                  actions: <Widget>[
-                    buildMembersButton(context),
-                  ],
-                ),
-                drawer: Drawer(child: ChatDrawerWidget()),
-                body: _buildBody(context)),
-            ios: (context) => CupertinoPageScaffoldData(
-                resizeToAvoidBottomInset: true,
-                body: _buildBody(context),
-                navigationBar: CupertinoNavigationBar(
-                  leading: PlatformIconButton(
-                    androidIcon: Icon(Icons.menu),
-                    iosIcon: Icon(Icons.menu),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          platformPageRoute(
-                              builder: (context) => ChatDrawerPage()));
-                    },
+        child: SafeArea(
+          child: PlatformScaffold(
+              android: (context) => MaterialScaffoldData(
+                  appBar: AppBar(
+                    title: _buildAppBarChild(context),
+                    actions: <Widget>[
+                      buildMembersButton(context),
+                    ],
                   ),
-                  trailing: buildMembersButton(context),
-                  middle: _buildAppBarChild(context),
-                ))));
+                  drawer: Drawer(child: ChatDrawerWidget()),
+                  body: _buildBody(context)),
+              ios: (context) => CupertinoPageScaffoldData(
+                  resizeToAvoidBottomInset: true,
+                  body: _buildBody(context),
+                  navigationBar: CupertinoNavigationBar(
+                    leading: PlatformIconButton(
+                      androidIcon: Icon(Icons.menu),
+                      iosIcon: Icon(Icons.menu),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            platformPageRoute(
+                                builder: (context) => ChatDrawerPage()));
+                      },
+                    ),
+                    trailing: buildMembersButton(context),
+                    middle: _buildAppBarChild(context),
+                  ))),
+        ));
   }
 
   Widget buildMembersButton(BuildContext context) {

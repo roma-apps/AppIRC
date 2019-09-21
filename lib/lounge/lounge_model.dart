@@ -9,6 +9,10 @@ class LoungeConstants {
   static const String off = "off";
   static const String channelsNamesSeparator = " ";
 
+  static const int CHANNEL_STATE_CONNECTED = 1;
+  static const int CHANNEL_STATE_DISCONNECTED = 0;
+
+
 }
 
 class LoungeChannelTypeConstants {

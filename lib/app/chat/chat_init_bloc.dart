@@ -13,15 +13,13 @@ class ChatInitBloc extends Providable {
   final ChatInputBackendService _backendService;
   final ChatConnectionBloc _connectionBloc;
   final ChatPreferences _startPreferences;
-  final bool isChatBuildOneTime;
 
   bool initStarted = false;
 
   ChatInitBloc(
-      this._backendService, this._connectionBloc, this._startPreferences, this.isChatBuildOneTime) {
+      this._backendService, this._connectionBloc, this._startPreferences) {
     _logger.d(() => "init $_startPreferences");
 
-    if(!isChatBuildOneTime) {
       if (_connectionBloc.isConnected) {
         _sendStartRequests();
       } else {
@@ -39,7 +37,7 @@ class ChatInitBloc extends Providable {
 
         addDisposable(streamSubscription: subscription);
       }
-    }
+
 
   }
 

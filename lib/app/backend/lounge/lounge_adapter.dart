@@ -90,3 +90,19 @@ IRCNetworkChannelType detectIRCNetworkChannelType(String typeString) {
   }
   return type;
 }
+
+NetworkChannelState toNetworkChannelState(
+        ChannelLoungeResponseBody loungeChannel) =>
+    NetworkChannelState.name(
+        topic: loungeChannel.topic,
+        editTopicPossible: loungeChannel.editTopic,
+        unreadCount: loungeChannel.unread,
+        connected:
+            loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED,
+        highlighted: loungeChannel.highlight != null);
+
+NetworkState toNetworkState(
+        NetworkStatusLoungeResponseBody loungeNetworkStatus) =>
+    NetworkState.name(
+        connected: loungeNetworkStatus.connected,
+        secure: loungeNetworkStatus.secure);

@@ -34,7 +34,7 @@ class NetworkChannelBloc extends Providable {
   }
 
   get messagesStream =>
-      channelsStatesBloc.getMessagesBloc(channel).messagesStream;
+      channelsStatesBloc.getMessagesBloc(network, channel).messagesStream;
 
   Future<RequestResult<bool>> leaveNetworkChannel(
           {bool waitForResult: false}) async =>

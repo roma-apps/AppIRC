@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -14,82 +13,122 @@ class ChatNetworkChannelsStateBloc extends Providable {
   final ChatOutputBackendService backendService;
   final ChatNetworksListBloc networksListBloc;
 
-  final Map<Network, Map<NetworkChannel, BehaviorSubject<NetworkChannelState>>>
-      _states =
-      Map<Network, Map<NetworkChannel, BehaviorSubject<NetworkChannelState>>>();
+  final Map<String, Map<int, BehaviorSubject<NetworkChannelState>>> _states =
+      Map();
 
-  final Map<NetworkChannel, NetworkChannelMessagesBloc> _messagesBlocs =
-      Map<NetworkChannel, NetworkChannelMessagesBloc>();
+  BehaviorSubject<NetworkChannelState> _getStateControllerForNetworkChannel(
+      Network network, NetworkChannel channel) {
+    var networkKey = _calculateNetworkKey(network);
+    var channelKey = _calculateChannelKey(channel);
+    if (!_states.containsKey(networkKey)) {
+      _states[networkKey] = Map<int, BehaviorSubject<NetworkChannelState>>();
+    }
 
-  NetworkChannelMessagesBloc getMessagesBloc(NetworkChannel channel) =>
-      _messagesBlocs[channel];
+    if (!_states[networkKey].containsKey(channelKey)) {
+      _states[networkKey][channelKey] = BehaviorSubject<NetworkChannelState>(
+          seedValue: NetworkChannelState.empty);
+    }
+
+    return _states[networkKey][_calculateChannelKey(channel)];
+  }
+
+  final Map<int, NetworkChannelMessagesBloc> _messagesBlocs = Map();
+
+  NetworkChannelMessagesBloc getMessagesBloc(
+      Network network, NetworkChannel channel) {
+    var channelKey = channel.remoteId;
+    if (!_messagesBlocs.containsKey(channelKey)) {
+      _messagesBlocs[channelKey] =
+          NetworkChannelMessagesBloc(backendService, network, channel);
+    }
+    return _messagesBlocs[channelKey];
+  }
 
   ChatNetworkChannelsStateBloc(this.backendService, this.networksListBloc) {
     addDisposable(streamSubscription:
-    networksListBloc.lastJoinedNetworkStream.listen((network) {
+        networksListBloc.lastJoinedNetworkStream.listen((network) {
       onNetworkJoined(network);
     }));
   }
 
-  void onNetworkJoined(Network network) {
-    var networkChannelListBloc =
-        networksListBloc.getChatNetworkChannelsListBloc(network);
+  void onNetworkJoined(NetworkWithState networkWithState) {
+    var network = networkWithState.network;
 
-    _states[network] =
-        Map<NetworkChannel, BehaviorSubject<NetworkChannelState>>();
+    networkWithState.channelsWithState.forEach((channelWithState) =>
+        _onChannelJoined(
+            network, channelWithState.channel, channelWithState.state));
 
-    network.channels.forEach((channel) =>
-        _onChannelJoined(networkChannelListBloc, network, channel));
+    var lastJoinedListener = backendService.listenForNetworkChannelJoin(network,
+        ((channelWithState) {
+      _onChannelJoined(
+          network, channelWithState.channel, channelWithState.state);
+    }));
 
-    var lastJoinedListener =
-        networkChannelListBloc.lastJoinedNetworkChannelStream.listen((channel) {
-      _onChannelJoined(networkChannelListBloc, network, channel);
-    });
-
-    addDisposable(streamSubscription: lastJoinedListener);
+    addDisposable(disposable: lastJoinedListener);
 
     addDisposable(
         disposable: backendService.listenForNetworkExit(network, () {
       onNetworkExit(network);
-      lastJoinedListener.cancel();
+      lastJoinedListener.dispose();
     }));
   }
 
-  void _onChannelJoined(ChatNetworkChannelsListBloc bloc, Network network,
-      NetworkChannel channel) {
-    _states[network][channel] = BehaviorSubject<NetworkChannelState>(seedValue: NetworkChannelState.empty);
-    _messagesBlocs[channel] =
-        NetworkChannelMessagesBloc(backendService, network, channel);
+  void _onChannelJoined(
+      Network network, NetworkChannel channel, NetworkChannelState state) {
+    _updateState(network, channel, state);
     addDisposable(
-        disposable: backendService
-            .listenForNetworkChannelState(network, channel,()=> _states[network][channel].value,  (state) {
-      _states[network][channel].add(state);
+        disposable: backendService.listenForNetworkChannelState(
+            network, channel, () => _states[network][channel].value, (state) {
+      _updateState(network, channel, state);
     }));
 
-    StreamSubscription exitListener;
-    exitListener = bloc.lastExitedNetworkChannelStream.listen((channel) {
-      _states[network].remove(channel).close();
-      _messagesBlocs.remove(channel).dispose();
-      exitListener.cancel();
+    Disposable exitListener;
+    exitListener =
+        backendService.listenForNetworkChannelLeave(network, channel, () {
+      _onChannelLeave(network, channel);
+      exitListener.dispose();
     });
 
-    addDisposable(streamSubscription: exitListener);
+    addDisposable(disposable: exitListener);
   }
+
+  void _onChannelLeave(Network network, NetworkChannel channel) {
+    var stateController =
+        _getStateControllerForNetworkChannel(network, channel);
+    stateController.close();
+    _states[_calculateNetworkKey(network)]
+        .remove(_calculateChannelKey(channel));
+    _messagesBlocs.remove(_calculateChannelKey(channel)).dispose();
+  }
+
+  void _updateState(
+      Network network, NetworkChannel channel, NetworkChannelState state) {
+    _getStateControllerForNetworkChannel(network, channel).add(state);
+  }
+
+  String _calculateNetworkKey(Network network) => network.remoteId;
+
+  int _calculateChannelKey(NetworkChannel channel) => channel.remoteId;
 
   void onNetworkExit(Network network) {
-    _states.remove(network).forEach((channel, subject) {
-      getMessagesBloc(channel).dispose();
-      return subject.close();
-    });
+    if (_states.containsKey(_calculateNetworkKey(network))) {
+      _states
+          .remove(_calculateNetworkKey(network))
+          .forEach((remoteChannelId, subject) {
+        if (_messagesBlocs.containsKey(remoteChannelId)) {
+          _messagesBlocs[remoteChannelId].dispose();
+        }
+
+        subject.close();
+      });
+    }
   }
 
   Stream<NetworkChannelState> getNetworkChannelStateStream(
           Network network, NetworkChannel networkChannel) =>
-      _states[network][networkChannel].stream;
+      _states[_calculateNetworkKey(network)][networkChannel.remoteId].stream;
 
   NetworkChannelState getNetworkChannelState(
           Network network, NetworkChannel networkChannel) =>
-      _states[network][networkChannel].value;
-
-
+      _states[_calculateNetworkKey(network)][networkChannel.remoteId].value;
 }

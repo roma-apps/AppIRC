@@ -49,27 +49,6 @@ class ChatConfig {
 
 class ServerNameNotUniqueException implements Exception {}
 
-class NetworkState {
-  static final NetworkState empty = NetworkState();
-
-  bool connected;
-}
-
-class NetworkChannelState {
-  String topic;
-
-  static final NetworkChannelState empty = NetworkChannelState();
-
-  var unreadCount;
-}
-
-class NetworkChannelInfo {
-  final String name;
-  final String topic;
-  final int usersCount;
-
-  NetworkChannelInfo(this.name, this.topic, this.usersCount);
-}
 
 class ChannelUserInfo {
   final String nick;

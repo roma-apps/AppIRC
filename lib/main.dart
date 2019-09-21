@@ -51,8 +51,11 @@ class AppIRCState extends State<AppIRC> {
   bool isInitStarted = false;
   bool isInitSuccess = false;
   LoungeBackendService loungeBackendService;
+
+  Widget createdWidget;
+
   LoungeConnectionPreferences loungeConnectionPreferences;
-  bool isChatBuildOneTime = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,9 +87,7 @@ class AppIRCState extends State<AppIRC> {
         if (loungeBackendService == null) {
           return _buildAppForStartLoungePreferences();
         } else {
-          var buildChat2 = buildChat(context, loungeBackendService, preferencesService, isChatBuildOneTime);
-          isChatBuildOneTime = true;
-          return buildChat2;
+          return createdWidget;
         }
       }
     }
@@ -101,13 +102,74 @@ class AppIRCState extends State<AppIRC> {
 
       _logger.d(() => "_onLoungeChanged $newPreferences");
 
+      var preferencesService = Provider.of<PreferencesService>(context);
       var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
       var loungeBackendService = LoungeBackendService(
           socketManagerProvider.manager, loungeConnectionPreferences);
 
       loungeBackendService.init().then((_) {
+
         this.loungeBackendService = loungeBackendService;
-        isChatBuildOneTime = false;
+
+
+        var chatPreferencesBloc = ChatPreferencesLoaderBloc(preferencesService);
+
+        var networksListBloc = ChatNetworksListBloc(
+          loungeBackendService,
+          nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
+          nextChannelIdGenerator: chatPreferencesBloc.getNextNetworkChannelLocalId,
+        );
+
+
+        var connectionBloc = ChatConnectionBloc(loungeBackendService);
+        var networkStatesBloc =
+        ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+        var channelsStatesBloc =
+        ChatNetworkChannelsStateBloc(loungeBackendService, networksListBloc);
+
+        var _startPreferences =
+        chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+
+        var chatInitBloc =
+        ChatInitBloc(loungeBackendService, connectionBloc, _startPreferences);
+        createdWidget =  Provider<LoungeBackendService>(
+          providable: loungeBackendService,
+          child: Provider<ChatInputOutputBackendService>(
+            providable: loungeBackendService,
+            child: Provider<ChatOutputBackendService>(
+              providable: loungeBackendService,
+              child: Provider<ChatInputBackendService>(
+                providable: loungeBackendService,
+                child: Provider(
+                  providable: chatPreferencesBloc,
+                  child: Provider(
+                    providable: connectionBloc,
+                    child: Provider(
+                      providable: networksListBloc,
+                      child: Provider(
+                        providable: networkStatesBloc,
+                        child: Provider(
+                          providable: channelsStatesBloc,
+                          child: Provider(
+                            providable: chatInitBloc,
+                            child: Provider(
+                              providable: ChatPreferencesSaverBloc(
+                                  preferencesService,
+                                  networksListBloc,
+                                  chatInitBloc),
+                              child: _buildApp(ChatPage()),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
         setState(() {});
       });
     }
@@ -125,7 +187,7 @@ class AppIRCState extends State<AppIRC> {
 //    var preferencesService =
 //    Provider.of<PreferencesService>(context);
 
-    _logger.d(() => "buildChat $isChatBuildOneTime");
+    _logger.d(() => "buildChat2 $isChatBuildOneTime");
 
     var chatPreferencesBloc = ChatPreferencesLoaderBloc(preferencesService);
 
@@ -134,6 +196,7 @@ class AppIRCState extends State<AppIRC> {
       nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
       nextChannelIdGenerator: chatPreferencesBloc.getNextNetworkChannelLocalId,
     );
+
 
     var connectionBloc = ChatConnectionBloc(loungeBackendService);
     var networkStatesBloc =
@@ -145,7 +208,7 @@ class AppIRCState extends State<AppIRC> {
         chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
 
     var chatInitBloc =
-        ChatInitBloc(loungeBackendService, connectionBloc, _startPreferences, isChatBuildOneTime);
+        ChatInitBloc(loungeBackendService, connectionBloc, _startPreferences);
     return Provider<LoungeBackendService>(
       providable: loungeBackendService,
       child: Provider<ChatInputOutputBackendService>(
