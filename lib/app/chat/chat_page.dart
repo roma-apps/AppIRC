@@ -180,10 +180,16 @@ class ChatPage extends StatelessWidget {
               } else {
                 var network = networkListBloc.findNetworkWithChannel(channel);
 
-                return Provider(
-                    providable: NetworkChannelBloc(
-                        backendService, network, channel, channelsStateBloc),
-                    child: IRCNetworkChannelWidget());
+                if(network == null) {
+                  return Container();
+                } else {
+
+                  return Provider(
+                      providable: NetworkChannelBloc(
+                          backendService, network, channel, channelsStateBloc),
+                      child: IRCNetworkChannelWidget());
+                }
+
               }
             }));
   }

@@ -41,9 +41,9 @@ class NetworkChannelBloc extends Providable {
       await backendService.leaveNetworkChannel(network, channel,
           waitForResult: waitForResult);
 
-  Future<RequestResult<ChannelUserInfo>> getUserInfo(String userNick,
+  Future<RequestResult<ChannelUserInfo>> printUserInfo(String userNick,
           {bool waitForResult: false}) async =>
-      await backendService.getUserInfo(network, channel, userNick,
+      await backendService.printUserInfo(network, channel, userNick,
           waitForResult: waitForResult);
 
   Future<RequestResult<NetworkChannelMessage>> printNetworkChannelBannedUsers(

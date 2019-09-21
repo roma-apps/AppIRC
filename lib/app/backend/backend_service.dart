@@ -96,7 +96,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
       Network network, NetworkChannel channel,
       {bool waitForResult: false});
 
-  Future<RequestResult<ChannelUserInfo>> getUserInfo(
+  Future<RequestResult<ChannelUserInfo>> printUserInfo(
       Network network, NetworkChannel channel, String userNick,
       {bool waitForResult: false});
 
