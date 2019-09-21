@@ -12,6 +12,8 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -314,10 +316,17 @@ class LoungeBackendService extends Providable
     var disposable = CompositeDisposable([]);
     disposable
         .add(createEventListenerDisposable(LoungeResponseEventNames.msg, (raw) {
+
+
       var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
+
+
+
+
       if (channel.remoteId == data.chan) {
-        var message = toIRCMessage(data.msg);
+        var message = toChatMessage(channel, data.msg);
+        _logger.d(() => "onNewMessage for {$data.chan}  $data");
         listener(message);
       }
     }));
@@ -328,8 +337,11 @@ class LoungeBackendService extends Providable
           MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
-        var message = IRCChatSpecialMessage(data.data);
-        listener(message);
+        var specialMessages = toSpecialMessages(channel, data.data);
+
+        specialMessages.forEach((specialMessage) {
+          listener(specialMessage);
+        });
       }
     }));
 
@@ -392,7 +404,7 @@ class LoungeBackendService extends Providable
         var loungeChannel = parsed.chan;
 
         var networkChannel = NetworkChannel(preferences,
-            detectIRCNetworkChannelType(parsed.chan.type), parsed.chan.id);
+            detectNetworkChannelType(parsed.chan.type), parsed.chan.id);
         var channelState = toNetworkChannelState(loungeChannel);
         listener(NetworkChannelWithState(networkChannel, channelState));
       }
@@ -502,8 +514,6 @@ class LoungeBackendService extends Providable
         }, orElse: () => null)
             as LoungeJsonRequest<NetworkNewLoungeRequestBody>;
 
-
-
         // todo retreive settings from request
         var connectionPreferences = IRCNetworkConnectionPreferences(
             serverPreferences: IRCNetworkServerPreferences(
@@ -523,7 +533,7 @@ class LoungeBackendService extends Providable
           var channel = NetworkChannel(
               IRCNetworkChannelPreferences.name(
                   name: loungeChannel.name, password: ""),
-              detectIRCNetworkChannelType(loungeChannel.type),
+              detectNetworkChannelType(loungeChannel.type),
               loungeChannel.id);
           var channelState = toNetworkChannelState((loungeChannel));
           channelsWithState.add(NetworkChannelWithState(channel, channelState));
@@ -573,26 +583,28 @@ class LoungeBackendService extends Providable
       NetworkStateListener listener) {
     var disposable = CompositeDisposable([]);
 
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.networkOptions), (raw) {
-          var parsed = NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    disposable.add(createEventListenerDisposable(
+        (LoungeResponseEventNames.networkOptions), (raw) {
+      var parsed =
+          NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (parsed.network == network.remoteId) {
-            // nothing to change right now
-            var currentState = currentStateExtractor();
-            listener(currentState);
-          }
-        }));
+      if (parsed.network == network.remoteId) {
+        // nothing to change right now
+        var currentState = currentStateExtractor();
+        listener(currentState);
+      }
+    }));
 
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.networkStatus), (raw) {
-          var parsed = NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    disposable.add(createEventListenerDisposable(
+        (LoungeResponseEventNames.networkStatus), (raw) {
+      var parsed =
+          NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (parsed.network == network.remoteId) {
-            var newState = toNetworkState(parsed);
-            listener(newState);
-          }
-        }));
+      if (parsed.network == network.remoteId) {
+        var newState = toNetworkState(parsed);
+        listener(newState);
+      }
+    }));
 
     return disposable;
   }
@@ -606,7 +618,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<List<IRCChatSpecialMessage>>>
+  Future<RequestResult<List<SpecialMessage>>>
       printNetworkAvailableChannels(Network network,
           {bool waitForResult = false}) async {
     if (waitForResult) {
@@ -617,7 +629,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<NetworkChannelMessage>> printNetworkChannelBannedUsers(
+  Future<RequestResult<RegularMessage>> printNetworkChannelBannedUsers(
       Network network, NetworkChannel channel,
       {bool waitForResult = false}) async {
     if (waitForResult) {
@@ -628,7 +640,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<NetworkChannelMessage>> printNetworkIgnoredUsers(
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
       Network network,
       {bool waitForResult = false}) async {
     if (waitForResult) {
@@ -639,7 +651,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<NetworkChannelMessage>> sendNetworkChannelRawMessage(
+  Future<RequestResult<RegularMessage>> sendNetworkChannelRawMessage(
       Network network, NetworkChannel channel, String rawMessage,
       {bool waitForResult = false}) async {
     if (waitForResult) {

@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 import 'network_model.dart';
@@ -20,12 +21,12 @@ class NetworkBloc extends Providable {
 
   NetworkBloc(this.backendService, this.network, this.networksStateBloc);
 
-  Future<RequestResult<List<IRCChatSpecialMessage>>>
+  Future<RequestResult<List<SpecialMessage>>>
       printNetworkAvailableChannels({bool waitForResult: false}) async =>
           await backendService.printNetworkAvailableChannels(network,
               waitForResult: waitForResult);
 
-  Future<RequestResult<NetworkChannelMessage>> printNetworkIgnoredUsers(
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
           {bool waitForResult: false}) async =>
       await backendService.printNetworkIgnoredUsers(network,
           waitForResult: waitForResult);

@@ -33,9 +33,6 @@ class NetworkChannelBloc extends Providable {
     }));
   }
 
-  get messagesStream =>
-      channelsStatesBloc.getMessagesBloc(network, channel).messagesStream;
-
   Future<RequestResult<bool>> leaveNetworkChannel(
           {bool waitForResult: false}) async =>
       await backendService.leaveNetworkChannel(network, channel,
@@ -46,7 +43,7 @@ class NetworkChannelBloc extends Providable {
       await backendService.printUserInfo(network, channel, userNick,
           waitForResult: waitForResult);
 
-  Future<RequestResult<NetworkChannelMessage>> printNetworkChannelBannedUsers(
+  Future<RequestResult<ChatMessage>> printNetworkChannelBannedUsers(
           {bool waitForResult: false}) async =>
       await backendService.printNetworkChannelBannedUsers(network, channel,
           waitForResult: waitForResult);
@@ -64,7 +61,7 @@ class NetworkChannelBloc extends Providable {
   Future<RequestResult<bool>> onOpenNetworkChannel() async =>
       await backendService.onOpenNetworkChannel(network, channel);
 
-  Future<RequestResult<NetworkChannelMessage>> sendNetworkChannelRawMessage(
+  Future<RequestResult<ChatMessage>> sendNetworkChannelRawMessage(
           String rawMessage,
           {bool waitForResult: false}) async =>
       await backendService.sendNetworkChannelRawMessage(

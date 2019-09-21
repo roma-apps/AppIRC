@@ -2,21 +2,28 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/message/message_widgets.dart';
+import 'package:flutter_appirc/app/chat/chat_messages_loader_bloc.dart';
+import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
+import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var channelBloc = Provider.of<NetworkChannelBloc>(context);
+    var chatDatabase = Provider.of<ChatDatabaseProvider>(context).db;
 
+    NetworkChannelMessagesLoaderBloc messagesLoader =
+        NetworkChannelMessagesLoaderBloc(
+            chatDatabase, channelBloc.network, channelBloc.channel);
 
-    
-    return StreamBuilder<List<IRCChatMessage>>(
-        stream: channelBloc.messagesStream,
-        builder: (BuildContext context,
-            AsyncSnapshot<List<IRCChatMessage>> snapshot) {
+    return StreamBuilder<List<ChatMessage>>(
+        stream: messagesLoader.messagesStream,
+        builder:
+            (BuildContext context, AsyncSnapshot<List<ChatMessage>> snapshot) {
           var messages = snapshot.data;
           if (messages != null) {
             messages =
@@ -45,18 +52,20 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     var message = messages[index];
 
-                    switch (message.chatMessageType) {
-                      case IRCChatMessageType.SPECIAL:
-                        var specialMessage = message as IRCChatSpecialMessage;
-                        return Text(specialMessage.data.toString());
+                    var chatMessageType = ChatMessage.chatMessageType(message);
+
+                    switch (chatMessageType) {
+                      case ChatMessageType.SPECIAL:
+                        var specialMessage = message as SpecialMessage;
+                        return Text(specialMessage.dataJsonEncoded);
                         break;
-                      case IRCChatMessageType.REGULAR:
+                      case ChatMessageType.REGULAR:
                         return IRCNetworkChannelMessageWidget(message);
                         break;
                     }
 
                     throw Exception(
-                        "Invalid message type = ${message.chatMessageType}");
+                        "Invalid message type = ${chatMessageType}");
                   }),
             );
           }
@@ -64,10 +73,11 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
   }
 }
 
-_isNeedPrint(IRCChatMessage message) {
-  if (message is NetworkChannelMessage) {
-    return message.type != IRCNetworkChannelMessageType.UNHANDLED &&
-        message.type != IRCNetworkChannelMessageType.RAW;
+_isNeedPrint(ChatMessage message) {
+  if (message is RegularMessage) {
+    var regularMessageType = RegularMessage.regularMessageType(message);
+    return regularMessageType != RegularMessageType.UNHANDLED &&
+        regularMessageType != RegularMessageType.RAW;
   } else {
     return true;
   }

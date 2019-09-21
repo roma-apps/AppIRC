@@ -9,11 +9,11 @@ class NetworkChannel {
   final IRCNetworkChannelPreferences channelPreferences;
 
   String get name => channelPreferences.name;
-  final IRCNetworkChannelType type;
+  final NetworkChannelType type;
 
   final int remoteId;
 
-  bool get isLobby => type == IRCNetworkChannelType.LOBBY;
+  bool get isLobby => type == NetworkChannelType.LOBBY;
 
   NetworkChannel(this.channelPreferences, this.type, this.remoteId);
 
@@ -28,7 +28,7 @@ class NetworkChannel {
   int get hashCode => remoteId.hashCode;
 }
 
-enum IRCNetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }
+enum NetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }
 
 class NetworkChannelWithState {
   final NetworkChannel channel;
@@ -62,10 +62,3 @@ class NetworkChannelState {
       highlighted: false);
 }
 
-class NetworkChannelInfo {
-  final String name;
-  final String topic;
-  final int usersCount;
-
-  NetworkChannelInfo(this.name, this.topic, this.usersCount);
-}

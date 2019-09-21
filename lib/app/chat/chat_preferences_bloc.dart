@@ -87,7 +87,7 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
 }
 
 _isNeedSave(NetworkChannel channel) =>
-    channel.type == IRCNetworkChannelType.CHANNEL;
+    channel.type == NetworkChannelType.CHANNEL;
 
 ChatPreferences _jsonConverter(Map<String, dynamic> json) =>
     ChatPreferences.fromJson(json);

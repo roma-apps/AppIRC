@@ -4,6 +4,8 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -12,7 +14,7 @@ typedef NetworkListener(NetworkWithState network);
 typedef NetworkStateListener(NetworkState networkState);
 typedef NetworkChannelListener(NetworkChannelWithState channel);
 typedef NetworkChannelStateListener(NetworkChannelState channelState);
-typedef NetworkChannelMessageListener(IRCChatMessage message);
+typedef NetworkChannelMessageListener(ChatMessage message);
 
 abstract class ChatBackendService implements Providable {
   Stream<ChatConnectionState> get connectionStateStream;
@@ -70,11 +72,11 @@ abstract class ChatInputBackendService implements ChatBackendService {
   Future<RequestResult<bool>> leaveNetwork(Network network,
       {bool waitForResult: false});
 
-  Future<RequestResult<List<IRCChatSpecialMessage>>>
+  Future<RequestResult<List<SpecialMessage>>>
       printNetworkAvailableChannels(Network network,
           {bool waitForResult: false});
 
-  Future<RequestResult<NetworkChannelMessage>> printNetworkIgnoredUsers(
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
       Network network,
       {bool waitForResult: false});
 
@@ -100,7 +102,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
       Network network, NetworkChannel channel, String userNick,
       {bool waitForResult: false});
 
-  Future<RequestResult<NetworkChannelMessage>> printNetworkChannelBannedUsers(
+  Future<RequestResult<RegularMessage>> printNetworkChannelBannedUsers(
       Network network, NetworkChannel channel,
       {bool waitForResult: false});
 
@@ -115,7 +117,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
   Future<RequestResult<bool>> onOpenNetworkChannel(
       Network network, NetworkChannel channel);
 
-  Future<RequestResult<NetworkChannelMessage>> sendNetworkChannelRawMessage(
+  Future<RequestResult<RegularMessage>> sendNetworkChannelRawMessage(
       Network network, NetworkChannel channel, String rawMessage,
       {bool waitForResult: false});
 }

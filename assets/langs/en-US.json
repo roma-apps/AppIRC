@@ -133,6 +133,8 @@
       "topic": "Topic",
       "unknown": "unknown",
       "quit": "quit",
+      "part": "part",
+      "nick": "nick",
       "channel_mode": "Channel mode: {}"
     },
     "users": {

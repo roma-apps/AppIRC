@@ -68,19 +68,19 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
     var iconData = Icons.message;
 
     switch (channel.type) {
-      case IRCNetworkChannelType.LOBBY:
+      case NetworkChannelType.LOBBY:
         iconData = Icons.message;
         break;
-      case IRCNetworkChannelType.SPECIAL:
+      case NetworkChannelType.SPECIAL:
         iconData = Icons.list;
         break;
-      case IRCNetworkChannelType.QUERY:
+      case NetworkChannelType.QUERY:
         iconData = Icons.account_circle;
         break;
-      case IRCNetworkChannelType.CHANNEL:
+      case NetworkChannelType.CHANNEL:
         iconData = Icons.group;
         break;
-      case IRCNetworkChannelType.UNKNOWN:
+      case NetworkChannelType.UNKNOWN:
         iconData = Icons.message;
         break;
     }
@@ -186,19 +186,19 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
     var appLocalizations = AppLocalizations.of(context);
 
     switch (channel.type) {
-      case IRCNetworkChannelType.LOBBY:
+      case NetworkChannelType.LOBBY:
         menuItems = [];
         break;
-      case IRCNetworkChannelType.SPECIAL:
+      case NetworkChannelType.SPECIAL:
         menuItems = [_buildCloseMenuItem(context)];
         break;
-      case IRCNetworkChannelType.QUERY:
+      case NetworkChannelType.QUERY:
         _buildUserChannelMenuItems(context);
         break;
-      case IRCNetworkChannelType.CHANNEL:
+      case NetworkChannelType.CHANNEL:
         menuItems = _buildChannelMenuItems(context, channel);
         break;
-      case IRCNetworkChannelType.UNKNOWN:
+      case NetworkChannelType.UNKNOWN:
         menuItems = [];
         break;
     }

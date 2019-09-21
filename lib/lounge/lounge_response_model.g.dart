@@ -429,6 +429,39 @@ Map<String, dynamic> _$TopicLoungeResponseBodyToJson(
       'topic': instance.topic,
     };
 
+TextSpecialMessageLoungeResponseBodyPart
+    _$TextSpecialMessageLoungeResponseBodyPartFromJson(
+        Map<String, dynamic> json) {
+  return TextSpecialMessageLoungeResponseBodyPart(
+    json['text'] as String,
+  );
+}
+
+Map<String, dynamic> _$TextSpecialMessageLoungeResponseBodyPartToJson(
+        TextSpecialMessageLoungeResponseBodyPart instance) =>
+    <String, dynamic>{
+      'text': instance.text,
+    };
+
+ChannelListItemSpecialMessageLoungeResponseBodyPart
+    _$ChannelListItemSpecialMessageLoungeResponseBodyPartFromJson(
+        Map<String, dynamic> json) {
+  return ChannelListItemSpecialMessageLoungeResponseBodyPart(
+    json['channel'] as String,
+    json['topic'] as String,
+    json['num_users'] as int,
+  );
+}
+
+Map<String, dynamic>
+    _$ChannelListItemSpecialMessageLoungeResponseBodyPartToJson(
+            ChannelListItemSpecialMessageLoungeResponseBodyPart instance) =>
+        <String, dynamic>{
+          'channel': instance.channel,
+          'topic': instance.topic,
+          'num_users': instance.num_users,
+        };
+
 UserLoungeResponseBodyPart _$UserLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return UserLoungeResponseBodyPart(

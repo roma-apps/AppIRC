@@ -481,6 +481,45 @@ class TopicLoungeResponseBody extends LoungeResponseBody {
       _$TopicLoungeResponseBodyFromJson(json);
 }
 
+
+@JsonSerializable()
+class TextSpecialMessageLoungeResponseBodyPart extends LoungeResponseBodyPart {
+  final String text;
+
+
+  @override
+  String toString() {
+    return 'TextSpecialMessageLoungeResponseBodyPart{text: $text}';
+  }
+
+  TextSpecialMessageLoungeResponseBodyPart(this.text);
+
+  factory TextSpecialMessageLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$TextSpecialMessageLoungeResponseBodyPartFromJson(json);
+}
+
+@JsonSerializable()
+class ChannelListItemSpecialMessageLoungeResponseBodyPart extends LoungeResponseBodyPart {
+  final String channel;
+  final String topic;
+  // ignore: non_constant_identifier_names
+  final int num_users;
+
+
+  ChannelListItemSpecialMessageLoungeResponseBodyPart(this.channel, this.topic,
+      this.num_users);
+
+
+  @override
+  String toString() {
+    return 'ChannelListItemSpecialMessageLoungeResponseBodyPart{'
+        'channel: $channel, topic: $topic, num_users: $num_users}';
+  }
+
+  factory ChannelListItemSpecialMessageLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$ChannelListItemSpecialMessageLoungeResponseBodyPartFromJson(json);
+}
+
 @JsonSerializable()
 class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final int lastMessage;
