@@ -78,7 +78,10 @@ class ChatNetworkChannelsStateBloc extends Providable {
     _updateState(network, channel, state);
     addDisposable(
         disposable: backendService.listenForNetworkChannelState(
-            network, channel, () => _states[network][channel].value, (state) {
+            network,
+            channel,
+            () => _getStateControllerForNetworkChannel(network, channel).value,
+            (state) {
       _updateState(network, channel, state);
     }));
 
