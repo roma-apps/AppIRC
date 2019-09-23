@@ -272,3 +272,5 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
   }
   throw Exception("Invalid RegularMessageType = $type");
 }
+
+

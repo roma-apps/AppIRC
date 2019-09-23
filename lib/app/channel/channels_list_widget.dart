@@ -7,11 +7,11 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
+import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -46,7 +46,8 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
           if (isChannelActive) {
             return Container(
                 decoration: BoxDecoration(
-                    color: UISkin.of(context).accentColor),
+                    color: Provider.of<ChannelsListSkinBloc>(context)
+                        .getChannelItemBackgroundColor(isChannelActive)),
                 child: _buildChannelRow(context, ircChatActiveChannelBloc,
                     network, channel, isChannelActive));
           } else {
@@ -85,7 +86,6 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
         break;
     }
 
-    var foregroundColor = calculateForegroundColor(isChannelActive);
     var channelBloc = NetworkChannelBloc(
         Provider.of<ChatInputOutputBackendService>(context),
         network,
@@ -101,10 +101,14 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
               channelState = NetworkChannelState.empty;
             }
 
+            var channelsListSkinBloc =
+                Provider.of<ChannelsListSkinBloc>(context);
             return Row(children: <Widget>[
               Padding(
                 padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
-                child: Icon(iconData, color: foregroundColor),
+                child: Icon(iconData,
+                    color: channelsListSkinBloc
+                        .getChannelItemIconColor(isChannelActive)),
               ),
               Expanded(
                 child: Padding(
@@ -119,10 +123,9 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
                           Container(
                               margin: EdgeInsets.all(8.0),
                               child: Text(channel.name,
-                                  style: UISkin.of(context)
-
-                                      .networksListChannelTextStyle
-                                      .copyWith(color: foregroundColor)))
+                                  style: channelsListSkinBloc
+                                      .getChannelItemTextStyle(
+                                          isChannelActive)))
                         ]),
                   ),
                 ),
@@ -134,12 +137,15 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
                       AsyncSnapshot<NetworkState> snapshot) {
                     var networkState = snapshot.data;
 
-                    return buildConnectionIcon(context, foregroundColor,
+                    return buildConnectionIcon(
+                        context,
+                        channelsListSkinBloc
+                            .getChannelItemIconColor(isChannelActive),
                         networkState.connected && channelState.connected);
                   }),
-              buildChannelUnreadCountBadge(context),
-              _buildPopupMenuButton(
-                  context, channel, channelState, foregroundColor)
+              buildChannelUnreadCountBadge(context, isChannelActive),
+              _buildPopupMenuButton(context, channel, channelState,
+                  channelsListSkinBloc.getChannelItemIconColor(isChannelActive))
             ]);
           }),
     );
@@ -259,9 +265,6 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
 }
 
 enum ChannelDropDownAction { LEAVE, TOPIC, LIST_BANNED, USER_INFORMATION }
-
-Color calculateForegroundColor(bool isChannelActive) =>
-    isChannelActive ? Colors.white : Colors.black;
 
 buildConnectionIcon(
     BuildContext context, Color foregroundColor, bool connected) {

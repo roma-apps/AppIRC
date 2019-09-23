@@ -9,6 +9,7 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_app_bar_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_channel_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
@@ -19,10 +20,10 @@ import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart';
-import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/app/user/users_list_page.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ChatPage extends StatelessWidget {
@@ -114,7 +115,7 @@ class ChatPage extends StatelessWidget {
                   AsyncSnapshot<ChatConnectionState> snapshot) {
                 var connectionState = snapshot.data;
 
-                var title = Text(AppLocalizations.of(context).tr('chat.title'));
+                var title = AppLocalizations.of(context).tr('chat.title');
 
                 String content;
 
@@ -133,12 +134,7 @@ class ChatPage extends StatelessWidget {
                     break;
                 }
 
-                var topicStyle = UISkin.of(context).topicTextStyle;
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[title, Text(content, style: topicStyle)],
-                );
+                return ChatAppBarWidget(title, content);
               });
         } else {
           var network = networkListBloc.findNetworkWithChannel(channel);
@@ -146,7 +142,7 @@ class ChatPage extends StatelessWidget {
           return Provider(
               providable: NetworkChannelBloc(
                   backendService, network, channel, channelsStateBloc),
-              child: IRCNetworkChannelTopicTitleWidget());
+              child: NetworkChannelTopicTitleAppBarWidget());
         }
       },
     );
@@ -224,7 +220,8 @@ class ChatPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text("Not connected to server"),
-                    PlatformButton(
+                    createSkinnedPlatformButton(
+                      context,
                         child: Text("Reconnect"),
                         onPressed: () {
                           connectionBloc.reconnect();

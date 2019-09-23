@@ -6,6 +6,8 @@ import 'package:flutter_appirc/app/network/network_server_preferences_form_widge
 import 'package:flutter_appirc/app/network/network_user_preferences_widget_form.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/app_skin_bloc.dart';
+import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'network_preferences_form_bloc.dart';
@@ -63,6 +65,7 @@ class IRCNetworkPreferencesFormWidgetState
                     child: IRCNetworkUserPreferencesFormWidget(startValues
                         .networkConnectionPreferences.userPreferences)),
                 buildFormTextRow(
+                    context,
                     appLocalizations.tr('irc_connection.channels_title'),
                     appLocalizations.tr('irc_connection.channels_hint'),
                     Icons.list,
@@ -82,9 +85,8 @@ class IRCNetworkPreferencesFormWidgetState
                   };
                 }
 
-                return PlatformButton(
-                  color: Colors.redAccent,
-                  disabledColor: Colors.grey,
+
+                return createSkinnedPlatformButton(context,
                   child: Text(
                     AppLocalizations.of(context).tr('irc_connection.connect'),
                     style: TextStyle(color: Colors.white),

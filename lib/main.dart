@@ -7,8 +7,11 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_page.dart';
+import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_input_message_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_saver_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
@@ -18,16 +21,35 @@ import 'package:flutter_appirc/app/chat/chat_preferences_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/default_values.dart';
-import 'package:flutter_appirc/app/skin/app_skin_preference_bloc.dart';
-import 'package:flutter_appirc/app/skin/ui_skin.dart';
+import 'package:flutter_appirc/app/message/messages_colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/app/message/messages_special_skin_bloc.dart';
+import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_app_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_button_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_chat_app_bar_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_form_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_messages_special_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_networks_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
+import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
+import 'package:flutter_appirc/form/form_skin_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/app_skin_bloc.dart';
+import 'package:flutter_appirc/skin/button_skin_bloc.dart';
+import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:rxdart/rxdart.dart';
+
+import 'app/skin/app_irc_channels_list_skin_bloc.dart';
+import 'app/skin/app_irc_chat_input_message_skin_bloc.dart';
+import 'app/skin/themes/day_app_irc_skin_theme.dart';
 
 var _logger = MyLogger(logTag: "Main", enabled: true);
 
@@ -269,39 +291,83 @@ class AppIRCState extends State<AppIRC> {
   Widget _buildApp(Widget child, {bool isPreferencesReady = true}) {
     var preferencesService = Provider.of<PreferencesService>(context);
 
-    var appSkinPreferenceBloc = AppSkinPreferenceBloc(
-        preferencesService, getAvailableSkins(), getDefaultUISkin());
+    var defaultSkinTheme = _defaultSkinTheme();
+    List<AppIRCSkinTheme> _allSkinThemes = [defaultSkinTheme];
+    _allSkinThemes.addAll(_additionalSkinThemes());
+    var appSkinPreferenceBloc = AppSkinPreferenceBloc<AppIRCSkinTheme>(
+        preferencesService, _allSkinThemes, defaultSkinTheme);
 
-    return Provider(
+    return Provider<AppSkinPreferenceBloc>(
       providable: appSkinPreferenceBloc,
       child: EasyLocalization(
-        child: StreamBuilder<AppSkin>(
+        child: StreamBuilder<AppIRCSkinTheme>(
             stream: isPreferencesReady
                 ? appSkinPreferenceBloc.appSkinStream
-                : BehaviorSubject<AppSkin>(
-                    seedValue: getDefaultUISkin()),
+                : BehaviorSubject<AppIRCSkinTheme>(
+                    seedValue: defaultSkinTheme),
             initialData: isPreferencesReady
-                ? appSkinPreferenceBloc.currentAppSkin
-                : getDefaultUISkin(),
+                ? appSkinPreferenceBloc.currentAppSkinTheme
+                : defaultSkinTheme,
             builder: (context, snapshot) {
-              var appSkin = snapshot.data;
+              AppIRCSkinTheme appSkinTheme = snapshot.data;
 
               var data = EasyLocalizationProvider.of(context).data;
 
+              var appIRCAppSkinBloc = AppIRCAppSkinBloc(appSkinTheme);
               return Provider(
-                providable: appSkin.uiSkin,
-                child: PlatformApp(
-                    title: "AppIRC",
-                    localizationsDelegates: [
-                      //app-specific localization
-                      EasylocaLizationDelegate(
-                          locale: data.locale, path: 'assets/langs'),
-                    ],
-                    supportedLocales: [Locale('en', 'US')],
-                    locale: data.savedLocale,
-                    android: (_) => MaterialAppData(theme: appSkin.androidTheme),
-                    ios: (_) => CupertinoAppData(theme: appSkin.iosTheme),
-                    home: child),
+                providable: appIRCAppSkinBloc,
+                child: Provider<AppSkinBloc>(
+                  providable: appIRCAppSkinBloc,
+                  child: Provider<ChannelsListSkinBloc>(
+                    providable: AppIRCChannelsListSkinBloc(appSkinTheme),
+                    child: Provider<ChatAppBarSkinBloc>(
+                      providable: AppIRCChatAppBarSkinBloc(appSkinTheme),
+                      child: Provider<ChatInputMessageSkinBloc>(
+                        providable:
+                            AppIRCChatInputMessageSkinBloc(appSkinTheme),
+                        child: Provider<FormSkinBloc>(
+                          providable: AppIRCFormSkinBloc(appSkinTheme),
+                          child: Provider<MessagesRegularSkinBloc>(
+                            providable:
+                                AppIRCMessagesRegularSkinBloc(appSkinTheme),
+                            child: Provider<MessagesSpecialSkinBloc>(
+                              providable:
+                                  AppIRCMessagesSpecialSkinBloc(appSkinTheme),
+                              child: Provider<NetworkListSkinBloc>(
+                                providable:
+                                    AppIRCNetworkListSkinBloc(appSkinTheme),
+                                child: Provider<ButtonSkinBloc>(
+                                  providable: AppIRCButtonSkinBloc(appSkinTheme),
+                                  child: Provider(
+                                    providable: MessagesColoredNicknamesBloc(
+                                        appSkinTheme.coloredNicknamesData),
+                                    child: PlatformApp(
+                                        title: "AppIRC",
+                                        localizationsDelegates: [
+                                          //app-specific localization
+                                          EasylocaLizationDelegate(
+                                              locale: data.locale,
+                                              path: 'assets/langs'),
+                                        ],
+                                        supportedLocales: [Locale('en', 'US')],
+                                        locale: data.savedLocale,
+                                        android: (_) => MaterialAppData(
+                                            theme: appSkinTheme
+                                                .androidThemeDataCreator()),
+                                        ios: (_) => CupertinoAppData(
+                                            theme: appSkinTheme
+                                                .iosThemeDataCreator()),
+                                        home: child),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               );
             }),
       ),
@@ -309,138 +375,6 @@ class AppIRCState extends State<AppIRC> {
   }
 }
 
-//class AppIRC2 extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    var preferencesService = Provider.of<PreferencesService>(context);
-//    var loungePreferencesBloc = LoungePreferencesBloc(preferencesService);
-//
-//    var defaultUISkin = createDefaultUISkin();
-//    var appSkinBloc = AppSkinBloc(preferencesService, defaultUISkin);
-//    return Provider<PreferencesService>(
-//        providable: preferencesService,
-//        child: Provider<LoungePreferencesBloc>(
-//          providable: loungePreferencesBloc,
-//          child: StreamBuilder<LoungeConnectionPreferences>(
-//              stream: loungePreferencesBloc.valueStream(
-//                  defaultValue: LoungeConnectionPreferences.empty),
-//              builder: (context, snapshot) {
-//                var loungePreferences = snapshot.data;
-//
-//                _logger.d(() => "stream for $loungePreferences");
-//
-//                var loungeBackendService =
-//                LoungeBackendService(socketIOManager, loungePreferences);
-//
-//                var data = EasyLocalizationProvider
-//                    .of(context)
-//                    .data;
-//
-//                return Provider<LoungeBackendService>(
-//                  providable: loungeBackendService,
-//                  child: Provider<ChatInputOutputBackendService>(
-//                    providable: loungeBackendService,
-//                    child: Provider<ChatOutputBackendService>(
-//                      providable: loungeBackendService,
-//                      child: Provider<ChatInputBackendService>(
-//                        providable: loungeBackendService,
-//                        child: Provider(
-//                          providable: chatPreferencesBloc,
-//                          child: Provider(
-//                            providable: connectionBloc,
-//                            child: Provider(
-//                              providable: networksListBloc,
-//                              child: Provider(
-//                                providable: networkStatesBloc,
-//                                child: Provider(
-//                                  providable: channelsStatesBloc,
-//                                  child: Provider(
-//                                      providable: ChatPreferencesSaverBloc(
-//                                          preferencesService, networksListBloc),
-//                                      child: StreamBuilder<UISkin>(
-//                                          stream: appSkinBloc.skinStream,
-//                                          initialData: defaultUISkin,
-//                                          builder: (context, snapshot) {
-//                                            var uiSkin = snapshot.data;
-//                                            return Provider(
-//                                              providable: uiSkin,
-//                                              child: PlatformApp(
-//                                                  title: "AppIRC",
-//                                                  localizationsDelegates: [
-//                                                    //app-specific localization
-//                                                    EasylocaLizationDelegate(
-//                                                        locale: data.locale,
-//                                                        path: 'assets/langs'),
-//                                                  ],
-//                                                  supportedLocales: [
-//                                                    Locale('en', 'US')
-//                                                  ],
-//                                                  locale: data.savedLocale,
-//                                                  android: (_) =>
-//                                                      MaterialAppData(
-//                                                          theme: uiSkin
-//                                                              .androidTheme),
-//                                                  ios: (_) =>
-//                                                      CupertinoAppData(
-//                                                          theme: uiSkin
-//                                                              .iosTheme),
-//                                                  home: buildChatApp(
-//                                                      loungePreferences,
-//                                                      context)),
-//                                            );
-//                                          })),
-//                                ),
-//                              ),
-//                            ),
-//                          ),
-//                        ),
-//                      ),
-//                    ),
-//                  ),
-//                );
-//              }),
-//        ));
-//  }
-////
-////  Widget buildChatApp(LoungeConnectionPreferences loungePreferences,
-////      BuildContext context) {
-////    var isHaveSavedPreferences =
-////        loungePreferences != LoungeConnectionPreferences.empty;
-////    if (!isHaveSavedPreferences) {
-////      return NewLoungePreferencesPage(createDefaultLoungePreferences(context));
-////    } else {
-////      return SplashPage((context) async {
-////        var backendService = Provider.of<LoungeBackendService>(context);
-////        await backendService.init();
-////
-////        var chatPreferencesLoaderBloc =
-////        Provider.of<ChatPreferencesLoaderBloc>(context);
-////
-////        var _startPreferences = await chatPreferencesLoaderBloc.getValue(
-////            defaultValue: ChatPreferences.empty);
-////
-////        await chatPreferencesLoaderBloc.init();
-////
-////        await Provider.of<ChatPreferencesSaverBloc>(context).init();
-////        await Provider.of<ChatNetworksListBloc>(context).init();
-////
-////        var chatConnectionBloc = Provider.of<ChatConnectionBloc>(context);
-////        await chatConnectionBloc.init();
-////        await Provider.of<ChatNetworksStateBloc>(context).init();
-////        await Provider.of<ChatNetworkChannelsStateBloc>(context).init();
-////
-////        var chatInitBloc =
-////        ChatInitBloc(backendService, chatConnectionBloc, _startPreferences);
-////
-//////        await chatInitBloc.init();
-////
-////        Navigator.pushReplacement(
-////            context,
-////            platformPageRoute(
-////                maintainState: false,
-////                builder: (_) =>
-////                    Provider(providable: chatInitBloc, child: ChatPage())));
-////      });
-////    }
-////  }
-//}
+AppIRCSkinTheme _defaultSkinTheme() => DayAppSkinTheme();
+
+List<AppIRCSkinTheme> _additionalSkinThemes() => [NightAppSkinTheme()];

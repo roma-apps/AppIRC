@@ -1,9 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
-import 'package:flutter_appirc/app/skin/ui_skin.dart';
+import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,8 +19,6 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var uiSkin = UISkin.of(context);
-
     var decoration;
 
     if (isNeedHighlight(message)) {
@@ -35,11 +34,11 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(2.0),
-              child: _buildMessageTitle(context, uiSkin),
+              child: _buildMessageTitle(context),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2.0),
-              child: _buildMessageBody(context, uiSkin),
+              child: _buildMessageBody(context),
             ),
           ],
         ),
@@ -47,9 +46,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageBody(BuildContext context, UISkin uiSkin) {
+  Widget _buildMessageBody(BuildContext context) {
     var regularMessageType = RegularMessage.regularMessageType(message);
-
 
     if (regularMessageType == RegularMessageType.AWAY ||
         regularMessageType == RegularMessageType.JOIN ||
@@ -65,6 +63,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
       }
     }
 
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
     var rows = <Widget>[
 //      Text("${message.type}"),
@@ -74,7 +73,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 
     if (params != null) {
       rows.add(Text("${params.join(", ")}",
-          style: uiSkin.channelMessagesBodyTextStyle));
+          style: messagesSkin.regularMessageBodyTextStyle));
     }
 
     if (message.text != null) {
@@ -89,9 +88,9 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
           }
         },
         text: text,
-        style: uiSkin.channelMessagesBodyTextStyle,
-        linkStyle: uiSkin.channelMessagesBodyTextStyle
-            .copyWith(color: Colors.blue),
+        style: messagesSkin.regularMessageBodyTextStyle,
+        linkStyle: messagesSkin
+            .modifyToLinkTextStyle(messagesSkin.regularMessageBodyTextStyle),
       ));
     }
 
@@ -102,15 +101,15 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageTitle(BuildContext context, UISkin uiSkin) {
-    var icon = _buildTitleIcon(message);
+  Widget _buildMessageTitle(BuildContext context) {
+    var icon = _buildTitleIcon(context, message);
 
     var startPart;
 
-    var subMessage = _buildTitleSubMessage(context, uiSkin);
+    var subMessage = _buildTitleSubMessage(context);
 
     if (RegularMessage.isHaveFromNick(message)) {
-      var messageTitleNick = _buildMessageTitleNick(uiSkin);
+      var messageTitleNick = _buildMessageTitleNick(context);
       if (subMessage != null) {
         startPart = Row(children: <Widget>[
           messageTitleNick,
@@ -134,12 +133,12 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
       endPart = Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          _buildMessageTitleDate(uiSkin),
+          _buildMessageTitleDate(context),
           icon,
         ],
       );
     } else {
-      endPart = _buildMessageTitleDate(uiSkin);
+      endPart = _buildMessageTitleDate(context);
     }
 
     if (startPart != null && endPart != null) {
@@ -157,41 +156,51 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     }
   }
 
-  Padding _buildMessageTitleDate(UISkin uiSkin) {
+  Padding _buildMessageTitleDate(BuildContext context) {
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+
     var dateString;
 
     var date = RegularMessage.date(message);
+    var messageType = RegularMessage.regularMessageType(message);
 
     if (RegularMessage.isMessageDateToday(message)) {
       dateString = todayDateFormatter.format(date);
     } else {
       dateString = oldDateFormatter.format(date);
     }
+    var color = messagesSkin.findTitleColorDataForMessage(messageType);
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Text(
         dateString,
-        style: uiSkin.channelMessagesDateTextStyle
-            .copyWith(color: _findTitleColorDataForMessage(message)),
+        style: messagesSkin.createDateTextStyle(color),
       ),
     );
   }
 
-  Text _buildMessageTitleNick(UISkin uiSkin) {
+  Text _buildMessageTitleNick(BuildContext context) {
+    var nickNamesBloc = Provider.of<MessagesColoredNicknamesBloc>(context);
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+    var nick = message.fromNick;
     return Text(
-      message.fromNick,
-      style: uiSkin.channelMessagesNickTextStyle,
+      nick,
+      style:
+          messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
     );
   }
 
-  _buildTitleIcon(RegularMessage message) {
+  _buildTitleIcon(BuildContext context, RegularMessage message) {
     var iconData = _findTitleIconDataForMessage(message);
-    var color = _findTitleColorDataForMessage(message);
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+    var color = messagesSkin.findTitleColorDataForMessage(
+        RegularMessage.regularMessageType(message));
 
     return Icon(iconData, color: color);
   }
 
-  Widget _buildTitleSubMessage(BuildContext context, UISkin uiSkin) {
+  Widget _buildTitleSubMessage(BuildContext context) {
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
     var regularMessageType = RegularMessage.regularMessageType(message);
     var appLocalizations = AppLocalizations.of(context);
@@ -262,9 +271,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     }
 
     if (str != null) {
-      return Text(str,
-          style: uiSkin.channelMessagesDateTextStyle
-              .copyWith(color: _findTitleColorDataForMessage(message)));
+      var color = messagesSkin.findTitleColorDataForMessage(regularMessageType);
+      return Text(str, style: messagesSkin.createDateTextStyle(color));
     } else {
       return null;
     }
@@ -272,72 +280,12 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 }
 
 isNeedHighlight(RegularMessage message) =>
-    message.highlight == true ||
-RegularMessage.regularMessageType(message) ==
+    RegularMessage.isHighlight(message) == true ||
+    RegularMessage.regularMessageType(message) ==
         RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
 
-Color _findTitleColorDataForMessage(RegularMessage message) {
-  var regularMessageType = RegularMessage.regularMessageType(message);
-  Color color;
-  switch (regularMessageType) {
-    case RegularMessageType.TOPIC_SET_BY:
-      color = Colors.lightBlue;
-      break;
-    case RegularMessageType.TOPIC:
-      color = Colors.lightBlue;
-      break;
-    case RegularMessageType.WHO_IS:
-      color = Colors.lightBlue;
-      break;
-    case RegularMessageType.UNHANDLED:
-      color = Colors.grey;
-      break;
-    case RegularMessageType.UNKNOWN:
-      color = Colors.redAccent;
-      break;
-    case RegularMessageType.MESSAGE:
-      color = Colors.grey;
-      break;
-    case RegularMessageType.JOIN:
-      color = Colors.lightGreen;
-      break;
-
-    case RegularMessageType.AWAY:
-      color = Colors.lightBlue;
-      break;
-    case RegularMessageType.MODE:
-      color = Colors.grey;
-      break;
-    case RegularMessageType.MOTD:
-      color = Colors.grey;
-      break;
-    case RegularMessageType.NOTICE:
-      color = Colors.grey;
-      break;
-    case RegularMessageType.ERROR:
-      color = Colors.redAccent;
-      break;
-    case RegularMessageType.BACK:
-      color = Colors.lightGreen;
-      break;
-    case RegularMessageType.MODE_CHANNEL:
-      color = Colors.grey;
-      break;
-    case RegularMessageType.QUIT:
-      color = Colors.redAccent;
-      break;
-    case RegularMessageType.RAW:
-      color = Colors.grey;
-      break;
-    case RegularMessageType.PART:
-      color = Colors.redAccent;
-      break;
-    case RegularMessageType.NICK:
-      color = Colors.lightBlue;
-      break;
-  }
-  return color;
-}
+bool isHaveLongText(RegularMessage message) =>
+    message.text != null ? message.text.length > 10 : false;
 
 IconData _findTitleIconDataForMessage(RegularMessage message) {
   IconData icon;
@@ -400,6 +348,3 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
   }
   return icon;
 }
-
-bool isHaveLongText(RegularMessage message) =>
-    message.text != null ? message.text.length > 10 : false;

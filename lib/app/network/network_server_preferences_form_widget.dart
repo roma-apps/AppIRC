@@ -53,11 +53,13 @@ class IRCNetworkServerPreferencesFormWidgetState
         buildFormTitle(
             context, appLocalizations.tr('irc_connection.network_prefs.title')),
         buildFormTextRow(
+            context,
             appLocalizations.tr('irc_connection.network_prefs.name_label'),
             appLocalizations.tr('irc_connection.network_prefs.name_hint'),
             Icons.account_circle,
             formBloc.nameFieldBloc, _nameController),
         buildFormTextRow(
+            context,
             appLocalizations
                 .tr('irc_connection.network_prefs.server_host_label'),
             appLocalizations
@@ -65,6 +67,7 @@ class IRCNetworkServerPreferencesFormWidgetState
             Icons.cloud,
             formBloc.hostFieldBloc, _hostController),
         buildFormTextRow(
+            context,
             appLocalizations
                 .tr('irc_connection.network_prefs.server_port_label'),
             appLocalizations
@@ -72,9 +75,11 @@ class IRCNetworkServerPreferencesFormWidgetState
             Icons.cloud,
             formBloc.portFieldBloc, _portController),
         buildFormBooleanRow(
+            context,
             appLocalizations.tr('irc_connection.network_prefs.use_tls'),
             formBloc.tlsFieldBloc),
         buildFormBooleanRow(
+            context,
             appLocalizations.tr('irc_connection.network_prefs.trusted_only'),
             formBloc.trustedFieldBloc)
       ],

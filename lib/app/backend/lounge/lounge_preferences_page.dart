@@ -10,6 +10,7 @@ import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -101,9 +102,8 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
                                     .extractData());
                       }
 
-                      return PlatformButton(
-                        color: Colors.redAccent,
-                        disabledColor: Colors.grey,
+                      return createSkinnedPlatformButton(
+                        context,
                         child: Text(
                             AppLocalizations.of(context)
                                 .tr('lounge.connection.new.connect'),

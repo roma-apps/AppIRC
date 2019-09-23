@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/network/network_user_preferences_form_bloc.da
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-
 class IRCNetworkUserPreferencesFormWidget extends StatefulWidget {
   final IRCNetworkUserPreferences startValues;
 
@@ -51,25 +50,33 @@ class IRCNetworkUserPreferencesFormState
         buildFormTitle(
             context, appLocalizations.tr('irc_connection.user_prefs.title')),
         buildFormTextRow(
+            context,
             appLocalizations.tr('irc_connection.user_prefs.nick_label'),
             appLocalizations.tr('irc_connection.user_prefs.nick_hint'),
             Icons.account_circle,
-            formBloc.nickFieldBloc, _nickController),
+            formBloc.nickFieldBloc,
+            _nickController),
         buildFormTextRow(
+            context,
             appLocalizations.tr('irc_connection.user_prefs.password_label'),
             appLocalizations.tr('irc_connection.user_prefs.password_hint'),
             Icons.lock,
-            formBloc.passwordFieldBloc, _passwordController),
+            formBloc.passwordFieldBloc,
+            _passwordController),
         buildFormTextRow(
+            context,
             appLocalizations.tr('irc_connection.user_prefs.real_name_label'),
             appLocalizations.tr('irc_connection.user_prefs.real_name_hint'),
             Icons.account_circle,
-            formBloc.realNameFieldBloc, _realNameController),
+            formBloc.realNameFieldBloc,
+            _realNameController),
         buildFormTextRow(
+            context,
             appLocalizations.tr('irc_connection.user_prefs.user_name_hint'),
             appLocalizations.tr('irc_connection.user_prefs.user_name_label'),
             Icons.account_circle,
-            formBloc.realNameFieldBloc,  _userNameController),
+            formBloc.realNameFieldBloc,
+            _userNameController),
       ],
     );
   }

@@ -1,16 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_app_bar_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
-import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
-import 'package:flutter_appirc/app/skin/ui_skin.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 import 'channel_model.dart';
 
-class IRCNetworkChannelTopicTitleWidget extends StatelessWidget {
+class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var channelBloc = Provider.of<NetworkChannelBloc>(context);
@@ -23,11 +21,11 @@ class IRCNetworkChannelTopicTitleWidget extends StatelessWidget {
             AsyncSnapshot<ChatConnectionState> snapshot) {
           ChatConnectionState connectionState = snapshot.data;
 
-
           return StreamBuilder<NetworkChannelState>(
             stream: channelBloc.networkChannelStateStream,
             initialData: channelBloc.networkChannelState,
-            builder: (BuildContext context, AsyncSnapshot<NetworkChannelState> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<NetworkChannelState> snapshot) {
               NetworkChannelState state = snapshot.data;
               var channelName = channelBloc.channel.name;
 
@@ -49,23 +47,7 @@ class IRCNetworkChannelTopicTitleWidget extends StatelessWidget {
                   break;
               }
 
-              if (subTitleText != null && subTitleText.isNotEmpty) {
-                var topicStyle = UISkin.of(context).topicTextStyle;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(channelName),
-                    Text(subTitleText, style: topicStyle)
-                  ],
-                );
-              } else {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[Text(channelName)],
-                );
-              }
+              return ChatAppBarWidget(channelName, subTitleText);
             },
           );
         });

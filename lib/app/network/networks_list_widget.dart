@@ -17,7 +17,7 @@ import 'package:flutter_appirc/app/network/network_expand_state_bloc.dart';
 import 'package:flutter_appirc/app/network/network_join_channel_page.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_preferences_page.dart';
-import 'package:flutter_appirc/app/skin/ui_skin.dart';
+import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -42,7 +42,8 @@ class IRCNetworksListWidget extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: listItemCount,
                   separatorBuilder: (context, index) => Divider(
-                        color: UISkin.of(context).accentColor,
+                        color: Provider.of<NetworkListSkinBloc>(context)
+                            .separatorColor,
                       ),
                   itemBuilder: (BuildContext context, int index) {
                     var network = snapshot.data[index];
@@ -108,13 +109,13 @@ class IRCNetworksListWidget extends StatelessWidget {
       networkExpandedStateIcon = Icons.arrow_right;
     }
 
-    var foregroundColor = calculateForegroundColor(isChannelActive);
     var networkBloc = Provider.of<NetworkBloc>(context);
     var channelBloc = NetworkChannelBloc(
         Provider.of<ChatInputOutputBackendService>(context),
         network,
         network.lobbyChannel,
         Provider.of<ChatNetworkChannelsStateBloc>(context));
+    var networkListSkinBloc = Provider.of<NetworkListSkinBloc>(context);
 
     var row = Provider(
         providable: channelBloc,
@@ -126,13 +127,15 @@ class IRCNetworksListWidget extends StatelessWidget {
               var state = snapshot.data;
               var connected = state.connected;
 
+
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   PlatformIconButton(
-                    icon:
-                        Icon(networkExpandedStateIcon, color: foregroundColor),
+                    icon: Icon(networkExpandedStateIcon,
+                        color: networkListSkinBloc
+                            .getNetworkItemIconColor(isChannelActive)),
                     onPressed: () {
                       if (expanded) {
                         expandBloc.collapse();
@@ -147,107 +150,30 @@ class IRCNetworksListWidget extends StatelessWidget {
                         ircChatActiveChannelBloc.changeActiveChanel(channel);
                       },
                       child: Text(network.name,
-                          style: UISkin.of(context)
-                              .networksListNetworkTextStyle
-                              .copyWith(color: foregroundColor)),
+                          style: networkListSkinBloc
+                              .getNetworkItemTextStyle(isChannelActive)),
                     ),
                   ),
-                  buildConnectionIcon(context, foregroundColor, connected),
-                  buildChannelUnreadCountBadge(context),
+                  buildConnectionIcon(context, networkListSkinBloc
+                      .getNetworkItemIconColor(isChannelActive), connected),
+                  buildChannelUnreadCountBadge(context, isChannelActive),
                   PopupMenuButton<NetworkDropDownAction>(
-                    icon: Icon(Icons.more_vert, color: foregroundColor),
+                    icon: Icon(Icons.more_vert, color: networkListSkinBloc
+                        .getNetworkItemIconColor(isChannelActive)),
                     onSelected: (value) async {
-                      switch (value) {
-                        case NetworkDropDownAction.EDIT:
-                          Navigator.push(
-                              context,
-                              platformPageRoute(
-                                  builder: (_) => EditChatNetworkPage(
-                                      createDefaultIRCNetworkPreferences(
-                                          context))));
-                          break;
-                        case NetworkDropDownAction.JOIN_CHANNEL:
-                          Navigator.push(
-                              context,
-                              platformPageRoute(
-                                  builder: (_) =>
-                                      IRCNetworkChannelJoinPage(network)));
-                          break;
-                        case NetworkDropDownAction.LIST_ALL_CHANNELS:
-                          networkBloc.printNetworkAvailableChannels();
-                          break;
-                        case NetworkDropDownAction.LIST_IGNORED_USERS:
-                          networkBloc.printNetworkIgnoredUsers();
-                          break;
-                        case NetworkDropDownAction.DISCONNECT:
-                          networkBloc.disableNetwork();
-                          break;
-
-                        case NetworkDropDownAction.CONNECT:
-                          networkBloc.enableNetwork();
-                          break;
-                        case NetworkDropDownAction.EXIT:
-                          networkBloc.leaveNetwork();
-                          break;
-                      }
+                      _onDropdownSelected(value, context, network, networkBloc);
                     },
                     itemBuilder: (context) {
-                      var appLocalizations = AppLocalizations.of(context);
-                      var items = <PopupMenuEntry<NetworkDropDownAction>>[
-                        buildDropdownMenuItemRow(
-                            value: NetworkDropDownAction.EDIT,
-                            text: appLocalizations
-                                .tr("settings.network_dropdown_menu.edit"),
-                            iconData: Icons.edit),
-                        buildDropdownMenuItemRow(
-                            value: NetworkDropDownAction.JOIN_CHANNEL,
-                            text: appLocalizations.tr(
-                                "settings.network_dropdown_menu.join_channel"),
-                            iconData: Icons.add),
-                        buildDropdownMenuItemRow(
-                            value: NetworkDropDownAction.LIST_ALL_CHANNELS,
-                            text: appLocalizations.tr(
-                                "settings.network_dropdown_menu.list_all_channels"),
-                            iconData: Icons.list),
-                        buildDropdownMenuItemRow(
-                            value: NetworkDropDownAction.LIST_IGNORED_USERS,
-                            text: appLocalizations.tr(
-                                "settings.network_dropdown_menu.list_ignored_users"),
-                            iconData: Icons.list),
-                        buildDropdownMenuItemRow(
-                            value: NetworkDropDownAction.EXIT,
-                            text: appLocalizations
-                                .tr("settings.network_dropdown_menu.exit"),
-                            iconData: Icons.clear),
-                      ];
-
-                      if (connected) {
-                        items.add(buildDropdownMenuItemRow(
-                            value: NetworkDropDownAction.DISCONNECT,
-                            text: appLocalizations.tr(
-                                "settings.network_dropdown_menu.disconnect"),
-                            iconData: Icons.cloud_off));
-                      } else {
-                        items.add(buildDropdownMenuItemRow(
-                            value: NetworkDropDownAction.CONNECT,
-                            text: appLocalizations
-                                .tr("settings.network_dropdown_menu.connect"),
-                            iconData: Icons.cloud));
-                      }
-                      return items;
+                      return _buildDropdownItems(context, connected);
                     },
                   )
                 ],
               );
             }));
-    var rowContainer;
-    if (isChannelActive) {
-      rowContainer = Container(
-          decoration: BoxDecoration(color: UISkin.of(context).accentColor),
+    var rowContainer = Container(
+          decoration: BoxDecoration(color: networkListSkinBloc
+              .getNetworkItemBackgroundColor(isChannelActive)),
           child: row);
-    } else {
-      rowContainer = Container(child: row);
-    }
 
     if (expanded == true) {
       return Column(
@@ -259,6 +185,85 @@ class IRCNetworksListWidget extends StatelessWidget {
           ]);
     } else {
       return rowContainer;
+    }
+  }
+
+  List<PopupMenuEntry<NetworkDropDownAction>> _buildDropdownItems(
+      BuildContext context, bool connected) {
+    var appLocalizations = AppLocalizations.of(context);
+    var items = <PopupMenuEntry<NetworkDropDownAction>>[
+      buildDropdownMenuItemRow(
+          value: NetworkDropDownAction.EDIT,
+          text: appLocalizations.tr("settings.network_dropdown_menu.edit"),
+          iconData: Icons.edit),
+      buildDropdownMenuItemRow(
+          value: NetworkDropDownAction.JOIN_CHANNEL,
+          text: appLocalizations
+              .tr("settings.network_dropdown_menu.join_channel"),
+          iconData: Icons.add),
+      buildDropdownMenuItemRow(
+          value: NetworkDropDownAction.LIST_ALL_CHANNELS,
+          text: appLocalizations
+              .tr("settings.network_dropdown_menu.list_all_channels"),
+          iconData: Icons.list),
+      buildDropdownMenuItemRow(
+          value: NetworkDropDownAction.LIST_IGNORED_USERS,
+          text: appLocalizations
+              .tr("settings.network_dropdown_menu.list_ignored_users"),
+          iconData: Icons.list),
+      buildDropdownMenuItemRow(
+          value: NetworkDropDownAction.EXIT,
+          text: appLocalizations.tr("settings.network_dropdown_menu.exit"),
+          iconData: Icons.clear),
+    ];
+
+    if (connected) {
+      items.add(buildDropdownMenuItemRow(
+          value: NetworkDropDownAction.DISCONNECT,
+          text:
+              appLocalizations.tr("settings.network_dropdown_menu.disconnect"),
+          iconData: Icons.cloud_off));
+    } else {
+      items.add(buildDropdownMenuItemRow(
+          value: NetworkDropDownAction.CONNECT,
+          text: appLocalizations.tr("settings.network_dropdown_menu.connect"),
+          iconData: Icons.cloud));
+    }
+    return items;
+  }
+
+  void _onDropdownSelected(NetworkDropDownAction value, BuildContext context,
+      Network network, NetworkBloc networkBloc) {
+    switch (value) {
+      case NetworkDropDownAction.EDIT:
+        Navigator.push(
+            context,
+            platformPageRoute(
+                builder: (_) => EditChatNetworkPage(
+                    createDefaultIRCNetworkPreferences(context))));
+        break;
+      case NetworkDropDownAction.JOIN_CHANNEL:
+        Navigator.push(
+            context,
+            platformPageRoute(
+                builder: (_) => IRCNetworkChannelJoinPage(network)));
+        break;
+      case NetworkDropDownAction.LIST_ALL_CHANNELS:
+        networkBloc.printNetworkAvailableChannels();
+        break;
+      case NetworkDropDownAction.LIST_IGNORED_USERS:
+        networkBloc.printNetworkIgnoredUsers();
+        break;
+      case NetworkDropDownAction.DISCONNECT:
+        networkBloc.disableNetwork();
+        break;
+
+      case NetworkDropDownAction.CONNECT:
+        networkBloc.enableNetwork();
+        break;
+      case NetworkDropDownAction.EXIT:
+        networkBloc.leaveNetwork();
+        break;
     }
   }
 }

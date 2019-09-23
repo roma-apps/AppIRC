@@ -1,12 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class LoungePreferencesFormWidget extends StatefulWidget {
   final LoungeConnectionPreferences startValues;
@@ -43,6 +41,7 @@ class LoungePreferencesFormWidgetState
         buildFormTitle(
             context, appLocalizations.tr('lounge.connection.settings')),
         buildFormTextRow(
+            context,
             appLocalizations.tr('lounge.connection.host_label'),
             appLocalizations.tr('lounge.connection.host_hint'),
             Icons.cloud,

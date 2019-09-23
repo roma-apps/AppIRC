@@ -52,11 +52,13 @@ class IRCNetworkChannelJoinFormWidgetState
     return Column(
       children: <Widget>[
         buildFormTextRow(
+          context,
             appLocalizations.tr('join_channel.channel.label'),
             appLocalizations.tr('join_channel.channel.hint'),
             Icons.add,
             formBloc.channelFieldBloc, _channelController),
         buildFormTextRow(
+            context,
             appLocalizations.tr('join_channel.password.label'),
             appLocalizations.tr('join_channel.password.hint'),
             Icons.lock,

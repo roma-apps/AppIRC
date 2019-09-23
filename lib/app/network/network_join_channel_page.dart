@@ -7,6 +7,7 @@ import 'package:flutter_appirc/app/network/network_join_channel_form_widget.dart
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class IRCNetworkChannelJoinPage extends StatefulWidget {
@@ -55,7 +56,8 @@ class IRCNetworkChannelJoinPageState extends State<IRCNetworkChannelJoinPage> {
                         });
                       }
                     : null;
-                return PlatformButton(
+                return createSkinnedPlatformButton(
+                  context,
                   child: Text(
                     appLocalizations.tr('join_channel.join'),
                     style: TextStyle(color: Colors.white),
