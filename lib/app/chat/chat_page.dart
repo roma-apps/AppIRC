@@ -45,38 +45,35 @@ class ChatPage extends StatelessWidget {
         builder: (context, asyncSnapshot) {
 
           AppIRCSkinTheme currentSkin = asyncSnapshot.data;
-          return Provider<IRCChatActiveChannelBloc>(
-            providable:
-            IRCChatActiveChannelBloc(networksListBloc, preferencesService),
-            child: SafeArea(
-                child: PlatformScaffold(
-                    android: (context) => MaterialScaffoldData(
-                        appBar:   AppBar(
-                          title: _buildAppBarChild(context),
-                          actions: <Widget>[
-                            buildMembersButton(context),
-                          ],
-                          backgroundColor:  currentSkin.appBarColor,
-                        ),
-                    drawer: Drawer(child: ChatDrawerWidget()),
-                    body: _buildBody(context)),
-                ios: (context) => CupertinoPageScaffoldData(
-                    resizeToAvoidBottomInset: true,
-                    body: _buildBody(context),
-                    navigationBar: CupertinoNavigationBar(
-                      leading: PlatformIconButton(
-                        icon: _buildMenuIcon(context),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              platformPageRoute(
-                                  builder: (context) => ChatDrawerPage()));
-                        },
+          return SafeArea(
+            child: PlatformScaffold(
+                  android: (context) => MaterialScaffoldData(
+                      appBar:   AppBar(
+                        title: _buildAppBarChild(context),
+                        actions: <Widget>[
+                          buildMembersButton(context),
+                        ],
+                        backgroundColor:  currentSkin.appBarColor,
                       ),
-                      trailing: buildMembersButton(context),
-                      middle: _buildAppBarChild(context),
-                    ))),
-          ));
+                  drawer: Drawer(child: ChatDrawerWidget()),
+                  body: _buildBody(context)),
+              ios: (context) => CupertinoPageScaffoldData(
+                  resizeToAvoidBottomInset: true,
+                  body: _buildBody(context),
+                  navigationBar: CupertinoNavigationBar(
+                    leading: PlatformIconButton(
+                      icon: _buildMenuIcon(context),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            platformPageRoute(
+                                builder: (context) => ChatDrawerPage()));
+                      },
+                    ),
+                    trailing: buildMembersButton(context),
+                    middle: _buildAppBarChild(context),
+                  ))),
+          );
 
         });
 
@@ -86,7 +83,7 @@ class ChatPage extends StatelessWidget {
   Icon _buildMenuIcon(BuildContext context) => Icon(Icons.menu, color: Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
 
   Widget buildMembersButton(BuildContext context) {
-    var activeChannelBloc = Provider.of<IRCChatActiveChannelBloc>(context);
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     return StreamBuilder<NetworkChannel>(
       stream: activeChannelBloc.activeChannelStream,
       builder: (BuildContext context,
@@ -117,7 +114,7 @@ class ChatPage extends StatelessWidget {
 
     var backendService = Provider.of<LoungeBackendService>(context);
 
-    var activeChannelBloc = Provider.of<IRCChatActiveChannelBloc>(context);
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
     var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
     var channelsStateBloc = Provider.of<ChatNetworkChannelsStateBloc>(context);
@@ -169,7 +166,7 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context) {
-    var activeChannelBloc = Provider.of<IRCChatActiveChannelBloc>(context);
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var backendService = Provider.of<ChatInputBackendService>(context);
     var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
     var channelsStateBloc = Provider.of<ChatNetworkChannelsStateBloc>(context);

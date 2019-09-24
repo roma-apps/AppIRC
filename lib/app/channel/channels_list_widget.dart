@@ -35,7 +35,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
   Widget _channelItem(
       BuildContext context, Network network, NetworkChannel channel) {
     var ircChatActiveChannelBloc =
-        Provider.of<IRCChatActiveChannelBloc>(context);
+        Provider.of<ChatActiveChannelBloc>(context);
 
     return StreamBuilder<NetworkChannel>(
         stream: ircChatActiveChannelBloc.activeChannelStream,
@@ -60,7 +60,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
 
   Widget _buildChannelRow(
       BuildContext context,
-      IRCChatActiveChannelBloc ircChatActiveChannelBloc,
+      ChatActiveChannelBloc ircChatActiveChannelBloc,
       Network network,
       NetworkChannel channel,
       bool isChannelActive) {

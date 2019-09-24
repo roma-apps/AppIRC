@@ -65,7 +65,7 @@ class IRCNetworksListWidget extends StatelessWidget {
   Widget _networkItem(BuildContext context, Network network) {
     var preferencesService = Provider.of<PreferencesService>(context);
     var ircChatActiveChannelBloc =
-        Provider.of<IRCChatActiveChannelBloc>(context);
+        Provider.of<ChatActiveChannelBloc>(context);
     var backendService = Provider.of<ChatInputBackendService>(context);
     var networksStatesBloc = Provider.of<ChatNetworksStateBloc>(context);
     var channel = network.lobbyChannel;
@@ -97,7 +97,7 @@ class IRCNetworksListWidget extends StatelessWidget {
 
   _buildNetworkRow(
       BuildContext context,
-      IRCChatActiveChannelBloc ircChatActiveChannelBloc,
+      ChatActiveChannelBloc ircChatActiveChannelBloc,
       Network network,
       NetworkChannel channel,
       bool isChannelActive,

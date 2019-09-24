@@ -8,6 +8,7 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_page.dart';
 import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
@@ -155,7 +156,10 @@ class AppIRCState extends State<AppIRC> {
         var connectionBloc = ChatConnectionBloc(loungeBackendService);
         var networkStatesBloc =
             ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+        var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService, networksListBloc, preferencesService);
+
         var channelsStatesBloc = ChatNetworkChannelsStateBloc(
+            activeChannelBloc,
             loungeBackendService, networksListBloc);
 
         var _startPreferences =
@@ -184,18 +188,21 @@ class AppIRCState extends State<AppIRC> {
                           child: Provider(
                             providable: channelsStatesBloc,
                             child: Provider(
-                              providable: chatInitBloc,
+                              providable: activeChannelBloc,
                               child: Provider(
-                                providable: NetworkChannelMessagesSaverBloc(
-                                    loungeBackendService,
-                                    networksListBloc,
-                                    database),
+                                providable: chatInitBloc,
                                 child: Provider(
-                                  providable: ChatPreferencesSaverBloc(
-                                      preferencesService,
+                                  providable: NetworkChannelMessagesSaverBloc(
+                                      loungeBackendService,
                                       networksListBloc,
-                                      chatInitBloc),
-                                  child: _buildApp(ChatPage()),
+                                      database),
+                                  child: Provider(
+                                    providable: ChatPreferencesSaverBloc(
+                                        preferencesService,
+                                        networksListBloc,
+                                        chatInitBloc),
+                                    child: _buildApp(ChatPage()),
+                                  ),
                                 ),
                               ),
                             ),
@@ -217,76 +224,6 @@ class AppIRCState extends State<AppIRC> {
 
   Widget _buildAppForStartLoungePreferences() => _buildApp(
       NewLoungePreferencesPage(createDefaultLoungePreferences(context)));
-
-  Widget buildChat(
-      BuildContext context,
-      LoungeBackendService loungeBackendService,
-      PreferencesService preferencesService,
-      bool isChatBuildOneTime) {
-//    var loungeBackendService =
-//    Provider.of<LoungeBackendService>(context);
-//    var preferencesService =
-//    Provider.of<PreferencesService>(context);
-
-    _logger.d(() => "buildChat2 $isChatBuildOneTime");
-
-    var chatPreferencesBloc = ChatPreferencesLoaderBloc(preferencesService);
-
-    var networksListBloc = ChatNetworksListBloc(
-      loungeBackendService,
-      nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
-      nextChannelIdGenerator: chatPreferencesBloc.getNextNetworkChannelLocalId,
-    );
-
-    var connectionBloc = ChatConnectionBloc(loungeBackendService);
-    var networkStatesBloc =
-        ChatNetworksStateBloc(loungeBackendService, networksListBloc);
-    var channelsStatesBloc =
-        ChatNetworkChannelsStateBloc(loungeBackendService, networksListBloc);
-
-    var _startPreferences =
-        chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
-
-    var chatInitBloc =
-        ChatInitBloc(loungeBackendService, connectionBloc, _startPreferences);
-    return Provider<LoungeBackendService>(
-      providable: loungeBackendService,
-      child: Provider<ChatInputOutputBackendService>(
-        providable: loungeBackendService,
-        child: Provider<ChatOutputBackendService>(
-          providable: loungeBackendService,
-          child: Provider<ChatInputBackendService>(
-            providable: loungeBackendService,
-            child: Provider(
-              providable: chatPreferencesBloc,
-              child: Provider(
-                providable: connectionBloc,
-                child: Provider(
-                  providable: networksListBloc,
-                  child: Provider(
-                    providable: networkStatesBloc,
-                    child: Provider(
-                      providable: channelsStatesBloc,
-                      child: Provider(
-                        providable: chatInitBloc,
-                        child: Provider(
-                          providable: ChatPreferencesSaverBloc(
-                              preferencesService,
-                              networksListBloc,
-                              chatInitBloc),
-                          child: _buildApp(ChatPage()),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildApp(Widget child, {bool isPreferencesReady = true}) {
     var preferencesService = Provider.of<PreferencesService>(context);

@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
+import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -11,7 +13,8 @@ import 'package:rxdart/rxdart.dart';
 var _preferenceKey = "chat.activeChannel";
 var _logger = MyLogger(logTag: "IRCChatActiveChannelBloc", enabled: true);
 
-class IRCChatActiveChannelBloc extends Providable {
+class ChatActiveChannelBloc extends Providable {
+  final ChatInputBackendService backendService;
   final ChatNetworksListBloc _networksListBloc;
   IntPreferencesBloc _preferenceBloc;
 
@@ -19,12 +22,12 @@ class IRCChatActiveChannelBloc extends Providable {
 
   // ignore: close_sinks
   final BehaviorSubject<NetworkChannel> _activeChannelController =
-      new BehaviorSubject<NetworkChannel>();
+      new BehaviorSubject();
 
   Stream<NetworkChannel> get activeChannelStream =>
       _activeChannelController.stream;
 
-  IRCChatActiveChannelBloc(this._networksListBloc, PreferencesService preferencesService) {
+  ChatActiveChannelBloc(this.backendService, this._networksListBloc, PreferencesService preferencesService) {
 
     _preferenceBloc = createActiveChannelPreferenceBloc(preferencesService);
 
@@ -45,7 +48,7 @@ class IRCChatActiveChannelBloc extends Providable {
       var allChannels = await _networksListBloc.allNetworksChannels;
 
       if (allChannels != null && allChannels.isNotEmpty) {
-        var savedLocalId = await _preferenceBloc.getValue(
+        var savedLocalId =  _preferenceBloc.getValue(
             defaultValue: allChannels.first.localId);
         if (savedLocalId != null) {
           var filtered =
@@ -73,9 +76,12 @@ class IRCChatActiveChannelBloc extends Providable {
       return;
     }
 
-    _logger.i(() => "changeActiveChanel $changeActiveChanel");
+    _logger.i(() => "changeActiveChanel $newActiveChannel");
     _preferenceBloc.setValue(newActiveChannel.localId);
     _activeChannelController.sink.add(newActiveChannel);
+    
+    Network network = _networksListBloc.findNetworkWithChannel(newActiveChannel);
+    backendService.onOpenNetworkChannel(network, newActiveChannel);
   }
 }
 

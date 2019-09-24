@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 
 class NetworkChannel {
@@ -26,6 +27,14 @@ class NetworkChannel {
 
   @override
   int get hashCode => remoteId.hashCode;
+
+  @override
+  String toString() {
+    return 'NetworkChannel{channelPreferences: $channelPreferences,'
+        ' type: $type, remoteId: $remoteId}';
+  }
+
+
 }
 
 enum NetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }

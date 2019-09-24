@@ -57,6 +57,7 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 
   Disposable listenForMessages(Network network, NetworkChannel channel,
       NetworkChannelMessageListener listener);
+
 }
 
 abstract class ChatInputBackendService implements ChatBackendService {
