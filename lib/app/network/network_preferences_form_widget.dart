@@ -12,29 +12,29 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'network_preferences_form_bloc.dart';
 
-class IRCNetworkPreferencesFormWidget extends StatefulWidget {
-  final IRCNetworkPreferences startValues;
+class ChatNetworkPreferencesFormWidget extends StatefulWidget {
+  final ChatNetworkPreferences startValues;
   final PreferencesActionCallback callback;
 
-  IRCNetworkPreferencesFormWidget(this.startValues, this.callback);
+  ChatNetworkPreferencesFormWidget(this.startValues, this.callback);
 
   @override
   State<StatefulWidget> createState() =>
-      IRCNetworkPreferencesFormWidgetState(startValues, callback);
+      ChatNetworkPreferencesFormWidgetState(startValues, callback);
 }
 
-class IRCNetworkPreferencesFormWidgetState
-    extends State<IRCNetworkPreferencesFormWidget> {
+class ChatNetworkPreferencesFormWidgetState
+    extends State<ChatNetworkPreferencesFormWidget> {
   final PreferencesActionCallback callback;
-  final IRCNetworkPreferences startValues;
+  final ChatNetworkPreferences startValues;
 
   TextEditingController _channelsController;
 
-  IRCNetworkPreferencesFormWidgetState(this.startValues, this.callback) {
+  ChatNetworkPreferencesFormWidgetState(this.startValues, this.callback) {
     _channelsController = TextEditingController(
         text: startValues.channelsWithoutPassword
             .map((channel) => channel.name)
-            .join(IRCNetworkPreferencesFormBloc.channelsNamesSeparator));
+            .join(ChatNetworkPreferencesFormBloc.channelsNamesSeparator));
   }
 
   @override
@@ -45,8 +45,8 @@ class IRCNetworkPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    IRCNetworkPreferencesFormBloc formBloc =
-        Provider.of<IRCNetworkPreferencesFormBloc>(context);
+    ChatNetworkPreferencesFormBloc formBloc =
+        Provider.of<ChatNetworkPreferencesFormBloc>(context);
 
     var appLocalizations = AppLocalizations.of(context);
     return Padding(
@@ -58,7 +58,7 @@ class IRCNetworkPreferencesFormWidgetState
               children: <Widget>[
                 Provider(
                     providable: formBloc.serverFormBloc,
-                    child: IRCNetworkServerPreferencesFormWidget(startValues
+                    child: ChatNetworkServerPreferencesFormWidget(startValues
                         .networkConnectionPreferences.serverPreferences)),
                 Provider(
                     providable: formBloc.userFormBloc,

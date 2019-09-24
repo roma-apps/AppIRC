@@ -10,7 +10,7 @@ class Network {
   int get localId => connectionPreferences.localId;
 
   set localId(int newId) => connectionPreferences.localId = newId;
-  final IRCNetworkConnectionPreferences connectionPreferences;
+  final ChatNetworkConnectionPreferences connectionPreferences;
 
   String get name => connectionPreferences.name;
   final String remoteId;
@@ -37,14 +37,14 @@ class Network {
 }
 
 @JsonSerializable()
-class IRCNetworkServerPreferences extends JsonPreferences {
+class ChatNetworkServerPreferences extends JsonPreferences {
   String name;
   String serverHost;
   String serverPort;
   bool useTls;
   bool useOnlyTrustedCertificates;
 
-  IRCNetworkServerPreferences(
+  ChatNetworkServerPreferences(
       {@required this.name,
       @required this.serverHost,
       @required this.serverPort,
@@ -56,7 +56,7 @@ class IRCNetworkServerPreferences extends JsonPreferences {
     return 'IRCNetworkServerPreferences{name: $name}';
   }
 
-  factory IRCNetworkServerPreferences.fromJson(Map<String, dynamic> json) =>
+  factory ChatNetworkServerPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkServerPreferencesFromJson(json);
 
   @override
@@ -64,13 +64,13 @@ class IRCNetworkServerPreferences extends JsonPreferences {
 }
 
 @JsonSerializable()
-class IRCNetworkUserPreferences extends JsonPreferences {
+class ChatNetworkUserPreferences extends JsonPreferences {
   String nickname;
   String username;
   String password;
   String realName;
 
-  IRCNetworkUserPreferences(
+  ChatNetworkUserPreferences(
       {@required this.nickname,
       this.password,
       @required this.realName,
@@ -82,7 +82,7 @@ class IRCNetworkUserPreferences extends JsonPreferences {
         ' password: $password, realName: $realName}';
   }
 
-  factory IRCNetworkUserPreferences.fromJson(Map<String, dynamic> json) =>
+  factory ChatNetworkUserPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkUserPreferencesFromJson(json);
 
   @override
@@ -90,14 +90,14 @@ class IRCNetworkUserPreferences extends JsonPreferences {
 }
 
 @JsonSerializable()
-class IRCNetworkChannelPreferences extends JsonPreferences {
+class ChatNetworkChannelPreferences extends JsonPreferences {
   int localId;
   final String name;
   final String password;
 
-  IRCNetworkChannelPreferences(this.localId, this.password, this.name);
+  ChatNetworkChannelPreferences(this.localId, this.password, this.name);
 
-  IRCNetworkChannelPreferences.name(
+  ChatNetworkChannelPreferences.name(
       {@required this.name, @required this.password, this.localId});
 
   @override
@@ -105,7 +105,7 @@ class IRCNetworkChannelPreferences extends JsonPreferences {
     return 'IRCNetworkChannelPreferences{localId: $localId, name: $name}';
   }
 
-  factory IRCNetworkChannelPreferences.fromJson(Map<String, dynamic> json) =>
+  factory ChatNetworkChannelPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkChannelPreferencesFromJson(json);
 
   @override
@@ -113,20 +113,20 @@ class IRCNetworkChannelPreferences extends JsonPreferences {
 }
 
 typedef PreferencesActionCallback = void Function(
-    BuildContext context, IRCNetworkPreferences preferences);
+    BuildContext context, ChatNetworkPreferences preferences);
 
 @JsonSerializable()
-class IRCNetworkPreferences extends JsonPreferences {
+class ChatNetworkPreferences extends JsonPreferences {
   int get localId => networkConnectionPreferences?.localId;
 
   int get localIdOrUndefined => localId != null ? localId : -1;
   static const String channelsSeparator = " ";
 
-  final IRCNetworkConnectionPreferences networkConnectionPreferences;
+  final ChatNetworkConnectionPreferences networkConnectionPreferences;
 
-  List<IRCNetworkChannelPreferences> channels;
+  List<ChatNetworkChannelPreferences> channels;
 
-  IRCNetworkPreferences(this.networkConnectionPreferences, this.channels);
+  ChatNetworkPreferences(this.networkConnectionPreferences, this.channels);
 
   @override
   String toString() {
@@ -136,18 +136,18 @@ class IRCNetworkPreferences extends JsonPreferences {
   }
 
   @JsonKey(ignore: true)
-  List<IRCNetworkChannelPreferences> get channelsWithoutPassword => channels
+  List<ChatNetworkChannelPreferences> get channelsWithoutPassword => channels
       .where(
           (channel) => (channel.password == null || channel.password.isEmpty))
       .toList();
 
   @JsonKey(ignore: true)
-  List<IRCNetworkChannelPreferences> get channelsWithPassword => channels
+  List<ChatNetworkChannelPreferences> get channelsWithPassword => channels
       .where((channel) =>
           (channel.password != null && channel.password.isNotEmpty))
       .toList();
 
-  factory IRCNetworkPreferences.fromJson(Map<String, dynamic> json) =>
+  factory ChatNetworkPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkPreferencesFromJson(json);
 
   @override
@@ -155,13 +155,13 @@ class IRCNetworkPreferences extends JsonPreferences {
 }
 
 @JsonSerializable()
-class IRCNetworkConnectionPreferences extends JsonPreferences {
+class ChatNetworkConnectionPreferences extends JsonPreferences {
   int localId;
 
-  IRCNetworkServerPreferences serverPreferences;
-  IRCNetworkUserPreferences userPreferences;
+  ChatNetworkServerPreferences serverPreferences;
+  ChatNetworkUserPreferences userPreferences;
 
-  IRCNetworkConnectionPreferences(
+  ChatNetworkConnectionPreferences(
       {@required this.serverPreferences,
       @required this.userPreferences,
       this.localId});
@@ -175,7 +175,7 @@ class IRCNetworkConnectionPreferences extends JsonPreferences {
         ' userPreferences: $userPreferences}';
   }
 
-  factory IRCNetworkConnectionPreferences.fromJson(Map<String, dynamic> json) =>
+  factory ChatNetworkConnectionPreferences.fromJson(Map<String, dynamic> json) =>
       _$IRCNetworkConnectionPreferencesFromJson(json);
 
   @override

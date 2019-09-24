@@ -67,7 +67,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
 
   Future<RequestResult<bool>> disconnectChat({bool waitForResult: false});
 
-  Future<RequestResult<NetworkWithState>> joinNetwork(IRCNetworkPreferences preferences,
+  Future<RequestResult<NetworkWithState>> joinNetwork(ChatNetworkPreferences preferences,
       {bool waitForResult: false});
 
   Future<RequestResult<bool>> leaveNetwork(Network network,
@@ -88,11 +88,11 @@ abstract class ChatInputBackendService implements ChatBackendService {
       {bool waitForResult: false});
 
   Future<RequestResult<Network>> editNetworkSettings(
-      Network network, IRCNetworkPreferences preferences,
+      Network network, ChatNetworkPreferences preferences,
       {bool waitForResult: false});
 
   Future<RequestResult<NetworkChannelWithState>> joinNetworkChannel(
-      Network network, IRCNetworkChannelPreferences preferences,
+      Network network, ChatNetworkChannelPreferences preferences,
       {bool waitForResult: false});
 
   Future<RequestResult<bool>> leaveNetworkChannel(

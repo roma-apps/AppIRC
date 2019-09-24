@@ -75,7 +75,7 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
             assert(channel.channelPreferences.localId != null);
             return channel.channelPreferences;
           }).toList();
-          return IRCNetworkPreferences(connectionPreferences, channels);
+          return ChatNetworkPreferences(connectionPreferences, channels);
         }).toList();
         var newPreferences = ChatPreferences(newNetworksSettings);
 

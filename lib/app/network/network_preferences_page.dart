@@ -13,7 +13,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class NewChatNetworkPage extends ChatNetworkPage {
   final VoidCallback successCallback;
 
-  NewChatNetworkPage(IRCNetworkPreferences startValues, this.successCallback)
+  NewChatNetworkPage(ChatNetworkPreferences startValues, this.successCallback)
       : super(startValues, (context, preferences) async {
           final ChatNetworksListBloc chatBloc =
               Provider.of<ChatNetworksListBloc>(context);
@@ -29,7 +29,7 @@ class NewChatNetworkPage extends ChatNetworkPage {
 }
 
 class EditChatNetworkPage extends ChatNetworkPage {
-  EditChatNetworkPage(IRCNetworkPreferences startValues)
+  EditChatNetworkPage(ChatNetworkPreferences startValues)
       : super(startValues, (context, preferences) async {
           final ChatNetworksListBloc chatBloc =
               Provider.of<ChatNetworksListBloc>(context);
@@ -57,7 +57,7 @@ class EditChatNetworkPage extends ChatNetworkPage {
 }
 
 class ChatNetworkPage extends StatefulWidget {
-  final IRCNetworkPreferences startValues;
+  final ChatNetworkPreferences startValues;
   final PreferencesActionCallback callback;
 
   ChatNetworkPage(this.startValues, this.callback);
@@ -69,13 +69,13 @@ class ChatNetworkPage extends StatefulWidget {
 }
 
 class ChatNetworkPageState extends State<ChatNetworkPage> {
-  final IRCNetworkPreferences startValues;
+  final ChatNetworkPreferences startValues;
   final PreferencesActionCallback callback;
 
-  IRCNetworkPreferencesFormBloc networkPreferencesFormBloc;
+  ChatNetworkPreferencesFormBloc networkPreferencesFormBloc;
 
   ChatNetworkPageState(this.startValues, this.callback) {
-    networkPreferencesFormBloc = IRCNetworkPreferencesFormBloc(startValues);
+    networkPreferencesFormBloc = ChatNetworkPreferencesFormBloc(startValues);
   }
 
   @override
@@ -106,7 +106,7 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
             child: ListView(
               shrinkWrap: true,
               children: <Widget>[
-                IRCNetworkPreferencesFormWidget(startValues, callback),
+                ChatNetworkPreferencesFormWidget(startValues, callback),
               ],
             ),
           ),

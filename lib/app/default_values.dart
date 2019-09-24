@@ -10,29 +10,29 @@ LoungeConnectionPreferences createDefaultLoungePreferences(
 //    LoungeConnectionPreferences(host: "http://192.168.0.103:9000/");
 //LoungePreferences(host: "http://192.168.1.103:9000/");
 
-IRCNetworkPreferences createDefaultIRCNetworkPreferences(
+ChatNetworkPreferences createDefaultIRCNetworkPreferences(
         BuildContext context) =>
-    IRCNetworkPreferences(
-        IRCNetworkConnectionPreferences(
+    ChatNetworkPreferences(
+        ChatNetworkConnectionPreferences(
           serverPreferences: createDefaultNetworkServerPreferences(context),
           userPreferences: createDefaultNetworkUserPreferences(context),
           localId: null,
         ),
         [
-          IRCNetworkChannelPreferences.name(
+          ChatNetworkChannelPreferences.name(
               name: "#thelounge-spam", password: "")
         ]);
 
-IRCNetworkUserPreferences createDefaultNetworkUserPreferences(
+ChatNetworkUserPreferences createDefaultNetworkUserPreferences(
         BuildContext context) =>
-    IRCNetworkUserPreferences(
+    ChatNetworkUserPreferences(
         username: "AppIRC User name",
         realName: "AppIRC Real Name",
         nickname: "AppIRCNick");
 
-IRCNetworkServerPreferences createDefaultNetworkServerPreferences(
+ChatNetworkServerPreferences createDefaultNetworkServerPreferences(
     BuildContext context) {
-  return IRCNetworkServerPreferences(
+  return ChatNetworkServerPreferences(
       serverPort: "6697",
       useTls: true,
       name: "Freenode",

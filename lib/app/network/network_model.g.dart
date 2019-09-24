@@ -6,9 +6,9 @@ part of 'network_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-IRCNetworkServerPreferences _$IRCNetworkServerPreferencesFromJson(
+ChatNetworkServerPreferences _$IRCNetworkServerPreferencesFromJson(
     Map<String, dynamic> json) {
-  return IRCNetworkServerPreferences(
+  return ChatNetworkServerPreferences(
     name: json['name'] as String,
     serverHost: json['serverHost'] as String,
     serverPort: json['serverPort'] as String,
@@ -18,7 +18,7 @@ IRCNetworkServerPreferences _$IRCNetworkServerPreferencesFromJson(
 }
 
 Map<String, dynamic> _$IRCNetworkServerPreferencesToJson(
-        IRCNetworkServerPreferences instance) =>
+        ChatNetworkServerPreferences instance) =>
     <String, dynamic>{
       'name': instance.name,
       'serverHost': instance.serverHost,
@@ -27,9 +27,9 @@ Map<String, dynamic> _$IRCNetworkServerPreferencesToJson(
       'useOnlyTrustedCertificates': instance.useOnlyTrustedCertificates,
     };
 
-IRCNetworkUserPreferences _$IRCNetworkUserPreferencesFromJson(
+ChatNetworkUserPreferences _$IRCNetworkUserPreferencesFromJson(
     Map<String, dynamic> json) {
-  return IRCNetworkUserPreferences(
+  return ChatNetworkUserPreferences(
     nickname: json['nickname'] as String,
     password: json['password'] as String,
     realName: json['realName'] as String,
@@ -38,7 +38,7 @@ IRCNetworkUserPreferences _$IRCNetworkUserPreferencesFromJson(
 }
 
 Map<String, dynamic> _$IRCNetworkUserPreferencesToJson(
-        IRCNetworkUserPreferences instance) =>
+        ChatNetworkUserPreferences instance) =>
     <String, dynamic>{
       'nickname': instance.nickname,
       'username': instance.username,
@@ -46,9 +46,9 @@ Map<String, dynamic> _$IRCNetworkUserPreferencesToJson(
       'realName': instance.realName,
     };
 
-IRCNetworkChannelPreferences _$IRCNetworkChannelPreferencesFromJson(
+ChatNetworkChannelPreferences _$IRCNetworkChannelPreferencesFromJson(
     Map<String, dynamic> json) {
-  return IRCNetworkChannelPreferences(
+  return ChatNetworkChannelPreferences(
     json['localId'] as int,
     json['password'] as String,
     json['name'] as String,
@@ -56,52 +56,52 @@ IRCNetworkChannelPreferences _$IRCNetworkChannelPreferencesFromJson(
 }
 
 Map<String, dynamic> _$IRCNetworkChannelPreferencesToJson(
-        IRCNetworkChannelPreferences instance) =>
+        ChatNetworkChannelPreferences instance) =>
     <String, dynamic>{
       'localId': instance.localId,
       'name': instance.name,
       'password': instance.password,
     };
 
-IRCNetworkPreferences _$IRCNetworkPreferencesFromJson(
+ChatNetworkPreferences _$IRCNetworkPreferencesFromJson(
     Map<String, dynamic> json) {
-  return IRCNetworkPreferences(
+  return ChatNetworkPreferences(
     json['networkConnectionPreferences'] == null
         ? null
-        : IRCNetworkConnectionPreferences.fromJson(
+        : ChatNetworkConnectionPreferences.fromJson(
             json['networkConnectionPreferences'] as Map<String, dynamic>),
     (json['channels'] as List)
         ?.map((e) => e == null
             ? null
-            : IRCNetworkChannelPreferences.fromJson(e as Map<String, dynamic>))
+            : ChatNetworkChannelPreferences.fromJson(e as Map<String, dynamic>))
         ?.toList(),
   );
 }
 
 Map<String, dynamic> _$IRCNetworkPreferencesToJson(
-        IRCNetworkPreferences instance) =>
+        ChatNetworkPreferences instance) =>
     <String, dynamic>{
       'networkConnectionPreferences': instance.networkConnectionPreferences,
       'channels': instance.channels,
     };
 
-IRCNetworkConnectionPreferences _$IRCNetworkConnectionPreferencesFromJson(
+ChatNetworkConnectionPreferences _$IRCNetworkConnectionPreferencesFromJson(
     Map<String, dynamic> json) {
-  return IRCNetworkConnectionPreferences(
+  return ChatNetworkConnectionPreferences(
     serverPreferences: json['serverPreferences'] == null
         ? null
-        : IRCNetworkServerPreferences.fromJson(
+        : ChatNetworkServerPreferences.fromJson(
             json['serverPreferences'] as Map<String, dynamic>),
     userPreferences: json['userPreferences'] == null
         ? null
-        : IRCNetworkUserPreferences.fromJson(
+        : ChatNetworkUserPreferences.fromJson(
             json['userPreferences'] as Map<String, dynamic>),
     localId: json['localId'] as int,
   );
 }
 
 Map<String, dynamic> _$IRCNetworkConnectionPreferencesToJson(
-        IRCNetworkConnectionPreferences instance) =>
+        ChatNetworkConnectionPreferences instance) =>
     <String, dynamic>{
       'localId': instance.localId,
       'serverPreferences': instance.serverPreferences,

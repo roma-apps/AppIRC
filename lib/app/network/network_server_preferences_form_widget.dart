@@ -6,27 +6,27 @@ import 'package:flutter_appirc/app/network/network_server_preferences_form_bloc.
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class IRCNetworkServerPreferencesFormWidget extends StatefulWidget {
+class ChatNetworkServerPreferencesFormWidget extends StatefulWidget {
 
-  final IRCNetworkServerPreferences startValues;
+  final ChatNetworkServerPreferences startValues;
 
-  IRCNetworkServerPreferencesFormWidget(this.startValues);
+  ChatNetworkServerPreferencesFormWidget(this.startValues);
 
   @override
   State<StatefulWidget> createState() =>
-      IRCNetworkServerPreferencesFormWidgetState(startValues);
+      ChatNetworkServerPreferencesFormWidgetState(startValues);
 }
 
-class IRCNetworkServerPreferencesFormWidgetState
-    extends State<IRCNetworkServerPreferencesFormWidget> {
+class ChatNetworkServerPreferencesFormWidgetState
+    extends State<ChatNetworkServerPreferencesFormWidget> {
 
-  final IRCNetworkServerPreferences startValues;
+  final ChatNetworkServerPreferences startValues;
 
   TextEditingController _hostController;
   TextEditingController _portController;
   TextEditingController _nameController;
 
-  IRCNetworkServerPreferencesFormWidgetState(this.startValues) {
+  ChatNetworkServerPreferencesFormWidgetState(this.startValues) {
     _hostController =
         TextEditingController(text: startValues.serverHost);
     _portController =
@@ -46,7 +46,7 @@ class IRCNetworkServerPreferencesFormWidgetState
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
-    var formBloc = Provider.of<IRCNetworkServerPreferencesFormBloc>(context);
+    var formBloc = Provider.of<ChatNetworkServerPreferencesFormBloc>(context);
 
     return Column(
       children: <Widget>[

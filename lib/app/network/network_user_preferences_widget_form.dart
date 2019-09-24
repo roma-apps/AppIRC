@@ -7,7 +7,7 @@ import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class IRCNetworkUserPreferencesFormWidget extends StatefulWidget {
-  final IRCNetworkUserPreferences startValues;
+  final ChatNetworkUserPreferences startValues;
 
   IRCNetworkUserPreferencesFormWidget(this.startValues);
 
@@ -18,7 +18,7 @@ class IRCNetworkUserPreferencesFormWidget extends StatefulWidget {
 
 class IRCNetworkUserPreferencesFormState
     extends State<IRCNetworkUserPreferencesFormWidget> {
-  final IRCNetworkUserPreferences startValues;
+  final ChatNetworkUserPreferences startValues;
 
   TextEditingController _nickController;
   TextEditingController _userNameController;

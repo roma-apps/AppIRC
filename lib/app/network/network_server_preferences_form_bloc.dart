@@ -2,7 +2,7 @@ import 'package:flutter_appirc/form/form_blocs.dart';
 
 import 'network_model.dart';
 
-class IRCNetworkServerPreferencesFormBloc extends FormBloc {
+class ChatNetworkServerPreferencesFormBloc extends FormBloc {
   final Validator<String> networkValidator;
 
   FormValueFieldBloc<String> nameFieldBloc;
@@ -11,8 +11,8 @@ class IRCNetworkServerPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<bool> tlsFieldBloc;
   FormValueFieldBloc<bool> trustedFieldBloc;
 
-  IRCNetworkServerPreferencesFormBloc(
-      IRCNetworkServerPreferences preferences, this.networkValidator) {
+  ChatNetworkServerPreferencesFormBloc(
+      ChatNetworkServerPreferences preferences, this.networkValidator) {
     nameFieldBloc = FormValueFieldBloc<String>(preferences.name,
         validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()]);
 
@@ -30,7 +30,7 @@ class IRCNetworkServerPreferencesFormBloc extends FormBloc {
   List<FormFieldBloc> get children =>
       [nameFieldBloc, hostFieldBloc, portFieldBloc];
 
-  IRCNetworkServerPreferences extractData() => IRCNetworkServerPreferences(
+  ChatNetworkServerPreferences extractData() => ChatNetworkServerPreferences(
       name: nameFieldBloc.value,
       serverHost: hostFieldBloc.value,
       serverPort: portFieldBloc.value,

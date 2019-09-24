@@ -183,7 +183,7 @@ class LoungeBackendService extends Providable
 
   @override
   Future<RequestResult<Network>> editNetworkSettings(
-      Network network, IRCNetworkPreferences preferences,
+      Network network, ChatNetworkPreferences preferences,
       {bool waitForResult = false}) {
 //    if (waitForResult) {
     throw NotImplementedYetException();
@@ -242,7 +242,7 @@ class LoungeBackendService extends Providable
 
   @override
   Future<RequestResult<NetworkWithState>> joinNetwork(
-      IRCNetworkPreferences networkPreferences,
+      ChatNetworkPreferences networkPreferences,
       {bool waitForResult = false}) async {
     var userPreferences =
         networkPreferences.networkConnectionPreferences.userPreferences;
@@ -323,7 +323,7 @@ class LoungeBackendService extends Providable
 
   @override
   Future<RequestResult<NetworkChannelWithState>> joinNetworkChannel(
-      Network network, IRCNetworkChannelPreferences preferences,
+      Network network, ChatNetworkChannelPreferences preferences,
       {bool waitForResult = false}) async {
     var request = LoungeJsonRequest(
         name: LoungeRequestEventNames.input,
@@ -432,12 +432,12 @@ class LoungeBackendService extends Providable
         var preferences;
 
         if (request != null) {
-          preferences = IRCNetworkChannelPreferences.name(
+          preferences = ChatNetworkChannelPreferences.name(
               localId: request.body.localId,
               name: parsed.chan.name,
               password: request.body.channelPassword);
         } else {
-          preferences = IRCNetworkChannelPreferences.name(
+          preferences = ChatNetworkChannelPreferences.name(
               name: parsed.chan.name, password: "");
         }
 
@@ -572,7 +572,7 @@ class LoungeBackendService extends Providable
             localId = networkChannelPreferences.localId;
           }
           var channel = NetworkChannel(
-              IRCNetworkChannelPreferences.name(
+              ChatNetworkChannelPreferences.name(
                   localId: localId,
                   name: loungeChannel.name,
                   // Network start channels always without password

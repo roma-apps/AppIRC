@@ -44,7 +44,7 @@ class JoinChannelInputLoungeRequestBody extends InputLoungeRequestBody {
 
 class JoinNetworkLoungeRequest
     extends LoungeJsonRequest<NetworkNewLoungeRequestBody> {
-  final IRCNetworkPreferences networkPreferences;
+  final ChatNetworkPreferences networkPreferences;
 
   JoinNetworkLoungeRequest(
       this.networkPreferences, NetworkNewLoungeRequestBody body)

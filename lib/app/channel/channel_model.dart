@@ -7,7 +7,7 @@ class NetworkChannel {
 
   set localId(int newId) => channelPreferences.localId = newId;
 
-  final IRCNetworkChannelPreferences channelPreferences;
+  final ChatNetworkChannelPreferences channelPreferences;
 
   String get name => channelPreferences.name;
   final NetworkChannelType type;

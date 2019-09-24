@@ -41,13 +41,13 @@ class NetworkBloc extends Providable {
           waitForResult: waitForResult);
 
   Future<RequestResult<Network>> editNetworkSettings(
-          IRCNetworkPreferences preferences,
+          ChatNetworkPreferences preferences,
           {bool waitForResult: false}) async =>
       await backendService.editNetworkSettings(network, preferences,
           waitForResult: waitForResult);
 
   Future<RequestResult<NetworkChannelWithState>> joinNetworkChannel(
-          IRCNetworkChannelPreferences preferences,
+          ChatNetworkChannelPreferences preferences,
           {bool waitForResult: false}) async =>
       await backendService.joinNetworkChannel(network, preferences,
           waitForResult: waitForResult);

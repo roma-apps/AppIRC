@@ -11,7 +11,7 @@ ChatPreferences _$ChatPreferencesFromJson(Map<String, dynamic> json) {
     (json['networks'] as List)
         ?.map((e) => e == null
             ? null
-            : IRCNetworkPreferences.fromJson(e as Map<String, dynamic>))
+            : ChatNetworkPreferences.fromJson(e as Map<String, dynamic>))
         ?.toList(),
   );
 }

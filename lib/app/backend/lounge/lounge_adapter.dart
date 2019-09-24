@@ -13,15 +13,15 @@ var _logger = MyLogger(logTag: "lounge_adapter", enabled: true);
 ChatConfig toChatConfig(
         ConfigurationLoungeResponseBody loungeConfig, List<String> commands) =>
     ChatConfig.name(
-        defaultNetwork: IRCNetworkConnectionPreferences(
-            serverPreferences: IRCNetworkServerPreferences(
+        defaultNetwork: ChatNetworkConnectionPreferences(
+            serverPreferences: ChatNetworkServerPreferences(
                 name: loungeConfig.defaults.name,
                 serverHost: loungeConfig.defaults.host,
                 serverPort: loungeConfig.defaults.port.toString(),
                 useTls: loungeConfig.defaults.tls,
                 useOnlyTrustedCertificates:
                     loungeConfig.defaults.rejectUnathorized),
-            userPreferences: IRCNetworkUserPreferences(
+            userPreferences: ChatNetworkUserPreferences(
                 nickname: loungeConfig.defaults.nick,
                 realName: loungeConfig.defaults.realname,
                 username: loungeConfig.defaults.username)),

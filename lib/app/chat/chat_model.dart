@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 
 class ChatConfig {
-  final IRCNetworkConnectionPreferences defaultNetwork;
+  final ChatNetworkConnectionPreferences defaultNetwork;
   final String defaultChannels;
   final String defaultPassword;
   final bool displayNetwork;

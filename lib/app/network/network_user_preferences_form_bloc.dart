@@ -8,7 +8,7 @@ class IRCNetworkUserPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<String> realNameFieldBloc;
   FormValueFieldBloc<String> userNameFieldBloc;
 
-  IRCNetworkUserPreferencesFormBloc(IRCNetworkUserPreferences preferences) {
+  IRCNetworkUserPreferencesFormBloc(ChatNetworkUserPreferences preferences) {
     nickFieldBloc = FormValueFieldBloc<String>(
         preferences.nickname,
         validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
@@ -21,7 +21,7 @@ class IRCNetworkUserPreferencesFormBloc extends FormBloc {
   List<FormFieldBloc> get children =>
       [nickFieldBloc, passwordFieldBloc, realNameFieldBloc, userNameFieldBloc];
 
-  IRCNetworkUserPreferences extractData() => IRCNetworkUserPreferences(
+  ChatNetworkUserPreferences extractData() => ChatNetworkUserPreferences(
       nickname: nickFieldBloc.value,
       password: passwordFieldBloc.value,
       realName: realNameFieldBloc.value,
