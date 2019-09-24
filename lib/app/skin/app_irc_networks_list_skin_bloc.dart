@@ -12,13 +12,13 @@ class AppIRCNetworkListSkinBloc extends AppIRCChannelsListSkinBloc implements Ne
 
 
 
-  Color get separatorColor => theme.platformSkinTheme.separatorColor;
+  Color get separatorColor => theme.platformSkinTheme.secondaryColor;
 
   TextStyle getNetworkItemTextStyle(bool isChannelActive) {
     if(isChannelActive) {
-      return theme.platformSkinTheme.textBoldMediumStyle.copyWith(color: theme.platformSkinTheme.foregroundColor);
+      return theme.platformSkinTheme.textBoldMediumStyle.copyWith(color: theme.onActiveListItemColor);
     } else {
-      return theme.platformSkinTheme.textBoldMediumStyle.copyWith(color: theme.platformSkinTheme.backgroundColor);
+      return theme.platformSkinTheme.textBoldMediumStyle.copyWith(color: theme.onNotActiveListItemColor);
     }
   }
 

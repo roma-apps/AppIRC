@@ -13,10 +13,7 @@ class IRCNetworkChannelWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Expanded(child: IRCNetworkChannelMessagesListWidget()),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: IRCNetworkChannelNewMessageWidget(),
-        )
+        IRCNetworkChannelNewMessageWidget()
       ],
     );
 }

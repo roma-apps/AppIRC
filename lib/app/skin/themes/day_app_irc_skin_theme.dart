@@ -13,9 +13,9 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
       : super(
             ID,
             MessagesColoredNicknamesData(Colors.primaries),
-            () => _androidDayThemeData(),
+            () =>_androidDayThemeData,
             () => MaterialBasedCupertinoThemeData(
-                materialTheme: _androidDayThemeData()));
+                materialTheme: _androidDayThemeData));
 
   Color findMessageColorByType(RegularMessageType regularMessageType) {
     Color color;
@@ -81,9 +81,42 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
 
   @override
   Color get linkColor => Colors.lightBlue;
+
+  @override
+  Color get activeListItemColor => _androidDayThemeData.primaryColor;
+
+  @override
+  Color get appBackgroundColor => _androidDayThemeData.scaffoldBackgroundColor;
+
+  @override
+  Color get appBarColor => _androidDayThemeData.primaryColor;
+
+  @override
+  Color get chatInputColor => _androidDayThemeData.primaryColor;
+
+  @override
+  Color get notActiveListItemColor => appBackgroundColor;
+
+  @override
+  Color get onActiveListItemColor => onAppBackgroundColor;
+
+  @override
+  Color get onAppBackgroundColor => _androidDayThemeData.colorScheme.onBackground;
+
+  @override
+  Color get onAppBarColor => Color(0xfff5f5f5);
+
+  @override
+  Color get onChatInputColor => onAppBarColor;
+
+  @override
+  Color get onChatInputHintColor => _androidDayThemeData.hintColor;
+
+  @override
+  Color get onNotActiveListItemColor => onAppBackgroundColor;
 }
 
-ThemeData _androidDayThemeData() => ThemeData(
+ThemeData _androidDayThemeData = ThemeData(
       primarySwatch: Colors.orange,
       brightness: Brightness.light,
       primaryColor: Color(0xffff9800),

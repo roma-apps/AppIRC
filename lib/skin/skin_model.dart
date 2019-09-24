@@ -9,13 +9,12 @@ typedef IOSThemeDataCreator = CupertinoThemeData Function();
 class AppSkinTheme {
   final String id;
 
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is AppSkinTheme &&
-              runtimeType == other.runtimeType &&
-              id == other.id;
+      other is AppSkinTheme &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -23,29 +22,39 @@ class AppSkinTheme {
   AndroidThemeDataCreator androidThemeDataCreator;
   IOSThemeDataCreator iosThemeDataCreator;
 
-  AppSkinTheme(this.id, this.androidThemeDataCreator,
-      this.iosThemeDataCreator) {
+  AppSkinTheme(
+      this.id, this.androidThemeDataCreator, this.iosThemeDataCreator) {
     if (Platform.isAndroid) {
       platformSkinTheme = AndroidAppSkinTheme(androidThemeDataCreator());
     } else if (Platform.isAndroid) {
-      platformSkinTheme = IOSAppSkinTheme(iosThemeDataCreator());
+      platformSkinTheme = MaterialBasedIOSAppSkinTheme(
+          AndroidAppSkinTheme(androidThemeDataCreator()));
     } else {
       throw Exception("Not supported platform ${Platform.operatingSystem}");
     }
   }
-
 }
 
 abstract class PlatformSkinTheme {
+  Color get disabledColor;
   Color get primaryColor;
 
-  Color get accentColor;
-  Color get disabledColor;
+  Color get primaryVariantColor;
 
+  Color get secondaryColor;
+
+  Color get secondaryVariantColor;
+
+  Color get onPrimaryColor;
+
+  Color get onSecondaryColor;
 
   TextStyle get textRegularMediumStyle;
+
   TextStyle get textBoldMediumStyle;
+
   TextStyle get textRegularSmallStyle;
+
   TextStyle get textBoldSmallStyle;
 
   TextStyle get textInputDecorationLabelStyle;
@@ -54,35 +63,15 @@ abstract class PlatformSkinTheme {
 
   TextStyle get textTitleStyle;
 
-  Color get separatorColor;
-
-  Color get foregroundColor;
-
-  Color get backgroundColor;
-
   TextStyle get textEditTextStyle;
 }
 
 class AndroidAppSkinTheme extends PlatformSkinTheme {
   final ThemeData theme;
-  TextTheme get  textTheme => theme.textTheme;
+
+  TextTheme get textTheme => theme.textTheme;
 
   AndroidAppSkinTheme(this.theme);
-
-  @override
-  Color get primaryColor => theme.primaryColor;
-
-  @override
-  Color get accentColor => theme.accentColor;
-
-  @override
-  Color get backgroundColor => theme.backgroundColor;
-
-  @override
-  Color get foregroundColor => theme.accentColor;
-
-  @override
-  Color get separatorColor => theme.accentColor;
 
   @override
   TextStyle get textBoldMediumStyle => textTheme.caption;
@@ -94,11 +83,11 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textEditTextStyle => textTheme.body1;
 
   @override
-  TextStyle get textInputDecorationHintStyle => textEditTextStyle.copyWith(color: theme.hintColor);
+  TextStyle get textInputDecorationHintStyle =>
+      textEditTextStyle.copyWith(color: theme.hintColor);
 
   @override
   TextStyle get textInputDecorationLabelStyle => textTheme.body1;
-
 
   @override
   TextStyle get textRegularMediumStyle => textTheme.body1;
@@ -110,30 +99,61 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textTitleStyle => textTheme.headline;
 
   @override
+  Color get primaryColor => theme.colorScheme.primary;
+
+  @override
+  Color get primaryVariantColor => theme.colorScheme.primaryVariant;
+
+  @override
+  Color get secondaryColor => theme.colorScheme.secondary;
+
+  @override
+  Color get secondaryVariantColor => theme.colorScheme.secondaryVariant;
+
+  @override
+  Color get onPrimaryColor => theme.colorScheme.onPrimary;
+
+  @override
+  Color get onSecondaryColor => theme.colorScheme.onSecondary;
+
+  @override
   Color get disabledColor => theme.disabledColor;
 }
 
-class IOSAppSkinTheme extends PlatformSkinTheme {
-  final CupertinoThemeData theme;
-  CupertinoTextThemeData get  textTheme => theme.textTheme;
+class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
+  AndroidAppSkinTheme androidAppSkinTheme;
+  CupertinoThemeData theme;
 
-  IOSAppSkinTheme(this.theme);
-
-  @override
-  Color get primaryColor => theme.primaryColor;
-
-  @override
-  Color get accentColor => theme.barBackgroundColor;
+  CupertinoTextThemeData get textTheme => theme.textTheme;
 
 
   @override
-  Color get backgroundColor => theme.barBackgroundColor;
+  Color get disabledColor => androidAppSkinTheme.theme.disabledColor;
+  @override
+  Color get primaryColor => androidAppSkinTheme.theme.colorScheme.primary;
 
   @override
-  Color get foregroundColor => theme.primaryColor;
+  Color get primaryVariantColor =>
+      androidAppSkinTheme.theme.colorScheme.primaryVariant;
 
   @override
-  Color get separatorColor => theme.primaryColor;
+  Color get secondaryColor => androidAppSkinTheme.theme.colorScheme.secondary;
+
+  @override
+  Color get secondaryVariantColor =>
+      androidAppSkinTheme.theme.colorScheme.secondaryVariant;
+
+  @override
+  Color get onPrimaryColor => androidAppSkinTheme.theme.colorScheme.onPrimary;
+
+  @override
+  Color get onSecondaryColor =>
+      androidAppSkinTheme.theme.colorScheme.onSecondary;
+
+  MaterialBasedIOSAppSkinTheme(this.androidAppSkinTheme) {
+    theme = MaterialBasedCupertinoThemeData(
+        materialTheme: androidAppSkinTheme.theme);
+  }
 
   @override
   TextStyle get textBoldMediumStyle => textTheme.textStyle;
@@ -150,7 +170,6 @@ class IOSAppSkinTheme extends PlatformSkinTheme {
   @override
   TextStyle get textInputDecorationLabelStyle => textTheme.textStyle;
 
-
   @override
   TextStyle get textRegularMediumStyle => textTheme.textStyle;
 
@@ -159,8 +178,4 @@ class IOSAppSkinTheme extends PlatformSkinTheme {
 
   @override
   TextStyle get textTitleStyle => textTheme.navLargeTitleTextStyle;
-
-
-  @override
-  Color get disabledColor => theme.primaryContrastingColor;
 }

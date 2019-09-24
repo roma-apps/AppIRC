@@ -9,45 +9,45 @@ class AppIRCChannelsListSkinBloc extends ChannelsListSkinBloc {
 
   TextStyle getChannelItemTextStyle(bool isChannelActive) {
     if (isChannelActive) {
-      return theme.platformSkinTheme.textRegularMediumStyle.copyWith(color: theme.platformSkinTheme.foregroundColor);
+      return theme.platformSkinTheme.textRegularMediumStyle
+          .copyWith(color: theme.onActiveListItemColor);
     } else {
-      return theme.platformSkinTheme.textRegularMediumStyle.copyWith(color: theme.platformSkinTheme.backgroundColor);
+      return theme.platformSkinTheme.textRegularMediumStyle
+          .copyWith(color: theme.onNotActiveListItemColor);
     }
   }
 
-
   Color getChannelItemBackgroundColor(bool isChannelActive) {
     if (isChannelActive) {
-      return theme.platformSkinTheme.backgroundColor;
+      return theme.activeListItemColor;
     } else {
-      return theme.platformSkinTheme.foregroundColor;
+      return theme.notActiveListItemColor;
     }
   }
 
   Color getChannelItemIconColor(bool isChannelActive) {
     if (isChannelActive) {
-      return theme.platformSkinTheme.foregroundColor;
+      return theme.onActiveListItemColor;
     } else {
-      return theme.platformSkinTheme.backgroundColor;
+      return theme.onNotActiveListItemColor;
     }
   }
-
 
   TextStyle getChannelUnreadTextStyle(bool isChannelActive) {
     if (!isChannelActive) {
-      return theme.platformSkinTheme.textRegularMediumStyle.copyWith(color: theme.platformSkinTheme.foregroundColor);
+      return theme.platformSkinTheme.textRegularMediumStyle.copyWith(
+          color: theme.platformSkinTheme.onPrimaryColor);
     } else {
-      return theme.platformSkinTheme.textRegularMediumStyle.copyWith(color: theme.platformSkinTheme.backgroundColor);
+      return theme.platformSkinTheme.textRegularMediumStyle
+          .copyWith(color: theme.platformSkinTheme.onPrimaryColor);
     }
   }
-
 
   Color getChannelUnreadItemBackgroundColor(bool isChannelActive) {
-    if (!isChannelActive) {
-      return theme.platformSkinTheme.backgroundColor;
+    if (isChannelActive) {
+      return theme.platformSkinTheme.primaryVariantColor;
     } else {
-      return theme.platformSkinTheme.foregroundColor;
+      return theme.platformSkinTheme.primaryVariantColor;
     }
   }
-
 }

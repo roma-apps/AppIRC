@@ -14,10 +14,8 @@ PlatformButton createSkinnedPlatformButton(BuildContext context,
     @required VoidCallback onPressed,
     @required Widget child,
     EdgeInsetsGeometry padding}) {
-  var buttonSkinBloc = Provider.of<ButtonSkinBloc>(context);
+//  var buttonSkinBloc = Provider.of<ButtonSkinBloc>(context);
   return PlatformButton(
       child: child,
-      onPressed: onPressed,
-      color: buttonSkinBloc.enabledColor,
-      disabledColor: buttonSkinBloc.disabledColor);
+      onPressed: onPressed);
 }

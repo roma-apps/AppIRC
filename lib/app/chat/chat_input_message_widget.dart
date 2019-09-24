@@ -24,40 +24,37 @@ class IRCNetworkChannelNewMessageState
     var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: inputMessageSkinBloc.dividerColor,
-            width: 1.0,
-            style: BorderStyle.solid,
-          ),
-        ),
+        color: inputMessageSkinBloc.inputMessageBackgroundColor
       ),
-      child: Row(
-        children: <Widget>[
-          Flexible(
-              child: PlatformTextField(
-            android: (_) {
-              return MaterialTextFieldData(
-                  decoration: InputDecoration(
-                      hintText: hintStr,
-                      hintStyle:
-                          inputMessageSkinBloc.inputMessageHintTextStyle));
-            },
-            ios: (_) => CupertinoTextFieldData(placeholder: hintStr),
-            cursorColor: inputMessageSkinBloc.cursorColor,
-            style: inputMessageSkinBloc.inputMessageTextStyle,
-            controller: _messageController,
-            onSubmitted: (term) {
-              sendMessage(channelBloc);
-            },
-          )),
-          PlatformIconButton(
-              color: inputMessageSkinBloc.iconSendMessageColor,
-              icon: new Icon(Icons.message),
-              onPressed: () {
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          children: <Widget>[
+            Flexible(
+                child: PlatformTextField(
+              android: (_) {
+                return MaterialTextFieldData(
+                    decoration: InputDecoration(
+                        hintText: hintStr,
+                        hintStyle:
+                            inputMessageSkinBloc.inputMessageHintTextStyle));
+              },
+              ios: (_) => CupertinoTextFieldData(placeholder: hintStr),
+              cursorColor: inputMessageSkinBloc.inputMessageCursorColor,
+              style: inputMessageSkinBloc.inputMessageTextStyle,
+              controller: _messageController,
+              onSubmitted: (term) {
                 sendMessage(channelBloc);
-              }),
-        ],
+              },
+            )),
+            PlatformIconButton(
+                color: inputMessageSkinBloc.iconSendMessageColor,
+                icon: new Icon(Icons.message),
+                onPressed: () {
+                  sendMessage(channelBloc);
+                }),
+          ],
+        ),
       ),
     );
   }
