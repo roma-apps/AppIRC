@@ -416,8 +416,7 @@ class LoungeBackendService extends Providable
       if (parsed.network == network.remoteId) {
         LoungeJsonRequest<JoinChannelInputLoungeRequestBody> request =
             _pendingRequests.firstWhere((request) {
-          if (request
-              is LoungeJsonRequest<JoinChannelInputLoungeRequestBody>) {
+          if (request is LoungeJsonRequest<JoinChannelInputLoungeRequestBody>) {
             LoungeJsonRequest<JoinChannelInputLoungeRequestBody> joinRequest =
                 request;
             if (joinRequest != null) {
@@ -451,6 +450,7 @@ class LoungeBackendService extends Providable
         var networkChannel = NetworkChannel(preferences,
             detectNetworkChannelType(parsed.chan.type), parsed.chan.id);
         var channelState = toNetworkChannelState(loungeChannel);
+        channelState = _modifyStateForChannel(channelState, networkChannel);
         listener(NetworkChannelWithState(networkChannel, channelState));
       }
     }));
@@ -489,7 +489,7 @@ class LoungeBackendService extends Providable
         if (data.unread != null) {
           var channelState = currentStateExtractor();
           channelState.unreadCount = data.unread;
-          listener(channelState);
+          listener(_modifyStateForChannel(channelState, channel));
         }
 
 //          cg  listener(message);
@@ -503,7 +503,7 @@ class LoungeBackendService extends Providable
       if (channel.remoteId == data.chan) {
         var channelState = currentStateExtractor();
         channelState.topic = data.topic;
-        listener(channelState);
+        listener(_modifyStateForChannel(channelState, channel));
 //        var message = toIRCMessage(data.msg);
 //        listener(message);
       }
@@ -522,20 +522,24 @@ class LoungeBackendService extends Providable
           channelState.connected = false;
         }
 
-        listener(channelState);
+        listener(_modifyStateForChannel(channelState, channel));
 //        var message = toIRCMessage(data.msg);
 //        listener(message);
       }
     }));
 
-    // TODO: implement listenForNetworkChannelState
-    //    _logger.i(() => "_onTopicResponse $raw");
-//    var data = TopicLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _topicController.sink.add(data);
-//    var parsed =
-//        ChannelStateLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _channelStateController.sink.add(parsed);
     return disposable;
+  }
+
+  NetworkChannelState _modifyStateForChannel(
+      NetworkChannelState channelState, NetworkChannel channel) {
+    if (channel.type == NetworkChannelType.QUERY ||
+        channel.type == NetworkChannelType.SPECIAL) {
+      // lounge send always not connected state for this types
+      channelState.connected = true;
+    }
+
+    return channelState;
   }
 
   @override
