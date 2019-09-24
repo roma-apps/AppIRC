@@ -116,9 +116,12 @@ List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
 }
 
 SpecialMessageType detectSpecialMessageType(data) {
-  var map = data as Map;
-  var iterable = data as Iterable;
-  if (map != null) {
+  var isMap = data is Map;
+  var isIterable = data is Iterable;
+
+
+  if (isMap) {
+    var map = data as Map;
     TextSpecialMessageLoungeResponseBodyPart textMessage;
     try {
       textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(map);
@@ -132,7 +135,9 @@ SpecialMessageType detectSpecialMessageType(data) {
       throw Exception("Invalid special message data = $data");
     }
   } else {
-    if (iterable != null) {
+    if (isIterable) {
+
+      var iterable = data as Iterable;
       var first = iterable.first;
 
       ChannelListItemSpecialMessageLoungeResponseBodyPart channelListItem;

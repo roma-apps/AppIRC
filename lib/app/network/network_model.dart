@@ -57,10 +57,10 @@ class ChatNetworkServerPreferences extends JsonPreferences {
   }
 
   factory ChatNetworkServerPreferences.fromJson(Map<String, dynamic> json) =>
-      _$IRCNetworkServerPreferencesFromJson(json);
+      _$ChatNetworkServerPreferencesFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$IRCNetworkServerPreferencesToJson(this);
+  Map<String, dynamic> toJson() => _$ChatNetworkServerPreferencesToJson(this);
 }
 
 @JsonSerializable()
@@ -78,15 +78,15 @@ class ChatNetworkUserPreferences extends JsonPreferences {
 
   @override
   String toString() {
-    return 'IRCNetworkUserPreferences{nickname: $nickname, username: $username,'
+    return 'ChatNetworkUserPreferences{nickname: $nickname, username: $username,'
         ' password: $password, realName: $realName}';
   }
 
   factory ChatNetworkUserPreferences.fromJson(Map<String, dynamic> json) =>
-      _$IRCNetworkUserPreferencesFromJson(json);
+      _$ChatNetworkUserPreferencesFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$IRCNetworkUserPreferencesToJson(this);
+  Map<String, dynamic> toJson() => _$ChatNetworkUserPreferencesToJson(this);
 }
 
 @JsonSerializable()
@@ -102,14 +102,14 @@ class ChatNetworkChannelPreferences extends JsonPreferences {
 
   @override
   String toString() {
-    return 'IRCNetworkChannelPreferences{localId: $localId, name: $name}';
+    return 'ChatNetworkChannelPreferences{localId: $localId, name: $name}';
   }
 
   factory ChatNetworkChannelPreferences.fromJson(Map<String, dynamic> json) =>
-      _$IRCNetworkChannelPreferencesFromJson(json);
+      _$ChatNetworkChannelPreferencesFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$IRCNetworkChannelPreferencesToJson(this);
+  Map<String, dynamic> toJson() => _$ChatNetworkChannelPreferencesToJson(this);
 }
 
 typedef PreferencesActionCallback = void Function(
@@ -148,10 +148,10 @@ class ChatNetworkPreferences extends JsonPreferences {
       .toList();
 
   factory ChatNetworkPreferences.fromJson(Map<String, dynamic> json) =>
-      _$IRCNetworkPreferencesFromJson(json);
+      _$ChatNetworkPreferencesFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$IRCNetworkPreferencesToJson(this);
+  Map<String, dynamic> toJson() => _$ChatNetworkPreferencesToJson(this);
 }
 
 @JsonSerializable()
@@ -170,17 +170,17 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
 
   @override
   String toString() {
-    return 'IRCNetworkConnectionPreferences{localId: $localId,'
+    return 'ChatNetworkConnectionPreferences{localId: $localId,'
         ' serverPreferences: $serverPreferences,'
         ' userPreferences: $userPreferences}';
   }
 
   factory ChatNetworkConnectionPreferences.fromJson(Map<String, dynamic> json) =>
-      _$IRCNetworkConnectionPreferencesFromJson(json);
+      _$ChatNetworkConnectionPreferencesFromJson(json);
 
   @override
   Map<String, dynamic> toJson() =>
-      _$IRCNetworkConnectionPreferencesToJson(this);
+      _$ChatNetworkConnectionPreferencesToJson(this);
 }
 
 

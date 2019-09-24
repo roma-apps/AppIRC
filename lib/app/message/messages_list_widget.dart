@@ -9,6 +9,7 @@ import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
+import 'package:flutter_appirc/app/message/messages_special_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
@@ -59,7 +60,7 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
                     switch (chatMessageType) {
                       case ChatMessageType.SPECIAL:
                         var specialMessage = message as SpecialMessage;
-                        return Text(specialMessage.data.toString());
+                        return buildSpecialMessageWidget(context,specialMessage);
                         break;
                       case ChatMessageType.REGULAR:
                         return IRCNetworkChannelMessageWidget(message);

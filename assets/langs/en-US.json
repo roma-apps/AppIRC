@@ -141,5 +141,9 @@
       "title": "Channel users",
       "loading": "Loading"
     }
+
+  },
+  "channels_list": {
+    "users": "{} users"
   }
 }

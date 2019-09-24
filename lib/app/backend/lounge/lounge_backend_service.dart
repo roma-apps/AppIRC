@@ -385,11 +385,11 @@ class LoungeBackendService extends Providable
 
     disposable.add(createEventListenerDisposable(
         LoungeResponseEventNames.msgSpecial, (raw) {
-      var data =
+      MessageSpecialLoungeResponseBody data =
           MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
-        var specialMessages = toSpecialMessages(channel, data.data);
+        var specialMessages = toSpecialMessages(channel, data);
 
         specialMessages.forEach((specialMessage) {
           listener(specialMessage);

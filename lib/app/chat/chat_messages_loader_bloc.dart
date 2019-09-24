@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter_appirc/app/backend/backend_service.dart';
@@ -15,9 +14,8 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(
-    logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
-
+var _logger =
+    MyLogger(logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
 
 class NetworkChannelMessagesLoaderBloc extends Providable {
   final ChatOutputBackendService backendService;
@@ -29,33 +27,39 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
 
   // ignore: close_sinks
   var _messagesController =
-  new BehaviorSubject<List<ChatMessage>>(seedValue: []);
+      new BehaviorSubject<List<ChatMessage>>(seedValue: []);
 
   Stream<List<ChatMessage>> get messagesStream => _messagesController.stream;
 
-  NetworkChannelMessagesLoaderBloc(this.backendService, this.db, this.network,
-      this.networkChannel) {
+  NetworkChannelMessagesLoaderBloc(
+      this.backendService, this.db, this.network, this.networkChannel) {
     addDisposable(subject: _messagesController);
 
-
     // socket listener
-    addDisposable(disposable: backendService.listenForMessages(
-        network, networkChannel, (newMessage) {
+    addDisposable(
+        disposable: backendService.listenForMessages(network, networkChannel,
+            (newMessage) {
       _currentMessages.add(newMessage);
+      if (newMessage.chatMessageType == ChatMessageType.SPECIAL) {
+        _onSpecialMessagesChanged();
+      }
       _onMessagesChanged();
     }));
 
     // history
-    db.regularMessagesDao.getChannelMessages(networkChannel.remoteId).then((
-        messagesDB) {
+    db.regularMessagesDao
+        .getChannelMessages(networkChannel.remoteId)
+        .then((messagesDB) {
       var messages = messagesDB.map(_regularMessageDBToChatMessage);
       _currentMessages.addAll(messages);
       _onMessagesChanged();
     });
-    db.specialMessagesDao.getChannelMessages(networkChannel.remoteId).then((
-        messagesDB) {
+    db.specialMessagesDao
+        .getChannelMessages(networkChannel.remoteId)
+        .then((messagesDB) {
       var messages = messagesDB.map(_specialMessageDBToChatMessage);
       _currentMessages.addAll(messages);
+      _onSpecialMessagesChanged();
       _onMessagesChanged();
     });
   }
@@ -65,36 +69,91 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
   }
 
   RegularMessage _regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
-      RegularMessage.name(
-          messageDB.channelRemoteId,
+      RegularMessage.name(messageDB.channelRemoteId,
           command: messageDB.command,
           hostMask: messageDB.hostMask,
           text: messageDB.text,
           params: _convertParams(messageDB),
-          regularMessageType: regularMessageTypeIdToType(messageDB.regularMessageTypeId),
-          self: messageDB.self != null ? messageDB.self == 0 ? false : true : null,
-          highlight: messageDB.highlight != null ? messageDB.highlight == 0 ? false : true : null,
+          regularMessageType:
+              regularMessageTypeIdToType(messageDB.regularMessageTypeId),
+          self: messageDB.self != null
+              ? messageDB.self == 0 ? false : true
+              : null,
+          highlight: messageDB.highlight != null
+              ? messageDB.highlight == 0 ? false : true
+              : null,
           previews: _convertPreviews(messageDB),
-          date: DateTime.fromMicrosecondsSinceEpoch(messageDB.dateMicrosecondsSinceEpoch),
+          date: DateTime.fromMicrosecondsSinceEpoch(
+              messageDB.dateMicrosecondsSinceEpoch),
           fromRemoteId: messageDB.fromRemoteId,
           fromNick: messageDB.fromNick,
-          fromMode: messageDB.fromMode, newNick: messageDB.newNick);
+          fromMode: messageDB.fromMode,
+          newNick: messageDB.newNick);
 
   List<String> _convertParams(RegularMessageDB messageDB) {
     var decoded = json.decode(messageDB.paramsJsonEncoded);
 
-    if(decoded == null) {
+    if (decoded == null) {
       return null;
-    } else if(decoded is List<dynamic>) {
-      decoded = (decoded as List<dynamic>).map((item) => item.toString()).toList();
+    } else if (decoded is List<dynamic>) {
+      decoded =
+          (decoded as List<dynamic>).map((item) => item.toString()).toList();
     }
     return decoded;
   }
 
-  _convertPreviews(RegularMessageDB messageDB) => json.decode(messageDB.previewsJsonEncoded);
+  _convertPreviews(RegularMessageDB messageDB) =>
+      json.decode(messageDB.previewsJsonEncoded);
 
-  SpecialMessage _specialMessageDBToChatMessage(SpecialMessageDB messageDB) =>
-      SpecialMessage.name(channelRemoteId: messageDB.channelRemoteId,
-          data: json.decode(messageDB.dataJsonEncoded),
-          specialType: specialMessageTypeIdToType(messageDB.specialTypeId));
+  SpecialMessage _specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
+    var type = specialMessageTypeIdToType(messageDB.specialTypeId);
+    var decodedJson = json.decode(messageDB.dataJsonEncoded);
+    var body;
+    switch (type) {
+      case SpecialMessageType.WHO_IS:
+        body = WhoIsSpecialMessageBody.fromJson(decodedJson);
+        break;
+      case SpecialMessageType.CHANNELS_LIST_ITEM:
+        body = NetworkChannelInfoSpecialMessageBody.fromJson(decodedJson);
+        break;
+      case SpecialMessageType.TEXT:
+        body = TextSpecialMessageBody.fromJson(decodedJson);
+        break;
+    }
+
+    return SpecialMessage.name(
+        channelRemoteId: messageDB.channelRemoteId,
+        data: body,
+        specialType: type);
+  }
+
+  void _onSpecialMessagesChanged() {
+    SpecialMessage latestTextMessage = _currentMessages.lastWhere((message) {
+      if (message.isSpecial) {
+        var specialMessage = message as SpecialMessage;
+        if (specialMessage.specialType == SpecialMessageType.TEXT) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }, orElse: () => null);
+
+    if (latestTextMessage != null) {
+      _currentMessages.removeWhere((message) {
+        if (message.isSpecial) {
+          var specialMessage = message as SpecialMessage;
+          if (specialMessage.specialType == SpecialMessageType.TEXT) {
+            return specialMessage != latestTextMessage;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      });
+    }
+  }
 }
