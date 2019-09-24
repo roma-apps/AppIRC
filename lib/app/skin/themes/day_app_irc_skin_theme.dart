@@ -527,7 +527,7 @@ ThemeData _androidDayThemeData = ThemeData(
         size: 24,
       ),
       primaryIconTheme: IconThemeData(
-        color: Color(0xff000000),
+        color: Color(0xffffffff),
         opacity: 1,
         size: 24,
       ),
