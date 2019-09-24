@@ -134,7 +134,7 @@
       "unknown": "unknown",
       "quit": "quit",
       "part": "part",
-      "nick": "nick",
+      "nick": "change nick to {}",
       "channel_mode": "Channel mode: {}"
     },
     "users": {

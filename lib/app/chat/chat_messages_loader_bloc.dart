@@ -78,7 +78,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
           date: DateTime.fromMicrosecondsSinceEpoch(messageDB.dateMicrosecondsSinceEpoch),
           fromRemoteId: messageDB.fromRemoteId,
           fromNick: messageDB.fromNick,
-          fromMode: messageDB.fromMode);
+          fromMode: messageDB.fromMode, newNick: messageDB.newNick);
 
   List<String> _convertParams(RegularMessageDB messageDB) {
     var decoded = json.decode(messageDB.paramsJsonEncoded);
@@ -86,7 +86,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
     if(decoded == null) {
       return null;
     } else if(decoded is List<dynamic>) {
-      decoded = (decoded as List<dynamic>).map((item) => item.toString());
+      decoded = (decoded as List<dynamic>).map((item) => item.toString()).toList();
     }
     return decoded;
   }

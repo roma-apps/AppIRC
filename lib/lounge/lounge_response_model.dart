@@ -322,6 +322,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
   final String command;
   final String type;
   final String time;
+  final String new_nick;
   final String text;
   final String hostmask;
   final bool self;
@@ -338,6 +339,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
       this.command,
       this.type,
       this.time,
+      this.new_nick,
       this.text,
       this.hostmask,
       this.self,
@@ -349,14 +351,15 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
       this.id,
       this.whois);
 
+
   @override
   String toString() {
     return 'MsgLoungeResponseBody{from: $from, command: $command,'
-        ' type: $type, time: $time, text: $text,'
-        ' hostmask: $hostmask, self: $self,'
-        ' highlight: $highlight, showInActive: $showInActive,'
-        ' users: $users, previews: $previews, '
-        'params: $params, id: $id, whois: $whois}';
+        ' type: $type, time: $time, new_nick: $new_nick, '
+        'text: $text, hostmask: $hostmask, self: $self, '
+        'highlight: $highlight, showInActive: $showInActive, '
+        'users: $users, previews: $previews, params: $params, '
+        'id: $id, whois: $whois}';
   }
 
   factory MsgLoungeResponseBody.fromJson(Map<String, dynamic> json) =>

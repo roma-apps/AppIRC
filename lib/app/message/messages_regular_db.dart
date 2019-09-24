@@ -83,6 +83,7 @@ class RegularMessageDB implements ChatMessageDB {
   final String fromNick;
 
   final String fromMode;
+  final String newNick;
 
   RegularMessageDB(
       this.localId,
@@ -100,7 +101,8 @@ class RegularMessageDB implements ChatMessageDB {
       this.dateMicrosecondsSinceEpoch,
       this.fromRemoteId,
       this.fromNick,
-      this.fromMode);
+      this.fromMode,
+      this.newNick);
 
   RegularMessageDB.name(
       {this.localId,
@@ -118,19 +120,25 @@ class RegularMessageDB implements ChatMessageDB {
       this.dateMicrosecondsSinceEpoch,
       this.fromRemoteId,
       this.fromNick,
-      this.fromMode}); //  RegularMessage(
+      this.fromMode,
+      this.newNick
+      });
 
   @override
   String toString() {
     return 'RegularMessageDB{localId: $localId, channelLocalId: $channelLocalId, '
-        'chatMessageTypeId: $chatMessageTypeId, channelRemoteId: $channelRemoteId,'
-        ' command: $command, hostMask: $hostMask, text: $text, '
+        'chatMessageTypeId: $chatMessageTypeId, channelRemoteId: $channelRemoteId, '
+        'command: $command, hostMask: $hostMask, text: $text, '
         'paramsJsonEncoded: $paramsJsonEncoded, '
-        'regularMessageTypeId: $regularMessageTypeId, self: $self,'
-        ' highlight: $highlight, previewsJsonEncoded: $previewsJsonEncoded,'
-        ' dateMicrosecondsSinceEpoch: $dateMicrosecondsSinceEpoch, '
-        'fromRemoteId: $fromRemoteId, fromNick: $fromNick, fromMode: $fromMode}';
-  }
+        'regularMessageTypeId: $regularMessageTypeId,'
+        ' self: $self, highlight: $highlight, '
+        'previewsJsonEncoded: $previewsJsonEncoded, '
+        'dateMicrosecondsSinceEpoch: $dateMicrosecondsSinceEpoch, '
+        'fromRemoteId: $fromRemoteId, fromNick: $fromNick, '
+        'fromMode: $fromMode, newNick: $newNick}';
+  } //  RegularMessage(
+
+
 }
 
 RegularMessageType regularMessageTypeIdToType(int id) {
@@ -271,4 +279,5 @@ RegularMessageDB toRegularMessageDB(RegularMessage regularMessage) =>
         fromNick: regularMessage.fromNick,
         fromRemoteId: regularMessage.fromRemoteId,
         fromMode: regularMessage.fromMode,
+        newNick: regularMessage.newNick,
         channelRemoteId: regularMessage.channelRemoteId);

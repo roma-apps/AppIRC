@@ -29,6 +29,8 @@ class RegularMessage extends ChatMessage {
 
   final String fromMode;
 
+  final String newNick;
+
   RegularMessage(
       int channelRemoteId,
       this.command,
@@ -40,6 +42,7 @@ class RegularMessage extends ChatMessage {
       this.highlight,
       this.previews,
       this.date,
+      this.newNick,
       this.fromRemoteId,
       this.fromNick,
       this.fromMode)
@@ -58,6 +61,7 @@ class RegularMessage extends ChatMessage {
       @required this.date,
       @required this.fromRemoteId,
       @required this.fromNick,
+      @required this.newNick,
       @required this.fromMode})
       : super(ChatMessageType.REGULAR, channelRemoteId);
 
@@ -69,6 +73,20 @@ class RegularMessage extends ChatMessage {
         Duration(hours: now.hour, minutes: now.minute, seconds: now.second));
     return todayStart.isBefore(date);
   }
+
+  @override
+  String toString() {
+    return 'RegularMessage{command: $command, hostMask: $hostMask,'
+        ' text: $text, params: $params,'
+        ' regularMessageType: $regularMessageType,'
+        ' self: $self, highlight: $highlight,'
+        ' previews: $previews, date: $date,'
+        ' fromRemoteId: $fromRemoteId,'
+        ' fromNick: $fromNick,'
+        ' fromMode: $fromMode, newNick: $newNick}';
+  }
+
+
 }
 
 enum RegularMessageType {

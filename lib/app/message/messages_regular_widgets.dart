@@ -193,8 +193,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
   _buildTitleIcon(BuildContext context, RegularMessage message) {
     var iconData = _findTitleIconDataForMessage(message);
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-    var color = messagesSkin.findTitleColorDataForMessage(
-        message.regularMessageType);
+    var color =
+        messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
     return Icon(iconData, color: color);
   }
@@ -266,7 +266,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
         str = appLocalizations.tr("chat.sub_message.part");
         break;
       case RegularMessageType.NICK:
-        str = appLocalizations.tr("chat.sub_message.nick");
+        str = appLocalizations
+            .tr("chat.sub_message.nick", args: [message.newNick]);
         break;
     }
 
@@ -280,8 +281,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 }
 
 isNeedHighlight(RegularMessage message) =>
-    message.highlight== true ||
-        message.regularMessageType ==
+    message.highlight == true ||
+    message.regularMessageType ==
         RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
 
 bool isHaveLongText(RegularMessage message) =>

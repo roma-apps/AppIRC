@@ -74,7 +74,7 @@ ChatMessage toChatMessage(
           : null,
       fromMode: msgLoungeResponseBody.from != null
           ? msgLoungeResponseBody.from.mode
-          : null,
+          : null, newNick: msgLoungeResponseBody.new_nick,
     );
 
 List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
@@ -229,7 +229,9 @@ RegularMessageType detectRegularMessageType(String stringType) {
     case "back":
       type = RegularMessageType.BACK;
       break;
-
+    case "raw":
+      type = RegularMessageType.RAW;
+      break;
     case "mode_channel":
       type = RegularMessageType.MODE_CHANNEL;
       break;
@@ -237,9 +239,16 @@ RegularMessageType detectRegularMessageType(String stringType) {
     case "quit":
       type = RegularMessageType.QUIT;
       break;
-    case "raw":
-      type = RegularMessageType.RAW;
+
+    case "part":
+      type = RegularMessageType.PART;
       break;
+
+    case "nick":
+      type = RegularMessageType.NICK;
+      break;
+
+
 
     default:
       type = RegularMessageType.UNKNOWN;
