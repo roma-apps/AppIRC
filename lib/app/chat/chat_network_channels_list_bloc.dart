@@ -20,6 +20,8 @@ class ChatNetworkChannelsListBloc extends Providable {
     addDisposable(subject: _lastJoinedNetworkChannelController);
     addDisposable(subject: _lastExitedNetworkChannelController);
 
+    _onChannelsChanged(network.channels);
+
     var listenForNetworkChannelJoin = backendService
         .listenForNetworkChannelJoin(network, (channelWithState) async {
       var channel = channelWithState.channel;
@@ -28,7 +30,7 @@ class ChatNetworkChannelsListBloc extends Providable {
       }
       network.channels.add(channel);
 
-      _onChannelsChanged(_currentNetworkChannels);
+      _onChannelsChanged(networkChannels);
 
       _lastJoinedNetworkChannelController.add(channel);
 
@@ -38,7 +40,7 @@ class ChatNetworkChannelsListBloc extends Providable {
           .listenForNetworkChannelLeave(network, channel, () async {
         network.channels.remove(channel);
         _lastExitedNetworkChannelController.add(channel);
-        _onChannelsChanged(_currentNetworkChannels);
+        _onChannelsChanged(networkChannels);
         listenForNetworkChannelLeave.dispose();
       });
       addDisposable(disposable: listenForNetworkChannelLeave);
@@ -51,8 +53,11 @@ class ChatNetworkChannelsListBloc extends Providable {
     _networksChannelsController.add(networkChannels);
   }
 
-  List<NetworkChannel> get _currentNetworkChannels =>
+  List<NetworkChannel> get networkChannels =>
       _networksChannelsController.value;
+
+  Stream<List<NetworkChannel>> get networkChannelsStream =>
+      _networksChannelsController.stream;
 
   // ignore: close_sinks
   var _networksChannelsController =

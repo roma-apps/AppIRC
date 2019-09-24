@@ -183,7 +183,7 @@ class IRCNetworksListWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             rowContainer,
-            IRCNetworkChannelsListWidget(network)
+            NetworkChannelsListWidget(network)
           ]);
     } else {
       return rowContainer;

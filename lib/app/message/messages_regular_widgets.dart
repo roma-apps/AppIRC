@@ -281,7 +281,6 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 }
 
 isNeedHighlight(RegularMessage message) =>
-    message.highlight == true ||
     message.regularMessageType ==
         RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
 

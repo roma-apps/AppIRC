@@ -416,17 +416,22 @@ class LoungeBackendService extends Providable
       if (parsed.network == network.remoteId) {
         LoungeJsonRequest<JoinChannelInputLoungeRequestBody> request =
             _pendingRequests.firstWhere((request) {
-          var joinRequest =
-              request as LoungeJsonRequest<JoinChannelInputLoungeRequestBody>;
-          if (joinRequest != null) {
-            if (joinRequest.body.channelName == parsed.chan.name) {
-              return true;
+          if (request
+              is LoungeJsonRequest<JoinChannelInputLoungeRequestBody>) {
+            LoungeJsonRequest<JoinChannelInputLoungeRequestBody> joinRequest =
+                request;
+            if (joinRequest != null) {
+              if (joinRequest.body.channelName == parsed.chan.name) {
+                return true;
+              }
+            } else {
+              return false;
             }
+
+            return false;
           } else {
             return false;
           }
-
-          return false;
         }, orElse: () => null);
 
         var preferences;
@@ -566,7 +571,7 @@ class LoungeBackendService extends Providable
           var networkChannelPreferences = request.networkPreferences.channels
               .firstWhere((channelPreferences) {
             return loungeChannel.name == channelPreferences.name;
-          }, orElse: ()=>null);
+          }, orElse: () => null);
           int localId;
           if (networkChannelPreferences != null) {
             localId = networkChannelPreferences.localId;

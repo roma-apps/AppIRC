@@ -10,6 +10,7 @@ import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
@@ -19,19 +20,33 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "IRCNetworkChannelsListWidget", enabled: true);
 
-class IRCNetworkChannelsListWidget extends StatelessWidget {
+class NetworkChannelsListWidget extends StatelessWidget {
   final Network network;
 
-  IRCNetworkChannelsListWidget(this.network);
+  NetworkChannelsListWidget(this.network);
 
   @override
   Widget build(BuildContext context) {
-    var channels = network.channelsWithoutLobby;
-    return ListView.builder(
-        shrinkWrap: true,
-        itemCount: channels.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _channelItem(context, network, channels[index]);
+    var networksListBloc = Provider.of<ChatNetworksListBloc>(context);
+    var channelsListBloc =
+        networksListBloc.getChatNetworkChannelsListBloc(network);
+
+    return StreamBuilder<List<NetworkChannel>>(
+        stream: channelsListBloc.networkChannelsStream,
+        initialData: channelsListBloc.networkChannels,
+        builder: (context, snapshot) {
+          var channels = snapshot.data;
+
+          _logger.d(() => "channels = $channels");
+
+          channels = channels.where((channel) => !channel.isLobby).toList();
+
+          return ListView.builder(
+              shrinkWrap: true,
+              itemCount: channels.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _channelItem(context, network, channels[index]);
+              });
         });
   }
 
