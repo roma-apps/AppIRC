@@ -13,8 +13,11 @@ import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+var _logger = MyLogger(logTag: "IRCNetworkChannelsListWidget", enabled: true);
 
 class IRCNetworkChannelsListWidget extends StatelessWidget {
   final Network network;
@@ -34,8 +37,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
 
   Widget _channelItem(
       BuildContext context, Network network, NetworkChannel channel) {
-    var ircChatActiveChannelBloc =
-        Provider.of<ChatActiveChannelBloc>(context);
+    var ircChatActiveChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
 
     return StreamBuilder<NetworkChannel>(
         stream: ircChatActiveChannelBloc.activeChannelStream,
@@ -94,12 +96,12 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
     return Provider(
       providable: channelBloc,
       child: StreamBuilder(
+          initialData: channelBloc.networkChannelState,
           stream: channelBloc.networkChannelStateStream,
           builder: (context, snapshot) {
             NetworkChannelState channelState = snapshot.data;
-            if (channelState == null) {
-              channelState = NetworkChannelState.empty;
-            }
+
+            _logger.d(() => "new state for channelItem $channelState");
 
             var channelsListSkinBloc =
                 Provider.of<ChannelsListSkinBloc>(context);
@@ -132,7 +134,7 @@ class IRCNetworkChannelsListWidget extends StatelessWidget {
               ),
               StreamBuilder<NetworkState>(
                   stream: networkBloc.networkStateStream,
-                  initialData: NetworkState.empty,
+                  initialData: networkBloc.networkState,
                   builder: (BuildContext context,
                       AsyncSnapshot<NetworkState> snapshot) {
                     var networkState = snapshot.data;

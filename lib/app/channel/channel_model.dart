@@ -69,5 +69,15 @@ class NetworkChannelState {
       unreadCount: 0,
       connected: false,
       highlighted: false);
+
+  @override
+  String toString() {
+    return 'NetworkChannelState{topic: $topic, '
+        'editTopicPossible: $editTopicPossible, '
+        'unreadCount: $unreadCount,'
+        ' connected: $connected, highlighted: $highlighted}';
+  }
+
+
 }
 
