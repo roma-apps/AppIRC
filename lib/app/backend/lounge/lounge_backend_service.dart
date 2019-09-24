@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:adhara_socket_io/manager.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_adapter.dart';
@@ -51,7 +52,7 @@ class LoungeBackendService extends Providable
       _loungePreferences != null &&
       _loungePreferences != LoungeConnectionPreferences.empty;
 
-  final List<LoungeRequest> _oldRequests = [];
+  final List<LoungeRequest> _pendingRequests = [];
 
   LoungeBackendService(this.socketIOManager, this._loungePreferences) {
     addDisposable(subject: _connectionStateController);
@@ -219,9 +220,11 @@ class LoungeBackendService extends Providable
       throw NotImplementedYetException();
     }
 
-    _sendRequest(LoungeJsonRequest(
-        name: LoungeRequestEventNames.names,
-        body: NamesLoungeRequestBody.name(target: channel.remoteId)));
+    _sendRequest(
+        LoungeJsonRequest(
+            name: LoungeRequestEventNames.names,
+            body: NamesLoungeRequestBody.name(target: channel.remoteId)),
+        isNeedAddRequestToPending: false);
 
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
@@ -238,55 +241,110 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<Network>> joinNetwork(IRCNetworkPreferences preferences,
+  Future<RequestResult<NetworkWithState>> joinNetwork(
+      IRCNetworkPreferences networkPreferences,
       {bool waitForResult = false}) async {
-    if (waitForResult) {
-      throw NotImplementedYetException();
-    }
-
     var userPreferences =
-        preferences.networkConnectionPreferences.userPreferences;
-    var networkPreferences =
-        preferences.networkConnectionPreferences.serverPreferences;
+        networkPreferences.networkConnectionPreferences.userPreferences;
+    var serverPreferences =
+        networkPreferences.networkConnectionPreferences.serverPreferences;
 
-    var channelsWithoutPassword = preferences.channelsWithoutPassword;
+    var channelsWithoutPassword = networkPreferences.channelsWithoutPassword;
     var channelNames = channelsWithoutPassword.map((channel) => channel.name);
     String join = channelNames.join(LoungeConstants.channelsNamesSeparator);
-    var request = LoungeJsonRequest(
-        name: LoungeRequestEventNames.networkNew,
-        body: NetworkNewLoungeRequestBody(
+    var request = JoinNetworkLoungeRequest(
+        networkPreferences,
+        NetworkNewLoungeRequestBody(
           username: userPreferences.username,
           nick: userPreferences.nickname,
           join: join,
           realname: userPreferences.realName,
           password: userPreferences.password,
-          host: networkPreferences.serverHost,
-          port: networkPreferences.serverPort,
-          rejectUnauthorized: networkPreferences.useOnlyTrustedCertificates
+          host: serverPreferences.serverHost,
+          port: serverPreferences.serverPort,
+          rejectUnauthorized: serverPreferences.useOnlyTrustedCertificates
               ? LoungeConstants.on
               : LoungeConstants.off,
-          tls: networkPreferences.useTls
+          tls: serverPreferences.useTls
               ? LoungeConstants.on
               : LoungeConstants.off,
-          name: networkPreferences.name,
+          name: serverPreferences.name,
         ));
 
-    // todo: support channels with passwords
-    _sendRequest(request);
+    var result;
+    Disposable networkListener;
+    networkListener = listenForNetworkEnter((networkWithState) async {
+      var networkFromResult = networkWithState.network;
 
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+      if (networkFromResult.name == serverPreferences.name) {
+        var channelsWithPassword = networkPreferences.channelsWithPassword;
+        for (var channelPreferences in channelsWithPassword) {
+          var joinChannelResult = await joinNetworkChannel(
+              networkWithState.network, channelPreferences,
+              waitForResult: true);
+          var channel = joinChannelResult.result.channel;
+          assert(channel != null);
+          networkFromResult.channels.add(channel);
+        }
+
+        result = networkWithState;
+        networkListener.dispose();
+      }
+    });
+    _sendRequest(request, isNeedAddRequestToPending: true);
+
+    if (waitForResult) {
+      return await _doWaitForResult<NetworkWithState>(() => result);
+    } else {
+      return RequestResult.name(isSentSuccessfully: true, result: null);
+    }
+  }
+
+  Future<RequestResult<T>> _doWaitForResult<T>(
+      T Function() resultExtractor) async {
+    RequestResult<T> result;
+
+    Future.delayed(_timeoutForRequestsWithResponse, () {
+      if (result == null) {
+        result = RequestResult(true, null);
+      }
+    });
+
+    while (result != null) {
+      await Future.delayed(_timeBetweenCheckResultForRequestsWithResponse);
+      T extracted = resultExtractor();
+      if (extracted != null) {
+        result = RequestResult(true, extracted);
+      }
+    }
+
+    return result;
   }
 
   @override
-  Future<RequestResult<NetworkChannel>> joinNetworkChannel(
+  Future<RequestResult<NetworkChannelWithState>> joinNetworkChannel(
       Network network, IRCNetworkChannelPreferences preferences,
       {bool waitForResult = false}) async {
+    var request = LoungeJsonRequest(
+        name: LoungeRequestEventNames.input,
+        body: InputLoungeRequestBody(
+            target: network.lobbyChannel.remoteId,
+            content: "/join ${preferences.name} ${preferences.password}"));
+
+    var result;
+    Disposable channelListener;
+    channelListener =
+        listenForNetworkChannelJoin(network, (channelWithState) async {
+      result = channelWithState;
+      channelListener.dispose();
+    });
+    _sendRequest(request, isNeedAddRequestToPending: true);
+
     if (waitForResult) {
-      throw NotImplementedYetException();
+      return await _doWaitForResult<NetworkChannelWithState>(() => result);
+    } else {
+      return RequestResult.name(isSentSuccessfully: true, result: null);
     }
-    _sendInputRequest(network, network.lobbyChannel,
-        "/join ${preferences.name} ${preferences.password}");
-    return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
   @override
@@ -316,13 +374,7 @@ class LoungeBackendService extends Providable
     var disposable = CompositeDisposable([]);
     disposable
         .add(createEventListenerDisposable(LoungeResponseEventNames.msg, (raw) {
-
-
       var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
-
-
-
-
 
       if (channel.remoteId == data.chan) {
         var message = toChatMessage(channel, data.msg);
@@ -362,44 +414,32 @@ class LoungeBackendService extends Providable
       var parsed = JoinLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.network == network.remoteId) {
-        var request = _oldRequests.firstWhere((request) {
-          var loungeJsonRequest =
-              request as LoungeJsonRequest<InputLoungeRequestBody>;
-          if (loungeJsonRequest != null) {
-            var content = loungeJsonRequest.body.content;
-            if (content.contains("/join")) {
-              var command = content.split(" ");
-
-              var channelName = command[1];
-
-              if (channelName == parsed.chan.name) {
-                return true;
-              }
-
+        LoungeJsonRequest<JoinChannelInputLoungeRequestBody> request =
+            _pendingRequests.firstWhere((request) {
+          var joinRequest =
+              request as LoungeJsonRequest<JoinChannelInputLoungeRequestBody>;
+          if (joinRequest != null) {
+            if (joinRequest.body.channelName == parsed.chan.name) {
               return true;
-            } else {
-              return false;
             }
+          } else {
+            return false;
           }
+
           return false;
-        }, orElse: () => null) as LoungeJsonRequest<InputLoungeRequestBody>;
+        }, orElse: () => null);
 
         var preferences;
 
-//            if(request != null) {
-//
-//              var command = content.split(" ");
-//
-//              var channelName = command[1];
-//
-//              var password;
-//              if(command.length > 2) {
-//                password = command[2];
-//              }
-//            } else {
-        preferences = IRCNetworkChannelPreferences.name(
-            name: parsed.chan.name, password: "");
-//            }
+        if (request != null) {
+          preferences = IRCNetworkChannelPreferences.name(
+              localId: request.body.localId,
+              name: parsed.chan.name,
+              password: request.body.channelPassword);
+        } else {
+          preferences = IRCNetworkChannelPreferences.name(
+              name: parsed.chan.name, password: "");
+        }
 
         var loungeChannel = parsed.chan;
 
@@ -503,36 +543,40 @@ class LoungeBackendService extends Providable
       for (var loungeNetwork in parsed.networks) {
         // todo: check existed networks
 
-        var request = _oldRequests.firstWhere((request) {
-          var loungeJsonRequest =
-              request as LoungeJsonRequest<NetworkNewLoungeRequestBody>;
+        JoinNetworkLoungeRequest request =
+            _pendingRequests.firstWhere((request) {
+          var loungeJsonRequest = request as JoinNetworkLoungeRequest;
           if (loungeJsonRequest != null) {
-            return true;
+            if (loungeNetwork.name == loungeJsonRequest.body.name) {
+              return true;
+            } else {
+              return false;
+            }
           } else {
             return false;
           }
-        }, orElse: () => null)
-            as LoungeJsonRequest<NetworkNewLoungeRequestBody>;
+        }, orElse: () => null);
 
-        // todo retreive settings from request
-        var connectionPreferences = IRCNetworkConnectionPreferences(
-            serverPreferences: IRCNetworkServerPreferences(
-                name: loungeNetwork.name,
-                serverHost: loungeNetwork.host,
-                serverPort: loungeNetwork.port.toString(),
-                useTls: true,
-                useOnlyTrustedCertificates: true),
-            userPreferences: IRCNetworkUserPreferences(
-                nickname: loungeNetwork.nick,
-                realName: loungeNetwork.realname,
-                username: loungeNetwork.username));
+        var connectionPreferences =
+            request.networkPreferences.networkConnectionPreferences;
 
         var channelsWithState = <NetworkChannelWithState>[];
 
         for (var loungeChannel in loungeNetwork.channels) {
+          var networkChannelPreferences = request.networkPreferences.channels
+              .firstWhere((channelPreferences) {
+            return loungeChannel.name == channelPreferences.name;
+          }, orElse: ()=>null);
+          int localId;
+          if (networkChannelPreferences != null) {
+            localId = networkChannelPreferences.localId;
+          }
           var channel = NetworkChannel(
               IRCNetworkChannelPreferences.name(
-                  name: loungeChannel.name, password: ""),
+                  localId: localId,
+                  name: loungeChannel.name,
+                  // Network start channels always without password
+                  password: ""),
               detectNetworkChannelType(loungeChannel.type),
               loungeChannel.id);
           var channelState = toNetworkChannelState((loungeChannel));
@@ -545,6 +589,8 @@ class LoungeBackendService extends Providable
 
         var network =
             Network(connectionPreferences, loungeNetwork.uuid, channels);
+
+        network.localId = request.networkPreferences.localId;
 
         var loungeNetworkStatus = loungeNetwork.status;
 
@@ -612,15 +658,17 @@ class LoungeBackendService extends Providable
   @override
   Future<RequestResult<bool>> onOpenNetworkChannel(
       Network network, NetworkChannel channel) async {
-    _sendRequest(LoungeRawRequest(
-        name: LoungeRequestEventNames.open, body: [channel.remoteId]));
+    _sendRequest(
+        LoungeRawRequest(
+            name: LoungeRequestEventNames.open, body: [channel.remoteId]),
+        isNeedAddRequestToPending: false);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
   @override
-  Future<RequestResult<List<SpecialMessage>>>
-      printNetworkAvailableChannels(Network network,
-          {bool waitForResult = false}) async {
+  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
+      Network network,
+      {bool waitForResult = false}) async {
     if (waitForResult) {
       throw NotImplementedYetException();
     }
@@ -640,8 +688,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
-      Network network,
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(Network network,
       {bool waitForResult = false}) async {
     if (waitForResult) {
       throw NotImplementedYetException();
@@ -685,8 +732,12 @@ class LoungeBackendService extends Providable
 //  }
   }
 
-  _sendRequest(LoungeRequest request) async {
-    _oldRequests.add(request);
+  _sendRequest(LoungeRequest request,
+      {@required bool isNeedAddRequestToPending}) async {
+    if (isNeedAddRequestToPending) {
+      _pendingRequests.add(request);
+    }
+
     _logger.d(() => "_sendCommand $request");
     return await _socketIOService.emit(request);
   }
@@ -761,10 +812,12 @@ class LoungeBackendService extends Providable
 
   void _sendInputRequest(
       Network network, NetworkChannel channel, String message) {
-    _sendRequest(LoungeJsonRequest(
-        name: LoungeRequestEventNames.input,
-        body: InputLoungeRequestBody(
-            target: channel.remoteId, content: message)));
+    _sendRequest(
+        LoungeJsonRequest(
+            name: LoungeRequestEventNames.input,
+            body: InputLoungeRequestBody(
+                target: channel.remoteId, content: message)),
+        isNeedAddRequestToPending: false);
   }
 }
 

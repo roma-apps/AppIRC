@@ -46,7 +46,7 @@ class NetworkBloc extends Providable {
       await backendService.editNetworkSettings(network, preferences,
           waitForResult: waitForResult);
 
-  Future<RequestResult<NetworkChannel>> joinNetworkChannel(
+  Future<RequestResult<NetworkChannelWithState>> joinNetworkChannel(
           IRCNetworkChannelPreferences preferences,
           {bool waitForResult: false}) async =>
       await backendService.joinNetworkChannel(network, preferences,

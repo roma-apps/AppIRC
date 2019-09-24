@@ -5,14 +5,12 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'lounge_request_model.g.dart';
 
-
 class LoungeRequestEventNames {
   static const String networkNew = "network:new";
   static const String names = "names";
   static const String input = "input";
   static const String open = "open";
 }
-
 
 abstract class LoungeRequest extends SocketIOCommand {
   final String name;
@@ -68,19 +66,15 @@ abstract class LoungeRequestBody {
   Map<String, dynamic> toJson();
 }
 
-
- class InputLoungeRequestBody extends LoungeRequestBody {
+class InputLoungeRequestBody extends LoungeRequestBody {
   final int target;
   final String content;
 
   InputLoungeRequestBody({@required this.target, @required this.content});
 
-
   @override
-  Map<String, dynamic> toJson() =>
-      {"target": target, "text": content};
+  Map<String, dynamic> toJson() => {"target": target, "text": content};
 }
-
 
 @JsonSerializable()
 class NamesLoungeRequestBody extends LoungeRequestBody {

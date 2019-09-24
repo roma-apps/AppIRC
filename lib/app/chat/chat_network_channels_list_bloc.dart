@@ -23,7 +23,9 @@ class ChatNetworkChannelsListBloc extends Providable {
     var listenForNetworkChannelJoin = backendService
         .listenForNetworkChannelJoin(network, (channelWithState) async {
       var channel = channelWithState.channel;
-      channel.localId = await _nextNetworkChannelLocalId;
+      if (channel.localId == null) {
+        channel.localId = await _nextNetworkChannelLocalId;
+      }
       network.channels.add(channel);
 
       _onChannelsChanged(_currentNetworkChannels);

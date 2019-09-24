@@ -141,7 +141,7 @@ class ChatNetworksListBloc extends Providable {
     return allChannels;
   }
 
-  Future<RequestResult<Network>> joinNetwork(IRCNetworkPreferences preferences,
+  Future<RequestResult<NetworkWithState>> joinNetwork(IRCNetworkPreferences preferences,
           {bool waitForResult: false}) async =>
       await backendService.joinNetwork(preferences,
           waitForResult: waitForResult);
