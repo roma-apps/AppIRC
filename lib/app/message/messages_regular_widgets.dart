@@ -47,7 +47,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
   }
 
   Widget _buildMessageBody(BuildContext context) {
-    var regularMessageType = RegularMessage.regularMessageType(message);
+    var regularMessageType = message.regularMessageType;
 
     if (regularMessageType == RegularMessageType.AWAY ||
         regularMessageType == RegularMessageType.JOIN ||
@@ -69,7 +69,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 //      Text("${message.type}"),
     ];
 
-    var params = RegularMessage.params(message);
+    var params = message.params;
 
     if (params != null) {
       rows.add(Text("${params.join(", ")}",
@@ -108,7 +108,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 
     var subMessage = _buildTitleSubMessage(context);
 
-    if (RegularMessage.isHaveFromNick(message)) {
+    if (message.isHaveFromNick) {
       var messageTitleNick = _buildMessageTitleNick(context);
       if (subMessage != null) {
         startPart = Row(children: <Widget>[
@@ -161,10 +161,10 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 
     var dateString;
 
-    var date = RegularMessage.date(message);
-    var messageType = RegularMessage.regularMessageType(message);
+    var date = message.date;
+    var messageType = message.regularMessageType;
 
-    if (RegularMessage.isMessageDateToday(message)) {
+    if (message.isMessageDateToday) {
       dateString = todayDateFormatter.format(date);
     } else {
       dateString = oldDateFormatter.format(date);
@@ -194,7 +194,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     var iconData = _findTitleIconDataForMessage(message);
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
     var color = messagesSkin.findTitleColorDataForMessage(
-        RegularMessage.regularMessageType(message));
+        message.regularMessageType);
 
     return Icon(iconData, color: color);
   }
@@ -202,7 +202,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
   Widget _buildTitleSubMessage(BuildContext context) {
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
-    var regularMessageType = RegularMessage.regularMessageType(message);
+    var regularMessageType = message.regularMessageType;
     var appLocalizations = AppLocalizations.of(context);
     String str;
     switch (regularMessageType) {
@@ -280,8 +280,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 }
 
 isNeedHighlight(RegularMessage message) =>
-    RegularMessage.isHighlight(message) == true ||
-    RegularMessage.regularMessageType(message) ==
+    message.highlight== true ||
+        message.regularMessageType ==
         RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
 
 bool isHaveLongText(RegularMessage message) =>
@@ -289,7 +289,7 @@ bool isHaveLongText(RegularMessage message) =>
 
 IconData _findTitleIconDataForMessage(RegularMessage message) {
   IconData icon;
-  switch (RegularMessage.regularMessageType(message)) {
+  switch (message.regularMessageType) {
     case RegularMessageType.TOPIC_SET_BY:
       icon = Icons.assistant_photo;
       break;

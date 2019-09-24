@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
@@ -58,43 +56,40 @@ WhoIsLoungeResponseBodyPart toIRCWhoIs(WhoIsLoungeResponseBodyPart whoIs) =>
 ChatMessage toChatMessage(
         NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) =>
     RegularMessage.name(
-        command: msgLoungeResponseBody.command,
-        hostMask: msgLoungeResponseBody.hostmask,
-        text: msgLoungeResponseBody.text,
-        regularMessageTypeId: regularMessageTypeTypeToId(
-            detectRegularMessageType(msgLoungeResponseBody.type)),
-        self: msgLoungeResponseBody.self != null ? msgLoungeResponseBody.self ?  1 : 0 : null,
-        highlight: msgLoungeResponseBody.highlight != null ? msgLoungeResponseBody.highlight ?  1 : 0 : null,
-        paramsJsonEncoded: json.encode(msgLoungeResponseBody.params),
-        previewsJsonEncoded: json.encode(msgLoungeResponseBody.previews),
-        dateMicrosecondsSinceEpoch:
-            DateTime.parse(msgLoungeResponseBody.time).millisecondsSinceEpoch,
-        fromNick: msgLoungeResponseBody.from != null
-            ? msgLoungeResponseBody.from.nick
-            : null,
-        fromRemoteId: msgLoungeResponseBody.from != null
-            ? msgLoungeResponseBody.from.id
-            : null,
-        fromMode: msgLoungeResponseBody.from != null
-            ? msgLoungeResponseBody.from.mode
-            : null,
-        channelRemoteId: channel.remoteId);
+      channel.remoteId,
+      command: msgLoungeResponseBody.command,
+      hostMask: msgLoungeResponseBody.hostmask,
+      text: msgLoungeResponseBody.text,
+      regularMessageType: detectRegularMessageType(msgLoungeResponseBody.type),
+      self: msgLoungeResponseBody.self,
+      highlight: msgLoungeResponseBody.highlight,
+      params: msgLoungeResponseBody.params,
+      previews: msgLoungeResponseBody.previews,
+      date: DateTime.parse(msgLoungeResponseBody.time),
+      fromNick: msgLoungeResponseBody.from != null
+          ? msgLoungeResponseBody.from.nick
+          : null,
+      fromRemoteId: msgLoungeResponseBody.from != null
+          ? msgLoungeResponseBody.from.id
+          : null,
+      fromMode: msgLoungeResponseBody.from != null
+          ? msgLoungeResponseBody.from.mode
+          : null,
+    );
 
 List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
     MessageSpecialLoungeResponseBody messageSpecialLoungeResponseBody) {
   var messageType =
       detectSpecialMessageType(messageSpecialLoungeResponseBody.data);
 
-
   if (messageType == SpecialMessageType.TEXT) {
     var textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(
         messageSpecialLoungeResponseBody.data);
-    var jsonEncoded = json.encode(TextSpecialMessageBody(textMessage.text));
     return [
       SpecialMessage.name(
-          dataJsonEncoded: jsonEncoded,
+          data: TextSpecialMessageBody(textMessage.text),
           channelRemoteId: channel.remoteId,
-          specialTypeId: specialMessageTypeTypeToId(messageType))
+          specialType: messageType)
     ];
   } else if (messageType == SpecialMessageType.CHANNELS_LIST_ITEM) {
     var iterable = messageSpecialLoungeResponseBody.data as Iterable;
@@ -108,11 +103,10 @@ List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
           NetworkChannelInfoSpecialMessageBody(loungeChannelItem.channel,
               loungeChannelItem.topic, loungeChannelItem.num_users);
 
-      var jsonEncoded = json.encode(networkChannelInfoSpecialMessageBody);
       specialMessages.add(SpecialMessage.name(
-          dataJsonEncoded: jsonEncoded,
+          data: networkChannelInfoSpecialMessageBody,
           channelRemoteId: channel.remoteId,
-          specialTypeId: specialMessageTypeTypeToId(messageType)));
+          specialType: messageType));
     });
 
     return specialMessages;

@@ -6,34 +6,17 @@ import 'messages_model.dart';
 
 part 'messages_special_model.g.dart';
 
-@Entity(tableName: "SpecialMessage")
-class SpecialMessage implements ChatMessage {
-  @PrimaryKey(autoGenerate: true)
-  final int localId;
+class SpecialMessage extends ChatMessage {
+  final SpecialMessageBody data;
+  final SpecialMessageType specialType;
 
-
-  int channelLocalId;
-
-  final int chatMessageTypeId;
-
-  final int channelRemoteId;
-
-  final String dataJsonEncoded;
-  int specialTypeId;
-
-  SpecialMessage(this.localId, this.channelLocalId, this.chatMessageTypeId,
-      this.channelRemoteId, this.dataJsonEncoded, this.specialTypeId);
+  SpecialMessage(int channelLocalId, int channelRemoteId, this.specialType,
+      this.data)
+      : super(ChatMessageType.SPECIAL, channelRemoteId);
 
   SpecialMessage.name(
-      {this.localId,
-      this.channelLocalId,
-      this.chatMessageTypeId = chatMessageTypeSpecialId,
-      @required this.channelRemoteId,
-      @required this.dataJsonEncoded,
-      @required this.specialTypeId});
-
-//  SpecialMessageType get specialType => specialMessageTypeIdToType(specialTypeId);
-
+      {@required  int channelRemoteId, @required this.data, @required this.specialType})
+      : super(ChatMessageType.SPECIAL, channelRemoteId);
 }
 
 enum SpecialMessageType { WHO_IS, CHANNELS_LIST_ITEM, TEXT }
@@ -149,35 +132,4 @@ class TextSpecialMessageBody extends SpecialMessageBody {
 
   @override
   Map<String, dynamic> toJson() => _$TextSpecialMessageBodyToJson(this);
-}
-
-SpecialMessageType specialMessageTypeIdToType(int id) {
-  switch (id) {
-    case 1:
-      return SpecialMessageType.WHO_IS;
-      break;
-    case 2:
-      return SpecialMessageType.CHANNELS_LIST_ITEM;
-      break;
-    case 3:
-      return SpecialMessageType.TEXT;
-      break;
-  }
-
-  throw Exception("Invalid SpecialMessageType id $id");
-}
-
-int specialMessageTypeTypeToId(SpecialMessageType type) {
-  switch (type) {
-    case SpecialMessageType.WHO_IS:
-      return 1;
-      break;
-    case SpecialMessageType.CHANNELS_LIST_ITEM:
-      return 2;
-      break;
-    case SpecialMessageType.TEXT:
-      return 3;
-      break;
-  }
-  throw Exception("Invalid SpecialMessageType = $type");
 }
