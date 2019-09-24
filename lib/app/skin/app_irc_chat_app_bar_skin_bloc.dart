@@ -8,8 +8,10 @@ class AppIRCChatAppBarSkinBloc extends ChatAppBarSkinBloc {
 
   AppIRCChatAppBarSkinBloc(this.theme);
 
-  TextStyle get titleTextStyle => theme.platformSkinTheme.textBoldMediumStyle;
+  TextStyle get titleTextStyle => theme.platformSkinTheme.textBoldMediumStyle.copyWith(color: theme.onAppBarColor);
 
-  TextStyle get subTitleTextStyle => theme.platformSkinTheme.textRegularSmallStyle;
+  TextStyle get subTitleTextStyle => theme.platformSkinTheme.textRegularSmallStyle.copyWith(color: theme.onAppBarColor);
+  Color get appBarColor => theme.appBarColor;
+  Color get iconAppBarColor => theme.onAppBarColor;
 
 }

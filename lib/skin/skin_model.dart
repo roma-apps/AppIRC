@@ -64,6 +64,8 @@ abstract class PlatformSkinTheme {
   TextStyle get textTitleStyle;
 
   TextStyle get textEditTextStyle;
+
+  Color get buttonColor;
 }
 
 class AndroidAppSkinTheme extends PlatformSkinTheme {
@@ -72,6 +74,9 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextTheme get textTheme => theme.textTheme;
 
   AndroidAppSkinTheme(this.theme);
+
+
+  Color get buttonColor => theme.buttonColor;
 
   @override
   TextStyle get textBoldMediumStyle => textTheme.caption;
@@ -93,7 +98,7 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textRegularMediumStyle => textTheme.body1;
 
   @override
-  TextStyle get textRegularSmallStyle => textTheme.body2;
+  TextStyle get textRegularSmallStyle => textTheme.body2.copyWith(fontSize: 12);
 
   @override
   TextStyle get textTitleStyle => textTheme.headline;
@@ -125,7 +130,7 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
   CupertinoThemeData theme;
 
   CupertinoTextThemeData get textTheme => theme.textTheme;
-
+  Color get buttonColor => androidAppSkinTheme.theme.buttonColor;
 
   @override
   Color get disabledColor => androidAppSkinTheme.theme.disabledColor;

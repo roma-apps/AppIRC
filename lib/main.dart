@@ -297,67 +297,70 @@ class AppIRCState extends State<AppIRC> {
     var appSkinPreferenceBloc = AppSkinPreferenceBloc<AppIRCSkinTheme>(
         preferencesService, _allSkinThemes, defaultSkinTheme);
 
-    return Provider<AppSkinPreferenceBloc>(
+    return Provider(
       providable: appSkinPreferenceBloc,
-      child: EasyLocalization(
-        child: StreamBuilder<AppIRCSkinTheme>(
-            stream: isPreferencesReady
-                ? appSkinPreferenceBloc.appSkinStream
-                : BehaviorSubject<AppIRCSkinTheme>(
-                    seedValue: defaultSkinTheme),
-            initialData: isPreferencesReady
-                ? appSkinPreferenceBloc.currentAppSkinTheme
-                : defaultSkinTheme,
-            builder: (context, snapshot) {
-              AppIRCSkinTheme appSkinTheme = snapshot.data;
+      child: Provider<AppSkinPreferenceBloc>(
+        providable: appSkinPreferenceBloc,
+        child: EasyLocalization(
+          child: StreamBuilder<AppIRCSkinTheme>(
+              stream: isPreferencesReady
+                  ? appSkinPreferenceBloc.appSkinStream
+                  : BehaviorSubject<AppIRCSkinTheme>(
+                      seedValue: defaultSkinTheme),
+              initialData: isPreferencesReady
+                  ? appSkinPreferenceBloc.currentAppSkinTheme
+                  : defaultSkinTheme,
+              builder: (context, snapshot) {
+                AppIRCSkinTheme appSkinTheme = snapshot.data;
 
-              var data = EasyLocalizationProvider.of(context).data;
+                var data = EasyLocalizationProvider.of(context).data;
 
-              var appIRCAppSkinBloc = AppIRCAppSkinBloc(appSkinTheme);
-              return Provider(
-                providable: appIRCAppSkinBloc,
-                child: Provider<AppSkinBloc>(
+                var appIRCAppSkinBloc = AppIRCAppSkinBloc(appSkinTheme);
+                return Provider(
                   providable: appIRCAppSkinBloc,
-                  child: Provider<ChannelsListSkinBloc>(
-                    providable: AppIRCChannelsListSkinBloc(appSkinTheme),
-                    child: Provider<ChatAppBarSkinBloc>(
-                      providable: AppIRCChatAppBarSkinBloc(appSkinTheme),
-                      child: Provider<ChatInputMessageSkinBloc>(
-                        providable:
-                            AppIRCChatInputMessageSkinBloc(appSkinTheme),
-                        child: Provider<FormSkinBloc>(
-                          providable: AppIRCFormSkinBloc(appSkinTheme),
-                          child: Provider<MessagesRegularSkinBloc>(
-                            providable:
-                                AppIRCMessagesRegularSkinBloc(appSkinTheme),
-                            child: Provider<MessagesSpecialSkinBloc>(
+                  child: Provider<AppSkinBloc>(
+                    providable: appIRCAppSkinBloc,
+                    child: Provider<ChannelsListSkinBloc>(
+                      providable: AppIRCChannelsListSkinBloc(appSkinTheme),
+                      child: Provider<ChatAppBarSkinBloc>(
+                        providable: AppIRCChatAppBarSkinBloc(appSkinTheme),
+                        child: Provider<ChatInputMessageSkinBloc>(
+                          providable:
+                              AppIRCChatInputMessageSkinBloc(appSkinTheme),
+                          child: Provider<FormSkinBloc>(
+                            providable: AppIRCFormSkinBloc(appSkinTheme),
+                            child: Provider<MessagesRegularSkinBloc>(
                               providable:
-                                  AppIRCMessagesSpecialSkinBloc(appSkinTheme),
-                              child: Provider<NetworkListSkinBloc>(
+                                  AppIRCMessagesRegularSkinBloc(appSkinTheme),
+                              child: Provider<MessagesSpecialSkinBloc>(
                                 providable:
-                                    AppIRCNetworkListSkinBloc(appSkinTheme),
-                                child: Provider<ButtonSkinBloc>(
-                                  providable: AppIRCButtonSkinBloc(appSkinTheme),
-                                  child: Provider(
-                                    providable: MessagesColoredNicknamesBloc(
-                                        appSkinTheme.coloredNicknamesData),
-                                    child: PlatformApp(
-                                        title: "AppIRC",
-                                        localizationsDelegates: [
-                                          //app-specific localization
-                                          EasylocaLizationDelegate(
-                                              locale: data.locale,
-                                              path: 'assets/langs'),
-                                        ],
-                                        supportedLocales: [Locale('en', 'US')],
-                                        locale: data.savedLocale,
-                                        android: (_) => MaterialAppData(
-                                            theme: appSkinTheme
-                                                .androidThemeDataCreator()),
-                                        ios: (_) => CupertinoAppData(
-                                            theme: appSkinTheme
-                                                .iosThemeDataCreator()),
-                                        home: child),
+                                    AppIRCMessagesSpecialSkinBloc(appSkinTheme),
+                                child: Provider<NetworkListSkinBloc>(
+                                  providable:
+                                      AppIRCNetworkListSkinBloc(appSkinTheme),
+                                  child: Provider<ButtonSkinBloc>(
+                                    providable: AppIRCButtonSkinBloc(appSkinTheme),
+                                    child: Provider(
+                                      providable: MessagesColoredNicknamesBloc(
+                                          appSkinTheme.coloredNicknamesData),
+                                      child: PlatformApp(
+                                          title: "AppIRC",
+                                          localizationsDelegates: [
+                                            //app-specific localization
+                                            EasylocaLizationDelegate(
+                                                locale: data.locale,
+                                                path: 'assets/langs'),
+                                          ],
+                                          supportedLocales: [Locale('en', 'US')],
+                                          locale: data.savedLocale,
+                                          android: (_) => MaterialAppData(
+                                              theme: appSkinTheme
+                                                  .androidThemeDataCreator()),
+                                          ios: (_) => CupertinoAppData(
+                                              theme: appSkinTheme
+                                                  .iosThemeDataCreator()),
+                                          home: child),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -367,9 +370,9 @@ class AppIRCState extends State<AppIRC> {
                       ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+        ),
       ),
     );
   }

@@ -7,7 +7,7 @@ class AppIRCButtonSkinBloc extends ButtonSkinBloc {
 
   AppIRCButtonSkinBloc(this.theme);
 
-  Color get enabledColor => theme.platformSkinTheme.primaryColor;
+  Color get enabledColor => theme.platformSkinTheme.buttonColor;
 
   Color get disabledColor => theme.platformSkinTheme.disabledColor;
 }

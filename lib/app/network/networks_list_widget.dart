@@ -52,8 +52,10 @@ class IRCNetworksListWidget extends StatelessWidget {
                   }),
             );
           } else {
-            return Text(
-                AppLocalizations.of(context).tr("irc_connection.no_networks"));
+            return Center(
+              child: Text(
+                  AppLocalizations.of(context).tr("irc_connection.no_networks")),
+            );
           }
         });
 
