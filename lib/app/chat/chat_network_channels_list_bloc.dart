@@ -22,6 +22,10 @@ class ChatNetworkChannelsListBloc extends Providable {
 
     _onChannelsChanged(network.channels);
 
+    for(var channel in network.channels) {
+      _onChannelJoined(channel);
+    }
+
     var listenForNetworkChannelJoin = backendService
         .listenForNetworkChannelJoin(network, (channelWithState) async {
       var channel = channelWithState.channel;
@@ -30,23 +34,30 @@ class ChatNetworkChannelsListBloc extends Providable {
       }
       network.channels.add(channel);
 
-      _onChannelsChanged(networkChannels);
+      _onChannelsChanged(network.channels);
 
-      _lastJoinedNetworkChannelController.add(channel);
-
-      Disposable listenForNetworkChannelLeave;
-
-      listenForNetworkChannelLeave = backendService
-          .listenForNetworkChannelLeave(network, channel, () async {
-        network.channels.remove(channel);
-        _lastExitedNetworkChannelController.add(channel);
-        _onChannelsChanged(networkChannels);
-        listenForNetworkChannelLeave.dispose();
-      });
-      addDisposable(disposable: listenForNetworkChannelLeave);
+      _onChannelJoined(channel);
     });
 
     addDisposable(disposable: listenForNetworkChannelJoin);
+  }
+
+  void _onChannelJoined(NetworkChannel channel) {
+
+    _lastJoinedNetworkChannelController.add(channel);
+
+    Disposable listenForNetworkChannelLeave;
+
+    listenForNetworkChannelLeave = backendService
+        .listenForNetworkChannelLeave(network, channel, () async {
+      network.channels.remove(channel);
+
+      _onChannelsChanged(network.channels);
+      _lastExitedNetworkChannelController.add(channel);
+      _onChannelsChanged(networkChannels);
+      listenForNetworkChannelLeave.dispose();
+    });
+    addDisposable(disposable: listenForNetworkChannelLeave);
   }
 
   void _onChannelsChanged(List<NetworkChannel> networkChannels) {

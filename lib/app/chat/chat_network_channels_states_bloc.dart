@@ -88,10 +88,14 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsBloc {
 
   @override
   void onChannelLeaved(Network network, NetworkChannel channel) {
-    var stateController =
-        _getStateControllerForNetworkChannel(network, channel);
-    stateController.close();
-    _states[_calculateNetworkKey(network)]
-        .remove(_calculateChannelKey(channel));
+
+//    Future.delayed(Duration(microseconds:  1000), () {
+      var stateController =
+      _getStateControllerForNetworkChannel(network, channel);
+      stateController.close();
+      _states[_calculateNetworkKey(network)]
+          .remove(_calculateChannelKey(channel));
+//    });
+
   }
 }
