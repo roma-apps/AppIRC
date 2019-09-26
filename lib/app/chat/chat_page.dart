@@ -18,7 +18,9 @@ import 'package:flutter_appirc/app/chat/chat_drawer_page.dart';
 import 'package:flutter_appirc/app/chat/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
+import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
@@ -170,6 +172,7 @@ class ChatPage extends StatelessWidget {
     var backendService = Provider.of<ChatInputBackendService>(context);
     var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
     var channelsStateBloc = Provider.of<ChatNetworkChannelsStateBloc>(context);
+    var networksStateBloc = Provider.of<ChatNetworksStateBloc>(context);
 
     return SafeArea(
         child: StreamBuilder<NetworkChannel>(
@@ -198,9 +201,12 @@ class ChatPage extends StatelessWidget {
                 } else {
 
                   return Provider(
-                      providable: NetworkChannelBloc(
-                          backendService, network, channel, channelsStateBloc),
-                      child: IRCNetworkChannelWidget());
+                    providable: NetworkBloc(backendService, network, networksStateBloc),
+                    child: Provider(
+                        providable: NetworkChannelBloc(
+                            backendService, network, channel, channelsStateBloc),
+                        child: IRCNetworkChannelWidget()),
+                  );
                 }
 
               }
