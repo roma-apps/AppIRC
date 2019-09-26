@@ -156,17 +156,22 @@ class AppIRCState extends State<AppIRC> {
         var connectionBloc = ChatConnectionBloc(loungeBackendService);
         var networkStatesBloc =
             ChatNetworksStateBloc(loungeBackendService, networksListBloc);
-        var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService, networksListBloc, preferencesService);
+
+
+        var _startPreferences =
+        chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+
+        var chatInitBloc = ChatInitBloc(
+            loungeBackendService, connectionBloc, _startPreferences);
+
+        var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,chatInitBloc, networksListBloc, preferencesService);
 
         var channelsStatesBloc = ChatNetworkChannelsStateBloc(
             activeChannelBloc,
             loungeBackendService, networksListBloc);
 
-        var _startPreferences =
-            chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
 
-        var chatInitBloc = ChatInitBloc(
-            loungeBackendService, connectionBloc, _startPreferences);
+
         createdWidget = Provider(
           providable: ChatDatabaseProvider(database),
           child: Provider<LoungeBackendService>(

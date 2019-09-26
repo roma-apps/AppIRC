@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -61,11 +62,11 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
 
   ChatPreferencesSaverBloc(PreferencesService preferencesService, this.chatBloc, this.initBloc)
       : super(preferencesService) {
-    addDisposable(streamSubscription: chatBloc.networksStream.listen((networks) async {
 
-      // don't save empty networks before init data was sent
-      if (initBloc.initStarted) {
-        var newNetworksSettings = networks.map((network) {
+    addDisposable(streamSubscription: initBloc.stateStream.listen((newState) {
+
+      if (newState == ChatInitState.FINISHED) {
+        var newNetworksSettings = chatBloc.networks.map((network) {
           var connectionPreferences = network.connectionPreferences;
 
           assert(connectionPreferences.localId != null);
@@ -83,6 +84,8 @@ class ChatPreferencesSaverBloc extends ChatPreferencesBloc {
         setValue(newPreferences);
       }
     }));
+
+
   }
 }
 

@@ -45,22 +45,22 @@ class IRCNetworkChannelJoinFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    IRCNetworkChannelJoinFormBloc formBloc =
-        Provider.of<IRCNetworkChannelJoinFormBloc>(context);
+    NetworkChannelJoinFormBloc formBloc =
+        Provider.of<NetworkChannelJoinFormBloc>(context);
 
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       children: <Widget>[
         buildFormTextRow(
           context,
-            appLocalizations.tr('join_channel.channel.label'),
-            appLocalizations.tr('join_channel.channel.hint'),
+            appLocalizations.tr('join_channel.channel_label'),
+            appLocalizations.tr('join_channel.channel_hint'),
             Icons.add,
             formBloc.channelFieldBloc, _channelController),
         buildFormTextRow(
             context,
-            appLocalizations.tr('join_channel.password.label'),
-            appLocalizations.tr('join_channel.password.hint'),
+            appLocalizations.tr('join_channel.password_label'),
+            appLocalizations.tr('join_channel.password_hint'),
             Icons.lock,
             formBloc.passwordFieldBloc, _passwordController),
       ],

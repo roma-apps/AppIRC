@@ -54,7 +54,7 @@ class ChatDrawerWidget extends StatelessWidget {
 
   Widget _buildLoungeSettingsButton(BuildContext context) => PlatformIconButton(
         onPressed: () async {
-          var settings = await Provider.of<LoungePreferencesBloc>(context)
+          var settings = Provider.of<LoungePreferencesBloc>(context)
               .getValue(defaultValue: createDefaultLoungePreferences(context));
           Navigator.push(
               context,

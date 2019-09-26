@@ -66,12 +66,13 @@ class IRCNetworksListWidget extends StatelessWidget {
     var preferencesService = Provider.of<PreferencesService>(context);
     var ircChatActiveChannelBloc =
         Provider.of<ChatActiveChannelBloc>(context);
-    var backendService = Provider.of<ChatInputBackendService>(context);
+    var backendService = Provider.of<ChatInputOutputBackendService>(context);
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var networksStatesBloc = Provider.of<ChatNetworksStateBloc>(context);
     var channel = network.lobbyChannel;
     var expandBloc = IRCChatNetworkExpandStateBloc(preferencesService, network);
     var networkStateBloc =
-        NetworkBloc(backendService, network, networksStatesBloc);
+        NetworkBloc(backendService, network, networksStatesBloc, activeChannelBloc);
 
     return Provider<NetworkBloc>(
       providable: networkStateBloc,
@@ -248,7 +249,7 @@ class IRCNetworksListWidget extends StatelessWidget {
         Navigator.push(
             context,
             platformPageRoute(
-                builder: (_) => IRCNetworkChannelJoinPage(network)));
+                builder: (_) => NetworkChannelJoinPage(network)));
         break;
       case NetworkDropDownAction.LIST_ALL_CHANNELS:
         networkBloc.printNetworkAvailableChannels();

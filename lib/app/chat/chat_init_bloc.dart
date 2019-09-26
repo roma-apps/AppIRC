@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
+import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "ChatInitBloc", enabled: true);
 
@@ -14,40 +16,51 @@ class ChatInitBloc extends Providable {
   final ChatConnectionBloc _connectionBloc;
   final ChatPreferences _startPreferences;
 
-  bool initStarted = false;
+  bool get isInitNotStarted=> state == ChatInitState.NOT_STARTED;
+  bool get isInitInProgress => state == ChatInitState.IN_PROGRESS;
+  bool get isInitFinished => state == ChatInitState.FINISHED;
 
-  ChatInitBloc(
-      this._backendService, this._connectionBloc, this._startPreferences) {
+
+  // ignore: close_sinks
+  BehaviorSubject<ChatInitState> _stateController = BehaviorSubject(
+      seedValue: ChatInitState.NOT_STARTED);
+  Stream<ChatInitState> get stateStream => _stateController.stream;
+  ChatInitState get state => _stateController.value;
+
+
+  ChatInitBloc(this._backendService, this._connectionBloc,
+      this._startPreferences) {
     _logger.d(() => "init $_startPreferences");
+    addDisposable(subject: _stateController);
 
-      if (_connectionBloc.isConnected) {
-        _sendStartRequests();
-      } else {
-        // ignore: cancel_subscriptions
-        StreamSubscription<ChatConnectionState> subscription;
-        subscription =
-            _connectionBloc.connectionStateStream.listen((connectionState) {
-              _logger.d(() =>
-              "send ${_connectionBloc.isConnected} connectionState $connectionState");
-              if (_connectionBloc.isConnected) {
-                _sendStartRequests();
-                subscription.cancel();
-              }
-            });
+    if (_connectionBloc.isConnected) {
+      _sendStartRequests();
+    } else {
+      // ignore: cancel_subscriptions
+      StreamSubscription<ChatConnectionState> subscription;
+      subscription =
+          _connectionBloc.connectionStateStream.listen((connectionState) {
+            _logger.d(() =>
+            "send ${_connectionBloc
+                .isConnected} connectionState $connectionState");
+            if (_connectionBloc.isConnected) {
+              _sendStartRequests();
+              subscription.cancel();
+            }
+          });
 
-        addDisposable(streamSubscription: subscription);
-      }
-
-
+      addDisposable(streamSubscription: subscription);
+    }
   }
 
   void _sendStartRequests() {
-    _logger.d(()=>"_sendStartRequests $initStarted");
-    if (!initStarted) {
-      initStarted = true;
+    _logger.d(() => "_sendStartRequests $state");
+    if (!isInitNotStarted) {
+      _stateController.add(ChatInitState.IN_PROGRESS);
       _startPreferences.networks.forEach((network) async {
         await _backendService.joinNetwork(network);
       });
+      _stateController.add(ChatInitState.FINISHED);
     }
   }
 }

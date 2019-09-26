@@ -92,8 +92,7 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
       return error;
     });
 
-    return PlatformScaffold(
-      iosContentBottomPadding: true,
+    return PlatformScaffold(      iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('irc_connection.title')),
@@ -103,12 +102,7 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
           padding: const EdgeInsets.all(8.0),
           child: Provider(
             providable: networkPreferencesFormBloc,
-            child: ListView(
-              shrinkWrap: true,
-              children: <Widget>[
-                ChatNetworkPreferencesFormWidget(startValues, callback),
-              ],
-            ),
+            child: ChatNetworkPreferencesFormWidget(startValues, callback),
           ),
         ),
       ),

@@ -70,7 +70,7 @@ class ChatNetworkPreferencesFormWidgetState
                     appLocalizations.tr('irc_connection.channels_hint'),
                     Icons.list,
                     formBloc.channelsFieldBloc,
-                    _channelsController),
+                    _channelsController)
               ],
             ),
           ),

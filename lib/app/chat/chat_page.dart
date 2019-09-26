@@ -35,54 +35,49 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var preferencesService = Provider.of<PreferencesService>(context);
-    var networksListBloc = Provider.of<ChatNetworksListBloc>(context);
 
     AppSkinPreferenceBloc<AppIRCSkinTheme> skinPreferenceBloc =
-    Provider.of<AppSkinPreferenceBloc<AppIRCSkinTheme>>(context);
+        Provider.of<AppSkinPreferenceBloc<AppIRCSkinTheme>>(context);
 
     return StreamBuilder<AppSkinTheme>(
-      initialData: skinPreferenceBloc.currentAppSkinTheme,
+        initialData: skinPreferenceBloc.currentAppSkinTheme,
         stream: skinPreferenceBloc.appSkinStream,
         builder: (context, asyncSnapshot) {
-
           AppIRCSkinTheme currentSkin = asyncSnapshot.data;
           return SafeArea(
             child: PlatformScaffold(
-                  android: (context) => MaterialScaffoldData(
-                      appBar:   AppBar(
-                        title: _buildAppBarChild(context),
-                        actions: <Widget>[
-                          buildMembersButton(context),
-                        ],
-                        backgroundColor:  currentSkin.appBarColor,
-                      ),
-                  drawer: Drawer(child: ChatDrawerWidget()),
-                  body: _buildBody(context)),
-              ios: (context) => CupertinoPageScaffoldData(
-                  resizeToAvoidBottomInset: true,
-                  body: _buildBody(context),
-                  navigationBar: CupertinoNavigationBar(
-                    leading: PlatformIconButton(
-                      icon: _buildMenuIcon(context),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            platformPageRoute(
-                                builder: (context) => ChatDrawerPage()));
-                      },
+                android: (context) => MaterialScaffoldData(
+                    appBar: AppBar(
+                      title: _buildAppBarChild(context),
+                      actions: <Widget>[
+                        buildMembersButton(context),
+                      ],
+                      backgroundColor: currentSkin.appBarColor,
                     ),
-                    trailing: buildMembersButton(context),
-                    middle: _buildAppBarChild(context),
-                  ))),
+                    drawer: Drawer(child: ChatDrawerWidget()),
+                    body: _buildBody(context)),
+                ios: (context) => CupertinoPageScaffoldData(
+                    resizeToAvoidBottomInset: true,
+                    body: _buildBody(context),
+                    navigationBar: CupertinoNavigationBar(
+                      leading: PlatformIconButton(
+                        icon: _buildMenuIcon(context),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              platformPageRoute(
+                                  builder: (context) => ChatDrawerPage()));
+                        },
+                      ),
+                      trailing: buildMembersButton(context),
+                      middle: _buildAppBarChild(context),
+                    ))),
           );
-
         });
-
-
   }
 
-  Icon _buildMenuIcon(BuildContext context) => Icon(Icons.menu, color: Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
+  Icon _buildMenuIcon(BuildContext context) => Icon(Icons.menu,
+      color: Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
 
   Widget buildMembersButton(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
@@ -95,7 +90,9 @@ class ChatPage extends StatelessWidget {
           return Container();
         } else {
           return PlatformIconButton(
-            icon: Icon(Icons.group, color: Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor),
+            icon: Icon(Icons.group,
+                color:
+                    Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor),
             onPressed: () {
               var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
               var network = networkListBloc.findNetworkWithChannel(channel);
@@ -112,8 +109,6 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildAppBarChild(BuildContext context) {
-
-
     var backendService = Provider.of<LoungeBackendService>(context);
 
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
@@ -196,19 +191,18 @@ class ChatPage extends StatelessWidget {
               } else {
                 var network = networkListBloc.findNetworkWithChannel(channel);
 
-                if(network == null) {
+                if (network == null) {
                   return Container();
                 } else {
-
                   return Provider(
-                    providable: NetworkBloc(backendService, network, networksStateBloc),
+                    providable: NetworkBloc(backendService, network,
+                        networksStateBloc, activeChannelBloc),
                     child: Provider(
-                        providable: NetworkChannelBloc(
-                            backendService, network, channel, channelsStateBloc),
+                        providable: NetworkChannelBloc(backendService, network,
+                            channel, channelsStateBloc),
                         child: IRCNetworkChannelWidget()),
                   );
                 }
-
               }
             }));
   }
@@ -243,12 +237,10 @@ class ChatPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text("Not connected to server"),
-                    createSkinnedPlatformButton(
-                      context,
-                        child: Text("Reconnect"),
-                        onPressed: () {
-                          connectionBloc.reconnect();
-                        })
+                    createSkinnedPlatformButton(context,
+                        child: Text("Reconnect"), onPressed: () {
+                      connectionBloc.reconnect();
+                    })
                   ],
                 ),
               );
