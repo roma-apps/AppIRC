@@ -243,7 +243,7 @@ class IRCNetworksListWidget extends StatelessWidget {
             context,
             platformPageRoute(
                 builder: (_) => EditChatNetworkPage(
-                    createDefaultIRCNetworkPreferences(context))));
+                    createDefaultNetworkPreferences(context))));
         break;
       case NetworkDropDownAction.JOIN_CHANNEL:
         Navigator.push(

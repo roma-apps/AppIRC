@@ -127,3 +127,17 @@ abstract class ChatInputOutputBackendService
     implements ChatInputBackendService, ChatOutputBackendService {
 
 }
+
+ChatNetworkPreferences createDefaultNetworkPreferences(
+    BuildContext context)
+{
+  var backendService =
+  Provider.of<ChatOutputBackendService>(context);
+  var chatConfig = backendService.chatConfig;
+  var channels = chatConfig.defaultChannels;
+
+  return ChatNetworkPreferences(
+      chatConfig.defaultNetwork, [
+    ChatNetworkChannelPreferences.name(name: channels, password: "")
+  ]);
+}

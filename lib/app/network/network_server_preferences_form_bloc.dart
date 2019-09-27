@@ -11,19 +11,33 @@ class ChatNetworkServerPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<bool> tlsFieldBloc;
   FormValueFieldBloc<bool> trustedFieldBloc;
 
+  bool enabled;
+  bool visible;
+
   ChatNetworkServerPreferencesFormBloc(
       ChatNetworkServerPreferences preferences, this.networkValidator) {
+    enabled = preferences.enabled;
+    visible = preferences.visible;
+
     nameFieldBloc = FormValueFieldBloc<String>(preferences.name,
-        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()]);
+        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],
+        enabled: enabled,
+        visible: visible);
 
     hostFieldBloc = FormValueFieldBloc<String>(preferences.serverHost,
-        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()]);
+        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],
+        enabled: enabled,
+        visible: visible);
     portFieldBloc = FormValueFieldBloc<String>(preferences.serverPort,
-        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()]);
+        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],
+        enabled: enabled,
+        visible: visible);
 
-    tlsFieldBloc = FormValueFieldBloc<bool>(preferences.useTls);
+    tlsFieldBloc = FormValueFieldBloc<bool>(preferences.useTls, enabled: enabled,
+        visible: visible);
     trustedFieldBloc =
-        FormValueFieldBloc<bool>(preferences.useOnlyTrustedCertificates);
+        FormValueFieldBloc<bool>(preferences.useOnlyTrustedCertificates, enabled: enabled,
+            visible: visible);
   }
 
   @override
@@ -35,5 +49,7 @@ class ChatNetworkServerPreferencesFormBloc extends FormBloc {
       serverHost: hostFieldBloc.value,
       serverPort: portFieldBloc.value,
       useTls: tlsFieldBloc.value,
-      useOnlyTrustedCertificates: trustedFieldBloc.value);
+      useOnlyTrustedCertificates: trustedFieldBloc.value,
+      enabled: enabled,
+      visible: visible);
 }

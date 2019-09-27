@@ -134,6 +134,8 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
 
 
 class FormValueFieldBloc<T> extends FormFieldBloc<T> {
+  final bool enabled;
+  final bool visible;
   T _currentValue;
 
 
@@ -143,7 +145,7 @@ class FormValueFieldBloc<T> extends FormFieldBloc<T> {
 
   T get value => _currentValue;
 
-  FormValueFieldBloc(T startValue, {List<Validator<T>> validators = const []})
+  FormValueFieldBloc(T startValue, {List<Validator<T>> validators = const [], this.enabled = true, this.visible = true})
       : super(validators) {
     addDisposable(streamSubscription: valueStream.listen((newValue) async =>
         onNewError(await validate())));

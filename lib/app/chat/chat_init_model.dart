@@ -1,0 +1,3 @@
+enum ChatInitState {
+  NOT_STARTED, IN_PROGRESS, FINISHED
+}

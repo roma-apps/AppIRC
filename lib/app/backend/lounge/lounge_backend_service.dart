@@ -254,22 +254,7 @@ class LoungeBackendService extends Providable
     String join = channelNames.join(LoungeConstants.channelsNamesSeparator);
     var request = JoinNetworkLoungeRequest(
         networkPreferences,
-        NetworkNewLoungeRequestBody(
-          username: userPreferences.username,
-          nick: userPreferences.nickname,
-          join: join,
-          realname: userPreferences.realName,
-          password: userPreferences.password,
-          host: serverPreferences.serverHost,
-          port: serverPreferences.serverPort,
-          rejectUnauthorized: serverPreferences.useOnlyTrustedCertificates
-              ? LoungeConstants.on
-              : LoungeConstants.off,
-          tls: serverPreferences.useTls
-              ? LoungeConstants.on
-              : LoungeConstants.off,
-          name: serverPreferences.name,
-        ));
+        toNetworkNewLoungeRequestBody(userPreferences, join, serverPreferences));
 
     var result;
     Disposable networkListener;
@@ -943,6 +928,11 @@ Future<ChatConfig> _connect(LoungeConnectionPreferences preferences,
       _listenForCommands(socketIOService, (result) => loungeCommands = result));
 
   Future.delayed(_connectTimeout, () => timeout = true);
+
+
+  socketIOService.onConnectError((data) {
+    _logger.d(() => "data $data");
+  });
 
   await socketIOService.connect();
   // lounge don't support connect/connecting callbacks

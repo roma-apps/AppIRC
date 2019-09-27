@@ -21,11 +21,11 @@ import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
+import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/user/users_list_page.dart';
-import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
@@ -35,7 +35,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     AppSkinPreferenceBloc<AppIRCSkinTheme> skinPreferenceBloc =
         Provider.of<AppSkinPreferenceBloc<AppIRCSkinTheme>>(context);
 
@@ -217,7 +216,9 @@ class ChatPage extends StatelessWidget {
           var connectionState = snapshot.data;
           switch (connectionState) {
             case ChatConnectionState.CONNECTED:
-              var startValues = createDefaultIRCNetworkPreferences(context);
+
+
+              var startValues  = createDefaultNetworkPreferences(context);
               return Provider(
                 providable: ChatNetworkPreferencesFormBloc(startValues),
                 child: ChatNetworkPreferencesFormWidget(startValues,

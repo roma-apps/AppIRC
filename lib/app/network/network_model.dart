@@ -43,17 +43,23 @@ class ChatNetworkServerPreferences extends JsonPreferences {
   String serverPort;
   bool useTls;
   bool useOnlyTrustedCertificates;
+  
+  bool visible;
+  bool enabled;
 
   ChatNetworkServerPreferences(
       {@required this.name,
       @required this.serverHost,
       @required this.serverPort,
       @required this.useTls,
-      @required this.useOnlyTrustedCertificates});
+      @required this.useOnlyTrustedCertificates,
+      @required this.enabled,
+      @required this.visible,
+      });
 
   @override
   String toString() {
-    return 'IRCNetworkServerPreferences{name: $name}';
+    return 'ChatNetworkServerPreferences{name: $name}';
   }
 
   factory ChatNetworkServerPreferences.fromJson(Map<String, dynamic> json) =>
@@ -160,6 +166,8 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
 
   ChatNetworkServerPreferences serverPreferences;
   ChatNetworkUserPreferences userPreferences;
+  
+  
 
   ChatNetworkConnectionPreferences(
       {@required this.serverPreferences,

@@ -6,6 +6,7 @@ import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 
 var _logger = MyLogger(logTag: "lounge_adapter", enabled: true);
@@ -20,16 +21,16 @@ ChatConfig toChatConfig(
                 serverPort: loungeConfig.defaults.port.toString(),
                 useTls: loungeConfig.defaults.tls,
                 useOnlyTrustedCertificates:
-                    loungeConfig.defaults.rejectUnathorized),
+                    loungeConfig.defaults.rejectUnathorized,
+                visible: loungeConfig.displayNetwork,
+                enabled: !loungeConfig.lockNetwork),
             userPreferences: ChatNetworkUserPreferences(
                 nickname: loungeConfig.defaults.nick,
                 realName: loungeConfig.defaults.realname,
                 username: loungeConfig.defaults.username)),
         defaultChannels: loungeConfig.defaults.join,
-        displayNetwork: loungeConfig.displayNetwork,
         fileUpload: loungeConfig.fileUpload,
         ldapEnabled: loungeConfig.ldapEnabled,
-        lockNetwork: loungeConfig.lockNetwork,
         prefetch: loungeConfig.prefetch,
         public: loungeConfig.public,
         useHexIp: loungeConfig.useHexIp,
@@ -74,7 +75,8 @@ ChatMessage toChatMessage(
           : null,
       fromMode: msgLoungeResponseBody.from != null
           ? msgLoungeResponseBody.from.mode
-          : null, newNick: msgLoungeResponseBody.new_nick,
+          : null,
+      newNick: msgLoungeResponseBody.new_nick,
     );
 
 List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
@@ -119,7 +121,6 @@ SpecialMessageType detectSpecialMessageType(data) {
   var isMap = data is Map;
   var isIterable = data is Iterable;
 
-
   if (isMap) {
     var map = data as Map;
     TextSpecialMessageLoungeResponseBodyPart textMessage;
@@ -136,7 +137,6 @@ SpecialMessageType detectSpecialMessageType(data) {
     }
   } else {
     if (isIterable) {
-
       var iterable = data as Iterable;
       var first = iterable.first;
 
@@ -253,11 +253,33 @@ RegularMessageType detectRegularMessageType(String stringType) {
       type = RegularMessageType.NICK;
       break;
 
-
-
     default:
       type = RegularMessageType.UNKNOWN;
   }
 
   return type;
+}
+
+NetworkNewLoungeRequestBody toNetworkNewLoungeRequestBody(
+    ChatNetworkUserPreferences userPreferences,
+    String join,
+    ChatNetworkServerPreferences serverPreferences) {
+  return NetworkNewLoungeRequestBody(
+    username: userPreferences.username,
+    nick: userPreferences.nickname,
+    join: join,
+    realname: userPreferences.realName,
+    password: userPreferences.password,
+    host: serverPreferences.serverHost,
+    port: serverPreferences.serverPort,
+    rejectUnauthorized: serverPreferences.useOnlyTrustedCertificates != null
+        ? serverPreferences.useOnlyTrustedCertificates
+            ? LoungeConstants.on
+            : LoungeConstants.off
+        : null,
+    tls: serverPreferences.useTls != null
+        ? serverPreferences.useTls ? LoungeConstants.on : LoungeConstants.off
+        : null,
+    name: serverPreferences.name,
+  );
 }

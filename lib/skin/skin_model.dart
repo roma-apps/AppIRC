@@ -101,7 +101,7 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textRegularSmallStyle => textTheme.body2.copyWith(fontSize: 12);
 
   @override
-  TextStyle get textTitleStyle => textTheme.headline;
+  TextStyle get textTitleStyle => textTheme.headline.copyWith(color: onPrimaryColor);
 
   @override
   Color get primaryColor => theme.colorScheme.primary;

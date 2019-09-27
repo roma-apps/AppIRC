@@ -60,7 +60,11 @@ class ChatInitBloc extends Providable {
       _startPreferences.networks.forEach((network) async {
         await _backendService.joinNetwork(network);
       });
-      _stateController.add(ChatInitState.FINISHED);
+
+      Future.delayed(Duration(milliseconds: 1000), () {
+        _stateController.add(ChatInitState.FINISHED);
+      });
+
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_page.dart';
 import 'package:flutter_appirc/app/default_values.dart';
@@ -44,7 +45,7 @@ class ChatDrawerWidget extends StatelessWidget {
               context,
               platformPageRoute(
                   builder: (context) => NewChatNetworkPage(
-                          createDefaultIRCNetworkPreferences(context), () {
+                          createDefaultNetworkPreferences(context), () {
                         Navigator.pop(context);
                       })));
         },

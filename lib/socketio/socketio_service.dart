@@ -175,7 +175,7 @@ class SocketIOService extends Providable {
         //Socket IO server URI
         host,
         //Enable or disable platform channel logging
-        enableLogging: false,
+        enableLogging: true,
         transports: [
           Transports.WEB_SOCKET,
           Transports.POLLING
@@ -189,8 +189,18 @@ class SocketIOService extends Providable {
       connected = true;
     };
 
-    var errorListener = (_) {
+    socketIO.onError((data) {
+      _logger.d(() => "data = $data");
+    });
+
+    socketIO.onConnectError((data) {
+      _logger.d(() => "data = $data");
+    });
+
+    var errorListener = (data) {
       connected = false;
+
+      _logger.d(() => "data = $data");
     };
 
     try {

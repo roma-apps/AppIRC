@@ -157,20 +157,17 @@ class AppIRCState extends State<AppIRC> {
         var networkStatesBloc =
             ChatNetworksStateBloc(loungeBackendService, networksListBloc);
 
-
         var _startPreferences =
-        chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+            chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
 
         var chatInitBloc = ChatInitBloc(
             loungeBackendService, connectionBloc, _startPreferences);
 
-        var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,chatInitBloc, networksListBloc, preferencesService);
+        var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,
+            chatInitBloc, networksListBloc, preferencesService);
 
         var channelsStatesBloc = ChatNetworkChannelsStateBloc(
-            activeChannelBloc,
-            loungeBackendService, networksListBloc);
-
-
+            activeChannelBloc, loungeBackendService, networksListBloc);
 
         createdWidget = Provider(
           providable: ChatDatabaseProvider(database),
@@ -203,6 +200,7 @@ class AppIRCState extends State<AppIRC> {
                                       database),
                                   child: Provider(
                                     providable: ChatPreferencesSaverBloc(
+                                        loungeBackendService,
                                         preferencesService,
                                         networksListBloc,
                                         chatInitBloc),
@@ -281,7 +279,8 @@ class AppIRCState extends State<AppIRC> {
                                   providable:
                                       AppIRCNetworkListSkinBloc(appSkinTheme),
                                   child: Provider<ButtonSkinBloc>(
-                                    providable: AppIRCButtonSkinBloc(appSkinTheme),
+                                    providable:
+                                        AppIRCButtonSkinBloc(appSkinTheme),
                                     child: Provider(
                                       providable: MessagesColoredNicknamesBloc(
                                           appSkinTheme.coloredNicknamesData),
@@ -293,7 +292,9 @@ class AppIRCState extends State<AppIRC> {
                                                 locale: data.locale,
                                                 path: 'assets/langs'),
                                           ],
-                                          supportedLocales: [Locale('en', 'US')],
+                                          supportedLocales: [
+                                            Locale('en', 'US')
+                                          ],
                                           locale: data.savedLocale,
                                           android: (_) => MaterialAppData(
                                               theme: appSkinTheme
