@@ -56,6 +56,9 @@ dependencies:
   # used for connection/channels settings
   streaming_shared_preferences: ^1.0.1
 
+  # autocomplete
+  flutter_typeahead: ^1.6.1
+
 
 dev_dependencies:
   flutter_test:

@@ -15,7 +15,7 @@ class NetworkChannelBloc extends Providable {
   final ChatNetworkChannelsStateBloc channelsStatesBloc;
 
   // ignore: close_sinks
-  final BehaviorSubject<List<ChannelUserInfo>> _usersController = BehaviorSubject();
+  final BehaviorSubject<List<ChannelUserInfo>> _usersController = BehaviorSubject(seedValue:[]);
    Stream<List<ChannelUserInfo>> get usersStream => _usersController.stream;
    List<ChannelUserInfo> get users => _usersController.value;
 

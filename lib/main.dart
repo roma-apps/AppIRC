@@ -171,40 +171,43 @@ class AppIRCState extends State<AppIRC> {
 
         createdWidget = Provider(
           providable: ChatDatabaseProvider(database),
-          child: Provider<LoungeBackendService>(
+          child: Provider<ChatBackendService>(
             providable: loungeBackendService,
-            child: Provider<ChatInputOutputBackendService>(
+            child: Provider<LoungeBackendService>(
               providable: loungeBackendService,
-              child: Provider<ChatOutputBackendService>(
+              child: Provider<ChatInputOutputBackendService>(
                 providable: loungeBackendService,
-                child: Provider<ChatInputBackendService>(
+                child: Provider<ChatOutputBackendService>(
                   providable: loungeBackendService,
-                  child: Provider(
-                    providable: chatPreferencesBloc,
+                  child: Provider<ChatInputBackendService>(
+                    providable: loungeBackendService,
                     child: Provider(
-                      providable: connectionBloc,
+                      providable: chatPreferencesBloc,
                       child: Provider(
-                        providable: networksListBloc,
+                        providable: connectionBloc,
                         child: Provider(
-                          providable: networkStatesBloc,
+                          providable: networksListBloc,
                           child: Provider(
-                            providable: channelsStatesBloc,
+                            providable: networkStatesBloc,
                             child: Provider(
-                              providable: activeChannelBloc,
+                              providable: channelsStatesBloc,
                               child: Provider(
-                                providable: chatInitBloc,
+                                providable: activeChannelBloc,
                                 child: Provider(
-                                  providable: NetworkChannelMessagesSaverBloc(
-                                      loungeBackendService,
-                                      networksListBloc,
-                                      database),
+                                  providable: chatInitBloc,
                                   child: Provider(
-                                    providable: ChatPreferencesSaverBloc(
+                                    providable: NetworkChannelMessagesSaverBloc(
                                         loungeBackendService,
-                                        preferencesService,
                                         networksListBloc,
-                                        chatInitBloc),
-                                    child: _buildApp(ChatPage()),
+                                        database),
+                                    child: Provider(
+                                      providable: ChatPreferencesSaverBloc(
+                                          loungeBackendService,
+                                          preferencesService,
+                                          networksListBloc,
+                                          chatInitBloc),
+                                      child: _buildApp(ChatPage()),
+                                    ),
                                   ),
                                 ),
                               ),
