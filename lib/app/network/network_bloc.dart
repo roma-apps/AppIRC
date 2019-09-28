@@ -80,4 +80,5 @@ class NetworkBloc extends Providable {
     return NetworkBloc(
         backendService, network, networksStateBloc, activeChannelBloc);
   }
+
 }

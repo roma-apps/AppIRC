@@ -26,7 +26,8 @@ abstract class SpecialMessageDao {
   @Query('DELETE FROM SpecialMessageDB')
   Future<void> deleteAllSpecialMessages();
 
-  @Query('DELETE FROM SpecialMessageDB WHERE channelRemoteId = :channelRemoteId')
+  @Query(
+      'DELETE FROM SpecialMessageDB WHERE channelRemoteId = :channelRemoteId')
   Future<void> deleteChannelSpecialMessages(int channelRemoteId);
 }
 
@@ -44,8 +45,19 @@ class SpecialMessageDB implements ChatMessageDB {
   final String dataJsonEncoded;
   int specialTypeId;
 
-  SpecialMessageDB(this.localId, this.channelLocalId, this.chatMessageTypeId,
-      this.channelRemoteId, this.dataJsonEncoded, this.specialTypeId);
+  final int dateMicrosecondsSinceEpoch;
+
+  static DateTime date(SpecialMessageDB message) =>
+      DateTime.fromMicrosecondsSinceEpoch(message.dateMicrosecondsSinceEpoch);
+
+  SpecialMessageDB(
+      this.localId,
+      this.channelLocalId,
+      this.chatMessageTypeId,
+      this.channelRemoteId,
+      this.dataJsonEncoded,
+      this.specialTypeId,
+      this.dateMicrosecondsSinceEpoch);
 
   SpecialMessageDB.name(
       {this.localId,
@@ -53,7 +65,8 @@ class SpecialMessageDB implements ChatMessageDB {
       this.chatMessageTypeId = chatMessageTypeSpecialId,
       @required this.channelRemoteId,
       @required this.dataJsonEncoded,
-      @required this.specialTypeId});
+      @required this.specialTypeId,
+      @required this.dateMicrosecondsSinceEpoch});
 }
 
 SpecialMessageType specialMessageTypeIdToType(int id) {
@@ -91,4 +104,5 @@ SpecialMessageDB toSpecialMessageDB(SpecialMessage specialMessage) =>
     SpecialMessageDB.name(
         channelRemoteId: specialMessage.channelRemoteId,
         dataJsonEncoded: json.encode(specialMessage.data),
-        specialTypeId: specialMessageTypeTypeToId(specialMessage.specialType));
+        specialTypeId: specialMessageTypeTypeToId(specialMessage.specialType),
+        dateMicrosecondsSinceEpoch: specialMessage.date.microsecondsSinceEpoch);

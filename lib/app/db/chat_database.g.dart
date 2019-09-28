@@ -84,7 +84,7 @@ class _$ChatDatabase extends ChatDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `RegularMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `command` TEXT, `hostMask` TEXT, `text` TEXT, `paramsJsonEncoded` TEXT, `regularMessageTypeId` INTEGER, `self` INTEGER, `highlight` INTEGER, `previewsJsonEncoded` TEXT, `dateMicrosecondsSinceEpoch` INTEGER, `fromRemoteId` INTEGER, `fromNick` TEXT, `fromMode` TEXT, `newNick` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `SpecialMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `dataJsonEncoded` TEXT, `specialTypeId` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `SpecialMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `dataJsonEncoded` TEXT, `specialTypeId` INTEGER, `dateMicrosecondsSinceEpoch` INTEGER)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -213,7 +213,8 @@ class _$SpecialMessageDao extends SpecialMessageDao {
                   'chatMessageTypeId': item.chatMessageTypeId,
                   'channelRemoteId': item.channelRemoteId,
                   'dataJsonEncoded': item.dataJsonEncoded,
-                  'specialTypeId': item.specialTypeId
+                  'specialTypeId': item.specialTypeId,
+                  'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch
                 },
             changeListener);
 
@@ -230,7 +231,8 @@ class _$SpecialMessageDao extends SpecialMessageDao {
           row['chatMessageTypeId'] as int,
           row['channelRemoteId'] as int,
           row['dataJsonEncoded'] as String,
-          row['specialTypeId'] as int);
+          row['specialTypeId'] as int,
+          row['dateMicrosecondsSinceEpoch'] as int);
 
   final InsertionAdapter<SpecialMessageDB> _specialMessageDBInsertionAdapter;
 

@@ -14,8 +14,12 @@ WhoIsSpecialMessageBody _$WhoIsSpecialMessageBodyFromJson(
     json['hostname'] as String,
     json['ident'] as String,
     json['idle'] as String,
-    json['idleTime'] as int,
-    json['logonTime'] as int,
+    json['idleTime'] == null
+        ? null
+        : DateTime.parse(json['idleTime'] as String),
+    json['logonTime'] == null
+        ? null
+        : DateTime.parse(json['logonTime'] as String),
     json['logon'] as String,
     json['nick'] as String,
     json['realName'] as String,
@@ -33,8 +37,8 @@ Map<String, dynamic> _$WhoIsSpecialMessageBodyToJson(
       'hostname': instance.hostname,
       'ident': instance.ident,
       'idle': instance.idle,
-      'idleTime': instance.idleTime,
-      'logonTime': instance.logonTime,
+      'idleTime': instance.idleTime?.toIso8601String(),
+      'logonTime': instance.logonTime?.toIso8601String(),
       'logon': instance.logon,
       'nick': instance.nick,
       'realName': instance.realName,

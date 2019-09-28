@@ -7,6 +7,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
+import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_app_bar_skin_bloc.dart';
@@ -19,9 +20,7 @@ import 'package:flutter_appirc/app/chat/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
-import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
-import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
@@ -36,7 +35,7 @@ class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppSkinPreferenceBloc<AppIRCSkinTheme> skinPreferenceBloc =
-        Provider.of<AppSkinPreferenceBloc<AppIRCSkinTheme>>(context);
+    Provider.of<AppSkinPreferenceBloc<AppIRCSkinTheme>>(context);
 
     return StreamBuilder<AppSkinTheme>(
         initialData: skinPreferenceBloc.currentAppSkinTheme,
@@ -45,41 +44,47 @@ class ChatPage extends StatelessWidget {
           AppIRCSkinTheme currentSkin = asyncSnapshot.data;
           return SafeArea(
             child: PlatformScaffold(
-                android: (context) => MaterialScaffoldData(
-                    appBar: AppBar(
-                      title: _buildAppBarChild(context),
-                      actions: <Widget>[
-                        _buildTrailing(context),
-                      ],
-                      backgroundColor: currentSkin.appBarColor,
-                    ),
-                    drawer: Drawer(child: ChatDrawerWidget()),
-                    body: _buildBody(context)),
-                ios: (context) => CupertinoPageScaffoldData(
-                    resizeToAvoidBottomInset: true,
-                    body: _buildBody(context),
-                    navigationBar: CupertinoNavigationBar(
-                      leading: PlatformIconButton(
-                        icon: _buildMenuIcon(context),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              platformPageRoute(
-                                  builder: (context) => ChatDrawerPage()));
-                        },
-                      ),
-                      trailing: _buildTrailing(context),
-                      middle: _buildAppBarChild(context),
-                    ))),
+                android: (context) =>
+                    MaterialScaffoldData(
+                        appBar: AppBar(
+                          title: _buildAppBarChild(context),
+                          actions: <Widget>[
+                            _buildTrailing(context),
+                          ],
+                          backgroundColor: currentSkin.appBarColor,
+                        ),
+                        drawer: Drawer(child: ChatDrawerWidget()),
+                        body: _buildBody(context)),
+                ios: (context) =>
+                    CupertinoPageScaffoldData(
+                        resizeToAvoidBottomInset: true,
+                        body: _buildBody(context),
+                        navigationBar: CupertinoNavigationBar(
+                          leading: PlatformIconButton(
+                            icon: _buildMenuIcon(context),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  platformPageRoute(
+                                      builder: (context) => ChatDrawerPage()));
+                            },
+                          ),
+                          trailing: _buildTrailing(context),
+                          middle: _buildAppBarChild(context),
+                        ))),
           );
         });
   }
 
-  Icon _buildMenuIcon(BuildContext context) => Icon(Icons.menu,
-      color: Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
+  Icon _buildMenuIcon(BuildContext context) =>
+      Icon(Icons.menu,
+          color: Provider
+              .of<ChatAppBarSkinBloc>(context)
+              .iconAppBarColor);
 
   Widget _buildTrailing(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+
     return StreamBuilder<NetworkChannel>(
       stream: activeChannelBloc.activeChannelStream,
       builder: (BuildContext context,
@@ -88,26 +93,47 @@ class ChatPage extends StatelessWidget {
         if (channel == null) {
           return SizedBox.shrink();
         } else {
+          var backendService = Provider.of<ChatInputBackendService>(context);
+          var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
+          var channelsStateBloc =
+          Provider.of<ChatNetworkChannelsStateBloc>(context);
+          var networksStateBloc = Provider.of<ChatNetworksStateBloc>(context);
 
-          if(channel.type == NetworkChannelType.CHANNEL) {
-            return PlatformIconButton(
-              icon: Icon(Icons.group,
-                  color:
-                  Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor),
-              onPressed: () {
-                var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
-                var network = networkListBloc.findNetworkWithChannel(channel);
-                Navigator.push(
-                    context,
-                    platformPageRoute(
-                        builder: (context) =>
-                            IRCNetworkChannelUsersPage(network, channel)));
-              },
+          var network = networkListBloc.findNetworkWithChannel(channel);
+
+          var networkBloc = NetworkBloc(
+              backendService, network, networksStateBloc, activeChannelBloc);
+          var channelBloc = NetworkChannelBloc(
+              backendService, network, channel, channelsStateBloc);
+
+
+          List<Widget> items = [buildChannelPopupMenuButton(
+              context,
+              networkBloc,
+              channelBloc,
+              Provider
+                  .of<ChatAppBarSkinBloc>(context)
+                  .iconAppBarColor)
+          ];
+
+          if (channel.type == NetworkChannelType.CHANNEL) {
+            items.add(PlatformIconButton(
+                icon: Icon(Icons.group,
+                    color:
+                    Provider
+                        .of<ChatAppBarSkinBloc>(context)
+                        .iconAppBarColor),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      platformPageRoute(
+                          builder: (context) =>
+                              IRCNetworkChannelUsersPage(network, channel)));
+                })
             );
-          } else {
-            return SizedBox.shrink();
           }
 
+          return Row(children: items);
         }
       },
     );
@@ -197,7 +223,7 @@ class ChatPage extends StatelessWidget {
                 var network = networkListBloc.findNetworkWithChannel(channel);
 
                 if (network == null) {
-                  return Container();
+                  return SizedBox.shrink();
                 } else {
                   return Provider(
                     providable: NetworkBloc(backendService, network,
@@ -205,7 +231,7 @@ class ChatPage extends StatelessWidget {
                     child: Provider(
                         providable: NetworkChannelBloc(backendService, network,
                             channel, channelsStateBloc),
-                        child: IRCNetworkChannelWidget()),
+                        child: NetworkChannelWidget()),
                   );
                 }
               }
@@ -222,16 +248,15 @@ class ChatPage extends StatelessWidget {
           var connectionState = snapshot.data;
           switch (connectionState) {
             case ChatConnectionState.CONNECTED:
-
-
-              var startValues  = createDefaultNetworkPreferences(context);
+              var startValues = createDefaultNetworkPreferences(context);
               return Provider(
                 providable: ChatNetworkPreferencesFormBloc(startValues),
                 child: ChatNetworkPreferencesFormWidget(startValues,
-                    (context, preferences) async {
-                  var networksBloc = Provider.of<ChatNetworksListBloc>(context);
-                  await networksBloc.joinNetwork(preferences);
-                }),
+                        (context, preferences) async {
+                      var networksBloc = Provider.of<ChatNetworksListBloc>(
+                          context);
+                      await networksBloc.joinNetwork(preferences);
+                    }),
               );
               break;
             case ChatConnectionState.CONNECTING:
@@ -246,8 +271,8 @@ class ChatPage extends StatelessWidget {
                     Text("Not connected to server"),
                     createSkinnedPlatformButton(context,
                         child: Text("Reconnect"), onPressed: () {
-                      connectionBloc.reconnect();
-                    })
+                          connectionBloc.reconnect();
+                        })
                   ],
                 ),
               );

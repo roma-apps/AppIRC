@@ -14,6 +14,8 @@ ChatNetworkServerPreferences _$ChatNetworkServerPreferencesFromJson(
     serverPort: json['serverPort'] as String,
     useTls: json['useTls'] as bool,
     useOnlyTrustedCertificates: json['useOnlyTrustedCertificates'] as bool,
+    enabled: json['enabled'] as bool,
+    visible: json['visible'] as bool,
   );
 }
 
@@ -25,6 +27,8 @@ Map<String, dynamic> _$ChatNetworkServerPreferencesToJson(
       'serverPort': instance.serverPort,
       'useTls': instance.useTls,
       'useOnlyTrustedCertificates': instance.useOnlyTrustedCertificates,
+      'visible': instance.visible,
+      'enabled': instance.enabled,
     };
 
 ChatNetworkUserPreferences _$ChatNetworkUserPreferencesFromJson(

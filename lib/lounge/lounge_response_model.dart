@@ -382,7 +382,7 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String real_name;
   final bool secure;
   final String server;
-  final String serverInfo;
+  final String server_info;
 
   @override
   String toString() {
@@ -391,7 +391,7 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
         'ident: $ident, idle: $idle, idleTime: $idleTime, '
         'logonTime: $logonTime, logon: $logon, nick: $nick, '
         'realName: $real_name, secure: $secure, '
-        'server: $server, serverInfo: $serverInfo}';
+        'server: $server, serverInfo: $server_info}';
   }
 
   WhoIsLoungeResponseBodyPart(
@@ -408,7 +408,7 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
       @required this.real_name,
       @required this.secure,
       @required this.server,
-      @required this.serverInfo});
+      @required this.server_info});
 
   factory WhoIsLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$WhoIsLoungeResponseBodyPartFromJson(json);

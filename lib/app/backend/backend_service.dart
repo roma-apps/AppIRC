@@ -95,6 +95,10 @@ abstract class ChatInputBackendService implements ChatBackendService {
       Network network, ChatNetworkChannelPreferences preferences,
       {bool waitForResult: false});
 
+  Future<RequestResult<NetworkChannelWithState>> openDirectMessagesChannel(
+      Network network, NetworkChannel channel, String nick,
+      {bool waitForResult: false});
+
   Future<RequestResult<bool>> leaveNetworkChannel(
       Network network, NetworkChannel channel,
       {bool waitForResult: false});

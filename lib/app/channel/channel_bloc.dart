@@ -15,9 +15,12 @@ class NetworkChannelBloc extends Providable {
   final ChatNetworkChannelsStateBloc channelsStatesBloc;
 
   // ignore: close_sinks
-  final BehaviorSubject<List<ChannelUserInfo>> _usersController = BehaviorSubject(seedValue:[]);
-   Stream<List<ChannelUserInfo>> get usersStream => _usersController.stream;
-   List<ChannelUserInfo> get users => _usersController.value;
+  final BehaviorSubject<List<ChannelUserInfo>> _usersController =
+      BehaviorSubject(seedValue: []);
+
+  Stream<List<ChannelUserInfo>> get usersStream => _usersController.stream;
+
+  List<ChannelUserInfo> get users => _usersController.value;
 
   NetworkChannelState get networkChannelState =>
       channelsStatesBloc.getNetworkChannelState(network, channel);
@@ -25,10 +28,12 @@ class NetworkChannelBloc extends Providable {
   Stream<NetworkChannelState> get networkChannelStateStream =>
       channelsStatesBloc.getNetworkChannelStateStream(network, channel);
 
-  NetworkChannelBloc(
-      this.backendService, this.network, this.channel, this.channelsStatesBloc) {
+  NetworkChannelBloc(this.backendService, this.network, this.channel,
+      this.channelsStatesBloc) {
     addDisposable(subject: _usersController);
-    addDisposable(disposable: backendService.listenForNetworkChannelUsers(network, channel, (newUsers) {
+    addDisposable(
+        disposable: backendService
+            .listenForNetworkChannelUsers(network, channel, (newUsers) {
       _usersController.add(newUsers);
     }));
   }
@@ -67,4 +72,8 @@ class NetworkChannelBloc extends Providable {
       await backendService.sendNetworkChannelRawMessage(
           network, channel, rawMessage,
           waitForResult: waitForResult);
+
+  Future<RequestResult<NetworkChannelWithState>> openDirectMessagesChannel(
+          String nick) async =>
+      await backendService.openDirectMessagesChannel(network, channel, nick);
 }

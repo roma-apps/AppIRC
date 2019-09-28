@@ -21,7 +21,6 @@ class RegularMessage extends ChatMessage {
 
   final dynamic previews;
 
-  final DateTime date;
 
   final int fromRemoteId;
 
@@ -41,12 +40,12 @@ class RegularMessage extends ChatMessage {
       this.self,
       this.highlight,
       this.previews,
-      this.date,
+      DateTime date,
       this.newNick,
       this.fromRemoteId,
       this.fromNick,
       this.fromMode)
-      : super(ChatMessageType.REGULAR, channelRemoteId);
+      : super(ChatMessageType.REGULAR, channelRemoteId, date);
 
   RegularMessage.name(
  int channelRemoteId,
@@ -58,21 +57,16 @@ class RegularMessage extends ChatMessage {
       @required this.self,
       @required this.highlight,
       @required this.previews,
-      @required this.date,
+      @required DateTime date,
       @required this.fromRemoteId,
       @required this.fromNick,
       @required this.newNick,
       @required this.fromMode})
-      : super(ChatMessageType.REGULAR, channelRemoteId);
+      : super(ChatMessageType.REGULAR, channelRemoteId, date);
 
   bool get isHaveFromNick => fromNick != null;
 
-  bool get isMessageDateToday {
-    var now = DateTime.now();
-    var todayStart = now.subtract(
-        Duration(hours: now.hour, minutes: now.minute, seconds: now.second));
-    return todayStart.isBefore(date);
-  }
+
 
   @override
   String toString() {

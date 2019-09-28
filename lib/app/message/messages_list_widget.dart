@@ -63,7 +63,7 @@ class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
                         return buildSpecialMessageWidget(context,specialMessage);
                         break;
                       case ChatMessageType.REGULAR:
-                        return IRCNetworkChannelMessageWidget(message);
+                        return NetworkChannelMessageWidget(message);
                         break;
                     }
 

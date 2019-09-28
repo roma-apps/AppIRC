@@ -335,7 +335,7 @@ WhoIsLoungeResponseBodyPart _$WhoIsLoungeResponseBodyPartFromJson(
     real_name: json['real_name'] as String,
     secure: json['secure'] as bool,
     server: json['server'] as String,
-    serverInfo: json['serverInfo'] as String,
+    server_info: json['server_info'] as String,
   );
 }
 
@@ -354,7 +354,7 @@ Map<String, dynamic> _$WhoIsLoungeResponseBodyPartToJson(
       'real_name': instance.real_name,
       'secure': instance.secure,
       'server': instance.server,
-      'serverInfo': instance.serverInfo,
+      'server_info': instance.server_info,
     };
 
 MsgFromLoungeResponseBodyPart _$MsgFromLoungeResponseBodyPartFromJson(

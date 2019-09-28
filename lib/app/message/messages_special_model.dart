@@ -1,4 +1,3 @@
-import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -11,12 +10,15 @@ class SpecialMessage extends ChatMessage {
   final SpecialMessageType specialType;
 
   SpecialMessage(int channelLocalId, int channelRemoteId, this.specialType,
-      this.data)
-      : super(ChatMessageType.SPECIAL, channelRemoteId);
+      this.data, DateTime date)
+      : super(ChatMessageType.SPECIAL, channelRemoteId, date);
 
   SpecialMessage.name(
-      {@required  int channelRemoteId, @required this.data, @required this.specialType})
-      : super(ChatMessageType.SPECIAL, channelRemoteId);
+      {@required int channelRemoteId,
+      @required this.data,
+      @required this.specialType,
+      @required DateTime date})
+      : super(ChatMessageType.SPECIAL, channelRemoteId, date);
 }
 
 enum SpecialMessageType { WHO_IS, CHANNELS_LIST_ITEM, TEXT }
@@ -32,8 +34,8 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
   final String hostname;
   final String ident;
   final String idle;
-  final int idleTime;
-  final int logonTime;
+  final DateTime idleTime;
+  final DateTime logonTime;
   final String logon;
   final String nick;
   final String realName;
@@ -43,7 +45,7 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
 
   @override
   String toString() {
-    return 'IRCNetworkChannelMessageWhoIS{account: $account, '
+    return 'WhoIsSpecialMessageBody{account: $account, '
         'channels: $channels, hostname: $hostname, '
         'ident: $ident, idle: $idle, idleTime: $idleTime, '
         'logonTime: $logonTime, logon: $logon, nick: $nick, '

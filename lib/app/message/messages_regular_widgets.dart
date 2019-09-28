@@ -1,49 +1,34 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 var todayDateFormatter = new DateFormat().add_Hm();
-var oldDateFormatter = new DateFormat().add_yMd().add_Hm();
+var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
 
-class IRCNetworkChannelMessageWidget extends StatelessWidget {
+class NetworkChannelMessageWidget extends StatelessWidget {
   final RegularMessage message;
 
-  IRCNetworkChannelMessageWidget(this.message);
+  NetworkChannelMessageWidget(this.message);
 
   @override
   Widget build(BuildContext context) {
-    var decoration;
+    var needHighlight = isNeedHighlight(message);
 
-    if (isNeedHighlight(message)) {
-      decoration = BoxDecoration(border: Border.all(color: Colors.redAccent));
-    }
+    var channelBloc = Provider.of<NetworkChannelBloc>(context);
 
-    return Container(
-      decoration: decoration,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: _buildMessageTitle(context),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-              child: _buildMessageBody(context),
-            ),
-          ],
-        ),
-      ),
-    );
+    var body = _buildMessageBody(context);
+    var title = _buildMessageTitle(context, channelBloc);
+    return buildRegularMessage(title, body, needHighlight);
   }
 
   Widget _buildMessageBody(BuildContext context) {
@@ -101,7 +86,8 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageTitle(BuildContext context) {
+  Widget _buildMessageTitle(
+      BuildContext context, NetworkChannelBloc channelBloc) {
     var icon = _buildTitleIcon(context, message);
 
     var startPart;
@@ -109,7 +95,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     var subMessage = _buildTitleSubMessage(context);
 
     if (message.isHaveFromNick) {
-      var messageTitleNick = _buildMessageTitleNick(context);
+      var messageTitleNick = _buildMessageTitleNick(context, channelBloc);
       if (subMessage != null) {
         startPart = Row(children: <Widget>[
           messageTitleNick,
@@ -128,76 +114,41 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
     }
 
     var endPart;
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+    var color =
+        messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
     if (icon != null) {
       endPart = Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          _buildMessageTitleDate(context),
+          buildMessageTitleDate(context, message, color),
           icon,
         ],
       );
     } else {
-      endPart = _buildMessageTitleDate(context);
+      endPart = buildMessageTitleDate(context, message, color);
     }
 
-    if (startPart != null && endPart != null) {
-      return Row(
-          children: <Widget>[startPart, endPart],
-          mainAxisAlignment: MainAxisAlignment.spaceBetween);
-    } else {
-      if (startPart != null) {
-        return Align(child: startPart, alignment: Alignment.centerLeft);
-      } else if (endPart != null) {
-        return Align(child: endPart, alignment: Alignment.centerRight);
-      } else {
-        return Container();
-      }
-    }
+    return buildMessageTitle(startPart, endPart);
   }
 
-  Padding _buildMessageTitleDate(BuildContext context) {
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-
-    var dateString;
-
-    var date = message.date;
-    var messageType = message.regularMessageType;
-
-    if (message.isMessageDateToday) {
-      dateString = todayDateFormatter.format(date);
-    } else {
-      dateString = oldDateFormatter.format(date);
-    }
-    var color = messagesSkin.findTitleColorDataForMessage(messageType);
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Text(
-        dateString,
-        style: messagesSkin.createDateTextStyle(color),
-      ),
-    );
-  }
-
-  Text _buildMessageTitleNick(BuildContext context) {
-    var nickNamesBloc = Provider.of<MessagesColoredNicknamesBloc>(context);
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+  Widget _buildMessageTitleNick(
+      BuildContext context, NetworkChannelBloc channelBloc) {
     var nick = message.fromNick;
-    return Text(
-      nick,
-      style:
-          messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
-    );
+    return buildMessagesTitleNick(context, nick, channelBloc);
   }
 
   _buildTitleIcon(BuildContext context, RegularMessage message) {
     var iconData = _findTitleIconDataForMessage(message);
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+
     var color =
         messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
-    return Icon(iconData, color: color);
+    return buildMessageIcon(iconData, color);
   }
+
 
   Widget _buildTitleSubMessage(BuildContext context) {
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
@@ -282,7 +233,7 @@ class IRCNetworkChannelMessageWidget extends StatelessWidget {
 
 isNeedHighlight(RegularMessage message) =>
     message.regularMessageType ==
-        RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
+    RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
 
 bool isHaveLongText(RegularMessage message) =>
     message.text != null ? message.text.length > 10 : false;
@@ -347,4 +298,112 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
       break;
   }
   return icon;
+}
+
+enum MessageNickMenuAction { WHO_IS, DIRECT_MESSAGES }
+
+Widget buildRegularMessage(Widget title, Widget body, bool needHighlight) {
+  var decoration;
+  if (needHighlight) {
+    decoration = BoxDecoration(border: Border.all(color: Colors.redAccent));
+  }
+
+  return Container(
+    decoration: decoration,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: title,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2.0),
+            child: body,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget buildMessageTitle(startPart, endPart) {
+  if (startPart != null && endPart != null) {
+    return Row(
+        children: <Widget>[startPart, endPart],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween);
+  } else {
+    if (startPart != null) {
+      return Align(child: startPart, alignment: Alignment.centerLeft);
+    } else if (endPart != null) {
+      return Align(child: endPart, alignment: Alignment.centerRight);
+    } else {
+      return Container();
+    }
+  }
+}
+
+Widget buildMessageTitleDate(
+    BuildContext context, ChatMessage message, Color color) {
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+
+  var dateString;
+
+  var date = message.date;
+
+  if (message.isMessageDateToday) {
+    dateString = todayDateFormatter.format(date);
+  } else {
+    dateString = regularDateFormatter.format(date);
+  }
+
+  return Padding(
+    padding: const EdgeInsets.all(4.0),
+    child: Text(
+      dateString,
+      style: messagesSkin.createDateTextStyle(color),
+    ),
+  );
+}
+
+PopupMenuButton<MessageNickMenuAction> buildMessagesTitleNick(
+    BuildContext context, String nick, NetworkChannelBloc channelBloc) {
+  var nickNamesBloc = Provider.of<MessagesColoredNicknamesBloc>(context);
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+
+  return PopupMenuButton<MessageNickMenuAction>(
+      child: Text(
+        nick,
+        style: messagesSkin
+            .createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+      ),
+      onSelected: (MessageNickMenuAction selectedAction) {
+        switch (selectedAction) {
+          case MessageNickMenuAction.WHO_IS:
+            channelBloc.printUserInfo(nick);
+            break;
+          case MessageNickMenuAction.DIRECT_MESSAGES:
+            channelBloc.openDirectMessagesChannel(nick);
+            break;
+        }
+      },
+      itemBuilder: (context) {
+        return [
+          buildDropdownMenuItemRow(
+              text: "User information",
+              iconData: Icons.account_box,
+              value: MessageNickMenuAction.WHO_IS),
+          buildDropdownMenuItemRow(
+              text: "Direct Messages",
+              iconData: Icons.message,
+              value: MessageNickMenuAction.DIRECT_MESSAGES)
+        ];
+      });
+}
+
+
+Icon buildMessageIcon(IconData iconData, Color color) {
+  return Icon(iconData, color: color);
 }

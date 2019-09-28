@@ -35,33 +35,36 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
       this.backendService, this.db, this.network, this.networkChannel) {
     addDisposable(subject: _messagesController);
 
-    // socket listener
-    addDisposable(
-        disposable: backendService.listenForMessages(network, networkChannel,
-            (newMessage) {
-      _currentMessages.add(newMessage);
-      if (newMessage.chatMessageType == ChatMessageType.SPECIAL) {
-        _onSpecialMessagesChanged();
-      }
-      _onMessagesChanged();
-    }));
 
-    // history
-    db.regularMessagesDao
-        .getChannelMessages(networkChannel.remoteId)
-        .then((messagesDB) {
-      var messages = messagesDB.map(_regularMessageDBToChatMessage);
-      _currentMessages.addAll(messages);
+    Timer.run( () async {
+
+      // history
+      var regularMessages = (await db.regularMessagesDao
+          .getChannelMessages(networkChannel.remoteId)).map(_regularMessageDBToChatMessage);
+      var specialMessages = (await db.specialMessagesDao
+          .getChannelMessages(networkChannel.remoteId)).map(_specialMessageDBToChatMessage);
+
+
+      _currentMessages.addAll(regularMessages);
+      _currentMessages.addAll(specialMessages);
+      _currentMessages.sort((a, b) {
+        return a.date.compareTo(b.date);
+      });
       _onMessagesChanged();
+      // socket listener
+      addDisposable(
+          disposable: backendService.listenForMessages(network, networkChannel,
+                  (newMessage) {
+                _currentMessages.add(newMessage);
+                if (newMessage.chatMessageType == ChatMessageType.SPECIAL) {
+                  _onSpecialMessagesChanged();
+                }
+                _onMessagesChanged();
+              }));
+
     });
-    db.specialMessagesDao
-        .getChannelMessages(networkChannel.remoteId)
-        .then((messagesDB) {
-      var messages = messagesDB.map(_specialMessageDBToChatMessage);
-      _currentMessages.addAll(messages);
-      _onSpecialMessagesChanged();
-      _onMessagesChanged();
-    });
+
+
   }
 
   void _onMessagesChanged() {
@@ -124,7 +127,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
     return SpecialMessage.name(
         channelRemoteId: messageDB.channelRemoteId,
         data: body,
-        specialType: type);
+        specialType: type, date: DateTime.fromMicrosecondsSinceEpoch(messageDB.dateMicrosecondsSinceEpoch));
   }
 
   void _onSpecialMessagesChanged() {
