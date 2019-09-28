@@ -49,7 +49,7 @@ class ChatPage extends StatelessWidget {
                     appBar: AppBar(
                       title: _buildAppBarChild(context),
                       actions: <Widget>[
-                        buildMembersButton(context),
+                        _buildTrailing(context),
                       ],
                       backgroundColor: currentSkin.appBarColor,
                     ),
@@ -68,7 +68,7 @@ class ChatPage extends StatelessWidget {
                                   builder: (context) => ChatDrawerPage()));
                         },
                       ),
-                      trailing: buildMembersButton(context),
+                      trailing: _buildTrailing(context),
                       middle: _buildAppBarChild(context),
                     ))),
           );
@@ -78,7 +78,7 @@ class ChatPage extends StatelessWidget {
   Icon _buildMenuIcon(BuildContext context) => Icon(Icons.menu,
       color: Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
 
-  Widget buildMembersButton(BuildContext context) {
+  Widget _buildTrailing(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     return StreamBuilder<NetworkChannel>(
       stream: activeChannelBloc.activeChannelStream,
@@ -86,22 +86,28 @@ class ChatPage extends StatelessWidget {
           AsyncSnapshot<NetworkChannel> activeChannelSnapshot) {
         var channel = activeChannelSnapshot.data;
         if (channel == null) {
-          return Container();
+          return SizedBox.shrink();
         } else {
-          return PlatformIconButton(
-            icon: Icon(Icons.group,
-                color:
-                    Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor),
-            onPressed: () {
-              var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
-              var network = networkListBloc.findNetworkWithChannel(channel);
-              Navigator.push(
-                  context,
-                  platformPageRoute(
-                      builder: (context) =>
-                          IRCNetworkChannelUsersPage(network, channel)));
-            },
-          );
+
+          if(channel.type == NetworkChannelType.CHANNEL) {
+            return PlatformIconButton(
+              icon: Icon(Icons.group,
+                  color:
+                  Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor),
+              onPressed: () {
+                var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
+                var network = networkListBloc.findNetworkWithChannel(channel);
+                Navigator.push(
+                    context,
+                    platformPageRoute(
+                        builder: (context) =>
+                            IRCNetworkChannelUsersPage(network, channel)));
+              },
+            );
+          } else {
+            return SizedBox.shrink();
+          }
+
         }
       },
     );
