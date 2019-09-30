@@ -7,15 +7,20 @@ var _logger = MyLogger(logTag: "doAsyncOperationWithDialog", enabled: true);
 Future<T> doAsyncOperationWithDialog<T>(BuildContext context,
     Future<T> asyncCode()) async {
 //For normal dialog
-  var pr = new ProgressDialog(context,
-      type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+  var pr = ProgressDialog(context,
+      type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
 
   pr.show();
   var result;
   try {
     result = await asyncCode();
   } finally {
-    await pr.hide();
+    // bug in progress library. Sometimes dialog not dismissed without additional wait
+    await Future.delayed(Duration(milliseconds: 100));
+    var hide = await pr.hide();
+    _logger.d(() => "progress dialog hide = $hide");
+
+
 
   }
 
