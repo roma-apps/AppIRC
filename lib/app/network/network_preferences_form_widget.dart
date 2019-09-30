@@ -63,7 +63,7 @@ class ChatNetworkPreferencesFormWidgetState
                     : SizedBox.shrink(),
                 Provider(
                     providable: formBloc.userFormBloc,
-                    child: IRCNetworkUserPreferencesFormWidget(startValues
+                    child: NetworkUserPreferencesFormWidget(startValues
                         .networkConnectionPreferences.userPreferences)),
                 buildFormTextRow(
                     context,

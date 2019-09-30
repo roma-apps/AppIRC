@@ -24,8 +24,8 @@ import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class IRCNetworksListWidget extends StatelessWidget {
-  IRCNetworksListWidget();
+class NetworksListWidget extends StatelessWidget {
+  NetworksListWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class IRCNetworksListWidget extends StatelessWidget {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var networksStatesBloc = Provider.of<ChatNetworksStateBloc>(context);
     var channel = network.lobbyChannel;
-    var expandBloc = IRCChatNetworkExpandStateBloc(preferencesService, network);
+    var expandBloc = ChatNetworkExpandStateBloc(preferencesService, network);
     var networkStateBloc =
     NetworkBloc(backendService, network, networksStatesBloc, activeChannelBloc);
 
@@ -112,7 +112,7 @@ class IRCNetworksListWidget extends StatelessWidget {
       NetworkChannel channel,
       bool isChannelActive,
       bool expanded,
-      IRCChatNetworkExpandStateBloc expandBloc) {
+      ChatNetworkExpandStateBloc expandBloc) {
     var networkExpandedStateIcon;
 
     if (expanded == true) {

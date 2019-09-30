@@ -35,13 +35,15 @@ abstract class ChatOutputBackendService implements ChatBackendService {
       NetworkState Function() currentStateExtractor,
       NetworkStateListener listener);
 
-  Disposable listenForNetworkEnter(NetworkListener listener);
+  Disposable listenForNetworkJoin(NetworkListener listener);
 
-  Disposable listenForNetworkExit(Network network, VoidCallback listener);
+  Disposable listenForNetworkLeave(Network network, VoidCallback listener);
 
   Disposable listenForNetworkChannelJoin(
       Network network, NetworkChannelListener listener);
 
+  Disposable listenForNetworkChannelLeave(
+      Network network, NetworkChannel channel, VoidCallback listener);
 
   Disposable listenForNetworkChannelState(
       Network network,
@@ -49,8 +51,7 @@ abstract class ChatOutputBackendService implements ChatBackendService {
       NetworkChannelState Function() currentStateExtractor,
       NetworkChannelStateListener listener);
 
-  Disposable listenForNetworkChannelLeave(
-      Network network, NetworkChannel channel, VoidCallback listener);
+
 
   Disposable listenForNetworkChannelUsers(Network network,
       NetworkChannel channel, Function(List<ChannelUserInfo>) listener);

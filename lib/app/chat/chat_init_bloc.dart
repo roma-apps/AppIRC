@@ -16,20 +16,22 @@ class ChatInitBloc extends Providable {
   final ChatConnectionBloc _connectionBloc;
   final ChatPreferences _startPreferences;
 
-  bool get isInitNotStarted=> state == ChatInitState.NOT_STARTED;
+  bool get isInitNotStarted => state == ChatInitState.NOT_STARTED;
+
   bool get isInitInProgress => state == ChatInitState.IN_PROGRESS;
+
   bool get isInitFinished => state == ChatInitState.FINISHED;
 
-
   // ignore: close_sinks
-  BehaviorSubject<ChatInitState> _stateController = BehaviorSubject(
-      seedValue: ChatInitState.NOT_STARTED);
+  BehaviorSubject<ChatInitState> _stateController =
+      BehaviorSubject(seedValue: ChatInitState.NOT_STARTED);
+
   Stream<ChatInitState> get stateStream => _stateController.stream;
+
   ChatInitState get state => _stateController.value;
 
-
-  ChatInitBloc(this._backendService, this._connectionBloc,
-      this._startPreferences) {
+  ChatInitBloc(
+      this._backendService, this._connectionBloc, this._startPreferences) {
     _logger.d(() => "init $_startPreferences");
     addDisposable(subject: _stateController);
 
@@ -40,14 +42,13 @@ class ChatInitBloc extends Providable {
       StreamSubscription<ChatConnectionState> subscription;
       subscription =
           _connectionBloc.connectionStateStream.listen((connectionState) {
-            _logger.d(() =>
-            "send ${_connectionBloc
-                .isConnected} connectionState $connectionState");
-            if (_connectionBloc.isConnected) {
-              _sendStartRequests();
-              subscription.cancel();
-            }
-          });
+        _logger.d(() =>
+            "send ${_connectionBloc.isConnected} connectionState $connectionState");
+        if (_connectionBloc.isConnected) {
+          _sendStartRequests();
+          subscription.cancel();
+        }
+      });
 
       addDisposable(streamSubscription: subscription);
     }
@@ -55,15 +56,13 @@ class ChatInitBloc extends Providable {
 
   void _sendStartRequests() {
     _logger.d(() => "_sendStartRequests $state");
-    if (!isInitNotStarted) {
+    if (isInitNotStarted) {
+      _logger.d(() => "_sendStartRequests $state");
       _stateController.add(ChatInitState.IN_PROGRESS);
       _startPreferences.networks.forEach((network) async {
-        await _backendService.joinNetwork(network);
+        await _backendService.joinNetwork(network, waitForResult: true);
       });
-
-      Future.delayed(Duration(milliseconds: 1000), () {
-        _stateController.add(ChatInitState.FINISHED);
-      });
+      _stateController.add(ChatInitState.FINISHED);
 
     }
   }

@@ -17,7 +17,7 @@ class ChatDrawerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Expanded(child: IRCNetworksListWidget()),
+        Expanded(child: NetworksListWidget()),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

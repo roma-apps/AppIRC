@@ -262,7 +262,7 @@ class LoungeBackendService extends Providable
 
     var result;
     Disposable networkListener;
-    networkListener = listenForNetworkEnter((networkWithState) async {
+    networkListener = listenForNetworkJoin((networkWithState) async {
       var networkFromResult = networkWithState.network;
 
       if (networkFromResult.name == serverPreferences.name) {
@@ -567,7 +567,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Disposable listenForNetworkEnter(NetworkListener listener) {
+  Disposable listenForNetworkJoin(NetworkListener listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable(LoungeResponseEventNames.network, (raw) {
@@ -642,7 +642,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Disposable listenForNetworkExit(Network network, VoidCallback listener) {
+  Disposable listenForNetworkLeave(Network network, VoidCallback listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable((LoungeResponseEventNames.part), (raw) {

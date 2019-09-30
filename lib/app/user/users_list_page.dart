@@ -9,24 +9,24 @@ import 'package:flutter_appirc/app/user/users_list_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class IRCNetworkChannelUsersPage extends StatefulWidget {
+class NetworkChannelUsersPage extends StatefulWidget {
   final Network network;
   final NetworkChannel channel;
 
-  IRCNetworkChannelUsersPage(this.network, this.channel);
+  NetworkChannelUsersPage(this.network, this.channel);
 
   @override
   State<StatefulWidget> createState() {
-    return IRCNetworkChannelUsersPageState(network, channel);
+    return NetworkChannelUsersPageState(network, channel);
   }
 }
 
-class IRCNetworkChannelUsersPageState
-    extends State<IRCNetworkChannelUsersPage> {
+class NetworkChannelUsersPageState
+    extends State<NetworkChannelUsersPage> {
   final Network network;
   final NetworkChannel channel;
 
-  IRCNetworkChannelUsersPageState(this.network, this.channel);
+  NetworkChannelUsersPageState(this.network, this.channel);
 
   @override
   Widget build(BuildContext context) {

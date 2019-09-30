@@ -45,7 +45,7 @@ PopupMenuButton buildChannelPopupMenuButton(
         case ChannelDropDownAction.TOPIC:
           showPlatformDialog(
               context: context,
-              builder: (_) => IRCNetworkChannelTopicEditWidget(channel),
+              builder: (_) => NetworkChannelTopicEditWidget(channel),
               androidBarrierDismissible: true);
           break;
         case ChannelDropDownAction.LIST_BANNED:

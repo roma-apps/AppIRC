@@ -12,7 +12,7 @@ import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class IRCNetworkChannelMessagesListWidget extends StatelessWidget {
+class NetworkChannelMessagesListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var backendService = Provider.of<ChatOutputBackendService>(context);

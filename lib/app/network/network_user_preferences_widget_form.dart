@@ -6,18 +6,18 @@ import 'package:flutter_appirc/app/network/network_user_preferences_form_bloc.da
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class IRCNetworkUserPreferencesFormWidget extends StatefulWidget {
+class NetworkUserPreferencesFormWidget extends StatefulWidget {
   final ChatNetworkUserPreferences startValues;
 
-  IRCNetworkUserPreferencesFormWidget(this.startValues);
+  NetworkUserPreferencesFormWidget(this.startValues);
 
   @override
   State<StatefulWidget> createState() =>
-      IRCNetworkUserPreferencesFormState(startValues);
+      NetworkUserPreferencesFormState(startValues);
 }
 
-class IRCNetworkUserPreferencesFormState
-    extends State<IRCNetworkUserPreferencesFormWidget> {
+class NetworkUserPreferencesFormState
+    extends State<NetworkUserPreferencesFormWidget> {
   final ChatNetworkUserPreferences startValues;
 
   TextEditingController _nickController;
@@ -25,7 +25,7 @@ class IRCNetworkUserPreferencesFormState
   TextEditingController _realNameController;
   TextEditingController _passwordController;
 
-  IRCNetworkUserPreferencesFormState(this.startValues) {
+  NetworkUserPreferencesFormState(this.startValues) {
     _nickController = TextEditingController(text: startValues.nickname);
     _userNameController = TextEditingController(text: startValues.username);
     _realNameController = TextEditingController(text: startValues.realName);
@@ -43,7 +43,7 @@ class IRCNetworkUserPreferencesFormState
 
   @override
   Widget build(BuildContext context) {
-    var formBloc = Provider.of<IRCNetworkUserPreferencesFormBloc>(context);
+    var formBloc = Provider.of<NetworkUserPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       children: <Widget>[

@@ -5,19 +5,19 @@ import 'package:flutter_appirc/app/network/network_join_channel_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class IRCNetworkChannelJoinFormWidget extends StatefulWidget {
+class NetworkChannelJoinFormWidget extends StatefulWidget {
   final String startChannelName;
   final String startPassword;
 
 
-  IRCNetworkChannelJoinFormWidget(this.startChannelName, this.startPassword);
+  NetworkChannelJoinFormWidget(this.startChannelName, this.startPassword);
 
   @override
-  State<StatefulWidget> createState() => IRCNetworkChannelJoinFormWidgetState(startChannelName, startPassword);
+  State<StatefulWidget> createState() => NetworkChannelJoinFormWidgetState(startChannelName, startPassword);
 }
 
-class IRCNetworkChannelJoinFormWidgetState
-    extends State<IRCNetworkChannelJoinFormWidget> {
+class NetworkChannelJoinFormWidgetState
+    extends State<NetworkChannelJoinFormWidget> {
   final String startChannelName;
   final String startPassword;
 
@@ -25,7 +25,7 @@ class IRCNetworkChannelJoinFormWidgetState
   TextEditingController _passwordController;
 
 
-  IRCNetworkChannelJoinFormWidgetState(this.startChannelName,
+  NetworkChannelJoinFormWidgetState(this.startChannelName,
       this.startPassword) {
     _channelController =
         TextEditingController(text: startChannelName);

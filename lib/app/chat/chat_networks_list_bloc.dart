@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -15,7 +14,7 @@ import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "ChatBloc", enabled: true);
 
-typedef LocalIdGenerator = Future<int> Function();
+typedef LocalIdGenerator = int Function();
 
 class ChatNetworksListBloc extends Providable {
   final LocalIdGenerator nextChannelIdGenerator;
@@ -32,47 +31,50 @@ class ChatNetworksListBloc extends Providable {
       {@required this.nextNetworkIdGenerator,
       @required this.nextChannelIdGenerator}) {
     addDisposable(subject: _networksController);
-    addDisposable(subject: _lastJoinedNetworkController);
-    addDisposable(subject: _lastExitedNetworkController);
 
 
-    addDisposable(
-        disposable: backendService.listenForNetworkEnter((networkWithState) async {
+    addDisposable(disposable:
+        backendService.listenForNetworkJoin((networkWithState) async {
+      var network = networkWithState.network;
 
-          var network = networkWithState.network;
+      if (network.localId == null) {
+        network.localId = await _nextNetworkLocalId;
+      }
+      for (var channel in network.channels) {
+        if (channel.localId == null) {
+          channel.localId = await _nextNetworkChannelLocalId;
+        }
+      }
 
-          if (network.localId == null) {
-            network.localId = await _nextNetworkLocalId;
-          }
-          for (var channel in network.channels) {
-            if (channel.localId == null) {
-              channel.localId = await _nextNetworkChannelLocalId;
-            }
-          }
+      _networksChannelListBlocs[network] = ChatNetworkChannelsListBloc(
+          backendService,
+          network,
+          networkWithState.channelsWithState,
+          nextChannelIdGenerator);
 
-          _networksChannelListBlocs[network] = ChatNetworkChannelsListBloc(
-              backendService, network, nextChannelIdGenerator);
+      var networks = _currentNetworks;
 
-          var networks = _currentNetworks;
+      Disposable listenForNetworkExit;
+      listenForNetworkExit = backendService.listenForNetworkLeave(network, () {
+        var networks = _currentNetworks;
 
-          Disposable listenForNetworkExit;
-          listenForNetworkExit = backendService.listenForNetworkExit(network, () {
-            var networks = _currentNetworks;
+        _networksChannelListBlocs.remove(network).dispose();
 
-            _networksChannelListBlocs.remove(network).dispose();
+        networks.remove(network);
 
-            networks.remove(network);
-            _lastExitedNetworkController.add(network);
-            _onNetworksChanged(networks);
-            listenForNetworkExit.dispose();
-          });
-          addDisposable(disposable: listenForNetworkExit);
+        leaveListeners[network].forEach((listener) => listener());
 
-          networks.add(network);
-          _lastJoinedNetworkController.add(networkWithState);
-          _onNetworksChanged(networks);
-        }));
+        _onNetworksChanged(networks);
+        listenForNetworkExit.dispose();
+      });
+      addDisposable(disposable: listenForNetworkExit);
 
+      networks.add(network);
+
+      joinListeners.forEach((listener) => listener(networkWithState));
+
+      _onNetworksChanged(networks);
+    }));
   }
 
   void _onNetworksChanged(List<Network> networks) {
@@ -86,24 +88,35 @@ class ChatNetworksListBloc extends Providable {
     return found != null;
   }
 
-  Future<int> get _nextNetworkLocalId async => await nextNetworkIdGenerator();
+  Future<int> get _nextNetworkLocalId async => nextNetworkIdGenerator();
 
-  Future<int> get _nextNetworkChannelLocalId async =>
-      await nextChannelIdGenerator();
+  Future<int> get _nextNetworkChannelLocalId async => nextChannelIdGenerator();
 
   var _networksController = BehaviorSubject<List<Network>>(seedValue: []);
 
-  // ignore: close_sinks
-  var _lastJoinedNetworkController = BehaviorSubject<NetworkWithState>();
+  final List<NetworkListener> joinListeners = [];
+  final Map<Network, List<VoidCallback>> leaveListeners = Map();
 
-  Stream<NetworkWithState> get lastJoinedNetworkStream =>
-      _lastJoinedNetworkController.stream;
+  Disposable listenForNetworkJoin(NetworkListener listener) {
 
-  // ignore: close_sinks
-  var _lastExitedNetworkController = BehaviorSubject<Network>();
+    joinListeners.add(listener);
+    return CustomDisposable(() {
+      joinListeners.remove(listener);
+    });
+  }
 
-  Stream<Network> get _lastExitedNetworkStream =>
-      _lastExitedNetworkController.stream;
+  Disposable listenForNetworkLeave(Network network, VoidCallback listener) {
+
+
+    if(!leaveListeners.containsKey(network)) {
+      leaveListeners[network] = [];
+    }
+    leaveListeners[network].add(listener);
+    return CustomDisposable(() {
+      leaveListeners[network].remove(listener);
+    });
+  }
+
 
   Stream<UnmodifiableListView<Network>> get networksStream =>
       _networksController.stream
@@ -141,7 +154,8 @@ class ChatNetworksListBloc extends Providable {
     return allChannels;
   }
 
-  Future<RequestResult<NetworkWithState>> joinNetwork(ChatNetworkPreferences preferences,
+  Future<RequestResult<NetworkWithState>> joinNetwork(
+          ChatNetworkPreferences preferences,
           {bool waitForResult: false}) async =>
       await backendService.joinNetwork(preferences,
           waitForResult: waitForResult);
@@ -152,6 +166,4 @@ class ChatNetworksListBloc extends Providable {
 
   Network findNetworkWithChannel(NetworkChannel channel) =>
       networks.firstWhere((network) => network.channels.contains(channel));
-
-
 }

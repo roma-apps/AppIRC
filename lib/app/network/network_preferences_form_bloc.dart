@@ -7,7 +7,7 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
   static const channelsNamesSeparator = " ";
   Validator<String> networkValidator;
   ChatNetworkServerPreferencesFormBloc serverFormBloc;
-  IRCNetworkUserPreferencesFormBloc userFormBloc;
+  NetworkUserPreferencesFormBloc userFormBloc;
 
   FormValueFieldBloc<String> channelsFieldBloc;
 
@@ -17,7 +17,7 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
     serverFormBloc = ChatNetworkServerPreferencesFormBloc(
         preferences.networkConnectionPreferences.serverPreferences,
         networkValidator);
-    userFormBloc = IRCNetworkUserPreferencesFormBloc(
+    userFormBloc = NetworkUserPreferencesFormBloc(
         preferences.networkConnectionPreferences.userPreferences);
 
     channelsFieldBloc = FormValueFieldBloc<String>(

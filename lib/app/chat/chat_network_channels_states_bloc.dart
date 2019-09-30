@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsBloc {
+class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
   final Map<String, Map<int, BehaviorSubject<NetworkChannelState>>> _states =
       Map();
 
@@ -28,32 +28,28 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsBloc {
     return _states[networkKey][_calculateChannelKey(channel)];
   }
 
-  ChatActiveChannelBloc activeChannelBloc;
+  final ChatActiveChannelBloc activeChannelBloc;
+  final ChatOutputBackendService backendService;
 
   ChatNetworkChannelsStateBloc(
-      this.activeChannelBloc,
-      ChatOutputBackendService backendService,
-      ChatNetworksListBloc networksListBloc)
-      : super(backendService, networksListBloc) {
+    this.backendService,
+    ChatNetworksListBloc networksListBloc,
+    this.activeChannelBloc,
+  ) : super(networksListBloc) {
     addDisposable(streamSubscription:
-        networksListBloc.lastJoinedNetworkStream.listen((network) {
-      onNetworkJoined(network);
-    }));
-
-    addDisposable(streamSubscription: activeChannelBloc.activeChannelStream.listen((newActiveChannel) {
-      Network networkForChannel = networksListBloc.findNetworkWithChannel(newActiveChannel);
+        activeChannelBloc.activeChannelStream.listen((newActiveChannel) {
+      Network networkForChannel =
+          networksListBloc.findNetworkWithChannel(newActiveChannel);
 
       var state = getNetworkChannelState(networkForChannel, newActiveChannel);
       state.unreadCount = 0;
       _updateState(networkForChannel, newActiveChannel, state);
-
     }));
   }
 
   void _updateState(
       Network network, NetworkChannel channel, NetworkChannelState state) {
-
-    if(activeChannelBloc.activeChannel == channel) {
+    if (activeChannelBloc.activeChannel == channel) {
       state.unreadCount = 0;
     }
 
@@ -74,7 +70,9 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsBloc {
 
   @override
   void onChannelJoined(
-      Network network, NetworkChannel channel, NetworkChannelState state) {
+      Network network, NetworkChannelWithState channelWithState) {
+    var channel = channelWithState.channel;
+    var state = channelWithState.state;
     _updateState(network, channel, state);
     addDisposable(
         disposable: backendService.listenForNetworkChannelState(
@@ -88,14 +86,12 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsBloc {
 
   @override
   void onChannelLeaved(Network network, NetworkChannel channel) {
-
 //    Future.delayed(Duration(microseconds:  1000), () {
-      var stateController =
-      _getStateControllerForNetworkChannel(network, channel);
-      stateController.close();
-      _states[_calculateNetworkKey(network)]
-          .remove(_calculateChannelKey(channel));
+    var stateController =
+        _getStateControllerForNetworkChannel(network, channel);
+    stateController.close();
+    _states[_calculateNetworkKey(network)]
+        .remove(_calculateChannelKey(channel));
 //    });
-
   }
 }

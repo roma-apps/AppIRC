@@ -54,21 +54,21 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
   }
 }
 
-class IRCNetworkChannelTopicEditWidget extends StatefulWidget {
+class NetworkChannelTopicEditWidget extends StatefulWidget {
   final NetworkChannel channel;
 
-  IRCNetworkChannelTopicEditWidget(this.channel);
+  NetworkChannelTopicEditWidget(this.channel);
 
   @override
   State<StatefulWidget> createState() =>
-      IRCNetworkChannelTopicEditWidgetState(channel);
+      NetworkChannelTopicEditWidgetState(channel);
 }
 
-class IRCNetworkChannelTopicEditWidgetState
-    extends State<IRCNetworkChannelTopicEditWidget> {
+class NetworkChannelTopicEditWidgetState
+    extends State<NetworkChannelTopicEditWidget> {
   final NetworkChannel channel;
 
-  IRCNetworkChannelTopicEditWidgetState(this.channel);
+  NetworkChannelTopicEditWidgetState(this.channel);
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
@@ -11,49 +13,56 @@ class ChatNetworkChannelsListBloc extends Providable {
   final Network network;
   final LocalIdGenerator nextChannelIdGenerator;
 
-  Future<int> get _nextNetworkChannelLocalId async =>
-      await nextChannelIdGenerator();
+  int get _nextNetworkChannelLocalId => nextChannelIdGenerator();
 
   ChatNetworkChannelsListBloc(
-      this.backendService, this.network, this.nextChannelIdGenerator) {
+      this.backendService,
+      this.network,
+      List<NetworkChannelWithState> startChannelsWithState,
+      this.nextChannelIdGenerator) {
     addDisposable(subject: _networksChannelsController);
-    addDisposable(subject: _lastJoinedNetworkChannelController);
-    addDisposable(subject: _lastExitedNetworkChannelController);
 
     _onChannelsChanged(network.channels);
 
-    for(var channel in network.channels) {
-      _onChannelJoined(channel);
+    for (var channelWithState in startChannelsWithState) {
+
+      _onChannelJoined(channelWithState);
     }
 
     var listenForNetworkChannelJoin = backendService
         .listenForNetworkChannelJoin(network, (channelWithState) async {
       var channel = channelWithState.channel;
-      if (channel.localId == null) {
-        channel.localId = await _nextNetworkChannelLocalId;
-      }
+
       network.channels.add(channel);
 
       _onChannelsChanged(network.channels);
 
-      _onChannelJoined(channel);
+      _onChannelJoined(channelWithState);
     });
 
     addDisposable(disposable: listenForNetworkChannelJoin);
   }
 
-  void _onChannelJoined(NetworkChannel channel) {
+  void _onChannelJoined(NetworkChannelWithState channelWithState) {
 
-    _lastJoinedNetworkChannelController.add(channel);
+    var channel = channelWithState.channel;
+
+    if (channel.localId == null) {
+      channel.localId = _nextNetworkChannelLocalId;
+    }
+
+    joinListeners.forEach((listener) => listener(channelWithState));
 
     Disposable listenForNetworkChannelLeave;
 
-    listenForNetworkChannelLeave = backendService
-        .listenForNetworkChannelLeave(network, channel, () async {
+    listenForNetworkChannelLeave =
+        backendService.listenForNetworkChannelLeave(network, channel, () async {
       network.channels.remove(channel);
 
       _onChannelsChanged(network.channels);
-      _lastExitedNetworkChannelController.add(channel);
+
+      leaveListeners[channel].forEach((listener) => listener());
+
       _onChannelsChanged(networkChannels);
       listenForNetworkChannelLeave.dispose();
     });
@@ -64,8 +73,7 @@ class ChatNetworkChannelsListBloc extends Providable {
     _networksChannelsController.add(networkChannels);
   }
 
-  List<NetworkChannel> get networkChannels =>
-      _networksChannelsController.value;
+  List<NetworkChannel> get networkChannels => _networksChannelsController.value;
 
   Stream<List<NetworkChannel>> get networkChannelsStream =>
       _networksChannelsController.stream;
@@ -74,15 +82,27 @@ class ChatNetworkChannelsListBloc extends Providable {
   var _networksChannelsController =
       BehaviorSubject<List<NetworkChannel>>(seedValue: []);
 
-  // ignore: close_sinks
-  var _lastJoinedNetworkChannelController = BehaviorSubject<NetworkChannel>();
 
-  Stream<NetworkChannel> get lastJoinedNetworkChannelStream =>
-      _lastJoinedNetworkChannelController.stream;
+  final List<NetworkChannelListener> joinListeners = [];
+  final Map<NetworkChannel, List<VoidCallback>> leaveListeners = Map();
 
-  // ignore: close_sinks
-  var _lastExitedNetworkChannelController = BehaviorSubject<NetworkChannel>();
+  Disposable listenForNetworkChannelJoin(NetworkChannelListener listener) {
 
-  Stream<NetworkChannel> get lastExitedNetworkChannelStream =>
-      _lastExitedNetworkChannelController.stream;
+    joinListeners.add(listener);
+    return CustomDisposable(() {
+      joinListeners.remove(listener);
+    });
+  }
+
+  Disposable listenForNetworkChannelLeave(NetworkChannel channel, VoidCallback listener) {
+
+
+    if(!leaveListeners.containsKey(channel)) {
+      leaveListeners[channel] = [];
+    }
+    leaveListeners[channel].add(listener);
+    return CustomDisposable(() {
+      leaveListeners[channel].remove(listener);
+    });
+  }
 }

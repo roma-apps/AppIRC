@@ -16,7 +16,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-var _logger = MyLogger(logTag: "IRCNetworkChannelsListWidget", enabled: true);
+var _logger = MyLogger(logTag: "NetworkChannelsListWidget", enabled: true);
 
 class NetworkChannelsListWidget extends StatelessWidget {
   final Network network;

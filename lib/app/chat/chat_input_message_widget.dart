@@ -10,13 +10,13 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-class IRCNetworkChannelNewMessageWidget extends StatefulWidget {
+class NetworkChannelNewMessageWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => IRCNetworkChannelNewMessageState();
+  State<StatefulWidget> createState() => NetworkChannelNewMessageState();
 }
 
-class IRCNetworkChannelNewMessageState
-    extends State<IRCNetworkChannelNewMessageWidget> {
+class NetworkChannelNewMessageState
+    extends State<NetworkChannelNewMessageWidget> {
   @override
   Widget build(BuildContext context) {
     var channelBloc = Provider.of<NetworkChannelBloc>(context);

@@ -32,7 +32,7 @@ class Network {
 
   @override
   String toString() {
-    return 'IRCNetwork{name: $name, remoteId: $remoteId, channels: $channels}';
+    return 'Network{name: $name, remoteId: $remoteId, channels: $channels}';
   }
 }
 
@@ -136,7 +136,7 @@ class ChatNetworkPreferences extends JsonPreferences {
 
   @override
   String toString() {
-    return 'IRCNetworkPreferences{'
+    return 'ChatNetworkPreferences{'
         'networkConnectionPreferences: $networkConnectionPreferences, '
         'channels: $channels}';
   }

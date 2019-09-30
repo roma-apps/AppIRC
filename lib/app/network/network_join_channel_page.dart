@@ -44,7 +44,7 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
         child: Provider<NetworkChannelJoinFormBloc>(
           providable: networkChannelJoinFormBloc,
           child: ListView(children: <Widget>[
-            IRCNetworkChannelJoinFormWidget("", ""),
+            NetworkChannelJoinFormWidget("", ""),
             StreamBuilder<bool>(
                 stream: networkChannelJoinFormBloc.dataValidStream,
                 builder: (context, snapshot) {

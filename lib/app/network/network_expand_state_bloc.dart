@@ -7,12 +7,12 @@ import 'package:flutter_appirc/provider/provider.dart';
 
 var _preferenceKeyPrefix = "chat.network";
 
-class IRCChatNetworkExpandStateBloc extends Providable {
+class ChatNetworkExpandStateBloc extends Providable {
   BoolPreferencesBloc preferenceBloc;
 
   Stream<bool> get expandedStream => preferenceBloc.valueStream(defaultValue: true);
 
-  IRCChatNetworkExpandStateBloc(
+  ChatNetworkExpandStateBloc(
       PreferencesService preferencesService, Network network) {
     var networkLocalId = network.localId;
     preferenceBloc = BoolPreferencesBloc(

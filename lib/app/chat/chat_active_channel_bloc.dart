@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_init_model.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
@@ -14,10 +15,10 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _preferenceKey = "chat.activeChannel";
-var _logger = MyLogger(logTag: "IRCChatActiveChannelBloc", enabled: true);
+var _logger = MyLogger(logTag: "ChatActiveChannelBloc", enabled: true);
 
-class ChatActiveChannelBloc extends Providable {
-  final ChatInputOutputBackendService backendService;
+class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
+  final ChatInputBackendService _backendService;
   final ChatNetworksListBloc _networksListBloc;
   final ChatInitBloc _chatInitBloc;
   IntPreferencesBloc _preferenceBloc;
@@ -31,8 +32,8 @@ class ChatActiveChannelBloc extends Providable {
   Stream<NetworkChannel> get activeChannelStream =>
       _activeChannelController.stream;
 
-  ChatActiveChannelBloc(this.backendService, this._chatInitBloc,
-      this._networksListBloc, PreferencesService preferencesService) {
+  ChatActiveChannelBloc(this._backendService, this._chatInitBloc, this._networksListBloc,
+      PreferencesService preferencesService) :super(_networksListBloc) {
     _preferenceBloc = createActiveChannelPreferenceBloc(preferencesService);
 
     _logger.i(() => "start creating");
@@ -41,29 +42,18 @@ class ChatActiveChannelBloc extends Providable {
 
     addDisposable(subject: _activeChannelController);
 
-    _chatInitBloc.stateStream.listen((ChatInitState newState) {
-      if (newState == ChatInitState.FINISHED) {
-        initOnStart();
-
-
-        for (var network in _networksListBloc.networks) {
-          onNetworkEntered(network, false);
-        }
-
-        backendService.listenForNetworkEnter((newNetworkWithState) {
-          onNetworkEntered(newNetworkWithState.network, true);
-        });
-      }
-    });
-
-    addDisposable(
-        streamSubscription: _networksListBloc.networksStream
-            .listen((newNetworks) async => initOnStart()));
-
     _logger.i(() => "stop creating");
   }
 
-  void initOnStart() async {
+  void tryRestoreActiveChannel() async {
+    if(_chatInitBloc.state != ChatInitState.FINISHED) {
+      return;
+    }
+
+    if (activeChannel != null) {
+      return;
+    }
+
     var allChannels = await _networksListBloc.allNetworksChannels;
 
     if (allChannels != null && allChannels.isNotEmpty) {
@@ -90,6 +80,10 @@ class ChatActiveChannelBloc extends Providable {
   }
 
   changeActiveChanel(NetworkChannel newActiveChannel) async {
+    if(_chatInitBloc.state != ChatInitState.FINISHED) {
+      return;
+    }
+
     if (activeChannel == newActiveChannel) {
       return;
     }
@@ -100,27 +94,7 @@ class ChatActiveChannelBloc extends Providable {
 
     Network network =
     _networksListBloc.findNetworkWithChannel(newActiveChannel);
-    backendService.onOpenNetworkChannel(network, newActiveChannel);
-  }
-
-  void onNetworkEntered(Network network, bool isInitFromStart) {
-    if (!isInitFromStart) {
-      changeActiveChanel(network.lobbyChannel);
-    }
-
-    for (var channel in network.channels) {
-      _listenForNetworkChannelLeave(network, channel);
-    }
-
-    backendService.listenForNetworkChannelJoin(network, (newChannelWithState) {
-      addDisposable(disposable: backendService.listenForNetworkChannelJoin(
-          network, (newChannelWithState) {
-        var channel = newChannelWithState.channel;
-        changeActiveChanel(channel);
-
-        _listenForNetworkChannelLeave(network, channel);
-      }));
-    });
+    _backendService.onOpenNetworkChannel(network, newActiveChannel);
   }
 
   _onActiveChannelLeaved() async {
@@ -131,20 +105,35 @@ class ChatActiveChannelBloc extends Providable {
     }
   }
 
-  void _listenForNetworkChannelLeave(Network network, NetworkChannel channel) {
-    Disposable listener;
-    listener =
-        backendService.listenForNetworkChannelLeave(network, channel, () {
-          if (activeChannel == channel) {
-            _onActiveChannelLeaved();
-          }
-
-          listener.dispose();
-        });
-    addDisposable(disposable: listener);
-  }
 
   IntPreferencesBloc createActiveChannelPreferenceBloc(
       PreferencesService preferencesService) =>
       IntPreferencesBloc(preferencesService, _preferenceKey);
+
+  @override
+  void onChannelJoined(Network network, NetworkChannelWithState channelWithState) {
+    var channel = channelWithState.channel;
+    changeActiveChanel(channel);
+  }
+
+  @override
+  void onChannelLeaved(Network network, NetworkChannel channel) {
+    if (activeChannel == channel) {
+      _onActiveChannelLeaved();
+    }
+
+  }
+
+  @override
+  void onNetworkJoined(NetworkWithState networkWithState) {
+
+
+    if(activeChannel == null) {
+      tryRestoreActiveChannel();
+    } else {
+      changeActiveChanel(networkWithState.network.lobbyChannel);
+    }
+
+    super.onNetworkJoined(networkWithState);
+  }
 }

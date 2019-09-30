@@ -2,13 +2,13 @@ import 'package:flutter_appirc/form/form_blocs.dart';
 
 import 'network_model.dart';
 
-class IRCNetworkUserPreferencesFormBloc extends FormBloc {
+class NetworkUserPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<String> nickFieldBloc;
   FormValueFieldBloc<String> passwordFieldBloc;
   FormValueFieldBloc<String> realNameFieldBloc;
   FormValueFieldBloc<String> userNameFieldBloc;
 
-  IRCNetworkUserPreferencesFormBloc(ChatNetworkUserPreferences preferences) {
+  NetworkUserPreferencesFormBloc(ChatNetworkUserPreferences preferences) {
     nickFieldBloc = FormValueFieldBloc<String>(
         preferences.nickname,
         validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);

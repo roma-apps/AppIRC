@@ -116,7 +116,7 @@ class ChatPage extends StatelessWidget {
                       context,
                       platformPageRoute(
                           builder: (context) =>
-                              IRCNetworkChannelUsersPage(network, channel)));
+                              NetworkChannelUsersPage(network, channel)));
                 }));
           }
 

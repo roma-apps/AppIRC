@@ -25,7 +25,7 @@ class ChatPreferences extends JsonPreferences {
 
   static final empty = ChatPreferences([]);
 
-  final List<ChatNetworkPreferences> networks;
+   List<ChatNetworkPreferences> networks;
 
   ChatPreferences(this.networks);
 

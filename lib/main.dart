@@ -20,6 +20,7 @@ import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_page.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
+import 'package:flutter_appirc/app/chat/chat_preferences_saver_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/message/messages_colored_nicknames_bloc.dart';
@@ -144,7 +145,7 @@ class AppIRCState extends State<AppIRC> {
       loungeBackendService.init().then((_) {
         this.loungeBackendService = loungeBackendService;
 
-        var chatPreferencesBloc = ChatPreferencesLoaderBloc(preferencesService);
+        var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);
 
         var networksListBloc = ChatNetworksListBloc(
           loungeBackendService,
@@ -167,7 +168,7 @@ class AppIRCState extends State<AppIRC> {
             chatInitBloc, networksListBloc, preferencesService);
 
         var channelsStatesBloc = ChatNetworkChannelsStateBloc(
-            activeChannelBloc, loungeBackendService, networksListBloc);
+            loungeBackendService, networksListBloc, activeChannelBloc);
 
         createdWidget = Provider(
           providable: ChatDatabaseProvider(database),
@@ -202,9 +203,8 @@ class AppIRCState extends State<AppIRC> {
                                         database),
                                     child: Provider(
                                       providable: ChatPreferencesSaverBloc(
-                                          loungeBackendService,
-                                          preferencesService,
                                           networksListBloc,
+                                          chatPreferencesBloc,
                                           chatInitBloc),
                                       child: _buildApp(ChatPage()),
                                     ),

@@ -7,6 +7,8 @@ abstract class ButtonSkinBloc extends SkinBloc {
   Color get enabledColor;
 
   Color get disabledColor;
+
+  Color get textColor;
 }
 
 PlatformButton createSkinnedPlatformButton(BuildContext context,
@@ -16,8 +18,16 @@ PlatformButton createSkinnedPlatformButton(BuildContext context,
     EdgeInsetsGeometry padding}) {
   var buttonSkinBloc = Provider.of<ButtonSkinBloc>(context);
   return PlatformButton(
-      child: child,
-      onPressed: onPressed,
-      color: buttonSkinBloc.enabledColor,
-      disabledColor: buttonSkinBloc.disabledColor);
+    child: child,
+    onPressed: onPressed,
+//    androidFlat: (context) => MaterialFlatButtonData(
+//        color: buttonSkinBloc.enabledColor,
+//        disabledColor: buttonSkinBloc.disabledColor,
+//
+//    ),
+//    ios: (context) => CupertinoButtonData(
+//      color: buttonSkinBloc.enabledColor,
+//      disabledColor: buttonSkinBloc.disabledColor
+//    ),
+  );
 }

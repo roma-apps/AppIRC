@@ -12,8 +12,8 @@ class NetworkChannelWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Expanded(child: IRCNetworkChannelMessagesListWidget()),
-        IRCNetworkChannelNewMessageWidget()
+        Expanded(child: NetworkChannelMessagesListWidget()),
+        NetworkChannelNewMessageWidget()
       ],
     );
 }
