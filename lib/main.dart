@@ -203,8 +203,9 @@ class AppIRCState extends State<AppIRC> {
                                         database),
                                     child: Provider(
                                       providable: ChatPreferencesSaverBloc(
-                                          networksListBloc,
+                                          loungeBackendService,
                                           networkStatesBloc,
+                                          networksListBloc,
                                           chatPreferencesBloc,
                                           chatInitBloc),
                                       child: _buildApp(ChatPage()),

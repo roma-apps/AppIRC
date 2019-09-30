@@ -174,10 +174,10 @@ NetworkChannelState toNetworkChannelState(
         highlighted: loungeChannel.highlight != null);
 
 NetworkState toNetworkState(
-    NetworkStatusLoungeResponseBody loungeNetworkStatus, String nick) =>
+    NetworkStatusLoungeResponseBody loungeNetworkStatus, String nick, String name) =>
     NetworkState.name(
         connected: loungeNetworkStatus.connected,
-        secure: loungeNetworkStatus.secure, nick: nick);
+        secure: loungeNetworkStatus.secure, nick: nick, name: name);
 
 RegularMessageType detectRegularMessageType(String stringType) {
   var type;

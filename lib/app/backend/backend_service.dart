@@ -11,6 +11,7 @@ import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 typedef NetworkListener(NetworkWithState network);
+typedef NetworkConnectionListener(ChatNetworkPreferences networkPreferences);
 typedef NetworkStateListener(NetworkState networkState);
 typedef NetworkChannelListener(NetworkChannelWithState channel);
 typedef NetworkChannelStateListener(NetworkChannelState channelState);
@@ -38,6 +39,7 @@ abstract class ChatOutputBackendService implements ChatBackendService {
   Disposable listenForNetworkJoin(NetworkListener listener);
 
   Disposable listenForNetworkLeave(Network network, VoidCallback listener);
+  Disposable listenForNetworkEdit(Network network, NetworkConnectionListener listener);
 
   Disposable listenForNetworkChannelJoin(
       Network network, NetworkChannelListener listener);

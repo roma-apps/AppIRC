@@ -132,7 +132,7 @@ class ChatNetworkPreferences extends JsonPreferences {
   int get localIdOrUndefined => localId != null ? localId : -1;
   static const String channelsSeparator = " ";
 
-  final ChatNetworkConnectionPreferences networkConnectionPreferences;
+   ChatNetworkConnectionPreferences networkConnectionPreferences;
 
   List<ChatNetworkChannelPreferences> channels;
 
@@ -195,17 +195,21 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
 }
 
 class NetworkState {
-  static final NetworkState empty =
-      NetworkState.name(connected: false, secure: false, nick: null);
+  static final NetworkState empty = NetworkState.name(
+      connected: false, secure: false, nick: null, name: null);
 
   bool connected;
   bool secure;
   String nick;
+  String name;
 
+  NetworkState(this.connected, this.secure, this.nick, this.name);
 
-  NetworkState(this.connected, this.secure, this.nick);
-
-  NetworkState.name({@required this.connected, @required this.secure, @required this.nick});
+  NetworkState.name(
+      {@required this.connected,
+      @required this.secure,
+      @required this.nick,
+      @required this.name});
 }
 
 class NetworkWithState {

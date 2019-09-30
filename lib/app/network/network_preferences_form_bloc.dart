@@ -11,8 +11,10 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
 
   FormValueFieldBloc<String> channelsFieldBloc;
 
+  final ChatNetworkPreferences preferences;
+
   ChatNetworkPreferencesFormBloc(
-    ChatNetworkPreferences preferences,
+    this.preferences,
     bool isNeedShowChannels,
     bool isNeedShowCommands,
   ) {
@@ -36,6 +38,7 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
 
   ChatNetworkPreferences extractData() => ChatNetworkPreferences(
       ChatNetworkConnectionPreferences(
+        localId: preferences.localId,
           serverPreferences: serverFormBloc.extractData(),
           userPreferences: userFormBloc.extractData()),
       channelsFieldBloc.value
