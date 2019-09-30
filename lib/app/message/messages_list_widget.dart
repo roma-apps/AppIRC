@@ -79,7 +79,7 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
 _isNeedPrint(ChatMessage message) {
   if (message is RegularMessage) {
     var regularMessageType = message.regularMessageType;
-    return regularMessageType != RegularMessageType.UNHANDLED &&
+    return
         regularMessageType != RegularMessageType.RAW;
   } else {
     return true;

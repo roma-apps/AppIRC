@@ -70,7 +70,7 @@ List<PopupMenuEntry<NetworkDropDownAction>> _buildDropdownItems(
   items.add(buildDropdownMenuItemRow(
       value: NetworkDropDownAction.EXIT,
       text: appLocalizations.tr("settings.network_dropdown_menu.exit"),
-      iconData: Icons.clear))
+      iconData: Icons.clear));
   return items;
 }
 

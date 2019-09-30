@@ -52,7 +52,7 @@ PopupMenuButton buildChannelPopupMenuButton(
           channelBloc.printNetworkChannelBannedUsers();
           break;
         case ChannelDropDownAction.USER_INFORMATION:
-          channelBloc.printUserInfo(network.name);
+          channelBloc.printUserInfo(channel.name);
           break;
       }
     },

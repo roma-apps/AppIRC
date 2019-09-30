@@ -74,6 +74,11 @@ class InputLoungeRequestBody extends LoungeRequestBody {
 
   @override
   Map<String, dynamic> toJson() => {"target": target, "text": content};
+
+  @override
+  String toString() {
+    return 'InputLoungeRequestBody{target: $target, content: $content}';
+  }
 }
 
 @JsonSerializable()
