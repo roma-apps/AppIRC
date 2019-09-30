@@ -65,7 +65,7 @@ DefaultsLoungeResponseBodyPart _$DefaultsLoungeResponseBodyPartFromJson(
     json['nick'] as String,
     json['password'] as String,
     json['realname'] as String,
-    json['rejectUnathorized'] as bool,
+    json['rejectUnauthorized'] as bool,
     json['tls'] as bool,
     json['username'] as String,
   );
@@ -81,7 +81,7 @@ Map<String, dynamic> _$DefaultsLoungeResponseBodyPartToJson(
       'nick': instance.nick,
       'password': instance.password,
       'realname': instance.realname,
-      'rejectUnathorized': instance.rejectUnathorized,
+      'rejectUnauthorized': instance.rejectUnauthorized,
       'tls': instance.tls,
       'username': instance.username,
     };

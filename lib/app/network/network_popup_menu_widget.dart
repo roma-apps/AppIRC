@@ -10,10 +10,9 @@ import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 PopupMenuButton<NetworkDropDownAction> buildNetworkPopupMenuButton(
-  BuildContext context,
-  NetworkBloc networkBloc,
-  Color iconColor,
-) {
+    BuildContext context,
+    NetworkBloc networkBloc,
+    Color iconColor,) {
   var network = networkBloc.network;
   var networkState = networkBloc.networkState;
 
@@ -42,7 +41,7 @@ List<PopupMenuEntry<NetworkDropDownAction>> _buildDropdownItems(
     buildDropdownMenuItemRow(
         value: NetworkDropDownAction.JOIN_CHANNEL,
         text:
-            appLocalizations.tr("settings.network_dropdown_menu.join_channel"),
+        appLocalizations.tr("settings.network_dropdown_menu.join_channel"),
         iconData: Icons.add),
     buildDropdownMenuItemRow(
         value: NetworkDropDownAction.LIST_ALL_CHANNELS,
@@ -54,10 +53,7 @@ List<PopupMenuEntry<NetworkDropDownAction>> _buildDropdownItems(
         text: appLocalizations
             .tr("settings.network_dropdown_menu.list_ignored_users"),
         iconData: Icons.list),
-    buildDropdownMenuItemRow(
-        value: NetworkDropDownAction.EXIT,
-        text: appLocalizations.tr("settings.network_dropdown_menu.exit"),
-        iconData: Icons.clear),
+
   ];
 
   if (connected) {
@@ -71,6 +67,10 @@ List<PopupMenuEntry<NetworkDropDownAction>> _buildDropdownItems(
         text: appLocalizations.tr("settings.network_dropdown_menu.connect"),
         iconData: Icons.cloud));
   }
+  items.add(buildDropdownMenuItemRow(
+      value: NetworkDropDownAction.EXIT,
+      text: appLocalizations.tr("settings.network_dropdown_menu.exit"),
+      iconData: Icons.clear))
   return items;
 }
 
@@ -81,8 +81,9 @@ void _onDropdownSelected(NetworkDropDownAction value, BuildContext context,
       Navigator.push(
           context,
           platformPageRoute(
-              builder: (_) => EditChatNetworkPage(
-                  createDefaultNetworkPreferences(context))));
+              builder: (_) =>
+                  EditChatNetworkPage(
+                      createDefaultNetworkPreferences(context))));
       break;
     case NetworkDropDownAction.JOIN_CHANNEL:
       Navigator.push(context,

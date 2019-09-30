@@ -92,15 +92,6 @@ class LoungeBackendService extends Providable
 
   ChatConnectionState get connectionState => _connectionStateController.value;
 
-  // lounge dont support socket io default connect/connecting commands
-  // TODO: rework when launch will support it
-//  @override
-//  Stream<ChatConnectionState> get connectionStateStream =>
-//      _socketIOService.connectionStateStream.map(mapState);
-//
-//  ChatConnectionState get connectionState =>
-//      mapState(_socketIOService.connectionState);
-
   Future<RequestResult<bool>> tryConnectWithDifferentPreferences(
       LoungeConnectionPreferences preferences) async {
     SocketIOService socketIOService;
@@ -421,10 +412,6 @@ class LoungeBackendService extends Providable
       }
     }));
 
-//    _messagesSpecialController.sink.add(data);
-//    _logger.i(() => "_onNickResponse $raw");
-//    var data = NickLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _nickController.sink.add(data);
 
     return disposable;
   }
@@ -516,7 +503,6 @@ class LoungeBackendService extends Providable
           listener(_modifyStateForChannel(channelState, channel));
         }
 
-//          cg  listener(message);
       }
     }));
 
@@ -528,8 +514,6 @@ class LoungeBackendService extends Providable
         var channelState = currentStateExtractor();
         channelState.topic = data.topic;
         listener(_modifyStateForChannel(channelState, channel));
-//        var message = toIRCMessage(data.msg);
-//        listener(message);
       }
     }));
 
@@ -573,6 +557,8 @@ class LoungeBackendService extends Providable
         createEventListenerDisposable(LoungeResponseEventNames.network, (raw) {
       var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
+      _logger.d(() => "listenForNetworkJoin parsed = $parsed");
+
       for (var loungeNetwork in parsed.networks) {
         // todo: check existed networks
 
@@ -592,6 +578,9 @@ class LoungeBackendService extends Providable
 
         var connectionPreferences =
             request.networkPreferences.networkConnectionPreferences;
+
+        // when requested nick is not available and server give new nick
+        connectionPreferences.userPreferences.nickname = loungeNetwork.nick;
 
         var channelsWithState = <NetworkChannelWithState>[];
 
@@ -635,17 +624,13 @@ class LoungeBackendService extends Providable
 
     return disposable;
 
-    // TODO: implement listenForNetworkChannelState
-    //    var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _logger.i(() => "_onNetworkResponse parsed $parsed");
-//    _networksController.sink.add(parsed);
   }
 
   @override
   Disposable listenForNetworkLeave(Network network, VoidCallback listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.part), (raw) {
+        createEventListenerDisposable((LoungeResponseEventNames.quit), (raw) {
       var parsed = QuitLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.network == network.remoteId) {

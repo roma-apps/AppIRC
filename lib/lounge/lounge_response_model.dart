@@ -92,20 +92,20 @@ class DefaultsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String nick;
   final String password;
   final String realname;
-  final bool rejectUnathorized;
+  final bool rejectUnauthorized;
   final bool tls;
   final String username;
 
   DefaultsLoungeResponseBodyPart(this.host, this.port, this.join,
       this.name, this.nick, this.password, this.realname,
-      this.rejectUnathorized, this.tls, this.username);
+      this.rejectUnauthorized, this.tls, this.username);
 
   @override
   String toString() {
     return 'DefaultsLoungeResponseBodyPart{host: $host,'
         ' port: $port, join: $join, name: $name, nick: $nick,'
         ' password: $password, realname: $realname,'
-        ' rejectUnathorized: $rejectUnathorized,'
+        ' rejectUnathorized: $rejectUnauthorized,'
         ' tls: $tls, username: $username}';
   }
   factory DefaultsLoungeResponseBodyPart.fromJson(

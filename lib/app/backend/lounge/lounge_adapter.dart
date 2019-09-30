@@ -21,7 +21,7 @@ ChatConfig toChatConfig(ConfigurationLoungeResponseBody loungeConfig,
                 serverPort: loungeConfig.defaults.port.toString(),
                 useTls: loungeConfig.defaults.tls,
                 useOnlyTrustedCertificates:
-                loungeConfig.defaults.rejectUnathorized,
+                loungeConfig.defaults.rejectUnauthorized,
                 visible: loungeConfig.displayNetwork,
                 enabled: !loungeConfig.lockNetwork),
             userPreferences: ChatNetworkUserPreferences(

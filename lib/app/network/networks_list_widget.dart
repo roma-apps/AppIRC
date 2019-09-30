@@ -140,6 +140,7 @@ class NetworksListWidget extends StatelessWidget {
               var connected = state.connected;
 
 
+              var networkTitle = "${network.name} (${network.connectionPreferences.userPreferences.nickname})";
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -161,7 +162,7 @@ class NetworksListWidget extends StatelessWidget {
                       onTap: () async {
                         ircChatActiveChannelBloc.changeActiveChanel(channel);
                       },
-                      child: Text(network.name,
+                      child: Text(networkTitle,
                           style: networkListSkinBloc
                               .getNetworkItemTextStyle(isChannelActive)),
                     ),
