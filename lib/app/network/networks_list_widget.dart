@@ -140,7 +140,7 @@ class NetworksListWidget extends StatelessWidget {
               var connected = state.connected;
 
 
-              var networkTitle = "${network.name} (${network.connectionPreferences.userPreferences.nickname})";
+              var networkTitle = "${network.name} (${state.nick})";
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,

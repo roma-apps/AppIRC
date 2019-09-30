@@ -25,7 +25,7 @@ class ChatNetworksStateBloc extends ChatNetworksChannelsListListenerBloc {
     var network = networkWithState.network;
 
     _states[_calculateNetworkKey(network)] =
-        BehaviorSubject<NetworkState>(seedValue: NetworkState.empty);
+        BehaviorSubject<NetworkState>(seedValue: networkWithState.state);
 
     addDisposable(
         disposable: _backendService.listenForNetworkState(

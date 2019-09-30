@@ -590,7 +590,8 @@ class LoungeBackendService extends Providable
             request.networkPreferences.networkConnectionPreferences;
 
         // when requested nick is not available and server give new nick
-        connectionPreferences.userPreferences.nickname = loungeNetwork.nick;
+        var nick = loungeNetwork.nick;
+        connectionPreferences.userPreferences.nickname = nick;
 
         var channelsWithState = <NetworkChannelWithState>[];
 
@@ -626,7 +627,7 @@ class LoungeBackendService extends Providable
 
         var loungeNetworkStatus = loungeNetwork.status;
 
-        var networkState = toNetworkState(loungeNetworkStatus);
+        var networkState = toNetworkState(loungeNetworkStatus, nick);
 
         listener(NetworkWithState(network, networkState, channelsWithState));
       }
@@ -657,6 +658,19 @@ class LoungeBackendService extends Providable
     var disposable = CompositeDisposable([]);
 
     disposable.add(createEventListenerDisposable(
+        (LoungeResponseEventNames.nick), (raw) {
+      var parsed =
+      NickLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+      if (parsed.network == network.remoteId) {
+
+        var currentState = currentStateExtractor();
+        currentState.nick = parsed.nick;
+        listener(currentState);
+      }
+    }));
+
+    disposable.add(createEventListenerDisposable(
         (LoungeResponseEventNames.networkOptions), (raw) {
       var parsed =
           NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
@@ -674,7 +688,8 @@ class LoungeBackendService extends Providable
           NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.network == network.remoteId) {
-        var newState = toNetworkState(parsed);
+        var currentState = currentStateExtractor();
+        var newState = toNetworkState(parsed, currentState.nick);
         listener(newState);
       }
     }));

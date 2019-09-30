@@ -196,14 +196,16 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
 
 class NetworkState {
   static final NetworkState empty =
-      NetworkState.name(connected: false, secure: false);
+      NetworkState.name(connected: false, secure: false, nick: null);
 
   bool connected;
   bool secure;
+  String nick;
 
-  NetworkState(this.connected, this.secure);
 
-  NetworkState.name({@required this.connected, @required this.secure});
+  NetworkState(this.connected, this.secure, this.nick);
+
+  NetworkState.name({@required this.connected, @required this.secure, @required this.nick});
 }
 
 class NetworkWithState {
