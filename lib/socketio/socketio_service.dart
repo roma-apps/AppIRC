@@ -189,18 +189,8 @@ class SocketIOService extends Providable {
       connected = true;
     };
 
-    socketIO.onError((data) {
-      _logger.d(() => "data = $data");
-    });
-
-    socketIO.onConnectError((data) {
-      _logger.d(() => "data = $data");
-    });
-
     var errorListener = (data) {
       connected = false;
-
-      _logger.d(() => "data = $data");
     };
 
     try {

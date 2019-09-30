@@ -33,7 +33,7 @@ const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
 
 const _timeoutForRequestsWithResponse = Duration(seconds: 10);
 const _timeBetweenCheckResultForRequestsWithResponse =
-Duration(milliseconds: 100);
+    Duration(milliseconds: 100);
 
 class LoungeBackendService extends Providable
     implements ChatInputOutputBackendService {
@@ -48,9 +48,9 @@ class LoungeBackendService extends Providable
   // TODO: implement isReadyToConnect
   bool get isReadyToConnect =>
       _socketIOService != null &&
-          connectionState == ChatConnectionState.DISCONNECTED &&
-          _loungePreferences != null &&
-          _loungePreferences != LoungeConnectionPreferences.empty;
+      connectionState == ChatConnectionState.DISCONNECTED &&
+      _loungePreferences != null &&
+      _loungePreferences != LoungeConnectionPreferences.empty;
 
   final List<LoungeRequest> _pendingRequests = [];
 
@@ -74,9 +74,9 @@ class LoungeBackendService extends Providable
     addDisposable(
         disposable: _createEventListenerDisposable(
             _socketIOService, SocketIO.DISCONNECT, (_) {
-          _logger.d(() => "on Disconnect");
-          _connectionStateController.add(ChatConnectionState.DISCONNECTED);
-        }));
+      _logger.d(() => "on Disconnect");
+      _connectionStateController.add(ChatConnectionState.DISCONNECTED);
+    }));
 
     _logger.d(() => "init finished");
   }
@@ -85,7 +85,7 @@ class LoungeBackendService extends Providable
 
   // ignore: close_sinks
   BehaviorSubject<ChatConnectionState> _connectionStateController =
-  BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
+      BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
 
   Stream<ChatConnectionState> get connectionStateStream =>
       _connectionStateController.stream;
@@ -110,6 +110,9 @@ class LoungeBackendService extends Providable
       await socketIOService.init();
       var chatConfig = await _connect(preferences, socketIOService);
       connected = chatConfig != null;
+    } catch(e) {
+      _logger.d(() => "error during tryConnectWithDifferentPreferences = $e");
+      connected = false;
     } finally {
       if (socketIOService != null && connected) {
         socketIOService.disconnect();
@@ -147,7 +150,7 @@ class LoungeBackendService extends Providable
   }
 
   Disposable listenForConfiguration(
-      Function(ConfigurationLoungeResponseBody) listener) =>
+          Function(ConfigurationLoungeResponseBody) listener) =>
       _listenForConfiguration(_socketIOService, listener);
 
   Disposable listenForCommands(Function(List<String>) listener) =>
@@ -156,8 +159,8 @@ class LoungeBackendService extends Providable
   Disposable listenForAuthorized(VoidCallback listener) =>
       _listenForAuthorized(_socketIOService, listener);
 
-  Disposable createEventListenerDisposable(String eventName,
-      Function(dynamic raw) listener) =>
+  Disposable createEventListenerDisposable(
+          String eventName, Function(dynamic raw) listener) =>
       _createEventListenerDisposable(_socketIOService, eventName, listener);
 
   @override
@@ -171,8 +174,8 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<bool>> editNetworkChannelTopic(Network network,
-      NetworkChannel channel, String newTopic,
+  Future<RequestResult<bool>> editNetworkChannelTopic(
+      Network network, NetworkChannel channel, String newTopic,
       {bool waitForResult = false}) async {
     if (waitForResult) {
       throw NotImplementedYetException();
@@ -182,8 +185,8 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<Network>> editNetworkSettings(Network network,
-      ChatNetworkPreferences preferences,
+  Future<RequestResult<Network>> editNetworkSettings(
+      Network network, ChatNetworkPreferences preferences,
       {bool waitForResult = false}) {
 //    if (waitForResult) {
     throw NotImplementedYetException();
@@ -230,8 +233,8 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<ChannelUserInfo>> printUserInfo(Network network,
-      NetworkChannel channel, String userNick,
+  Future<RequestResult<ChannelUserInfo>> printUserInfo(
+      Network network, NetworkChannel channel, String userNick,
       {bool waitForResult = false}) async {
     if (waitForResult) {
       throw NotImplementedYetException();
@@ -321,9 +324,9 @@ class LoungeBackendService extends Providable
     Disposable channelListener;
     channelListener =
         listenForNetworkChannelJoin(network, (channelWithState) async {
-          result = channelWithState;
-          channelListener.dispose();
-        });
+      result = channelWithState;
+      channelListener.dispose();
+    });
     _sendRequest(request, isNeedAddRequestToPending: true);
 
     if (waitForResult) {
@@ -333,24 +336,22 @@ class LoungeBackendService extends Providable
     }
   }
 
-
   @override
   Future<RequestResult<NetworkChannelWithState>> openDirectMessagesChannel(
-      Network network, NetworkChannel channel,  String nick,
+      Network network, NetworkChannel channel, String nick,
       {bool waitForResult = false}) async {
     var request = LoungeJsonRequest(
         name: LoungeRequestEventNames.input,
         body: InputLoungeRequestBody(
-            target: channel.remoteId,
-            content: "/query $nick"));
+            target: channel.remoteId, content: "/query $nick"));
 
     var result;
     Disposable channelListener;
     channelListener =
         listenForNetworkChannelJoin(network, (channelWithState) async {
-          result = channelWithState;
-          channelListener.dispose();
-        });
+      result = channelWithState;
+      channelListener.dispose();
+    });
     _sendRequest(request, isNeedAddRequestToPending: true);
 
     if (waitForResult) {
@@ -371,8 +372,8 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<bool>> leaveNetworkChannel(Network network,
-      NetworkChannel channel,
+  Future<RequestResult<bool>> leaveNetworkChannel(
+      Network network, NetworkChannel channel,
       {bool waitForResult = false}) async {
     if (waitForResult) {
       throw NotImplementedYetException();
@@ -395,9 +396,11 @@ class LoungeBackendService extends Providable
         var type = detectRegularMessageType(data.msg.type);
         if (type == RegularMessageType.WHO_IS) {
           var whoIsSpecialBody = toSpecialMessageWhoIs(data.msg.whois);
-          listener(SpecialMessage.name(channelRemoteId: data.chan,
+          listener(SpecialMessage.name(
+              channelRemoteId: data.chan,
               data: whoIsSpecialBody,
-              specialType: SpecialMessageType.WHO_IS, date: DateTime.now()));
+              specialType: SpecialMessageType.WHO_IS,
+              date: DateTime.now()));
         } else {
           listener(message);
         }
@@ -407,7 +410,7 @@ class LoungeBackendService extends Providable
     disposable.add(createEventListenerDisposable(
         LoungeResponseEventNames.msgSpecial, (raw) {
       MessageSpecialLoungeResponseBody data =
-      MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
+          MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
         var specialMessages = toSpecialMessages(channel, data);
@@ -427,78 +430,77 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Disposable listenForNetworkChannelJoin(Network network,
-      NetworkChannelListener listener) {
+  Disposable listenForNetworkChannelJoin(
+      Network network, NetworkChannelListener listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable(LoungeResponseEventNames.join, (raw) {
-          var parsed = JoinLoungeResponseBody.fromJson(_preProcessRawData(raw));
+      var parsed = JoinLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (parsed.network == network.remoteId) {
-            LoungeJsonRequest<JoinChannelInputLoungeRequestBody> request =
+      if (parsed.network == network.remoteId) {
+        LoungeJsonRequest<JoinChannelInputLoungeRequestBody> request =
             _pendingRequests.firstWhere((request) {
-              if (request is LoungeJsonRequest<
-                  JoinChannelInputLoungeRequestBody>) {
-                LoungeJsonRequest<
-                    JoinChannelInputLoungeRequestBody> joinRequest =
-                    request;
-                if (joinRequest != null) {
-                  if (joinRequest.body.channelName == parsed.chan.name) {
-                    return true;
-                  }
-                } else {
-                  return false;
-                }
-
-                return false;
-              } else {
-                return false;
+          if (request is LoungeJsonRequest<JoinChannelInputLoungeRequestBody>) {
+            LoungeJsonRequest<JoinChannelInputLoungeRequestBody> joinRequest =
+                request;
+            if (joinRequest != null) {
+              if (joinRequest.body.channelName == parsed.chan.name) {
+                return true;
               }
-            }, orElse: () => null);
-
-            var preferences;
-
-            if (request != null) {
-              preferences = ChatNetworkChannelPreferences.name(
-                  localId: request.body.localId,
-                  name: parsed.chan.name,
-                  password: request.body.channelPassword);
             } else {
-              preferences = ChatNetworkChannelPreferences.name(
-                  name: parsed.chan.name, password: "");
+              return false;
             }
 
-            var loungeChannel = parsed.chan;
-
-            var networkChannel = NetworkChannel(preferences,
-                detectNetworkChannelType(parsed.chan.type), parsed.chan.id);
-            var channelState = toNetworkChannelState(loungeChannel);
-            channelState = _modifyStateForChannel(channelState, networkChannel);
-            listener(NetworkChannelWithState(networkChannel, channelState));
+            return false;
+          } else {
+            return false;
           }
-        }));
+        }, orElse: () => null);
+
+        var preferences;
+
+        if (request != null) {
+          preferences = ChatNetworkChannelPreferences.name(
+              localId: request.body.localId,
+              name: parsed.chan.name,
+              password: request.body.channelPassword);
+        } else {
+          preferences = ChatNetworkChannelPreferences.name(
+              name: parsed.chan.name, password: "");
+        }
+
+        var loungeChannel = parsed.chan;
+
+        var networkChannel = NetworkChannel(preferences,
+            detectNetworkChannelType(parsed.chan.type), parsed.chan.id);
+        var channelState = toNetworkChannelState(loungeChannel);
+        channelState = _modifyStateForChannel(channelState, networkChannel);
+        listener(NetworkChannelWithState(networkChannel, channelState));
+      }
+    }));
 
     return disposable;
   }
 
   @override
-  Disposable listenForNetworkChannelLeave(Network network,
-      NetworkChannel channel, VoidCallback listener) {
+  Disposable listenForNetworkChannelLeave(
+      Network network, NetworkChannel channel, VoidCallback listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable((LoungeResponseEventNames.part), (raw) {
-          var parsed = PartLoungeResponseBody.fromJson(_preProcessRawData(raw));
+      var parsed = PartLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (parsed.chan == channel.remoteId) {
-            listener();
-          }
-        }));
+      if (parsed.chan == channel.remoteId) {
+        listener();
+      }
+    }));
 
     return disposable;
   }
 
   @override
-  Disposable listenForNetworkChannelState(Network network,
+  Disposable listenForNetworkChannelState(
+      Network network,
       NetworkChannel channel,
       NetworkChannelState Function() currentStateExtractor,
       NetworkChannelStateListener listener) {
@@ -520,21 +522,21 @@ class LoungeBackendService extends Providable
 
     disposable.add(
         createEventListenerDisposable(LoungeResponseEventNames.topic, (raw) {
-          var data = TopicLoungeResponseBody.fromJson(_preProcessRawData(raw));
+      var data = TopicLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (channel.remoteId == data.chan) {
-            var channelState = currentStateExtractor();
-            channelState.topic = data.topic;
-            listener(_modifyStateForChannel(channelState, channel));
+      if (channel.remoteId == data.chan) {
+        var channelState = currentStateExtractor();
+        channelState.topic = data.topic;
+        listener(_modifyStateForChannel(channelState, channel));
 //        var message = toIRCMessage(data.msg);
 //        listener(message);
-          }
-        }));
+      }
+    }));
 
     disposable.add(createEventListenerDisposable(
         LoungeResponseEventNames.channelState, (raw) {
       var data =
-      ChannelStateLoungeResponseBody.fromJson(_preProcessRawData(raw));
+          ChannelStateLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
         var channelState = currentStateExtractor();
@@ -553,8 +555,8 @@ class LoungeBackendService extends Providable
     return disposable;
   }
 
-  NetworkChannelState _modifyStateForChannel(NetworkChannelState channelState,
-      NetworkChannel channel) {
+  NetworkChannelState _modifyStateForChannel(
+      NetworkChannelState channelState, NetworkChannel channel) {
     if (channel.type == NetworkChannelType.QUERY ||
         channel.type == NetworkChannelType.SPECIAL) {
       // lounge send always not connected state for this types
@@ -569,71 +571,67 @@ class LoungeBackendService extends Providable
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable(LoungeResponseEventNames.network, (raw) {
-          var parsed = NetworksLoungeResponseBody.fromJson(
-              _preProcessRawData(raw));
+      var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          for (var loungeNetwork in parsed.networks) {
-            // todo: check existed networks
+      for (var loungeNetwork in parsed.networks) {
+        // todo: check existed networks
 
-            JoinNetworkLoungeRequest request =
+        JoinNetworkLoungeRequest request =
             _pendingRequests.firstWhere((request) {
-              var loungeJsonRequest = request as JoinNetworkLoungeRequest;
-              if (loungeJsonRequest != null) {
-                if (loungeNetwork.name == loungeJsonRequest.body.name) {
-                  return true;
-                } else {
-                  return false;
-                }
-              } else {
-                return false;
-              }
-            }, orElse: () => null);
-
-            var connectionPreferences =
-                request.networkPreferences.networkConnectionPreferences;
-
-            var channelsWithState = <NetworkChannelWithState>[];
-
-            for (var loungeChannel in loungeNetwork.channels) {
-              var networkChannelPreferences = request.networkPreferences
-                  .channels
-                  .firstWhere((channelPreferences) {
-                return loungeChannel.name == channelPreferences.name;
-              }, orElse: () => null);
-              int localId;
-              if (networkChannelPreferences != null) {
-                localId = networkChannelPreferences.localId;
-              }
-              var channel = NetworkChannel(
-                  ChatNetworkChannelPreferences.name(
-                      localId: localId,
-                      name: loungeChannel.name,
-                      // Network start channels always without password
-                      password: ""),
-                  detectNetworkChannelType(loungeChannel.type),
-                  loungeChannel.id);
-              var channelState = toNetworkChannelState((loungeChannel));
-              channelsWithState.add(
-                  NetworkChannelWithState(channel, channelState));
+          var loungeJsonRequest = request as JoinNetworkLoungeRequest;
+          if (loungeJsonRequest != null) {
+            if (loungeNetwork.name == loungeJsonRequest.body.name) {
+              return true;
+            } else {
+              return false;
             }
+          } else {
+            return false;
+          }
+        }, orElse: () => null);
 
-            var channels = channelsWithState
-                .map((channelWithState) => channelWithState.channel)
-                .toList();
+        var connectionPreferences =
+            request.networkPreferences.networkConnectionPreferences;
 
-            var network =
+        var channelsWithState = <NetworkChannelWithState>[];
+
+        for (var loungeChannel in loungeNetwork.channels) {
+          var networkChannelPreferences = request.networkPreferences.channels
+              .firstWhere((channelPreferences) {
+            return loungeChannel.name == channelPreferences.name;
+          }, orElse: () => null);
+          int localId;
+          if (networkChannelPreferences != null) {
+            localId = networkChannelPreferences.localId;
+          }
+          var channel = NetworkChannel(
+              ChatNetworkChannelPreferences.name(
+                  localId: localId,
+                  name: loungeChannel.name,
+                  // Network start channels always without password
+                  password: ""),
+              detectNetworkChannelType(loungeChannel.type),
+              loungeChannel.id);
+          var channelState = toNetworkChannelState((loungeChannel));
+          channelsWithState.add(NetworkChannelWithState(channel, channelState));
+        }
+
+        var channels = channelsWithState
+            .map((channelWithState) => channelWithState.channel)
+            .toList();
+
+        var network =
             Network(connectionPreferences, loungeNetwork.uuid, channels);
 
-            network.localId = request.networkPreferences.localId;
+        network.localId = request.networkPreferences.localId;
 
-            var loungeNetworkStatus = loungeNetwork.status;
+        var loungeNetworkStatus = loungeNetwork.status;
 
-            var networkState = toNetworkState(loungeNetworkStatus);
+        var networkState = toNetworkState(loungeNetworkStatus);
 
-            listener(
-                NetworkWithState(network, networkState, channelsWithState));
-          }
-        }));
+        listener(NetworkWithState(network, networkState, channelsWithState));
+      }
+    }));
 
     return disposable;
 
@@ -648,17 +646,18 @@ class LoungeBackendService extends Providable
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable((LoungeResponseEventNames.part), (raw) {
-          var parsed = QuitLoungeResponseBody.fromJson(_preProcessRawData(raw));
+      var parsed = QuitLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (parsed.network == network.remoteId) {
-            listener();
-          }
-        }));
+      if (parsed.network == network.remoteId) {
+        listener();
+      }
+    }));
 
     return disposable;
   }
 
-  Disposable listenForNetworkState(Network network,
+  Disposable listenForNetworkState(
+      Network network,
       NetworkState Function() currentStateExtractor,
       NetworkStateListener listener) {
     var disposable = CompositeDisposable([]);
@@ -666,7 +665,7 @@ class LoungeBackendService extends Providable
     disposable.add(createEventListenerDisposable(
         (LoungeResponseEventNames.networkOptions), (raw) {
       var parsed =
-      NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
+          NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.network == network.remoteId) {
         // nothing to change right now
@@ -678,7 +677,7 @@ class LoungeBackendService extends Providable
     disposable.add(createEventListenerDisposable(
         (LoungeResponseEventNames.networkStatus), (raw) {
       var parsed =
-      NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
+          NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.network == network.remoteId) {
         var newState = toNetworkState(parsed);
@@ -690,8 +689,8 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<bool>> onOpenNetworkChannel(Network network,
-      NetworkChannel channel) async {
+  Future<RequestResult<bool>> onOpenNetworkChannel(
+      Network network, NetworkChannel channel) async {
     _sendRequest(
         LoungeRawRequest(
             name: LoungeRequestEventNames.open, body: [channel.remoteId]),
@@ -748,17 +747,15 @@ class LoungeBackendService extends Providable
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable((LoungeResponseEventNames.names), (raw) {
-          var parsed = NamesLoungeResponseBody.fromJson(
-              _preProcessRawData(raw));
+      var parsed = NamesLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (parsed.id == channel.remoteId) {
-            listener(parsed.users
-                .map((loungeUser) =>
-                ChannelUserInfo.name(
-                    nick: loungeUser.nick, mode: loungeUser.mode))
-                .toList());
-          }
-        }));
+      if (parsed.id == channel.remoteId) {
+        listener(parsed.users
+            .map((loungeUser) => ChannelUserInfo.name(
+                nick: loungeUser.nick, mode: loungeUser.mode))
+            .toList());
+      }
+    }));
 
     return disposable;
 
@@ -846,8 +843,8 @@ class LoungeBackendService extends Providable
 //  sendSettingsGetRequest() async =>
 //      await _sendRequest(LoungeRawRequest(name: "setting:get"));
 
-  void _sendInputRequest(Network network, NetworkChannel channel,
-      String message) {
+  void _sendInputRequest(
+      Network network, NetworkChannel channel, String message) {
     _sendRequest(
         LoungeJsonRequest(
             name: LoungeRequestEventNames.input,
@@ -878,7 +875,7 @@ Disposable _listenForConfiguration(SocketIOService _socketIOService,
   disposable.add(_createEventListenerDisposable(
       _socketIOService, (LoungeResponseEventNames.configuration), (raw) {
     var parsed =
-    ConfigurationLoungeResponseBody.fromJson(_preProcessRawData(raw));
+        ConfigurationLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
     listener(parsed);
   }));
@@ -886,8 +883,8 @@ Disposable _listenForConfiguration(SocketIOService _socketIOService,
   return disposable;
 }
 
-Disposable _listenForCommands(SocketIOService _socketIOService,
-    Function(List<String>) listener) {
+Disposable _listenForCommands(
+    SocketIOService _socketIOService, Function(List<String>) listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
       _socketIOService, (LoungeResponseEventNames.commands), (raw) {
@@ -905,8 +902,8 @@ Disposable _listenForCommands(SocketIOService _socketIOService,
   return disposable;
 }
 
-Disposable _listenForAuthorized(SocketIOService _socketIOService,
-    VoidCallback listener) {
+Disposable _listenForAuthorized(
+    SocketIOService _socketIOService, VoidCallback listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
       _socketIOService, (LoungeResponseEventNames.authorized), (raw) {
@@ -916,8 +913,8 @@ Disposable _listenForAuthorized(SocketIOService _socketIOService,
   return disposable;
 }
 
-Disposable _listenForAuth(SocketIOService _socketIOService,
-    VoidCallback listener) {
+Disposable _listenForAuth(
+    SocketIOService _socketIOService, VoidCallback listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
       _socketIOService, (LoungeResponseEventNames.auth), (raw) {
@@ -970,22 +967,22 @@ Future<ChatConfig> _connect(LoungeConnectionPreferences preferences,
       _listenForCommands(socketIOService, (result) => loungeCommands = result));
 
   Future.delayed(_connectTimeout, () => timeout = true);
+  var socketConnected = true;
 
-
-  socketIOService.onConnectError((data) {
-    _logger.d(() => "data $data");
-  });
+  var connectErrorListener = (data) {
+    socketConnected = false;
+  };
+  socketIOService.onConnectError(connectErrorListener);
 
   await socketIOService.connect();
-  // lounge don't support connect/connecting callbacks
-  // TODO: should be changed if lounge will start support it
-  var socketConnected = true;
+
+  socketIOService.offConnectError(connectErrorListener);
 
   _logger.d(() => "_connect socketConnected= $socketConnected");
 
   if (socketConnected) {
     while ((loungeCommands == null && loungeConfig == null ||
-        authorizedReceived == false) &&
+            authorizedReceived == false) &&
         !timeout &&
         authReceived == false) {
       await Future.delayed(_timeBetweenCheckingConnectionResponse);
