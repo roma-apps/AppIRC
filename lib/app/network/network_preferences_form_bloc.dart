@@ -13,15 +13,21 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
 
   ChatNetworkPreferencesFormBloc(
     ChatNetworkPreferences preferences,
+    bool isNeedShowChannels,
+    bool isNeedShowCommands,
   ) {
     serverFormBloc = ChatNetworkServerPreferencesFormBloc(
         preferences.networkConnectionPreferences.serverPreferences,
         networkValidator);
     userFormBloc = NetworkUserPreferencesFormBloc(
-        preferences.networkConnectionPreferences.userPreferences);
+        preferences.networkConnectionPreferences.userPreferences,
+        isNeedShowCommands);
 
     channelsFieldBloc = FormValueFieldBloc<String>(
-        preferences.channelsWithoutPassword.map((channel) => channel.name).join(channelsNamesSeparator),
+        preferences.channelsWithoutPassword
+            .map((channel) => channel.name)
+            .join(channelsNamesSeparator),
+        visible: isNeedShowChannels,
         validators: [NotEmptyTextValidator()]);
   }
 

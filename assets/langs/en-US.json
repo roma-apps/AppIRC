@@ -88,7 +88,9 @@
       "real_name_label": "Real name",
       "real_name_hint": "https://demo.thelounge.chat/",
       "user_name_hint": "User name",
-      "user_name_label": "User name"
+      "user_name_label": "User name",
+      "commands_hint": "One raw command per line, each command will be executed on new connection",
+      "commands_label": "Commands"
     },
     "not_unique_name_dialog": {
       "title": "Name already in use",

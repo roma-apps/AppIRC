@@ -238,12 +238,12 @@ class ChatPage extends StatelessWidget {
             case ChatConnectionState.CONNECTED:
               var startValues = createDefaultNetworkPreferences(context);
               return Provider(
-                providable: ChatNetworkPreferencesFormBloc(startValues),
+                providable: ChatNetworkPreferencesFormBloc(startValues, true, false),
                 child: ChatNetworkPreferencesFormWidget(startValues,
                     (context, preferences) async {
                   var networksBloc = Provider.of<ChatNetworksListBloc>(context);
                   await networksBloc.joinNetwork(preferences);
-                }),
+                }, AppLocalizations.of(context).tr('irc_connection.connect')),
               );
               break;
             case ChatConnectionState.CONNECTING:

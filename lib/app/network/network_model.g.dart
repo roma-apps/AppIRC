@@ -36,6 +36,7 @@ ChatNetworkUserPreferences _$ChatNetworkUserPreferencesFromJson(
   return ChatNetworkUserPreferences(
     nickname: json['nickname'] as String,
     password: json['password'] as String,
+    commands: json['commands'] as String,
     realName: json['realName'] as String,
     username: json['username'] as String,
   );
@@ -48,6 +49,7 @@ Map<String, dynamic> _$ChatNetworkUserPreferencesToJson(
       'username': instance.username,
       'password': instance.password,
       'realName': instance.realName,
+      'commands': instance.commands,
     };
 
 ChatNetworkChannelPreferences _$ChatNetworkChannelPreferencesFromJson(

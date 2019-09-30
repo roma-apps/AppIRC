@@ -24,12 +24,14 @@ class NetworkUserPreferencesFormState
   TextEditingController _userNameController;
   TextEditingController _realNameController;
   TextEditingController _passwordController;
+  TextEditingController _commandsController;
 
   NetworkUserPreferencesFormState(this.startValues) {
     _nickController = TextEditingController(text: startValues.nickname);
     _userNameController = TextEditingController(text: startValues.username);
     _realNameController = TextEditingController(text: startValues.realName);
     _passwordController = TextEditingController(text: startValues.password);
+    _commandsController = TextEditingController(text: startValues.commands);
   }
 
   @override
@@ -39,6 +41,7 @@ class NetworkUserPreferencesFormState
     _userNameController.dispose();
     _realNameController.dispose();
     _passwordController.dispose();
+    _commandsController.dispose();
   }
 
   @override
@@ -72,11 +75,18 @@ class NetworkUserPreferencesFormState
             _realNameController),
         buildFormTextRow(
             context,
-            appLocalizations.tr('irc_connection.user_prefs.user_name_hint'),
             appLocalizations.tr('irc_connection.user_prefs.user_name_label'),
+            appLocalizations.tr('irc_connection.user_prefs.user_name_hint'),
             Icons.account_circle,
             formBloc.realNameFieldBloc,
             _userNameController),
+        buildFormTextRow(
+            context,
+            appLocalizations.tr('irc_connection.user_prefs.commands_label'),
+            appLocalizations.tr('irc_connection.user_prefs.commands_hint'),
+            Icons.settings,
+            formBloc.commandsFieldBloc,
+            _commandsController),
       ],
     );
   }

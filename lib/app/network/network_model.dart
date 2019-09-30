@@ -43,19 +43,19 @@ class ChatNetworkServerPreferences extends JsonPreferences {
   String serverPort;
   bool useTls;
   bool useOnlyTrustedCertificates;
-  
+
   bool visible;
   bool enabled;
 
-  ChatNetworkServerPreferences(
-      {@required this.name,
-      @required this.serverHost,
-      @required this.serverPort,
-      @required this.useTls,
-      @required this.useOnlyTrustedCertificates,
-      @required this.enabled,
-      @required this.visible,
-      });
+  ChatNetworkServerPreferences({
+    @required this.name,
+    @required this.serverHost,
+    @required this.serverPort,
+    @required this.useTls,
+    @required this.useOnlyTrustedCertificates,
+    @required this.enabled,
+    @required this.visible,
+  });
 
   @override
   String toString() {
@@ -75,16 +75,20 @@ class ChatNetworkUserPreferences extends JsonPreferences {
   String username;
   String password;
   String realName;
+  String commands;
 
   ChatNetworkUserPreferences(
       {@required this.nickname,
-      this.password,
+      @required this.password,
+      @required this.commands,
       @required this.realName,
       @required this.username});
 
   @override
   String toString() {
-    return 'ChatNetworkUserPreferences{nickname: $nickname, username: $username,'
+    return 'ChatNetworkUserPreferences{nickname: $nickname,'
+        ' username: $username,'
+        ' commands: $commands,'
         ' password: $password, realName: $realName}';
   }
 
@@ -166,8 +170,6 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
 
   ChatNetworkServerPreferences serverPreferences;
   ChatNetworkUserPreferences userPreferences;
-  
-  
 
   ChatNetworkConnectionPreferences(
       {@required this.serverPreferences,
@@ -183,7 +185,8 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
         ' userPreferences: $userPreferences}';
   }
 
-  factory ChatNetworkConnectionPreferences.fromJson(Map<String, dynamic> json) =>
+  factory ChatNetworkConnectionPreferences.fromJson(
+          Map<String, dynamic> json) =>
       _$ChatNetworkConnectionPreferencesFromJson(json);
 
   @override
@@ -191,12 +194,9 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
       _$ChatNetworkConnectionPreferencesToJson(this);
 }
 
-
-
 class NetworkState {
-  static final NetworkState empty = NetworkState.name(connected: false, secure: false);
-
-
+  static final NetworkState empty =
+      NetworkState.name(connected: false, secure: false);
 
   bool connected;
   bool secure;
@@ -204,10 +204,7 @@ class NetworkState {
   NetworkState(this.connected, this.secure);
 
   NetworkState.name({@required this.connected, @required this.secure});
-
-
 }
-
 
 class NetworkWithState {
   final Network network;
@@ -216,6 +213,4 @@ class NetworkWithState {
   final List<NetworkChannelWithState> channelsWithState;
 
   NetworkWithState(this.network, this.state, this.channelsWithState);
-
-
 }

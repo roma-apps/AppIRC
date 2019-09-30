@@ -160,6 +160,8 @@ class ChatNetworksListBloc extends Providable {
       await backendService.joinNetwork(preferences,
           waitForResult: waitForResult);
 
+
+
   Future<RequestResult<bool>> leaveNetwork(Network network,
           {bool waitForResult: false}) async =>
       await backendService.leaveNetwork(network, waitForResult: waitForResult);

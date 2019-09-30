@@ -101,7 +101,7 @@ class LoungeBackendService extends Providable
       await socketIOService.init();
       var chatConfig = await _connect(preferences, socketIOService);
       connected = chatConfig != null;
-    } catch(e) {
+    } catch (e) {
       _logger.d(() => "error during tryConnectWithDifferentPreferences = $e");
       connected = false;
     } finally {
@@ -177,13 +177,25 @@ class LoungeBackendService extends Providable
 
   @override
   Future<RequestResult<Network>> editNetworkSettings(
-      Network network, ChatNetworkPreferences preferences,
-      {bool waitForResult = false}) {
-//    if (waitForResult) {
-    throw NotImplementedYetException();
-//    }
-//    // TODO: implement editNetworkSettings
-//    return null;
+      Network network, ChatNetworkPreferences networkPreferences,
+      {bool waitForResult = false}) async {
+    if (waitForResult) {
+      throw NotImplementedYetException();
+    }
+
+    var userPreferences =
+        networkPreferences.networkConnectionPreferences.userPreferences;
+    var serverPreferences =
+        networkPreferences.networkConnectionPreferences.serverPreferences;
+
+    var request = LoungeJsonRequest(
+        name: LoungeRequestEventNames.networkEdit,
+        body: toNetworkEditLoungeRequestBody(
+            network.remoteId, userPreferences, serverPreferences));
+
+    _sendRequest(request, isNeedAddRequestToPending: false);
+
+    return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
   @override
@@ -412,7 +424,6 @@ class LoungeBackendService extends Providable
       }
     }));
 
-
     return disposable;
   }
 
@@ -502,7 +513,6 @@ class LoungeBackendService extends Providable
           channelState.unreadCount = data.unread;
           listener(_modifyStateForChannel(channelState, channel));
         }
-
       }
     }));
 
@@ -623,7 +633,6 @@ class LoungeBackendService extends Providable
     }));
 
     return disposable;
-
   }
 
   @override

@@ -44,7 +44,7 @@ class ChatDrawerWidget extends StatelessWidget {
           Navigator.push(
               context,
               platformPageRoute(
-                  builder: (context) => NewChatNetworkPage(
+                  builder: (context) => NewChatNetworkPage(context,
                           createDefaultNetworkPreferences(context), () {
                         Navigator.pop(context);
                       })));

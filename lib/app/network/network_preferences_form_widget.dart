@@ -13,22 +13,24 @@ import 'network_preferences_form_bloc.dart';
 class ChatNetworkPreferencesFormWidget extends StatefulWidget {
   final ChatNetworkPreferences startValues;
   final PreferencesActionCallback callback;
+  final String buttonText;
 
-  ChatNetworkPreferencesFormWidget(this.startValues, this.callback);
+  ChatNetworkPreferencesFormWidget(this.startValues, this.callback, this.buttonText);
 
   @override
   State<StatefulWidget> createState() =>
-      ChatNetworkPreferencesFormWidgetState(startValues, callback);
+      ChatNetworkPreferencesFormWidgetState(startValues, callback, buttonText);
 }
 
 class ChatNetworkPreferencesFormWidgetState
     extends State<ChatNetworkPreferencesFormWidget> {
   final PreferencesActionCallback callback;
   final ChatNetworkPreferences startValues;
+  final String buttonText;
 
   TextEditingController _channelsController;
 
-  ChatNetworkPreferencesFormWidgetState(this.startValues, this.callback) {
+  ChatNetworkPreferencesFormWidgetState(this.startValues, this.callback, this.buttonText) {
     _channelsController = TextEditingController(
         text: startValues.channelsWithoutPassword
             .map((channel) => channel.name)
@@ -89,7 +91,7 @@ class ChatNetworkPreferencesFormWidgetState
                 return createSkinnedPlatformButton(
                   context,
                   child: Text(
-                    AppLocalizations.of(context).tr('irc_connection.connect'),
+                    buttonText,
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: pressed,

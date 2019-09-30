@@ -7,14 +7,20 @@ class NetworkUserPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<String> passwordFieldBloc;
   FormValueFieldBloc<String> realNameFieldBloc;
   FormValueFieldBloc<String> userNameFieldBloc;
+  FormValueFieldBloc<String> commandsFieldBloc;
 
-  NetworkUserPreferencesFormBloc(ChatNetworkUserPreferences preferences) {
-    nickFieldBloc = FormValueFieldBloc<String>(
-        preferences.nickname,
+  NetworkUserPreferencesFormBloc(
+      ChatNetworkUserPreferences preferences, bool isNeedShowCommands) {
+    nickFieldBloc = FormValueFieldBloc<String>(preferences.nickname,
         validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
-    passwordFieldBloc = FormValueFieldBloc<String>(preferences.password, validators: [NoWhitespaceTextValidator()]);
-    realNameFieldBloc = FormValueFieldBloc<String>(preferences.realName, validators: [NotEmptyTextValidator()]);
-    userNameFieldBloc = FormValueFieldBloc<String>(preferences.username, validators: [NotEmptyTextValidator()]);
+    passwordFieldBloc = FormValueFieldBloc<String>(preferences.password,
+        validators: [NoWhitespaceTextValidator()]);
+    realNameFieldBloc = FormValueFieldBloc<String>(preferences.realName,
+        validators: [NotEmptyTextValidator()]);
+    userNameFieldBloc = FormValueFieldBloc<String>(preferences.username,
+        validators: [NotEmptyTextValidator()]);
+    commandsFieldBloc =
+        FormValueFieldBloc<String>(preferences.commands, validators: [], visible: isNeedShowCommands);
   }
 
   @override
@@ -25,5 +31,6 @@ class NetworkUserPreferencesFormBloc extends FormBloc {
       nickname: nickFieldBloc.value,
       password: passwordFieldBloc.value,
       realName: realNameFieldBloc.value,
-      username: userNameFieldBloc.value);
+      username: userNameFieldBloc.value,
+      commands: commandsFieldBloc.value);
 }

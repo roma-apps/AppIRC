@@ -7,6 +7,7 @@ part 'lounge_request_model.g.dart';
 
 class LoungeRequestEventNames {
   static const String networkNew = "network:new";
+  static const String networkEdit = "network:edit";
   static const String names = "names";
   static const String input = "input";
   static const String open = "open";
@@ -139,3 +140,49 @@ class NetworkNewLoungeRequestBody extends LoungeRequestBody {
 
   Map<String, dynamic> toJson() => _$NetworkNewLoungeRequestBodyToJson(this);
 }
+
+
+@JsonSerializable()
+class NetworkEditLoungeRequestBody extends LoungeRequestBody {
+  final String uuid;
+  final String host;
+  final String name;
+  final String nick;
+  final String port;
+  final String realname;
+  final String password;
+  final String rejectUnauthorized;
+  final String tls;
+  final String username;
+  final String commands;
+
+  bool get isTls => tls == LoungeConstants.on;
+
+  bool get isRejectUnauthorized => rejectUnauthorized == LoungeConstants.on;
+
+  String get uri => "$host:$port";
+
+  @override
+  String toString() {
+    return 'NetworkNewLoungeRequestBody{host: $host, uuid: $uuid, commands: $commands, name: $name,'
+        ' nick: $nick, port: $port, realname: $realname, password: $password,'
+        ' rejectUnauthorized: $rejectUnauthorized, tls: $tls,'
+        ' username: $username}';
+  }
+
+  NetworkEditLoungeRequestBody(
+      {@required this.host,
+        @required this.commands,
+        @required this.uuid,
+        @required this.name,
+        @required this.nick,
+        @required this.port,
+        @required this.realname,
+        @required this.rejectUnauthorized,
+        @required this.tls,
+        @required this.username,
+        @required this.password});
+
+  Map<String, dynamic> toJson() => _$NetworkEditLoungeRequestBodyToJson(this);
+}
+

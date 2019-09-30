@@ -27,7 +27,7 @@ ChatConfig toChatConfig(ConfigurationLoungeResponseBody loungeConfig,
             userPreferences: ChatNetworkUserPreferences(
                 nickname: loungeConfig.defaults.nick,
                 realName: loungeConfig.defaults.realname,
-                username: loungeConfig.defaults.username)),
+                username: loungeConfig.defaults.username, password: null, commands: null)),
         defaultChannels: loungeConfig.defaults.join,
         fileUpload: loungeConfig.fileUpload,
         ldapEnabled: loungeConfig.ldapEnabled,
@@ -266,6 +266,30 @@ NetworkNewLoungeRequestBody toNetworkNewLoungeRequestBody(
         ? serverPreferences.useTls ? LoungeConstants.on : LoungeConstants.off
         : null,
     name: serverPreferences.name,
+  );
+}
+
+
+NetworkEditLoungeRequestBody toNetworkEditLoungeRequestBody(
+    String remoteId,
+    ChatNetworkUserPreferences userPreferences,
+    ChatNetworkServerPreferences serverPreferences) {
+  return NetworkEditLoungeRequestBody(
+    username: userPreferences.username,
+    nick: userPreferences.nickname,
+    realname: userPreferences.realName,
+    password: userPreferences.password,
+    host: serverPreferences.serverHost,
+    port: serverPreferences.serverPort,
+    rejectUnauthorized: serverPreferences.useOnlyTrustedCertificates != null
+        ? serverPreferences.useOnlyTrustedCertificates
+        ? LoungeConstants.on
+        : LoungeConstants.off
+        : null,
+    tls: serverPreferences.useTls != null
+        ? serverPreferences.useTls ? LoungeConstants.on : LoungeConstants.off
+        : null,
+    name: serverPreferences.name, uuid: remoteId, commands: userPreferences.commands,
   );
 }
 
