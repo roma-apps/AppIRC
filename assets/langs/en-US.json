@@ -117,8 +117,10 @@
     "connection": {
       "connected": "Connected to server",
       "connecting": "Connecting to server",
-      "disconnected": "Not connected to server"
+      "disconnected": "Not connected to server",
+      "reconnect": "Reconnect"
     },
+
     "sub_message": {
       "mode_short": "mode {}",
       "mode_long": "mode",

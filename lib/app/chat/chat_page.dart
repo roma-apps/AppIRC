@@ -35,7 +35,7 @@ class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppSkinPreferenceBloc<AppIRCSkinTheme> skinPreferenceBloc =
-    Provider.of<AppSkinPreferenceBloc<AppIRCSkinTheme>>(context);
+        Provider.of<AppSkinPreferenceBloc<AppIRCSkinTheme>>(context);
 
     return StreamBuilder<AppSkinTheme>(
         initialData: skinPreferenceBloc.currentAppSkinTheme,
@@ -44,43 +44,38 @@ class ChatPage extends StatelessWidget {
           AppIRCSkinTheme currentSkin = asyncSnapshot.data;
           return SafeArea(
             child: PlatformScaffold(
-                android: (context) =>
-                    MaterialScaffoldData(
-                        appBar: AppBar(
-                          title: _buildAppBarChild(context),
-                          actions: <Widget>[
-                            _buildTrailing(context),
-                          ],
-                          backgroundColor: currentSkin.appBarColor,
-                        ),
-                        drawer: Drawer(child: ChatDrawerWidget()),
-                        body: _buildBody(context)),
-                ios: (context) =>
-                    CupertinoPageScaffoldData(
-                        resizeToAvoidBottomInset: true,
-                        body: _buildBody(context),
-                        navigationBar: CupertinoNavigationBar(
-                          leading: PlatformIconButton(
-                            icon: _buildMenuIcon(context),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  platformPageRoute(
-                                      builder: (context) => ChatDrawerPage()));
-                            },
-                          ),
-                          trailing: _buildTrailing(context),
-                          middle: _buildAppBarChild(context),
-                        ))),
+                android: (context) => MaterialScaffoldData(
+                    appBar: AppBar(
+                      title: _buildAppBarChild(context),
+                      actions: <Widget>[
+                        _buildTrailing(context),
+                      ],
+                      backgroundColor: currentSkin.appBarColor,
+                    ),
+                    drawer: Drawer(child: ChatDrawerWidget()),
+                    body: _buildBody(context)),
+                ios: (context) => CupertinoPageScaffoldData(
+                    resizeToAvoidBottomInset: true,
+                    body: _buildBody(context),
+                    navigationBar: CupertinoNavigationBar(
+                      leading: PlatformIconButton(
+                        icon: _buildMenuIcon(context),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              platformPageRoute(
+                                  builder: (context) => ChatDrawerPage()));
+                        },
+                      ),
+                      trailing: _buildTrailing(context),
+                      middle: _buildAppBarChild(context),
+                    ))),
           );
         });
   }
 
-  Icon _buildMenuIcon(BuildContext context) =>
-      Icon(Icons.menu,
-          color: Provider
-              .of<ChatAppBarSkinBloc>(context)
-              .iconAppBarColor);
+  Icon _buildMenuIcon(BuildContext context) => Icon(Icons.menu,
+      color: Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
 
   Widget _buildTrailing(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
@@ -96,7 +91,7 @@ class ChatPage extends StatelessWidget {
           var backendService = Provider.of<ChatInputBackendService>(context);
           var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
           var channelsStateBloc =
-          Provider.of<ChatNetworkChannelsStateBloc>(context);
+              Provider.of<ChatNetworkChannelsStateBloc>(context);
           var networksStateBloc = Provider.of<ChatNetworksStateBloc>(context);
 
           var network = networkListBloc.findNetworkWithChannel(channel);
@@ -106,22 +101,15 @@ class ChatPage extends StatelessWidget {
           var channelBloc = NetworkChannelBloc(
               backendService, network, channel, channelsStateBloc);
 
-
-          List<Widget> items = [buildChannelPopupMenuButton(
-              context,
-              networkBloc,
-              channelBloc,
-              Provider
-                  .of<ChatAppBarSkinBloc>(context)
-                  .iconAppBarColor)
+          List<Widget> items = [
+            buildChannelPopupMenuButton(context, networkBloc, channelBloc,
+                Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor)
           ];
 
           if (channel.type == NetworkChannelType.CHANNEL) {
             items.add(PlatformIconButton(
                 icon: Icon(Icons.group,
-                    color:
-                    Provider
-                        .of<ChatAppBarSkinBloc>(context)
+                    color: Provider.of<ChatAppBarSkinBloc>(context)
                         .iconAppBarColor),
                 onPressed: () {
                   Navigator.push(
@@ -129,8 +117,7 @@ class ChatPage extends StatelessWidget {
                       platformPageRoute(
                           builder: (context) =>
                               IRCNetworkChannelUsersPage(network, channel)));
-                })
-            );
+                }));
           }
 
           return Row(children: items);
@@ -246,21 +233,23 @@ class ChatPage extends StatelessWidget {
         builder: (BuildContext context,
             AsyncSnapshot<ChatConnectionState> snapshot) {
           var connectionState = snapshot.data;
+          var appLocalizations = AppLocalizations.of(context);
           switch (connectionState) {
             case ChatConnectionState.CONNECTED:
               var startValues = createDefaultNetworkPreferences(context);
               return Provider(
                 providable: ChatNetworkPreferencesFormBloc(startValues),
                 child: ChatNetworkPreferencesFormWidget(startValues,
-                        (context, preferences) async {
-                      var networksBloc = Provider.of<ChatNetworksListBloc>(
-                          context);
-                      await networksBloc.joinNetwork(preferences);
-                    }),
+                    (context, preferences) async {
+                  var networksBloc = Provider.of<ChatNetworksListBloc>(context);
+                  await networksBloc.joinNetwork(preferences);
+                }),
               );
               break;
             case ChatConnectionState.CONNECTING:
-              return Center(child: Text("Connecting to server"));
+              return Center(
+                  child:
+                      Text(appLocalizations.tr("chat.connection.connecting")));
               break;
             case ChatConnectionState.DISCONNECTED:
               return Center(
@@ -268,11 +257,13 @@ class ChatPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text("Not connected to server"),
+                    Text(appLocalizations.tr("chat.connection.disconnected")),
                     createSkinnedPlatformButton(context,
-                        child: Text("Reconnect"), onPressed: () {
-                          connectionBloc.reconnect();
-                        })
+                        child: Text(
+                            appLocalizations.tr("chat.connection.reconnect")),
+                        onPressed: () {
+                      connectionBloc.reconnect();
+                    })
                   ],
                 ),
               );
