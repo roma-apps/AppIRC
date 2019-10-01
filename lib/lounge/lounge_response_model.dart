@@ -372,6 +372,8 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String channels;
   final String hostname;
   final String ident;
+  final String actual_hostname;
+  final String actual_ip;
   final String idle;
   final int idleTime;
   final int logonTime;
@@ -391,6 +393,7 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
         'ident: $ident, idle: $idle, idleTime: $idleTime, '
         'logonTime: $logonTime, logon: $logon, nick: $nick, '
         'realName: $real_name, secure: $secure, '
+        'actual_ip: $actual_ip, actual_hostname: $actual_hostname, '
         'server: $server, serverInfo: $server_info}';
   }
 
@@ -403,6 +406,8 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
       @required this.idleTime,
       @required this.logonTime,
       @required this.logon,
+      @required this.actual_hostname,
+      @required this.actual_ip,
       @required this.nick,
       // ignore: non_constant_identifier_names
       @required this.real_name,

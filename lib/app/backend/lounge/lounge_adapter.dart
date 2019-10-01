@@ -11,8 +11,8 @@ import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 
 var _logger = MyLogger(logTag: "lounge_adapter", enabled: true);
 
-ChatConfig toChatConfig(ConfigurationLoungeResponseBody loungeConfig,
-    List<String> commands) =>
+ChatConfig toChatConfig(
+        ConfigurationLoungeResponseBody loungeConfig, List<String> commands) =>
     ChatConfig.name(
         defaultNetwork: ChatNetworkConnectionPreferences(
             serverPreferences: ChatNetworkServerPreferences(
@@ -21,13 +21,15 @@ ChatConfig toChatConfig(ConfigurationLoungeResponseBody loungeConfig,
                 serverPort: loungeConfig.defaults.port.toString(),
                 useTls: loungeConfig.defaults.tls,
                 useOnlyTrustedCertificates:
-                loungeConfig.defaults.rejectUnauthorized,
+                    loungeConfig.defaults.rejectUnauthorized,
                 visible: loungeConfig.displayNetwork,
                 enabled: !loungeConfig.lockNetwork),
             userPreferences: ChatNetworkUserPreferences(
                 nickname: loungeConfig.defaults.nick,
                 realName: loungeConfig.defaults.realname,
-                username: loungeConfig.defaults.username, password: null, commands: null)),
+                username: loungeConfig.defaults.username,
+                password: null,
+                commands: null)),
         defaultChannels: loungeConfig.defaults.join,
         fileUpload: loungeConfig.fileUpload,
         ldapEnabled: loungeConfig.ldapEnabled,
@@ -38,9 +40,8 @@ ChatConfig toChatConfig(ConfigurationLoungeResponseBody loungeConfig,
         commands: commands,
         defaultPassword: loungeConfig.defaults.password);
 
-
-ChatMessage toChatMessage(NetworkChannel channel,
-    MsgLoungeResponseBody msgLoungeResponseBody) =>
+ChatMessage toChatMessage(
+        NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) =>
     RegularMessage.name(
       channel.remoteId,
       command: msgLoungeResponseBody.command,
@@ -67,7 +68,7 @@ ChatMessage toChatMessage(NetworkChannel channel,
 List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
     MessageSpecialLoungeResponseBody messageSpecialLoungeResponseBody) {
   var messageType =
-  detectSpecialMessageType(messageSpecialLoungeResponseBody.data);
+      detectSpecialMessageType(messageSpecialLoungeResponseBody.data);
 
   if (messageType == SpecialMessageType.TEXT) {
     var textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(
@@ -76,7 +77,8 @@ List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
       SpecialMessage.name(
           data: TextSpecialMessageBody(textMessage.text),
           channelRemoteId: channel.remoteId,
-          specialType: messageType, date: DateTime.now())
+          specialType: messageType,
+          date: DateTime.now())
     ];
   } else if (messageType == SpecialMessageType.CHANNELS_LIST_ITEM) {
     var iterable = messageSpecialLoungeResponseBody.data as Iterable;
@@ -85,15 +87,16 @@ List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
 
     iterable.forEach((item) {
       var loungeChannelItem =
-      ChannelListItemSpecialMessageLoungeResponseBodyPart.fromJson(item);
+          ChannelListItemSpecialMessageLoungeResponseBodyPart.fromJson(item);
       var networkChannelInfoSpecialMessageBody =
-      NetworkChannelInfoSpecialMessageBody(loungeChannelItem.channel,
-          loungeChannelItem.topic, loungeChannelItem.num_users);
+          NetworkChannelInfoSpecialMessageBody(loungeChannelItem.channel,
+              loungeChannelItem.topic, loungeChannelItem.num_users);
 
       specialMessages.add(SpecialMessage.name(
           data: networkChannelInfoSpecialMessageBody,
           channelRemoteId: channel.remoteId,
-          specialType: messageType, date: DateTime.now()));
+          specialType: messageType,
+          date: DateTime.now()));
     });
 
     return specialMessages;
@@ -164,20 +167,22 @@ NetworkChannelType detectNetworkChannelType(String typeString) {
 }
 
 NetworkChannelState toNetworkChannelState(
-    ChannelLoungeResponseBody loungeChannel) =>
+        ChannelLoungeResponseBody loungeChannel) =>
     NetworkChannelState.name(
         topic: loungeChannel.topic,
         editTopicPossible: loungeChannel.editTopic,
         unreadCount: loungeChannel.unread,
         connected:
-        loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED,
+            loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED,
         highlighted: loungeChannel.highlight != null);
 
-NetworkState toNetworkState(
-    NetworkStatusLoungeResponseBody loungeNetworkStatus, String nick, String name) =>
+NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
+        String nick, String name) =>
     NetworkState.name(
         connected: loungeNetworkStatus.connected,
-        secure: loungeNetworkStatus.secure, nick: nick, name: name);
+        secure: loungeNetworkStatus.secure,
+        nick: nick,
+        name: name);
 
 RegularMessageType detectRegularMessageType(String stringType) {
   var type;
@@ -259,8 +264,8 @@ NetworkNewLoungeRequestBody toNetworkNewLoungeRequestBody(
     port: serverPreferences.serverPort,
     rejectUnauthorized: serverPreferences.useOnlyTrustedCertificates != null
         ? serverPreferences.useOnlyTrustedCertificates
-        ? LoungeConstants.on
-        : LoungeConstants.off
+            ? LoungeConstants.on
+            : LoungeConstants.off
         : null,
     tls: serverPreferences.useTls != null
         ? serverPreferences.useTls ? LoungeConstants.on : LoungeConstants.off
@@ -268,7 +273,6 @@ NetworkNewLoungeRequestBody toNetworkNewLoungeRequestBody(
     name: serverPreferences.name,
   );
 }
-
 
 NetworkEditLoungeRequestBody toNetworkEditLoungeRequestBody(
     String remoteId,
@@ -283,28 +287,33 @@ NetworkEditLoungeRequestBody toNetworkEditLoungeRequestBody(
     port: serverPreferences.serverPort,
     rejectUnauthorized: serverPreferences.useOnlyTrustedCertificates != null
         ? serverPreferences.useOnlyTrustedCertificates
-        ? LoungeConstants.on
-        : LoungeConstants.off
+            ? LoungeConstants.on
+            : LoungeConstants.off
         : null,
     tls: serverPreferences.useTls != null
         ? serverPreferences.useTls ? LoungeConstants.on : LoungeConstants.off
         : null,
-    name: serverPreferences.name, uuid: remoteId, commands: userPreferences.commands,
+    name: serverPreferences.name,
+    uuid: remoteId,
+    commands: userPreferences.commands,
   );
 }
 
-
 WhoIsSpecialMessageBody toSpecialMessageWhoIs(
-    WhoIsLoungeResponseBodyPart loungeWhoIs) => WhoIsSpecialMessageBody.name(account: loungeWhoIs.account,
-      channels: loungeWhoIs.channels,
-      hostname: loungeWhoIs.hostname,
-      ident: loungeWhoIs.ident,
-      idle: loungeWhoIs.idle,
-      idleTime: DateTime.fromMillisecondsSinceEpoch(loungeWhoIs.idleTime),
-      logonTime:  DateTime.fromMillisecondsSinceEpoch(loungeWhoIs.logonTime),
-      logon: loungeWhoIs.logon,
-      nick: loungeWhoIs.nick,
-      realName: loungeWhoIs.real_name,
-      secure: loungeWhoIs.secure,
-      server: loungeWhoIs.server,
-      serverInfo: loungeWhoIs.server_info);
+        WhoIsLoungeResponseBodyPart loungeWhoIs) =>
+    WhoIsSpecialMessageBody.name(
+        account: loungeWhoIs.account,
+        channels: loungeWhoIs.channels,
+        hostname: loungeWhoIs.hostname,
+        ident: loungeWhoIs.ident,
+        idle: loungeWhoIs.idle,
+        idleTime: DateTime.fromMillisecondsSinceEpoch(loungeWhoIs.idleTime),
+        logonTime: DateTime.fromMillisecondsSinceEpoch(loungeWhoIs.logonTime),
+        logon: loungeWhoIs.logon,
+        nick: loungeWhoIs.nick,
+        realName: loungeWhoIs.real_name,
+        secure: loungeWhoIs.secure,
+        server: loungeWhoIs.server,
+        serverInfo: loungeWhoIs.server_info,
+        actualHostname: loungeWhoIs.actual_hostname,
+        actualIp: loungeWhoIs.actual_ip);
