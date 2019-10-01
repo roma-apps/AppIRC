@@ -188,6 +188,10 @@ class LoungeBackendService extends Providable
       throw NotImplementedYetException();
     }
 
+    // todo: open ticket for lounge
+    // if you change nickname to registered nickname on Freenode
+    // then you should write additional query to identify
+
     var userPreferences =
         networkPreferences.networkConnectionPreferences.userPreferences;
     var serverPreferences =
