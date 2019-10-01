@@ -5,84 +5,48 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
-import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_popup_menu_widget.dart';
-import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "buildChannelPopupMenuButton", enabled: true);
 
-enum ChannelDropDownAction { LEAVE, TOPIC, LIST_BANNED, USER_INFORMATION }
-
-PopupMenuButton buildChannelPopupMenuButton(
-    BuildContext context,
-    NetworkBloc networkBloc,
-    NetworkChannelBloc channelBloc,
-    Color iconColor) {
-
+Widget buildChannelPopupMenuButton(BuildContext context,
+    NetworkBloc networkBloc, NetworkChannelBloc channelBloc, Color iconColor) {
   var channel = channelBloc.channel;
   var channelState = channelBloc.networkChannelState;
   var network = networkBloc.network;
 
-
   if (channel.type == NetworkChannelType.LOBBY) {
-    return buildNetworkPopupMenuButton(
-        context, networkBloc, iconColor);
+    return buildNetworkPopupMenuButton(context, networkBloc, iconColor);
   }
 
-  return PopupMenuButton<ChannelDropDownAction>(
-    icon: Icon(Icons.more_vert,
-        color: iconColor),
-    onSelected: (value) async {
-      switch (value) {
-        case ChannelDropDownAction.LEAVE:
-          channelBloc.leaveNetworkChannel();
-          break;
-        case ChannelDropDownAction.TOPIC:
-          showPlatformDialog(
-              context: context,
-              builder: (_) => NetworkChannelTopicEditWidget(channel),
-              androidBarrierDismissible: true);
-          break;
-        case ChannelDropDownAction.LIST_BANNED:
-          channelBloc.printNetworkChannelBannedUsers();
-          break;
-        case ChannelDropDownAction.USER_INFORMATION:
-          channelBloc.printUserInfo(channel.name);
-          break;
-      }
-    },
-    itemBuilder: (context) {
-      return _buildMenuItems(context, network, channel, channelState);
-    },
-  );
+  return createPlatformPopupMenuButton(context,
+      child: Icon(Icons.more_vert, color: iconColor),
+      actions: _buildMenuItems(context, network, channel, channelState));
 }
 
-List<PopupMenuEntry<ChannelDropDownAction>> _buildMenuItems(
-    BuildContext context,
-    Network network,
-    NetworkChannel channel,
-    NetworkChannelState channelState) {
-  List<PopupMenuEntry<ChannelDropDownAction>> menuItems;
+List<PlatformAwarePopupMenuAction> _buildMenuItems(BuildContext context,
+    Network network, NetworkChannel channel, NetworkChannelState channelState) {
+  List<PlatformAwarePopupMenuAction> menuItems;
 
-  var appLocalizations = AppLocalizations.of(context);
+  var channelBloc = NetworkChannelBloc.of(context, channel);
 
   switch (channel.type) {
     case NetworkChannelType.LOBBY:
       menuItems = [];
       break;
     case NetworkChannelType.SPECIAL:
-      menuItems = [_buildCloseMenuItem(context)];
+      menuItems = [_buildCloseMenuItem(context, channelBloc)];
       break;
     case NetworkChannelType.QUERY:
-      menuItems = _buildUserChannelMenuItems(context);
+      menuItems = _buildUserChannelMenuItems(context, channelBloc);
       break;
     case NetworkChannelType.CHANNEL:
-      menuItems = _buildChannelMenuItems(context, channel);
+      menuItems = _buildChannelMenuItems(context, channelBloc);
       break;
     case NetworkChannelType.UNKNOWN:
       menuItems = [];
@@ -90,53 +54,74 @@ List<PopupMenuEntry<ChannelDropDownAction>> _buildMenuItems(
   }
 
   if (channelState.editTopicPossible == true) {
-    menuItems.insert(
-        0,
-        buildDropdownMenuItemRow(
-            value: ChannelDropDownAction.TOPIC,
-            text: appLocalizations.tr("settings.channel_dropdown_menu.topic"),
-            iconData: Icons.edit));
+    menuItems.insert(0, _buildEditTopicMenuItem(context, channelBloc));
   }
 
   return menuItems;
 }
 
-List<PopupMenuEntry<ChannelDropDownAction>> _buildChannelMenuItems(
-    BuildContext context, NetworkChannel channel) {
-  var appLocalizations = AppLocalizations.of(context);
-
-  var items = <PopupMenuEntry<ChannelDropDownAction>>[
-    buildDropdownMenuItemRow(
-        value: ChannelDropDownAction.LIST_BANNED,
-        text: appLocalizations.tr("settings.channel_dropdown_menu.list_banned"),
-        iconData: Icons.list),
-    buildDropdownMenuItemRow(
-        value: ChannelDropDownAction.LEAVE,
-        text: appLocalizations.tr("settings.channel_dropdown_menu.leave"),
-        iconData: Icons.clear)
+List<PlatformAwarePopupMenuAction> _buildChannelMenuItems(
+    BuildContext context, NetworkChannelBloc channelBloc) {
+  var items = <PlatformAwarePopupMenuAction>[
+    _buildBannedUsersMenuItem(context, channelBloc),
+    _buildCloseMenuItem(context, channelBloc),
   ];
 
   return items;
 }
 
-List<PopupMenuEntry<ChannelDropDownAction>> _buildUserChannelMenuItems(
-    BuildContext context) {
-  var appLocalizations = AppLocalizations.of(context);
-
-  return <PopupMenuEntry<ChannelDropDownAction>>[
-    buildDropdownMenuItemRow(
-        value: ChannelDropDownAction.USER_INFORMATION,
-        text: appLocalizations
-            .tr("settings.channel_dropdown_menu.user_information"),
-        iconData: Icons.account_box),
-    _buildCloseMenuItem(context)
+List<PlatformAwarePopupMenuAction> _buildUserChannelMenuItems(
+    BuildContext context, NetworkChannelBloc channelBloc) {
+  return <PlatformAwarePopupMenuAction>[
+    _buildUserInformationMenuItem(context, channelBloc),
+    _buildCloseMenuItem(context, channelBloc)
   ];
 }
 
-PopupMenuItem<ChannelDropDownAction> _buildCloseMenuItem(BuildContext context) {
+PlatformAwarePopupMenuAction _buildCloseMenuItem(
+    BuildContext context, NetworkChannelBloc channelBloc) {
   var appLocalizations = AppLocalizations.of(context);
-  return buildDropdownMenuItemRow(
-      value: ChannelDropDownAction.LEAVE,
-      text: appLocalizations.tr("settings.channel_dropdown_menu.close"),
-      iconData: Icons.clear);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("settings.channel_dropdown_menu.leave"),
+      iconData: Icons.clear,
+      actionCallback: (action) {
+        channelBloc.leaveNetworkChannel();
+      });
+}
+
+PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
+    BuildContext context, NetworkChannelBloc channelBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations
+          .tr("settings.channel_dropdown_menu.user_information"),
+      iconData: Icons.account_box,
+      actionCallback: (action) {
+        channelBloc.printUserInfo(channelBloc.channel.name);
+      });
+}
+
+PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
+    BuildContext context, NetworkChannelBloc channelBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("settings.channel_dropdown_menu.list_banned"),
+      iconData: Icons.list,
+      actionCallback: (action) {
+        channelBloc.printNetworkChannelBannedUsers();
+      });
+}
+
+PlatformAwarePopupMenuAction _buildEditTopicMenuItem(
+    BuildContext context, NetworkChannelBloc channelBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("settings.channel_dropdown_menu.topic"),
+      iconData: Icons.edit,
+      actionCallback: (action) {
+        showPlatformDialog(
+            context: context,
+            builder: (_) => NetworkChannelTopicEditWidget(channelBloc.channel),
+            androidBarrierDismissible: true);
+      });
 }

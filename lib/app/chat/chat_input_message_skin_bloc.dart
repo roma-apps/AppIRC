@@ -6,7 +6,6 @@ abstract class ChatInputMessageSkinBloc extends SkinBloc {
 
   TextStyle get inputMessageTextStyle;
 
-  Color get iconSendMessageColor;
   Color get inputMessageCursorColor;
   Color get inputMessageBackgroundColor;
 

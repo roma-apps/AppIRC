@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
 
 
 
@@ -92,7 +93,7 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   Color get appBarColor => _androidDayThemeData.primaryColor;
 
   @override
-  Color get chatInputColor => _androidDayThemeData.primaryColor;
+  Color get chatInputColor => isMaterial ? _androidDayThemeData.primaryColor : _androidDayThemeData.bottomAppBarColor;
 
   @override
   Color get notActiveListItemColor => appBackgroundColor;
@@ -104,7 +105,7 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   Color get onAppBackgroundColor => _androidDayThemeData.colorScheme.onBackground;
 
   @override
-  Color get onAppBarColor => _androidDayThemeData.colorScheme.onPrimary;
+  Color get onAppBarColor => isMaterial ? _androidDayThemeData.colorScheme.onPrimary : _androidDayThemeData.buttonColor;
 
   @override
   Color get onChatInputColor => onAppBarColor;

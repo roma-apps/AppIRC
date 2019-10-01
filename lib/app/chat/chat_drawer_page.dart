@@ -20,5 +20,11 @@ class ChatDrawerPageState extends State<ChatDrawerPage> {
       appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('settings.title')),
       ),
-      body: SafeArea(child: ChatDrawerWidget()));
+      body: SafeArea(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ChatDrawerWidget(onActionCallback: () {
+          Navigator.pop(context);
+        }),
+      )));
 }

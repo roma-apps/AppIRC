@@ -12,7 +12,6 @@
     "title": "Settings",
     "channel_dropdown_menu": {
       "leave": "Leave",
-      "close": "Close",
       "list_banned": "List banned users",
       "topic": "Topic",
       "user_information": "User information"

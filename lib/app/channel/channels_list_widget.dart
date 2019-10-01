@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart'
     show Colors, Icons, PopupMenuButton, PopupMenuEntry, PopupMenuItem;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_connection_status_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
@@ -10,7 +8,6 @@ import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -22,7 +19,9 @@ var _logger = MyLogger(logTag: "NetworkChannelsListWidget", enabled: true);
 class NetworkChannelsListWidget extends StatelessWidget {
   final Network network;
 
-  NetworkChannelsListWidget(this.network);
+  final VoidCallback onActionCallback;
+
+  NetworkChannelsListWidget(this.network, this.onActionCallback);
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +75,7 @@ class NetworkChannelsListWidget extends StatelessWidget {
 
   Widget _buildChannelRow(
       BuildContext context,
-      ChatActiveChannelBloc ircChatActiveChannelBloc,
+      ChatActiveChannelBloc activeChannelBloc,
       Network network,
       NetworkChannel channel,
       bool isChannelActive) {
@@ -102,68 +101,73 @@ class NetworkChannelsListWidget extends StatelessWidget {
         break;
     }
 
-    var channelBloc = ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
-    return Provider(
-      providable: channelBloc,
-      child: StreamBuilder(
-          initialData: channelBloc.networkChannelState,
-          stream: channelBloc.networkChannelStateStream,
-          builder: (context, snapshot) {
-            NetworkChannelState channelState = snapshot.data;
+    var channelBloc =
+        ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Provider(
+        providable: channelBloc,
+        child: StreamBuilder(
+            initialData: channelBloc.networkChannelState,
+            stream: channelBloc.networkChannelStateStream,
+            builder: (context, snapshot) {
+              NetworkChannelState channelState = snapshot.data;
 
-            _logger.d(() => "new state for channelItem $channelState");
+              _logger.d(() => "new state for channelItem $channelState");
 
-            var channelsListSkinBloc =
-                Provider.of<ChannelsListSkinBloc>(context);
-            return Row(children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
-                child: Icon(iconData,
-                    color: channelsListSkinBloc
-                        .getChannelItemIconColor(isChannelActive)),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: GestureDetector(
-                    onTap: () =>
-                        ircChatActiveChannelBloc.changeActiveChanel(channel),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.all(8.0),
-                              child: Text(channel.name,
-                                  style: channelsListSkinBloc
-                                      .getChannelItemTextStyle(
-                                          isChannelActive)))
-                        ]),
+              var channelsListSkinBloc =
+                  Provider.of<ChannelsListSkinBloc>(context);
+              return Row(children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
+                  child: Icon(iconData,
+                      color: channelsListSkinBloc
+                          .getChannelItemIconColor(isChannelActive)),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (onActionCallback != null) {
+                          onActionCallback();
+                        }
+                        return activeChannelBloc.changeActiveChanel(channel);
+                      },
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(channel.name,
+                                style: channelsListSkinBloc
+                                    .getChannelItemTextStyle(isChannelActive))
+                          ]),
+                    ),
                   ),
                 ),
-              ),
-              StreamBuilder<NetworkState>(
-                  stream: networkBloc.networkStateStream,
-                  initialData: networkBloc.networkState,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<NetworkState> snapshot) {
-                    var networkState = snapshot.data;
+                StreamBuilder<NetworkState>(
+                    stream: networkBloc.networkStateStream,
+                    initialData: networkBloc.networkState,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<NetworkState> snapshot) {
+                      var networkState = snapshot.data;
 
-                    return buildConnectionIcon(
-                        context,
-                        channelsListSkinBloc
-                            .getChannelItemIconColor(isChannelActive),
-                        networkState.connected && channelState.connected);
-                  }),
-              buildChannelUnreadCountBadge(context, isChannelActive),
-              buildChannelPopupMenuButton(
-                  context,
-                  networkBloc,
-                  channelBloc,
-                  channelsListSkinBloc
-                      .getChannelItemIconColor(isChannelActive))
-            ]);
-          }),
+                      return buildConnectionIcon(
+                          context,
+                          channelsListSkinBloc
+                              .getChannelItemIconColor(isChannelActive),
+                          networkState.connected && channelState.connected);
+                    }),
+                buildChannelUnreadCountBadge(context, isChannelActive),
+                buildChannelPopupMenuButton(
+                    context,
+                    networkBloc,
+                    channelBloc,
+                    channelsListSkinBloc
+                        .getChannelItemIconColor(isChannelActive))
+              ]);
+            }),
+      ),
     );
   }
 }

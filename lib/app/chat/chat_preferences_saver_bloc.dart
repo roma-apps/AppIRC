@@ -43,14 +43,14 @@ class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
     addDisposable(
         streamSubscription:
         _stateBloc.getNetworkStateStream(network).listen((state) {
-          var newNick = state.nick
+          var newNick = state.nick;
           var oldUserPreferences = findPreferencesForNetwork(network)
               .networkConnectionPreferences
               .userPreferences;
 
           if (oldUserPreferences.nickname != newNick) {
             oldUserPreferences
-                .nickname = newNickin;
+                .nickname = newNick;
             _onPreferencesChanged();
           }
         }));

@@ -43,6 +43,7 @@ import 'package:flutter_appirc/form/form_skin_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
@@ -58,6 +59,9 @@ import 'app/skin/themes/day_app_irc_skin_theme.dart';
 var _logger = MyLogger(logTag: "Main", enabled: true);
 
 Future main() async {
+
+//  changeToCupertinoPlatformAware();
+
   var preferencesService = PreferencesService();
   var socketIOManager = SocketIOManager();
 

@@ -7,7 +7,6 @@ import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
-import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
@@ -310,7 +309,6 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
   return icon;
 }
 
-enum MessageNickMenuAction { WHO_IS, DIRECT_MESSAGES }
 
 Widget buildRegularMessage(Widget title, Widget body, bool needHighlight) {
   var decoration;

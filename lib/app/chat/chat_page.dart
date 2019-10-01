@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart' show CupertinoNavigationBar;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, AppBar, Drawer;
+import 'package:flutter/material.dart' show AppBar, Colors, Drawer, Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
@@ -118,19 +118,19 @@ class ChatPage extends StatelessWidget {
                 }));
           }
 
-          return Row(children: items);
+          return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: items);
         }
       },
     );
   }
 
   Widget _buildAppBarChild(BuildContext context) {
-    var backendService = Provider.of<LoungeBackendService>(context);
-
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
     var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
-    var channelsStateBloc = Provider.of<ChatNetworkChannelsStateBloc>(context);
+
 
     return StreamBuilder<NetworkChannel>(
       stream: activeChannelBloc.activeChannelStream,
@@ -167,8 +167,6 @@ class ChatPage extends StatelessWidget {
                 return ChatAppBarWidget(title, content);
               });
         } else {
-          var network = networkListBloc.findNetworkWithChannel(channel);
-
           var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
               .getNetworkChannelBloc(channel);
           return Provider(

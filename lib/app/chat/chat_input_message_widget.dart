@@ -5,22 +5,21 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_skin_bloc.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware_type_ahead_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class NetworkChannelNewMessageWidget extends StatefulWidget {
-
   NetworkChannelNewMessageWidget();
 
   @override
-  State<StatefulWidget> createState() =>
-      NetworkChannelNewMessageState();
+  State<StatefulWidget> createState() => NetworkChannelNewMessageState();
 }
 
 class NetworkChannelNewMessageState
     extends State<NetworkChannelNewMessageWidget> {
-
   @override
   Widget build(BuildContext context) {
     var hintStr = AppLocalizations.of(context).tr("chat.enter_message.hint");
@@ -30,7 +29,6 @@ class NetworkChannelNewMessageState
     var channelBloc = Provider.of<NetworkChannelBloc>(context);
     ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
 
-
     return Container(
       decoration: BoxDecoration(
           color: inputMessageSkinBloc.inputMessageBackgroundColor),
@@ -39,30 +37,62 @@ class NetworkChannelNewMessageState
         child: Row(
           children: <Widget>[
             Flexible(
-                child: TypeAheadField(
-              keepSuggestionsOnSuggestionSelected: true,
-              direction: AxisDirection.up,
-              noItemsFoundBuilder: (_) => SizedBox.shrink(),
-              textFieldConfiguration: TextFieldConfiguration(
-                  autofocus: false,
-                  controller: inputMessageBloc.messageController,
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(fontStyle: FontStyle.italic),
-                  decoration: InputDecoration(border: OutlineInputBorder())),
-              suggestionsCallback: (pattern) async {
-                var suggestions = await inputMessageBloc
-                    .calculateAutoCompleteSuggestions(pattern);
-                return suggestions;
-              },
-              itemBuilder: (context, suggestion) {
-                return ListTile(
-                  title: Text(suggestion),
-                );
-              },
-              onSuggestionSelected: (suggestion) {
-                inputMessageBloc.onAutoCompleteSelected(suggestion);
-              },
+                child: Container(
+//              decoration: BoxDecoration(border: Border.all(color: inputMessageSkinBloc.inputMessageCursorColor)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: createPlatformTypeAhead(
+                  context,
+                  keepSuggestionsOnSuggestionSelected: true,
+                  direction: AxisDirection.up,
+                  noItemsFoundBuilder: (_) => SizedBox.shrink(),
+                  suggestionsCallback: (pattern) async {
+                    var suggestions = await inputMessageBloc
+                        .calculateAutoCompleteSuggestions(pattern);
+                    return suggestions;
+                  },
+                  itemBuilder: (context, suggestion) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(suggestion),
+                    );
+                  },
+                  onSuggestionSelected: (suggestion) {
+                    inputMessageBloc.onAutoCompleteSelected(suggestion);
+                  },
+                  android: () {
+                    return AndroidTypeAheadData(
+                        textFieldConfiguration: TextFieldConfiguration(
+                            autofocus: false,
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (_) {
+                              inputMessageBloc.sendMessage();
+                            },
+                            controller: inputMessageBloc.messageController,
+                            style: DefaultTextStyle.of(context)
+                                .style
+                                .copyWith(fontStyle: FontStyle.italic),
+                            decoration: InputDecoration(
+                                hintText: hintStr,
+                                hintStyle: inputMessageSkinBloc
+                                    .inputMessageHintTextStyle)));
+                  },
+                  ios: () {
+                    return CupertinoTypeAheadData(
+                        textFieldConfiguration: CupertinoTextFieldConfiguration(
+                            autofocus: false,
+                            controller: inputMessageBloc.messageController,
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (_) {
+                              inputMessageBloc.sendMessage();
+                            },
+                            style: DefaultTextStyle.of(context)
+                                .style
+                                .copyWith(fontStyle: FontStyle.italic),
+                            placeholder: hintStr));
+                  },
+                ),
+              ),
             )),
 //            Flexible(
 //                child: PlatformTextField(
@@ -82,8 +112,7 @@ class NetworkChannelNewMessageState
 //              },
 //            )),
             PlatformIconButton(
-                color: inputMessageSkinBloc.iconSendMessageColor,
-                icon: new Icon(Icons.message),
+                icon: Icon(Icons.message),
                 onPressed: () {
                   inputMessageBloc.sendMessage();
                 }),

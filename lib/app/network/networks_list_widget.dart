@@ -2,32 +2,28 @@ import 'package:easy_localization/easy_localization_delegate.dart';
 import 'package:flutter/material.dart'
     show Divider, Icons, PopupMenuButton, PopupMenuEntry;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_connection_status_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/channel/channels_list_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_expand_state_bloc.dart';
-import 'package:flutter_appirc/app/network/network_join_channel_page.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_popup_menu_widget.dart';
-import 'package:flutter_appirc/app/network/network_preferences_page.dart';
 import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
-import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class NetworksListWidget extends StatelessWidget {
-  NetworksListWidget();
+
+  final VoidCallback onActionCallback;
+
+  NetworksListWidget(this.onActionCallback);
 
   @override
   Widget build(BuildContext context) {
@@ -37,17 +33,15 @@ class NetworksListWidget extends StatelessWidget {
         stream: networksListBloc.networksStream,
         builder: (BuildContext context, AsyncSnapshot<List<Network>> snapshot) {
           var listItemCount =
-          (snapshot.data == null ? 0 : snapshot.data.length);
+              (snapshot.data == null ? 0 : snapshot.data.length);
 
           if (listItemCount > 0) {
             return Container(
               child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: listItemCount,
-                  separatorBuilder: (context, index) =>
-                      Divider(
-                        color: Provider
-                            .of<NetworkListSkinBloc>(context)
+                  separatorBuilder: (context, index) => Divider(
+                        color: Provider.of<NetworkListSkinBloc>(context)
                             .separatorColor,
                       ),
                   itemBuilder: (BuildContext context, int index) {
@@ -58,9 +52,8 @@ class NetworksListWidget extends StatelessWidget {
             );
           } else {
             return Center(
-              child: Text(
-                  AppLocalizations.of(context).tr(
-                      "irc_connection.no_networks")),
+              child: Text(AppLocalizations.of(context)
+                  .tr("irc_connection.no_networks")),
             );
           }
         });
@@ -70,13 +63,11 @@ class NetworksListWidget extends StatelessWidget {
 
   Widget _networkItem(BuildContext context, Network network) {
     var preferencesService = Provider.of<PreferencesService>(context);
-    var ircChatActiveChannelBloc =
-    Provider.of<ChatActiveChannelBloc>(context);
+    var ircChatActiveChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var channel = network.lobbyChannel;
     var expandBloc = ChatNetworkExpandStateBloc(preferencesService, network);
 
-    var networkBloc =
-    ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
+    var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
     return Provider<NetworkBloc>(
       providable: networkBloc,
       child: StreamBuilder<bool>(
@@ -91,21 +82,16 @@ class NetworksListWidget extends StatelessWidget {
                 var isChannelActive =
                     activeChannel?.remoteId == channel.remoteId;
 
-                return _buildNetworkRow(
-                    context,
-                    ircChatActiveChannelBloc,
-                    network,
-                    channel,
-                    isChannelActive,
-                    expanded,
-                    expandBloc);
+                return _buildNetworkRow(context, ircChatActiveChannelBloc,
+                    network, channel, isChannelActive, expanded, expandBloc);
               });
         },
       ),
     );
   }
 
-  _buildNetworkRow(BuildContext context,
+  _buildNetworkRow(
+      BuildContext context,
       ChatActiveChannelBloc ircChatActiveChannelBloc,
       Network network,
       NetworkChannel channel,
@@ -122,8 +108,8 @@ class NetworksListWidget extends StatelessWidget {
 
     var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
 
-    var channelBloc = ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
-
+    var channelBloc =
+        ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
 
     var networkListSkinBloc = Provider.of<NetworkListSkinBloc>(context);
 
@@ -136,7 +122,6 @@ class NetworksListWidget extends StatelessWidget {
                 (BuildContext context, AsyncSnapshot<NetworkState> snapshot) {
               var state = snapshot.data;
               var connected = state.connected;
-
 
               var networkTitle = "${state.name} (${state.nick})";
               return Row(
@@ -158,6 +143,10 @@ class NetworksListWidget extends StatelessWidget {
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
+                        if(onActionCallback != null) {
+                          onActionCallback();
+                        }
+
                         ircChatActiveChannelBloc.changeActiveChanel(channel);
                       },
                       child: Text(networkTitle,
@@ -165,28 +154,31 @@ class NetworksListWidget extends StatelessWidget {
                               .getNetworkItemTextStyle(isChannelActive)),
                     ),
                   ),
-                  buildConnectionIcon(context, networkListSkinBloc
-                      .getNetworkItemIconColor(isChannelActive), connected),
+                  buildConnectionIcon(
+                      context,
+                      networkListSkinBloc
+                          .getNetworkItemIconColor(isChannelActive),
+                      connected),
                   buildChannelUnreadCountBadge(context, isChannelActive),
                   buildNetworkPopupMenuButton(
-                       context, networkBloc, networkListSkinBloc
-                      .getNetworkItemIconColor(isChannelActive))
+                      context,
+                      networkBloc,
+                      networkListSkinBloc
+                          .getNetworkItemIconColor(isChannelActive))
                 ],
               );
             }));
     var rowContainer = Container(
-        decoration: BoxDecoration(color: networkListSkinBloc
-            .getNetworkItemBackgroundColor(isChannelActive)),
+        decoration: BoxDecoration(
+            color: networkListSkinBloc
+                .getNetworkItemBackgroundColor(isChannelActive)),
         child: row);
 
     if (expanded == true) {
       return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            rowContainer,
-            NetworkChannelsListWidget(network)
-          ]);
+          children: <Widget>[rowContainer, NetworkChannelsListWidget(network, onActionCallback)]);
     } else {
       return rowContainer;
     }

@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class ChannelUsersInfoWidget extends StatefulWidget {
-  ChannelUsersInfoWidget();
 
   @override
   State<StatefulWidget> createState() => ChannelUsersInfoState();
@@ -17,21 +17,13 @@ class ChannelUsersInfoWidget extends StatefulWidget {
 
 class ChannelUsersInfoState extends State<ChannelUsersInfoWidget> {
 
-  NetworkChannelBloc channelBloc;
-
-
-  @override
-  void dispose() {
-    super.dispose();
-    channelBloc.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
 
     ColoredNicknamesBloc coloredNicknamesBloc = Provider.of(context);
-    channelBloc = NetworkChannelBloc.of(context);
+    NetworkChannelBloc channelBloc = Provider.of<NetworkChannelBloc>(context);
 
 
     return StreamBuilder<List<ChannelUserInfo>>(

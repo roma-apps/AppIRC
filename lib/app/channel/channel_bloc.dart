@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -114,6 +115,6 @@ class NetworkChannelBloc extends Providable {
           String nick) async =>
       await backendService.openDirectMessagesChannel(network, channel, nick);
 
-  static NetworkChannelBloc of(BuildContext context) =>
-      Provider.of<NetworkChannelBloc>(context);
+  static NetworkChannelBloc of(BuildContext context, NetworkChannel channel) =>
+      Provider.of<ChatNetworkChannelsBlocsBloc>(context).getNetworkChannelBloc(channel);
 }

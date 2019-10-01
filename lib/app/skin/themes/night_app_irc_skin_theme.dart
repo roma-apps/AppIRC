@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
 
 class NightAppSkinTheme extends AppIRCSkinTheme {
   static const String ID = "NightAppSkin";
@@ -19,7 +21,7 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   Color get appBarColor => _androidNightThemeData.primaryColor;
 
   @override
-  Color get chatInputColor => _androidNightThemeData.primaryColor;
+  Color get chatInputColor => isMaterial ? _androidNightThemeData.primaryColor : _androidNightThemeData.bottomAppBarColor;
 
   @override
   Color get notActiveListItemColor => appBackgroundColor;
@@ -32,7 +34,8 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
       _androidNightThemeData.colorScheme.onBackground;
 
   @override
-  Color get onAppBarColor => Color(0xfff5f5f5);
+  Color get onAppBarColor => isMaterial ? _androidNightThemeData.colorScheme.onPrimary : _androidNightThemeData.buttonColor;
+
 
   @override
   Color get onChatInputColor => onAppBarColor;
@@ -113,6 +116,7 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
     return color;
   }
 }
+
 
 ThemeData _androidNightThemeData = ThemeData(
   primarySwatch: MaterialColor(4280361249, {
@@ -595,4 +599,5 @@ ThemeData _androidNightThemeData = ThemeData(
     ),
     borderRadius: BorderRadius.all(Radius.circular(0.0)),
   )),
+    cupertinoOverrideTheme: CupertinoThemeData(primaryColor: Color(0xff1e88e5))
 );

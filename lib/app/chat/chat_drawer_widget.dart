@@ -13,11 +13,15 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ChatDrawerWidget extends StatelessWidget {
+  final VoidCallback onActionCallback;
+
+  ChatDrawerWidget({this.onActionCallback});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Expanded(child: NetworksListWidget()),
+        Expanded(child: NetworksListWidget(onActionCallback)),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -62,7 +66,7 @@ class ChatDrawerWidget extends StatelessWidget {
               platformPageRoute(
                   builder: (context) => EditLoungePreferencesPage(settings)));
         },
-        androidIcon: Icon(Icons.settings),
+        icon: Icon(Icons.settings),
         iosIcon: Icon(CupertinoIcons.settings),
       );
 }

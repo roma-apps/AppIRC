@@ -17,8 +17,6 @@ class AppIRCChatInputMessageSkinBloc extends ChatInputMessageSkinBloc {
   @override
   Color get inputMessageCursorColor => theme.onChatInputColor;
 
-  @override
-  Color get iconSendMessageColor => theme.onChatInputColor;
 
   @override
   Color get inputMessageBackgroundColor => theme.chatInputColor;
