@@ -28,7 +28,15 @@ class NetworkChannelMessageWidget extends StatelessWidget {
 
     var body = _buildMessageBody(context);
     var title = _buildMessageTitle(context, channelBloc);
-    return buildRegularMessage(title, body, needHighlight);
+
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+
+
+    var color =
+    messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
+
+
+    return buildRegularMessage(title, body, needHighlight, color);
   }
 
   Widget _buildMessageBody(BuildContext context) {
@@ -241,6 +249,7 @@ class NetworkChannelMessageWidget extends StatelessWidget {
 }
 
 isNeedHighlight(RegularMessage message) =>
+message.highlight == true ||
     message.regularMessageType ==
     RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
 
@@ -310,10 +319,10 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
 }
 
 
-Widget buildRegularMessage(Widget title, Widget body, bool needHighlight) {
+Widget buildRegularMessage(Widget title, Widget body, bool needHighlight, Color color) {
   var decoration;
   if (needHighlight) {
-    decoration = BoxDecoration(border: Border.all(color: Colors.redAccent));
+    decoration = BoxDecoration(border: Border.all(color: color));
   }
 
   return Container(
