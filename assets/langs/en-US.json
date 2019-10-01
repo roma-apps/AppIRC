@@ -123,6 +123,17 @@
       "disconnected": "Not connected to server",
       "reconnect": "Reconnect"
     },
+    "who_is": {
+      "hostmask": "Hostmask:",
+      "actual_hostname": "Actual hostname:",
+      "real_name": "Real Name:",
+      "channels": "Channels:",
+      "secure_connection": "Secure connection:",
+      "account": "Account:",
+      "connected_at": "Connected at:",
+      "connected_to": "Connected to:",
+      "idle_since": "Idle since:"
+    },
 
     "sub_message": {
       "mode_short": "mode {}",

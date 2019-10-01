@@ -23,7 +23,7 @@ import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_saver_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/default_values.dart';
-import 'package:flutter_appirc/app/message/messages_colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
@@ -287,7 +287,7 @@ class AppIRCState extends State<AppIRC> {
                                     providable:
                                         AppIRCButtonSkinBloc(appSkinTheme),
                                     child: Provider(
-                                      providable: MessagesColoredNicknamesBloc(
+                                      providable: ColoredNicknamesBloc(
                                           appSkinTheme.coloredNicknamesData),
                                       child: PlatformApp(
                                           title: "AppIRC",

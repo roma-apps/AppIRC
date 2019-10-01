@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/app/message/messages_colored_nicknames_model.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 
@@ -12,7 +12,7 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   DayAppSkinTheme()
       : super(
             ID,
-            MessagesColoredNicknamesData(Colors.primaries),
+            ColoredNicknamesData(Colors.primaries),
             () =>_androidDayThemeData,
             () => MaterialBasedCupertinoThemeData(
                 materialTheme: _androidDayThemeData));

@@ -3,11 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -46,28 +49,59 @@ Widget buildSpecialMessageWidget(
 
 Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
   WhoIsSpecialMessageBody whoIsBody = message.data as WhoIsSpecialMessageBody;
+  String actualHostNameValue;
+
+  if (whoIsBody.actualIp != null || whoIsBody.actualHostname != null) {
+    if (whoIsBody.actualIp != null && whoIsBody.actualHostname != null) {
+      if (whoIsBody.actualIp != whoIsBody.actualHostname) {
+        actualHostNameValue =
+            "${whoIsBody.actualIp}@${whoIsBody.actualHostname}";
+      } else {
+        actualHostNameValue = "${whoIsBody.actualIp}";
+      }
+    } else {
+      if (whoIsBody.actualIp != null) {
+        actualHostNameValue = "${whoIsBody.actualIp}";
+      } else if (whoIsBody.actualHostname != null) {
+        actualHostNameValue = "${whoIsBody.actualHostname}";
+      }
+    }
+  }
+
+  var appLocalizations = AppLocalizations.of(context);
+
   var body = Column(
     children: <Widget>[
-//      _buildWhoIsRow("Nick", whoIsBody.nick),
-      _buildWhoIsRow("Hostmask", "${whoIsBody.ident}@${whoIsBody.hostname}"),
-      _buildWhoIsRow("Real Name", whoIsBody.realName),
-      _buildWhoIsRow("Channels", whoIsBody.channels),
-      _buildWhoIsRow("Secure connection", whoIsBody.secure.toString()),
-//      _buildWhoIsRow("Idle", whoIsBody.idle),
+
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.hostmask"), "${whoIsBody.ident}@${whoIsBody.hostname}"),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.actual_hostname"), actualHostNameValue),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.real_name"), whoIsBody.realName),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.channels"), whoIsBody.channels),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.secure_connection"), whoIsBody.secure.toString()),
       _buildWhoIsRow(
-          "Connected to:", "${whoIsBody.server} (${whoIsBody.serverInfo})"),
-      _buildWhoIsRow("Account", whoIsBody.account),
+          appLocalizations.tr("chat.who_is.connected_to"), "${whoIsBody.server} (${whoIsBody.serverInfo})"),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.account"), whoIsBody.account),
       _buildWhoIsRow(
-          "Connected at:", regularDateFormatter.format(whoIsBody.logonTime)),
+          appLocalizations.tr("chat.who_is.connected_at"), regularDateFormatter.format(whoIsBody.logonTime)),
       _buildWhoIsRow(
-          "Idle since:", regularDateFormatter.format(whoIsBody.idleTime)),
+          appLocalizations.tr("chat.who_is.idle_since"), regularDateFormatter.format(whoIsBody.idleTime)),
 //      _buildWhoIsRow("Logon", whoIsBody.logon),
     ],
   );
   var color = Colors.blue;
   var channelBloc = Provider.of<NetworkChannelBloc>(context);
+
+  var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+  var nick = whoIsBody.nick;
+  var child = Text(
+    nick,
+    style:
+        messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+  );
+
   Widget title = buildMessageTitle(
-      buildMessagesTitleNick(context, whoIsBody.nick, channelBloc),
+      buildUserNickWithPopupMenu(context, child, nick, channelBloc),
       Row(
         children: <Widget>[
           buildMessageTitleDate(context, message, color),
@@ -83,7 +117,7 @@ Widget _buildWhoIsRow(String label, String value) {
       padding: const EdgeInsets.all(8.0),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[Text(label), Text(value)]),
+          children: <Widget>[Text(label), Flexible(child: Text(value))]),
     );
   } else {
     return SizedBox.shrink();

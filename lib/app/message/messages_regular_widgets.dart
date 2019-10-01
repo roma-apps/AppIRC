@@ -2,10 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/message/messages_colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/app/widgets/menu_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -136,7 +137,16 @@ class NetworkChannelMessageWidget extends StatelessWidget {
   Widget _buildMessageTitleNick(
       BuildContext context, NetworkChannelBloc channelBloc) {
     var nick = message.fromNick;
-    return buildMessagesTitleNick(context, nick, channelBloc);
+
+    var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+    var child =Text(
+      nick,
+      style: messagesSkin
+          .createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+    );
+
+    return buildUserNickWithPopupMenu(context, child, nick, channelBloc);
   }
 
   _buildTitleIcon(BuildContext context, RegularMessage message) {
@@ -368,40 +378,6 @@ Widget buildMessageTitleDate(
   );
 }
 
-PopupMenuButton<MessageNickMenuAction> buildMessagesTitleNick(
-    BuildContext context, String nick, NetworkChannelBloc channelBloc) {
-  var nickNamesBloc = Provider.of<MessagesColoredNicknamesBloc>(context);
-  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-
-  return PopupMenuButton<MessageNickMenuAction>(
-      child: Text(
-        nick,
-        style: messagesSkin
-            .createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
-      ),
-      onSelected: (MessageNickMenuAction selectedAction) {
-        switch (selectedAction) {
-          case MessageNickMenuAction.WHO_IS:
-            channelBloc.printUserInfo(nick);
-            break;
-          case MessageNickMenuAction.DIRECT_MESSAGES:
-            channelBloc.openDirectMessagesChannel(nick);
-            break;
-        }
-      },
-      itemBuilder: (context) {
-        return [
-          buildDropdownMenuItemRow(
-              text: "User information",
-              iconData: Icons.account_box,
-              value: MessageNickMenuAction.WHO_IS),
-          buildDropdownMenuItemRow(
-              text: "Direct Messages",
-              iconData: Icons.message,
-              value: MessageNickMenuAction.DIRECT_MESSAGES)
-        ];
-      });
-}
 
 
 Icon buildMessageIcon(IconData iconData, Color color) {

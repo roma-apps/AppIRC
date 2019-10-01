@@ -24,6 +24,7 @@ import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/users_list_page.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
@@ -100,6 +101,8 @@ class ChatPage extends StatelessWidget {
               backendService, network, networksStateBloc, activeChannelBloc);
           var channelBloc = NetworkChannelBloc(
               backendService, network, channel, channelsStateBloc);
+
+
 
           List<Widget> items = [
             buildChannelPopupMenuButton(context, networkBloc, channelBloc,

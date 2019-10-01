@@ -1,14 +1,14 @@
 import 'dart:ui';
 
-import 'package:flutter_appirc/app/message/messages_colored_nicknames_model.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class MessagesColoredNicknamesBloc extends Providable {
-  final MessagesColoredNicknamesData nicknameColorsData;
+class ColoredNicknamesBloc extends Providable {
+  final ColoredNicknamesData nicknameColorsData;
 
   List<Color> get _colors => nicknameColorsData.colors;
 
-  MessagesColoredNicknamesBloc(this.nicknameColorsData);
+  ColoredNicknamesBloc(this.nicknameColorsData);
 
   int _currentColorIndex = 0;
   Map<String, Color> _nickToColor = Map();

@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/user/users_list_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -38,6 +39,8 @@ class NetworkChannelUsersPageState
 
     channelBloc.getNetworkChannelUsers();
 
+
+
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('chat.users.title')),
@@ -47,7 +50,7 @@ class NetworkChannelUsersPageState
           padding: const EdgeInsets.all(8.0),
           child: Provider(
               providable: channelBloc,
-              child: ChannelUserInfosWidget(
+              child: ChannelUsersInfoWidget(
                   channelBloc.usersStream, channelBloc.users)),
         ),
       ),

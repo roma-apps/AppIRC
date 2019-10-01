@@ -32,6 +32,8 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
   final String account;
   final String channels;
   final String hostname;
+  final String actualHostname;
+  final String actualIp;
   final String ident;
   final String idle;
   final DateTime idleTime;
@@ -50,6 +52,7 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
         'ident: $ident, idle: $idle, idleTime: $idleTime, '
         'logonTime: $logonTime, logon: $logon, nick: $nick, '
         'realName: $realName, secure: $secure, '
+        'actualIp: $actualIp, actualHostname: $actualHostname, '
         'server: $server, serverInfo: $serverInfo}';
   }
 
@@ -57,6 +60,8 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
       this.account,
       this.channels,
       this.hostname,
+      this.actualHostname,
+      this.actualIp,
       this.ident,
       this.idle,
       this.idleTime,
@@ -72,6 +77,8 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
       {@required this.account,
       @required this.channels,
       @required this.hostname,
+      @required this.actualHostname,
+      @required this.actualIp,
       @required this.ident,
       @required this.idle,
       @required this.idleTime,

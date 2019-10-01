@@ -12,6 +12,8 @@ WhoIsSpecialMessageBody _$WhoIsSpecialMessageBodyFromJson(
     json['account'] as String,
     json['channels'] as String,
     json['hostname'] as String,
+    json['actualHostname'] as String,
+    json['actualIp'] as String,
     json['ident'] as String,
     json['idle'] as String,
     json['idleTime'] == null
@@ -35,6 +37,8 @@ Map<String, dynamic> _$WhoIsSpecialMessageBodyToJson(
       'account': instance.account,
       'channels': instance.channels,
       'hostname': instance.hostname,
+      'actualHostname': instance.actualHostname,
+      'actualIp': instance.actualIp,
       'ident': instance.ident,
       'idle': instance.idle,
       'idleTime': instance.idleTime?.toIso8601String(),
