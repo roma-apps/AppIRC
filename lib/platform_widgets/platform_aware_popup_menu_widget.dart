@@ -45,14 +45,20 @@ BuildContext context,
             .toList(),
       );
     });
-  },child: child);
+  },child: Padding(
+    padding: const EdgeInsets.all(4.0),
+    child: child,
+  ));
 
 }
 
 PopupMenuButton<PlatformAwarePopupMenuAction> _buildMaterialPopupButton(
     Widget child, List<PlatformAwarePopupMenuAction> actions) {
   return PopupMenuButton(
-    child: child,
+    child: Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: child,
+    ),
     itemBuilder: (_) => actions
         .map((action) => buildDropdownMenuItemRow(
             text: action.text, iconData: action.iconData, value: action))

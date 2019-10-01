@@ -62,8 +62,16 @@ Future main() async {
 
 //  changeToCupertinoPlatformAware();
 
+
+
+
   var preferencesService = PreferencesService();
+
+  await preferencesService.init();
+//           preferencesService.clear();
+
   var socketIOManager = SocketIOManager();
+
 
   var loungePreferencesBloc = LoungePreferencesBloc(preferencesService);
   runApp(EasyLocalization(
@@ -107,8 +115,6 @@ class AppIRCState extends State<AppIRC> {
           database.regularMessagesDao.deleteAllRegularMessages();
           database.specialMessagesDao.deleteAllSpecialMessages();
 
-          await preferencesService.init();
-//           preferencesService.clear();
 
           loungePreferencesBloc
               .valueStream(defaultValue: LoungeConnectionPreferences.empty)
@@ -120,7 +126,7 @@ class AppIRCState extends State<AppIRC> {
         });
       }
 
-      return _buildApp(SplashPage(), isPreferencesReady: false);
+      return _buildApp(SplashPage());
     } else {
       if (loungeConnectionPreferences == null) {
         return _buildAppForStartLoungePreferences();

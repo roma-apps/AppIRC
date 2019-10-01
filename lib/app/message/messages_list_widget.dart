@@ -55,7 +55,7 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
 
             },
 
-            )
+            );
 
 
           } else {
