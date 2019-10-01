@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_loader_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
@@ -17,11 +18,13 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var backendService = Provider.of<ChatOutputBackendService>(context);
     var channelBloc = Provider.of<NetworkChannelBloc>(context);
-    var chatDatabase = Provider.of<ChatDatabaseProvider>(context).db;
+    var chatDatabase = Provider
+        .of<ChatDatabaseProvider>(context)
+        .db;
 
     NetworkChannelMessagesLoaderBloc messagesLoader =
-        NetworkChannelMessagesLoaderBloc(backendService,
-            chatDatabase, channelBloc.network, channelBloc.channel);
+    NetworkChannelMessagesLoaderBloc(backendService,
+        chatDatabase, channelBloc.network, channelBloc.channel);
 
     return StreamBuilder<List<ChatMessage>>(
         stream: messagesLoader.messagesStream,
@@ -34,9 +37,27 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
           }
 
           if (messages == null || messages.length == 0) {
-            return Center(
-                child: Text(
-                    AppLocalizations.of(context).tr("chat.empty_channel")));
+            return StreamBuilder<NetworkChannelState>(
+              stream: channelBloc.networkChannelStateStream,
+              initialData: channelBloc.networkChannelState,
+              builder: (BuildContext context, AsyncSnapshot<NetworkChannelState> snapshot) {
+                var currentChannelState = snapshot.data;
+
+                if(currentChannelState.connected) {
+                  return Center(
+                      child: Text(
+                          AppLocalizations.of(context).tr("chat.empty_channel")));
+                } else {
+                  return Center(
+                      child: Text(
+                          AppLocalizations.of(context).tr("chat.not_connected_channel")));
+                }
+
+            },
+
+            )
+
+
           } else {
             var scrollController = ScrollController();
 
@@ -60,7 +81,8 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
                     switch (chatMessageType) {
                       case ChatMessageType.SPECIAL:
                         var specialMessage = message as SpecialMessage;
-                        return buildSpecialMessageWidget(context,specialMessage);
+                        return buildSpecialMessageWidget(
+                            context, specialMessage);
                         break;
                       case ChatMessageType.REGULAR:
                         return NetworkChannelMessageWidget(message);
@@ -80,7 +102,7 @@ _isNeedPrint(ChatMessage message) {
   if (message is RegularMessage) {
     var regularMessageType = message.regularMessageType;
     return
-        regularMessageType != RegularMessageType.RAW;
+      regularMessageType != RegularMessageType.RAW;
   } else {
     return true;
   }

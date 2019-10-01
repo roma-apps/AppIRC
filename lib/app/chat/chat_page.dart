@@ -16,6 +16,8 @@ import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/chat_drawer_page.dart';
 import 'package:flutter_appirc/app/chat/chat_drawer_widget.dart';
+import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
@@ -129,8 +131,6 @@ class ChatPage extends StatelessWidget {
   Widget _buildAppBarChild(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
-    var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
-
 
     return StreamBuilder<NetworkChannel>(
       stream: activeChannelBloc.activeChannelStream,
@@ -179,18 +179,18 @@ class ChatPage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
-    var backendService = Provider.of<ChatInputBackendService>(context);
     var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
-    var channelsStateBloc = Provider.of<ChatNetworkChannelsStateBloc>(context);
-    var networksStateBloc = Provider.of<ChatNetworksStateBloc>(context);
+
 
     return SafeArea(
         child: StreamBuilder<NetworkChannel>(
             stream: activeChannelBloc.activeChannelStream,
             builder:
                 (BuildContext context, AsyncSnapshot<NetworkChannel> snapshot) {
-              var channel = snapshot.data;
-              if (channel == null) {
+              var activeChannel = snapshot.data;
+              if (activeChannel == null) {
+
+
                 return StreamBuilder<bool>(
                   stream: networkListBloc.isNetworksEmptyStream,
                   initialData: networkListBloc.isNetworksEmpty,
@@ -204,13 +204,13 @@ class ChatPage extends StatelessWidget {
                   },
                 );
               } else {
-                var network = networkListBloc.findNetworkWithChannel(channel);
+                var network = networkListBloc.findNetworkWithChannel(activeChannel);
 
                 if (network == null) {
                   return SizedBox.shrink();
                 } else {
                   var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
-                      .getNetworkChannelBloc(channel);
+                      .getNetworkChannelBloc(activeChannel);
 
                   return Provider(
                     providable: channelBloc,
@@ -233,16 +233,32 @@ class ChatPage extends StatelessWidget {
           var appLocalizations = AppLocalizations.of(context);
           switch (connectionState) {
             case ChatConnectionState.CONNECTED:
-              var startValues = createDefaultNetworkPreferences(context);
-              return Provider(
-                providable:
-                    ChatNetworkPreferencesFormBloc(startValues, true, false),
-                child: ChatNetworkPreferencesFormWidget(startValues,
-                    (context, preferences) async {
-                  var networksBloc = Provider.of<ChatNetworksListBloc>(context);
-                  await networksBloc.joinNetwork(preferences);
-                }, AppLocalizations.of(context).tr('irc_connection.connect')),
-              );
+
+
+              var initBloc = Provider.of<ChatInitBloc>(context);
+
+              return StreamBuilder<ChatInitState>(   stream: initBloc.stateStream,
+                  initialData: initBloc.state,
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    var currentInitState = snapshot.data;
+
+                    if(currentInitState == ChatInitState.FINISHED) {
+                      var startValues = createDefaultNetworkPreferences(context);
+                      return Provider(
+                        providable:
+                        ChatNetworkPreferencesFormBloc(startValues, true, false),
+                        child: ChatNetworkPreferencesFormWidget(startValues,
+                                (context, preferences) async {
+                              var networksBloc = Provider.of<ChatNetworksListBloc>(context);
+                              await networksBloc.joinNetwork(preferences);
+                            }, AppLocalizations.of(context).tr('irc_connection.connect')),
+                      );
+                    } else {
+                      return Center(child: PlatformCircularProgressIndicator());
+                    }
+
+                  });
+
               break;
             case ChatConnectionState.CONNECTING:
               return Center(
