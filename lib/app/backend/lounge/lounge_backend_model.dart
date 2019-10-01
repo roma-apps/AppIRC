@@ -24,22 +24,19 @@ class InvalidConnectionResponseException extends LoungeException {
 class NotImplementedYetException implements LoungeException {}
 
 class JoinChannelInputLoungeRequestBody extends InputLoungeRequestBody {
-  int localId;
-  String channelName;
-  String channelPassword;
+  ChatNetworkChannelPreferences preferences;
 
   JoinChannelInputLoungeRequestBody(
-    this.localId,
-    this.channelName,
-    this.channelPassword,
-    int target,
-  ) : super(target: target, content: "/join $channelName $channelPassword");
+    this.preferences,
+    int target
+  ) : super(target: target, content: "/join ${preferences.name} ${preferences.password}");
 
   @override
   String toString() {
-    return 'JoinChannelInputLoungeRequestBody{localId: $localId, '
-        'channelName: $channelName, channelPassword: $channelPassword}';
+    return 'JoinChannelInputLoungeRequestBody{preferences: $preferences}';
   }
+
+
 }
 
 class JoinNetworkLoungeRequest

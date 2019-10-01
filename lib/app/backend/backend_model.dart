@@ -7,4 +7,11 @@ class RequestResult<T> {
 
   RequestResult(this.isSentSuccessfully, this.result);
   RequestResult.name({@required this.isSentSuccessfully, @required this.result});
+
+  @override
+  String toString() {
+    return 'RequestResult{isSentSuccessfully: $isSentSuccessfully, result: $result}';
+  }
+
+
 }

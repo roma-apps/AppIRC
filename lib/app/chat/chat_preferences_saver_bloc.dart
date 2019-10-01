@@ -68,6 +68,9 @@ class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
   @override
   void onChannelJoined(
       Network network, NetworkChannelWithState channelWithState) {
+
+    _logger.d(() => "onChannelJoined $channelWithState");
+
     var channel = channelWithState.channel;
     var networkPreference = findPreferencesForNetwork(network);
 

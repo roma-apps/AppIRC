@@ -112,7 +112,8 @@ class ChatNetworkChannelPreferences extends JsonPreferences {
 
   @override
   String toString() {
-    return 'ChatNetworkChannelPreferences{localId: $localId, name: $name}';
+    return 'ChatNetworkChannelPreferences{localId: $localId, '
+        'name: $name, password: $password}';
   }
 
   factory ChatNetworkChannelPreferences.fromJson(Map<String, dynamic> json) =>
@@ -132,7 +133,7 @@ class ChatNetworkPreferences extends JsonPreferences {
   int get localIdOrUndefined => localId != null ? localId : -1;
   static const String channelsSeparator = " ";
 
-   ChatNetworkConnectionPreferences networkConnectionPreferences;
+  ChatNetworkConnectionPreferences networkConnectionPreferences;
 
   List<ChatNetworkChannelPreferences> channels;
 

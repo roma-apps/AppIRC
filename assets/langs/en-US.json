@@ -67,6 +67,7 @@
   },
   "irc_connection": {
     "title": "New Server connection",
+    "title_edit": "Edit Server connection",
     "no_networks": "No networks",
     "network_prefs": {
       "title": "Network preferences",

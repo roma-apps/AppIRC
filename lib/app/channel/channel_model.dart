@@ -44,6 +44,13 @@ class NetworkChannelWithState {
   final NetworkChannelState state;
 
   NetworkChannelWithState(this.channel, this.state);
+
+  @override
+  String toString() {
+    return 'NetworkChannelWithState{channel: $channel, state: $state}';
+  }
+
+
 }
 
 class NetworkChannelState {

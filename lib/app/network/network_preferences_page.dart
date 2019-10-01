@@ -16,7 +16,8 @@ class NewChatNetworkPage extends ChatNetworkPage {
 
   NewChatNetworkPage(BuildContext context, ChatNetworkPreferences startValues,
       this.successCallback)
-      : super(startValues, (context, preferences) async {
+      : super(AppLocalizations.of(context).tr('irc_connection.title'),
+            startValues, (context, preferences) async {
           final ChatNetworksListBloc chatBloc =
               Provider.of<ChatNetworksListBloc>(context);
 
@@ -33,7 +34,8 @@ class NewChatNetworkPage extends ChatNetworkPage {
 
 class EditChatNetworkPage extends ChatNetworkPage {
   EditChatNetworkPage(BuildContext context, ChatNetworkPreferences startValues)
-      : super(startValues, (context, preferences) async {
+      : super(AppLocalizations.of(context).tr('irc_connection.title_edit'),
+            startValues, (context, preferences) async {
           final NetworkBloc networkBloc = Provider.of<NetworkBloc>(context);
 
           var result = await doAsyncOperationWithDialog(context, () async {
@@ -53,14 +55,15 @@ class ChatNetworkPage extends StatefulWidget {
   final bool isNeedShowChannels;
   final bool isNeedShowCommands;
   final String buttonText;
+  final String titleText;
 
-  ChatNetworkPage(this.startValues, this.callback, this.isNeedShowChannels,
-      this.isNeedShowCommands, this.buttonText);
+  ChatNetworkPage(this.titleText, this.startValues, this.callback,
+      this.isNeedShowChannels, this.isNeedShowCommands, this.buttonText);
 
   @override
   State<StatefulWidget> createState() {
-    return ChatNetworkPageState(startValues, callback, isNeedShowChannels,
-        isNeedShowCommands, buttonText);
+    return ChatNetworkPageState(titleText, startValues, callback,
+        isNeedShowChannels, isNeedShowCommands, buttonText);
   }
 }
 
@@ -71,8 +74,10 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
 
   ChatNetworkPreferencesFormBloc networkPreferencesFormBloc;
 
-  ChatNetworkPageState(this.startValues, this.callback, bool isNeedShowChannels,
-      bool isNeedShowCommands, this.buttonText) {
+  final String titleText;
+
+  ChatNetworkPageState(this.titleText, this.startValues, this.callback,
+      bool isNeedShowChannels, bool isNeedShowCommands, this.buttonText) {
     networkPreferencesFormBloc = ChatNetworkPreferencesFormBloc(
         startValues, isNeedShowChannels, isNeedShowCommands);
   }
@@ -95,7 +100,7 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBar(
-        title: Text(AppLocalizations.of(context).tr('irc_connection.title')),
+        title: Text(titleText),
       ),
       body: SafeArea(
         child: Padding(
