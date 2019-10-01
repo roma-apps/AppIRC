@@ -12,21 +12,6 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
   final Map<String, Map<int, BehaviorSubject<NetworkChannelState>>> _states =
       Map();
 
-  BehaviorSubject<NetworkChannelState> _getStateControllerForNetworkChannel(
-      Network network, NetworkChannel channel) {
-    var networkKey = _calculateNetworkKey(network);
-    var channelKey = _calculateChannelKey(channel);
-    if (!_states.containsKey(networkKey)) {
-      _states[networkKey] = Map<int, BehaviorSubject<NetworkChannelState>>();
-    }
-
-    if (!_states[networkKey].containsKey(channelKey)) {
-      _states[networkKey][channelKey] = BehaviorSubject<NetworkChannelState>(
-          seedValue: NetworkChannelState.empty);
-    }
-
-    return _states[networkKey][_calculateChannelKey(channel)];
-  }
 
   final ChatActiveChannelBloc activeChannelBloc;
   final ChatOutputBackendService backendService;
@@ -46,6 +31,24 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
       _updateState(networkForChannel, newActiveChannel, state);
     }));
   }
+
+
+  BehaviorSubject<NetworkChannelState> _getStateControllerForNetworkChannel(
+      Network network, NetworkChannel channel) {
+    var networkKey = _calculateNetworkKey(network);
+    var channelKey = _calculateChannelKey(channel);
+    if (!_states.containsKey(networkKey)) {
+      _states[networkKey] = Map<int, BehaviorSubject<NetworkChannelState>>();
+    }
+
+    if (!_states[networkKey].containsKey(channelKey)) {
+      _states[networkKey][channelKey] = BehaviorSubject<NetworkChannelState>(
+          seedValue: NetworkChannelState.empty);
+    }
+
+    return _states[networkKey][_calculateChannelKey(channel)];
+  }
+
 
   void _updateState(
       Network network, NetworkChannel channel, NetworkChannelState state) {

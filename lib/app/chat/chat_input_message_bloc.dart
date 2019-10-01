@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
@@ -10,21 +11,24 @@ var _splitSeparator = " ";
 var _logger = MyLogger(logTag: "ChatInputMessageBloc", enabled: true);
 
 class ChatInputMessageBloc extends Providable {
+  final ChatConfig chatConfig;
   final NetworkChannelBloc channelBloc;
-  final List<String> commands;
-  final messageController = TextEditingController();
 
-  String get message => messageController.text;
+  var messageController = TextEditingController();
 
   List<AutoCompleteProvider> autoCompleteProviders;
 
-  ChatInputMessageBloc(this.commands, this.channelBloc) {
-    autoCompleteProviders = [
-      CommandsAutoCompleteProvider(commands),
-      NamesAutoCompleteProvider(channelBloc)
-    ];
-
-    addDisposable(textEditingController: messageController);
+  ChatInputMessageBloc(this.chatConfig, this.channelBloc) {
+    if (channelBloc.channel.isCanHaveSeveralUsers) {
+      autoCompleteProviders = [
+        CommandsAutoCompleteProvider(chatConfig.commands),
+        NamesAutoCompleteProvider(channelBloc)
+      ];
+    } else {
+      autoCompleteProviders = [
+        CommandsAutoCompleteProvider(chatConfig.commands),
+      ];
+    }
   }
 
   @override
@@ -49,15 +53,22 @@ class ChatInputMessageBloc extends Providable {
 
   void sendMessage() {
     channelBloc.sendNetworkChannelRawMessage(messageController.text);
+    messageController.text = "";
   }
 
   void onAutoCompleteSelected(String selectedSuggestion) {
-    var lastWord = _findLastWord(message);
+    var currentMessage = messageController.text;
+    var lastWord = _findLastWord(currentMessage);
 
-    messageController.text = message.replaceAll(lastWord, selectedSuggestion);
+    var replaceText = "$selectedSuggestion ";
+    var newMessage = currentMessage.replaceAll(lastWord, replaceText);
+
+    messageController.text = newMessage;
+    messageController.selection =
+        TextSelection.fromPosition(TextPosition(offset: newMessage.length));
 
     _logger.d(() =>
-        "after onAutoCompleteSelected $message suggestion = $selectedSuggestion");
+        "after onAutoCompleteSelected $currentMessage replaceText = $replaceText newMessage = $newMessage");
   }
 }
 
@@ -79,20 +90,16 @@ class CommandsAutoCompleteProvider extends AutoCompleteProvider {
       return [];
     }
 
-    return commands.where((command) => command.startsWith(pattern)).toList();
+    return commands
+        .where((command) => command.startsWith(pattern) && command != pattern)
+        .toList();
   }
 }
 
 class NamesAutoCompleteProvider extends AutoCompleteProvider {
   NetworkChannelBloc channelBloc;
 
-  NamesAutoCompleteProvider(this.channelBloc) {
-    addDisposable(
-        timer: Timer.periodic(Duration(seconds: 60), (_) {
-      // TODO: rework user updating
-      channelBloc.getNetworkChannelUsers();
-    }));
-  }
+  NamesAutoCompleteProvider(this.channelBloc);
 
   @override
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern) async {
@@ -100,12 +107,13 @@ class NamesAutoCompleteProvider extends AutoCompleteProvider {
 
     // TODO: rework filter
     if (lastWord != null && lastWord.length > 2) {
-      var users = channelBloc.users;
-      lastWord = lastWord.toLowerCase();
-      return users
-          .map((user) => user.nick)
-          .where((nick) => nick.toLowerCase().startsWith(pattern))
-          .toList();
+      var users = await channelBloc.getUsers();
+      var lastWordLowerCase = lastWord.toLowerCase();
+      return users.map((user) => user.nick).where((nick) {
+        var nickLowerCase = nick.toLowerCase();
+        return nickLowerCase.startsWith(lastWordLowerCase) &&
+            lastWordLowerCase != nickLowerCase;
+      }).toList();
     } else {
       return [];
     }
@@ -119,8 +127,8 @@ String _findLastWord(String pattern) {
   if (lastIndexOfSeparator == -1) {
     lastWord = pattern;
   } else {
-    if (lastIndexOfSeparator < pattern.length - 1) {
-      lastWord = pattern.substring(lastIndexOfSeparator);
+    if (lastIndexOfSeparator < pattern.length - 2) {
+      lastWord = pattern.substring(lastIndexOfSeparator + 1);
     }
   }
   return lastWord;

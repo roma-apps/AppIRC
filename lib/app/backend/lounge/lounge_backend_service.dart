@@ -592,6 +592,24 @@ class LoungeBackendService extends Providable
     return disposable;
   }
 
+
+  Disposable listenForNetworkChannelUsers(Network network,
+      NetworkChannel channel, VoidCallback listener) {
+
+    var disposable = CompositeDisposable([]);
+    disposable.add(
+        createEventListenerDisposable((LoungeResponseEventNames.users), (raw) {
+          var parsed = UsersLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+          if (parsed.chan == channel.remoteId) {
+            listener();
+          }
+        }));
+
+    return disposable;
+
+  }
+
   NetworkChannelState _modifyStateForChannel(
       NetworkChannelState channelState, NetworkChannel channel) {
     if (channel.type == NetworkChannelType.QUERY ||
@@ -814,12 +832,14 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Disposable listenForNetworkChannelUsers(Network network,
+  Disposable listenForNetworkChannelNames(Network network,
       NetworkChannel channel, Function(List<ChannelUserInfo>) listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable((LoungeResponseEventNames.names), (raw) {
       var parsed = NamesLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+      _logger.d(()=>"listenForNetworkChannelUsers $parsed for $channel");
 
       if (parsed.id == channel.remoteId) {
         listener(parsed.users

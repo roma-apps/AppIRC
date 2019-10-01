@@ -3,6 +3,8 @@ import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
@@ -14,6 +16,7 @@ class NetworkBloc extends Providable {
   final ChatInputBackendService backendService;
   final Network network;
   final ChatNetworksStateBloc networksStateBloc;
+  final ChatNetworkChannelsStateBloc channelsStateBloc;
   final ChatActiveChannelBloc activeChannelBloc;
 
   NetworkState get networkState => networksStateBloc.getNetworkState(network);
@@ -22,7 +25,7 @@ class NetworkBloc extends Providable {
       networksStateBloc.getNetworkStateStream(network);
 
   NetworkBloc(this.backendService, this.network, this.networksStateBloc,
-      this.activeChannelBloc);
+      this.channelsStateBloc, this.activeChannelBloc);
 
   Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
           {bool waitForResult: false}) async =>
@@ -58,11 +61,11 @@ class NetworkBloc extends Providable {
 
     if (alreadyJoinedChannel != null) {
       activeChannelBloc.changeActiveChanel(alreadyJoinedChannel);
-      // TODO: retrieve channel state
+
+      var channelState = channelsStateBloc.getNetworkChannelState(
+          network, alreadyJoinedChannel);
       return RequestResult<NetworkChannelWithState>(
-          true,
-          NetworkChannelWithState(
-              alreadyJoinedChannel, NetworkChannelState.empty));
+          true, NetworkChannelWithState(alreadyJoinedChannel, channelState));
     } else {
       return await backendService.joinNetworkChannel(network, preferences,
           waitForResult: waitForResult);
@@ -72,12 +75,6 @@ class NetworkBloc extends Providable {
   Future<RequestResult<bool>> leaveNetwork({bool waitForResult: false}) async =>
       await backendService.leaveNetwork(network, waitForResult: waitForResult);
 
-  static NetworkBloc newBloc(BuildContext context, Network network) {
-    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
-    var backendService = Provider.of<ChatInputBackendService>(context);
-    var networksStateBloc = Provider.of<ChatNetworksStateBloc>(context);
-
-    return NetworkBloc(
-        backendService, network, networksStateBloc, activeChannelBloc);
-  }
+  static of(BuildContext context, Network network) =>
+      ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
 }

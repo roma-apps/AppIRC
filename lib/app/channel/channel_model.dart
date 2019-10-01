@@ -15,6 +15,7 @@ class NetworkChannel {
   final int remoteId;
 
   bool get isLobby => type == NetworkChannelType.LOBBY;
+  bool get isCanHaveSeveralUsers => type == NetworkChannelType.CHANNEL;
 
   NetworkChannel(this.channelPreferences, this.type, this.remoteId);
 

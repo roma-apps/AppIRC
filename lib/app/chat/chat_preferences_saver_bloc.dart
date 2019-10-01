@@ -18,8 +18,7 @@ class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
   final ChatPreferencesBloc chatPreferencesBloc;
   final ChatInitBloc initBloc;
 
-  ChatPreferencesSaverBloc(
-      this._backendService,
+  ChatPreferencesSaverBloc(this._backendService,
       this._stateBloc,
       ChatNetworksListBloc networksListBloc,
       this.chatPreferencesBloc,
@@ -35,21 +34,26 @@ class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
 
     addDisposable(
         disposable: _backendService.listenForNetworkEdit(network,
-            (ChatNetworkPreferences networkPreferences) {
-      findPreferencesForNetwork(network).networkConnectionPreferences =
-          networkPreferences.networkConnectionPreferences;
-      _onPreferencesChanged();
-    }));
+                (ChatNetworkPreferences networkPreferences) {
+              findPreferencesForNetwork(network).networkConnectionPreferences =
+                  networkPreferences.networkConnectionPreferences;
+              _onPreferencesChanged();
+            }));
 
     addDisposable(
         streamSubscription:
-            _stateBloc.getNetworkStateStream(network).listen((state) {
-      findPreferencesForNetwork(network)
-          .networkConnectionPreferences
-          .userPreferences
-          .nickname = state.nick;
-      _onPreferencesChanged();
-    }));
+        _stateBloc.getNetworkStateStream(network).listen((state) {
+          var newNick = state.nick
+          var oldUserPreferences = findPreferencesForNetwork(network)
+              .networkConnectionPreferences
+              .userPreferences;
+
+          if (oldUserPreferences.nickname != newNick) {
+            oldUserPreferences
+                .nickname = newNickin;
+            _onPreferencesChanged();
+          }
+        }));
 
     _onPreferencesChanged();
 
@@ -66,9 +70,8 @@ class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
   }
 
   @override
-  void onChannelJoined(
-      Network network, NetworkChannelWithState channelWithState) {
-
+  void onChannelJoined(Network network,
+      NetworkChannelWithState channelWithState) {
     _logger.d(() => "onChannelJoined $channelWithState");
 
     var channel = channelWithState.channel;

@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Colors, Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_skin_bloc.dart';
@@ -11,22 +10,27 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class NetworkChannelNewMessageWidget extends StatefulWidget {
+
+  NetworkChannelNewMessageWidget();
+
   @override
-  State<StatefulWidget> createState() => NetworkChannelNewMessageState();
+  State<StatefulWidget> createState() =>
+      NetworkChannelNewMessageState();
 }
 
 class NetworkChannelNewMessageState
     extends State<NetworkChannelNewMessageWidget> {
+
   @override
   Widget build(BuildContext context) {
-    var channelBloc = Provider.of<NetworkChannelBloc>(context);
-
     var hintStr = AppLocalizations.of(context).tr("chat.enter_message.hint");
+
     var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
 
-    var backend = Provider.of<ChatBackendService>(context);
-    var inputMessageBloc =
-        ChatInputMessageBloc(backend.chatConfig.commands, channelBloc);
+    var channelBloc = Provider.of<NetworkChannelBloc>(context);
+    ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
+
+
     return Container(
       decoration: BoxDecoration(
           color: inputMessageSkinBloc.inputMessageBackgroundColor),
@@ -36,11 +40,12 @@ class NetworkChannelNewMessageState
           children: <Widget>[
             Flexible(
                 child: TypeAheadField(
+              keepSuggestionsOnSuggestionSelected: true,
               direction: AxisDirection.up,
               noItemsFoundBuilder: (_) => SizedBox.shrink(),
               textFieldConfiguration: TextFieldConfiguration(
                   autofocus: false,
-
+                  controller: inputMessageBloc.messageController,
                   style: DefaultTextStyle.of(context)
                       .style
                       .copyWith(fontStyle: FontStyle.italic),

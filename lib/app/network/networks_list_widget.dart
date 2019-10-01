@@ -9,7 +9,9 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/channel/channels_list_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
@@ -70,16 +72,13 @@ class NetworksListWidget extends StatelessWidget {
     var preferencesService = Provider.of<PreferencesService>(context);
     var ircChatActiveChannelBloc =
     Provider.of<ChatActiveChannelBloc>(context);
-    var backendService = Provider.of<ChatInputOutputBackendService>(context);
-    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
-    var networksStatesBloc = Provider.of<ChatNetworksStateBloc>(context);
     var channel = network.lobbyChannel;
     var expandBloc = ChatNetworkExpandStateBloc(preferencesService, network);
-    var networkStateBloc =
-    NetworkBloc(backendService, network, networksStatesBloc, activeChannelBloc);
 
+    var networkBloc =
+    ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
     return Provider<NetworkBloc>(
-      providable: networkStateBloc,
+      providable: networkBloc,
       child: StreamBuilder<bool>(
         stream: expandBloc.expandedStream,
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -121,12 +120,11 @@ class NetworksListWidget extends StatelessWidget {
       networkExpandedStateIcon = Icons.arrow_right;
     }
 
-    var networkBloc = Provider.of<NetworkBloc>(context);
-    var channelBloc = NetworkChannelBloc(
-        Provider.of<ChatInputOutputBackendService>(context),
-        network,
-        network.lobbyChannel,
-        Provider.of<ChatNetworkChannelsStateBloc>(context));
+    var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
+
+    var channelBloc = ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
+
+
     var networkListSkinBloc = Provider.of<NetworkListSkinBloc>(context);
 
     var row = Provider(

@@ -1,10 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
-import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/user/users_list_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -22,8 +19,7 @@ class NetworkChannelUsersPage extends StatefulWidget {
   }
 }
 
-class NetworkChannelUsersPageState
-    extends State<NetworkChannelUsersPage> {
+class NetworkChannelUsersPageState extends State<NetworkChannelUsersPage> {
   final Network network;
   final NetworkChannel channel;
 
@@ -31,15 +27,8 @@ class NetworkChannelUsersPageState
 
   @override
   Widget build(BuildContext context) {
-    var backendService = Provider.of<ChatInputOutputBackendService>(context);
-    var channelsStateBloc = Provider.of<ChatNetworkChannelsStateBloc>(context);
-
     var channelBloc =
-        NetworkChannelBloc(backendService, network, channel, channelsStateBloc);
-
-    channelBloc.getNetworkChannelUsers();
-
-
+        ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
 
     return PlatformScaffold(
       appBar: PlatformAppBar(
@@ -50,8 +39,7 @@ class NetworkChannelUsersPageState
           padding: const EdgeInsets.all(8.0),
           child: Provider(
               providable: channelBloc,
-              child: ChannelUsersInfoWidget(
-                  channelBloc.usersStream, channelBloc.users)),
+              child: ChannelUsersInfoWidget()),
         ),
       ),
     );

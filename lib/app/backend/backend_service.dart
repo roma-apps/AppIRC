@@ -55,8 +55,15 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 
 
 
-  Disposable listenForNetworkChannelUsers(Network network,
+  Disposable listenForNetworkChannelNames(Network network,
       NetworkChannel channel, Function(List<ChannelUserInfo>) listener);
+
+
+
+  Disposable listenForNetworkChannelUsers(Network network,
+      NetworkChannel channel, VoidCallback listener);
+
+
 
   Disposable listenForMessages(Network network, NetworkChannel channel,
       NetworkChannelMessageListener listener);

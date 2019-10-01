@@ -9,6 +9,7 @@ import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
@@ -101,11 +102,7 @@ class NetworkChannelsListWidget extends StatelessWidget {
         break;
     }
 
-    var channelBloc = NetworkChannelBloc(
-        Provider.of<ChatInputOutputBackendService>(context),
-        network,
-        channel,
-        Provider.of<ChatNetworkChannelsStateBloc>(context));
+    var channelBloc = ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
     return Provider(
       providable: channelBloc,
       child: StreamBuilder(

@@ -7,7 +7,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 
 abstract class ChatNetworkChannelsListListenerBloc
-    extends ChatNetworksChannelsListListenerBloc {
+    extends ChatNetworksListListenerBloc {
   ChatNetworkChannelsListListenerBloc(ChatNetworksListBloc networksListBloc)
       : super(networksListBloc);
 

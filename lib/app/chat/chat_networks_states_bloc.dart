@@ -4,7 +4,7 @@ import 'package:flutter_appirc/app/chat/chat_networks_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ChatNetworksStateBloc extends ChatNetworksChannelsListListenerBloc {
+class ChatNetworksStateBloc extends ChatNetworksListListenerBloc {
   final ChatOutputBackendService _backendService;
   final Map<String, BehaviorSubject<NetworkState>> _states = Map();
 

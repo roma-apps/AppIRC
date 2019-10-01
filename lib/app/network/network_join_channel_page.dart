@@ -33,7 +33,7 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
     var networkChannelJoinFormBloc = NetworkChannelJoinFormBloc();
-    var networkBloc = NetworkBloc.newBloc(context, network);
+    var networkBloc = NetworkBloc.of(context, network);
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: Text(appLocalizations.tr('join_channel.title')),

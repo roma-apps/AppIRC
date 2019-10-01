@@ -7,10 +7,10 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-abstract class ChatNetworksChannelsListListenerBloc extends Providable {
+abstract class ChatNetworksListListenerBloc extends Providable {
   final ChatNetworksListBloc networksListBloc;
 
-  ChatNetworksChannelsListListenerBloc(this.networksListBloc) {
+  ChatNetworksListListenerBloc(this.networksListBloc) {
     addDisposable(
         disposable: networksListBloc.listenForNetworkJoin((networkWithState) {
           var network = networkWithState.network;
