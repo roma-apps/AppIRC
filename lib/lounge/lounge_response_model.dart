@@ -8,6 +8,7 @@ class LoungeResponseEventNames {
   static const String nick = "nick";
   static const String msg = "msg";
   static const String msgSpecial = "msg:special";
+  static const String msgPreview = "msg:preview";
   static const String configuration = "configuration";
   static const String authorized = "authorized";
   static const String auth = "auth";
@@ -22,6 +23,13 @@ class LoungeResponseEventNames {
   static const String networkOptions = "network:options";
   static const String channelState = "channel:state";
   static const String init = "init";
+}
+
+class LoungeResponseMessagePreviewType {
+
+  static const String link = "link";
+  static const String loading = "loading";
+  static const String image = "image";
 }
 
 abstract class LoungeRequestBody {
@@ -329,7 +337,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
   final bool highlight;
   final bool showInActive;
   final List<dynamic> users;
-  final List<dynamic> previews;
+  final List<MsgPreviewLoungeResponseBodyPart> previews;
   final List<String> params;
   final int id;
   final WhoIsLoungeResponseBodyPart whois;
@@ -434,6 +442,52 @@ class MsgFromLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   factory MsgFromLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$MsgFromLoungeResponseBodyPartFromJson(json);
+}
+
+
+@JsonSerializable()
+class MsgPreviewLoungeResponseBodyPart extends LoungeResponseBodyPart {
+  final String head;
+  final String body;
+  final bool canDisplay;
+  final bool shown;
+  final String link;
+  final String thumb;
+  final String type; // image or link
+
+  MsgPreviewLoungeResponseBodyPart(this.head, this.body, this.canDisplay,
+      this.shown, this.link, this.thumb, this.type);
+
+
+  @override
+  String toString() {
+    return 'MsgPreviewLoungeResponseBodyPart{head: $head, body: $body, '
+        'canDisplay: $canDisplay, shown: $shown,'
+        ' link: $link, thumb: $thumb, type: $type}';
+  }
+
+  factory MsgPreviewLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$MsgPreviewLoungeResponseBodyPartFromJson(json);
+}
+
+@JsonSerializable()
+class MsgPreviewLoungeResponseBody extends LoungeResponseBody {
+  final int id;
+  final int chan;
+
+  final MsgPreviewLoungeResponseBodyPart preview;
+
+
+  @override
+  String toString() {
+    return 'MsgPreviewLoungeResponseBody{id: $id, chan: $chan, preview: $preview}';
+  }
+
+  MsgPreviewLoungeResponseBody(this.id, this.chan, this.preview);
+
+
+  factory MsgPreviewLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$MsgPreviewLoungeResponseBodyFromJson(json);
 }
 
 @JsonSerializable()

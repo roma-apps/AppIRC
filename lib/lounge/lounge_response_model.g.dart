@@ -290,7 +290,12 @@ MsgLoungeResponseBody _$MsgLoungeResponseBodyFromJson(
     json['highlight'] as bool,
     json['showInActive'] as bool,
     json['users'] as List,
-    json['previews'] as List,
+    (json['previews'] as List)
+        ?.map((e) => e == null
+            ? null
+            : MsgPreviewLoungeResponseBodyPart.fromJson(
+                e as Map<String, dynamic>))
+        ?.toList(),
     (json['params'] as List)?.map((e) => e as String)?.toList(),
     json['id'] as int,
     json['whois'] == null
@@ -376,6 +381,51 @@ Map<String, dynamic> _$MsgFromLoungeResponseBodyPartToJson(
       'id': instance.id,
       'mode': instance.mode,
       'nick': instance.nick,
+    };
+
+MsgPreviewLoungeResponseBodyPart _$MsgPreviewLoungeResponseBodyPartFromJson(
+    Map<String, dynamic> json) {
+  return MsgPreviewLoungeResponseBodyPart(
+    json['head'] as String,
+    json['body'] as String,
+    json['canDisplay'] as bool,
+    json['shown'] as bool,
+    json['link'] as String,
+    json['thumb'] as String,
+    json['type'] as String,
+  );
+}
+
+Map<String, dynamic> _$MsgPreviewLoungeResponseBodyPartToJson(
+        MsgPreviewLoungeResponseBodyPart instance) =>
+    <String, dynamic>{
+      'head': instance.head,
+      'body': instance.body,
+      'canDisplay': instance.canDisplay,
+      'shown': instance.shown,
+      'link': instance.link,
+      'thumb': instance.thumb,
+      'type': instance.type,
+    };
+
+MsgPreviewLoungeResponseBody _$MsgPreviewLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return MsgPreviewLoungeResponseBody(
+    json['id'] as int,
+    json['chan'] as int,
+    json['preview'] == null
+        ? null
+        : MsgPreviewLoungeResponseBodyPart.fromJson(
+            json['preview'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$MsgPreviewLoungeResponseBodyToJson(
+        MsgPreviewLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'chan': instance.chan,
+      'preview': instance.preview,
     };
 
 InitLoungeResponseBody _$InitLoungeResponseBodyFromJson(

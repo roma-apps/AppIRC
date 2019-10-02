@@ -1,6 +1,7 @@
 import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 
 
 class RegularMessage extends ChatMessage {
@@ -19,9 +20,6 @@ class RegularMessage extends ChatMessage {
 
   final bool highlight;
 
-  final dynamic previews;
-
-
   final int fromRemoteId;
 
   final String fromNick;
@@ -29,6 +27,8 @@ class RegularMessage extends ChatMessage {
   final String fromMode;
 
   final String newNick;
+
+  final List<MessagePreview> previews;
 
   RegularMessage(
       int channelRemoteId,

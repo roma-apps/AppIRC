@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
@@ -83,6 +84,10 @@ class NetworkChannelMessageWidget extends StatelessWidget {
         linkStyle: messagesSkin
             .modifyToLinkTextStyle(messagesSkin.regularMessageBodyTextStyle),
       ));
+    }
+
+    if (message.previews != null) {
+      message.previews.forEach((preview) => rows.add(buildPreview(context, preview)));
     }
 
     return Column(
@@ -242,6 +247,42 @@ class NetworkChannelMessageWidget extends StatelessWidget {
     } else {
       return null;
     }
+  }
+
+  Widget buildPreview(BuildContext context, MessagePreview preview) {
+    switch (preview.type) {
+      case MessagePreviewType.LINK:
+        return buildMessageLinkPreview(context, preview);
+
+        break;
+      case MessagePreviewType.IMAGE:
+        return buildMessageImagePreview(context, preview);
+        break;
+      case MessagePreviewType.LOADING:
+        return Text("Loading");
+        break;
+    }
+  }
+
+  Widget buildMessageLinkPreview(BuildContext context, MessagePreview preview) {
+    var rows = <Widget>[
+      Text(preview.head),
+      Text(preview.body),
+    ];
+
+    if (preview.thumb != null) {
+      rows.add(_buildPreviewThumb(context, preview.thumb));
+    }
+    return Column(children: rows);
+  }
+
+  Widget buildMessageImagePreview(
+      BuildContext context, MessagePreview preview) {
+    return _buildPreviewThumb(context, preview.thumb);
+  }
+
+  Widget _buildPreviewThumb(BuildContext context, String thumb) {
+    return Image.network(thumb);
   }
 }
 

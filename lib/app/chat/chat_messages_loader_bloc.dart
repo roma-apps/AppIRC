@@ -5,6 +5,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_db.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_db.dart';
@@ -105,8 +106,12 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
     return decoded;
   }
 
-  _convertPreviews(RegularMessageDB messageDB) =>
-      json.decode(messageDB.previewsJsonEncoded);
+  List<MessagePreview> _convertPreviews(RegularMessageDB messageDB) {
+    var decoded = json.decode(messageDB.previewsJsonEncoded);
+    var list = decoded as List<dynamic>;
+
+    return list.map((listItem) => MessagePreview.fromJson(listItem)).toList();
+  }
 
   SpecialMessage _specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
     var type = specialMessageTypeIdToType(messageDB.specialTypeId);

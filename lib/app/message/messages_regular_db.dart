@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/messages_db.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 
 //part 'messages_regular_db_dao.g.dart';
@@ -70,7 +71,7 @@ class RegularMessageDB implements ChatMessageDB {
 
   final String previewsJsonEncoded;
 
-  static List<String> previews(RegularMessageDB message) =>
+  static List<MessagePreview> previews(RegularMessageDB message) =>
       json.decode(message.previewsJsonEncoded);
 
   final int dateMicrosecondsSinceEpoch;

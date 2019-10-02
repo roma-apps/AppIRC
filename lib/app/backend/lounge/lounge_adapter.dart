@@ -1,6 +1,7 @@
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -51,7 +52,11 @@ ChatMessage toChatMessage(
       self: msgLoungeResponseBody.self,
       highlight: msgLoungeResponseBody.highlight,
       params: msgLoungeResponseBody.params,
-      previews: msgLoungeResponseBody.previews,
+      previews: msgLoungeResponseBody.previews != null
+          ? msgLoungeResponseBody.previews
+              .map((loungePreview) => toMessagePreview(loungePreview))
+              .toList()
+          : null,
       date: DateTime.parse(msgLoungeResponseBody.time),
       fromNick: msgLoungeResponseBody.from != null
           ? msgLoungeResponseBody.from.nick
@@ -317,3 +322,30 @@ WhoIsSpecialMessageBody toSpecialMessageWhoIs(
         serverInfo: loungeWhoIs.server_info,
         actualHostname: loungeWhoIs.actual_hostname,
         actualIp: loungeWhoIs.actual_ip);
+
+MessagePreview toMessagePreview(
+        MsgPreviewLoungeResponseBodyPart loungePreview) =>
+    MessagePreview.name(
+        head: loungePreview.head,
+        body: loungePreview.body,
+        canDisplay: loungePreview.canDisplay,
+        shown: loungePreview.shown,
+        link: loungePreview.link,
+        thumb: loungePreview.thumb,
+        type: detectMessagePreviewType(loungePreview.type));
+
+MessagePreviewType detectMessagePreviewType(String type) {
+  switch (type) {
+    case LoungeResponseMessagePreviewType.image:
+      return MessagePreviewType.IMAGE;
+      break;
+    case LoungeResponseMessagePreviewType.link:
+      return MessagePreviewType.LINK;
+      break;
+      case LoungeResponseMessagePreviewType.loading:
+      return MessagePreviewType.LOADING;
+      break;
+  }
+
+  throw Exception("Invalid MessagePreviewType type $type");
+}
