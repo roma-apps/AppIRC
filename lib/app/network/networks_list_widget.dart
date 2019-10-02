@@ -17,6 +17,7 @@ import 'package:flutter_appirc/app/network/network_popup_menu_widget.dart';
 import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class NetworksListWidget extends StatelessWidget {
@@ -53,7 +54,9 @@ class NetworksListWidget extends StatelessWidget {
           } else {
             return Center(
               child: Text(AppLocalizations.of(context)
-                  .tr("irc_connection.no_networks")),
+                  .tr("irc_connection.no_networks"), style: TextStyle(
+                  color:
+                  AppSkinBloc.of(context).appSkinTheme.textColor)),
             );
           }
         });

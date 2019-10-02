@@ -20,14 +20,14 @@ PlatformButton createSkinnedPlatformButton(BuildContext context,
   return PlatformButton(
     child: child,
     onPressed: onPressed,
-//    androidFlat: (context) => MaterialFlatButtonData(
-//        color: buttonSkinBloc.enabledColor,
-//        disabledColor: buttonSkinBloc.disabledColor,
-//
-//    ),
-//    ios: (context) => CupertinoButtonData(
-//      color: buttonSkinBloc.enabledColor,
-//      disabledColor: buttonSkinBloc.disabledColor
-//    ),
+    androidFlat: (context) => MaterialFlatButtonData(
+        color: buttonSkinBloc.enabledColor,
+        disabledColor: buttonSkinBloc.disabledColor,
+
+    ),
+    ios: (context) => CupertinoButtonData(
+      color: buttonSkinBloc.enabledColor,
+      disabledColor: buttonSkinBloc.disabledColor
+    ),
   );
 }

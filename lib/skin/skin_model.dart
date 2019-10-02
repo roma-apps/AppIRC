@@ -2,12 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
 
 typedef AndroidThemeDataCreator = ThemeData Function();
 typedef IOSThemeDataCreator = CupertinoThemeData Function();
 
 class AppSkinTheme {
   final String id;
+
+  get textColor => platformSkinTheme.onBackgroundColor;
+
+  get backgroundColor => platformSkinTheme.backgroundColor;
 
   @override
   bool operator ==(Object other) =>
@@ -24,9 +29,9 @@ class AppSkinTheme {
 
   AppSkinTheme(
       this.id, this.androidThemeDataCreator, this.iosThemeDataCreator) {
-    if (Platform.isAndroid) {
+    if (isMaterial) {
       platformSkinTheme = AndroidAppSkinTheme(androidThemeDataCreator());
-    } else if (Platform.isAndroid) {
+    } else if (isCupertino) {
       platformSkinTheme = MaterialBasedIOSAppSkinTheme(
           AndroidAppSkinTheme(androidThemeDataCreator()));
     } else {
@@ -37,6 +42,7 @@ class AppSkinTheme {
 
 abstract class PlatformSkinTheme {
   Color get disabledColor;
+
   Color get primaryColor;
 
   Color get primaryVariantColor;
@@ -66,6 +72,10 @@ abstract class PlatformSkinTheme {
   TextStyle get textEditTextStyle;
 
   Color get buttonColor;
+
+  Color get onBackgroundColor;
+
+  Color get backgroundColor;
 }
 
 class AndroidAppSkinTheme extends PlatformSkinTheme {
@@ -74,7 +84,6 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextTheme get textTheme => theme.textTheme;
 
   AndroidAppSkinTheme(this.theme);
-
 
   Color get buttonColor => theme.buttonColor;
 
@@ -101,7 +110,8 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textRegularSmallStyle => textTheme.body2.copyWith(fontSize: 12);
 
   @override
-  TextStyle get textTitleStyle => textTheme.headline.copyWith(color: onPrimaryColor);
+  TextStyle get textTitleStyle =>
+      textTheme.headline.copyWith(color: onPrimaryColor);
 
   @override
   Color get primaryColor => theme.colorScheme.primary;
@@ -123,6 +133,12 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
 
   @override
   Color get disabledColor => theme.disabledColor;
+
+  @override
+  Color get onBackgroundColor => theme.colorScheme.onPrimary;
+
+  @override
+  Color get backgroundColor => theme.backgroundColor;
 }
 
 class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
@@ -130,10 +146,12 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
   CupertinoThemeData theme;
 
   CupertinoTextThemeData get textTheme => theme.textTheme;
+
   Color get buttonColor => androidAppSkinTheme.theme.buttonColor;
 
   @override
   Color get disabledColor => androidAppSkinTheme.theme.disabledColor;
+
   @override
   Color get primaryColor => androidAppSkinTheme.theme.colorScheme.primary;
 
@@ -161,10 +179,11 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
   }
 
   @override
-  TextStyle get textBoldMediumStyle => textTheme.textStyle;
+  TextStyle get textBoldMediumStyle => textTheme.navTitleTextStyle;
 
   @override
-  TextStyle get textBoldSmallStyle => textTheme.textStyle;
+  TextStyle get textBoldSmallStyle =>
+      textTheme.navTitleTextStyle.copyWith(fontSize: 14);
 
   @override
   TextStyle get textEditTextStyle => textTheme.textStyle;
@@ -179,8 +198,15 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textRegularMediumStyle => textTheme.textStyle;
 
   @override
-  TextStyle get textRegularSmallStyle => textTheme.textStyle;
+  TextStyle get textRegularSmallStyle =>
+      textTheme.textStyle.copyWith(fontSize: 12);
 
   @override
-  TextStyle get textTitleStyle => textTheme.navLargeTitleTextStyle;
+  TextStyle get textTitleStyle => textTheme.navTitleTextStyle;
+
+  Color get onBackgroundColor =>
+      androidAppSkinTheme.theme.colorScheme.onPrimary;
+
+  @override
+  Color get backgroundColor => androidAppSkinTheme.theme.backgroundColor;
 }

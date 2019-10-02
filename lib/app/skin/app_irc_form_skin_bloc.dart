@@ -11,6 +11,8 @@ class AppIRCFormSkinBloc extends FormSkinBloc {
 
   AppIRCFormSkinBloc(this.theme);
 
+  Color get switchActiveColor => theme.platformSkinTheme.buttonColor;
+
   TextStyle get booleanRowLabelTextStyle => theme.platformSkinTheme.textRegularMediumStyle;
 
   TextStyle get textRowInputDecorationLabelTextStyle => theme.platformSkinTheme.textInputDecorationLabelStyle;

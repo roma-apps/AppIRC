@@ -28,6 +28,7 @@ import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart'
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/user/users_list_page.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
 import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
@@ -44,35 +45,36 @@ class ChatPage extends StatelessWidget {
         stream: skinPreferenceBloc.appSkinStream,
         builder: (context, asyncSnapshot) {
           AppIRCSkinTheme currentSkin = asyncSnapshot.data;
-          return SafeArea(
-            child: PlatformScaffold(
-                android: (context) => MaterialScaffoldData(
-                    appBar: AppBar(
-                      title: _buildAppBarChild(context),
-                      actions: <Widget>[
-                        _buildTrailing(context),
-                      ],
-                      backgroundColor: currentSkin.appBarColor,
+
+
+
+          return PlatformScaffold(
+              android: (context) => MaterialScaffoldData(
+                  appBar: AppBar(
+                    title: _buildAppBarChild(context),
+                    actions: <Widget>[
+                      _buildTrailing(context),
+                    ],
+                    backgroundColor: currentSkin.appBarColor,
+                  ),
+                  drawer: Drawer(child: ChatDrawerWidget()),
+                  body: _buildBody(context)),
+              ios: (context) => CupertinoPageScaffoldData(
+                  resizeToAvoidBottomInset: true,
+                  body: _buildBody(context),
+                  navigationBar: CupertinoNavigationBar(
+                    leading: PlatformIconButton(
+                      icon: _buildMenuIcon(context),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            platformPageRoute(
+                                builder: (context) => ChatDrawerPage()));
+                      },
                     ),
-                    drawer: Drawer(child: ChatDrawerWidget()),
-                    body: _buildBody(context)),
-                ios: (context) => CupertinoPageScaffoldData(
-                    resizeToAvoidBottomInset: true,
-                    body: _buildBody(context),
-                    navigationBar: CupertinoNavigationBar(
-                      leading: PlatformIconButton(
-                        icon: _buildMenuIcon(context),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              platformPageRoute(
-                                  builder: (context) => ChatDrawerPage()));
-                        },
-                      ),
-                      trailing: _buildTrailing(context),
-                      middle: _buildAppBarChild(context),
-                    ))),
-          );
+                    trailing: _buildTrailing(context),
+                    middle: _buildAppBarChild(context),
+                  )));
         });
   }
 
@@ -263,7 +265,9 @@ class ChatPage extends StatelessWidget {
             case ChatConnectionState.CONNECTING:
               return Center(
                   child:
-                      Text(appLocalizations.tr("chat.connection.connecting")));
+                      Text(appLocalizations.tr("chat.connection.connecting"), style: TextStyle(
+                          color:
+                          AppSkinBloc.of(context).appSkinTheme.textColor)));
               break;
             case ChatConnectionState.DISCONNECTED:
               return Center(
@@ -271,7 +275,9 @@ class ChatPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(appLocalizations.tr("chat.connection.disconnected")),
+                    Text(appLocalizations.tr("chat.connection.disconnected"), style: TextStyle(
+                        color:
+                        AppSkinBloc.of(context).appSkinTheme.textColor)),
                     createSkinnedPlatformButton(context,
                         child: Text(
                             appLocalizations.tr("chat.connection.reconnect")),
@@ -289,7 +295,9 @@ class ChatPage extends StatelessWidget {
 
   Center _buildNoActiveChannelMessage(BuildContext context) {
     return Center(
-      child: Text(AppLocalizations.of(context).tr('chat.no_active_channel')),
+      child: Text(AppLocalizations.of(context).tr('chat.no_active_channel'), style: TextStyle(
+          color:
+          AppSkinBloc.of(context).appSkinTheme.textColor)),
     );
   }
 }

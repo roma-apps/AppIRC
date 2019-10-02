@@ -5,6 +5,7 @@ import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/user/users_list_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class NetworkChannelUsersPage extends StatefulWidget {
@@ -38,8 +39,7 @@ class NetworkChannelUsersPageState extends State<NetworkChannelUsersPage> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Provider(
-              providable: channelBloc,
-              child: ChannelUsersInfoWidget()),
+              providable: channelBloc, child: ChannelUsersInfoWidget()),
         ),
       ),
     );

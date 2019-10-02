@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/async/async_dialog_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:progress_dialog/progress_dialog.dart';
+
 
 var _logger = MyLogger(logTag: "doAsyncOperationWithDialog", enabled: true);
 
@@ -26,3 +27,5 @@ Future<T> doAsyncOperationWithDialog<T>(BuildContext context,
 
   return result;
 }
+
+

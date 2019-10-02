@@ -38,8 +38,8 @@ BuildContext context,
             .map((action) => CupertinoActionSheetAction(
           child: _buildRow(action.iconData, action.text),
           onPressed: () {
-            action.actionCallback(action);
             Navigator.pop(context);
+            action.actionCallback(action);
           },
         ))
             .toList(),

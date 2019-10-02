@@ -41,8 +41,6 @@ dependencies:
   # checking network connection
   connectivity: ^0.4.4
 
-  # async operations dialog
-  progress_dialog: ^1.2.0
 
   # sqlite orm
   floor: ^0.8.0

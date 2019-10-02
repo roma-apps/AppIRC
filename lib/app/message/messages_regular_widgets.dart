@@ -2,10 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -31,10 +31,8 @@ class NetworkChannelMessageWidget extends StatelessWidget {
 
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
-
     var color =
-    messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
-
+        messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
     return buildRegularMessage(title, body, needHighlight, color);
   }
@@ -147,10 +145,10 @@ class NetworkChannelMessageWidget extends StatelessWidget {
 
     var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-    var child =Text(
+    var child = Text(
       nick,
-      style: messagesSkin
-          .createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+      style:
+          messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
     );
 
     return buildUserNickWithPopupMenu(context, child, nick, channelBloc);
@@ -165,7 +163,6 @@ class NetworkChannelMessageWidget extends StatelessWidget {
 
     return buildMessageIcon(iconData, color);
   }
-
 
   Widget _buildTitleSubMessage(BuildContext context) {
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
@@ -249,9 +246,9 @@ class NetworkChannelMessageWidget extends StatelessWidget {
 }
 
 isNeedHighlight(RegularMessage message) =>
-message.highlight == true ||
+    message.highlight == true ||
     message.regularMessageType ==
-    RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
+        RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
 
 bool isHaveLongText(RegularMessage message) =>
     message.text != null ? message.text.length > 10 : false;
@@ -318,8 +315,8 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
   return icon;
 }
 
-
-Widget buildRegularMessage(Widget title, Widget body, bool needHighlight, Color color) {
+Widget buildRegularMessage(
+    Widget title, Widget body, bool needHighlight, Color color) {
   var decoration;
   if (needHighlight) {
     decoration = BoxDecoration(border: Border.all(color: color));
@@ -384,8 +381,6 @@ Widget buildMessageTitleDate(
     ),
   );
 }
-
-
 
 Icon buildMessageIcon(IconData iconData, Color color) {
   return Icon(iconData, color: color);

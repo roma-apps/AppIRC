@@ -132,9 +132,3 @@ Widget createPlatformTypeAhead<T>(BuildContext context, {Key key,
   }
   throw Exception("invalid platform");
 }
-
-Widget _buildCupertinoTypeAhead(BuildContext context) {
-}
-
-Widget _buildMaterialTypeAhead(BuildContext context) {
-}

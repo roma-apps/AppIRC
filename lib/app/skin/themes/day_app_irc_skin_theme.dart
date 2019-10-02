@@ -566,4 +566,12 @@ ThemeData _androidDayThemeData = ThemeData(
       )
 
   ),
+//    cupertinoOverrideTheme: CupertinoThemeData(
+//      primaryColor: Colors.amber,
+//        textTheme: CupertinoTextThemeData(
+//
+//
+//        actionTextStyle: TextStyle(color: Colors.amber),
+//        textStyle: TextStyle(color: Colors.amber)
+//    ))
 );

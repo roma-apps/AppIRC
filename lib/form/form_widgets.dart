@@ -37,32 +37,61 @@ buildFormTextRow(
   var formSkinBloc = Provider.of<FormSkinBloc>(context);
 
   if (bloc.visible) {
-    TextField textField;
+    var androidBuilder;
+    var iosBuilder;
+
     if (bloc.enabled) {
-      textField = TextField(
+      androidBuilder = (_) => MaterialTextFieldData(
           enabled: bloc.enabled,
-          controller: controller,
           style: formSkinBloc.textRowEditTextStyle,
           decoration: InputDecoration(
               labelText: label,
               hintText: hint,
               labelStyle: formSkinBloc.textRowInputDecorationLabelTextStyle,
-              hintStyle: formSkinBloc.textRowInputDecorationHintTextStyle),
-          onChanged: (newValue) {
-            bloc.onNewValue(newValue);
-          });
+              hintStyle: formSkinBloc.textRowInputDecorationHintTextStyle));
+
+      iosBuilder = (_) => CupertinoTextFieldData(
+            enabled: bloc.enabled,
+            padding: EdgeInsets.all(8),
+            style: formSkinBloc.textRowEditTextStyle,
+            placeholder: hint,
+            prefix: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(label,
+                  style: formSkinBloc.textRowInputDecorationLabelTextStyle
+                      .copyWith(color: Colors.grey)),
+            ),
+            placeholderStyle: formSkinBloc.textRowInputDecorationHintTextStyle
+                .copyWith(color: Colors.grey),
+          );
     } else {
-      textField = TextField(
-          enabled: false,
-          controller: controller,
-          style: formSkinBloc.textRowEditTextStyle.copyWith(color:Colors.grey),
+      androidBuilder = (_) => MaterialTextFieldData(
+          enabled: bloc.enabled,
+          style: formSkinBloc.textRowEditTextStyle.copyWith(color: Colors.grey),
           decoration: InputDecoration(
               enabled: false,
               labelText: label,
               hintText: hint,
-              labelStyle: formSkinBloc.textRowInputDecorationHintTextStyle.copyWith(color:Colors.grey),
-              hintStyle: formSkinBloc.textRowInputDecorationHintTextStyle.copyWith(color:Colors.grey)),
-          );
+              labelStyle: formSkinBloc.textRowInputDecorationLabelTextStyle
+                  .copyWith(color: Colors.grey),
+              hintStyle: formSkinBloc.textRowInputDecorationHintTextStyle
+                  .copyWith(color: Colors.grey)));
+
+      iosBuilder = (_) => CupertinoTextFieldData(
+          enabled: bloc.enabled,
+          placeholder: hint,
+          padding: EdgeInsets.all(8),
+          style: formSkinBloc.textRowEditTextStyle.copyWith(color: Colors.grey),
+          prefix: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              label,
+              style: formSkinBloc.textRowInputDecorationLabelTextStyle
+                  .copyWith(color: Colors.grey),
+            ),
+          ),
+          placeholderStyle: formSkinBloc.textRowInputDecorationHintTextStyle
+              .copyWith(color: Colors.grey));
     }
 
     return Column(
@@ -74,24 +103,16 @@ buildFormTextRow(
               child: Icon(iconData),
             ),
             Flexible(
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: textField,
-
-//            child: PlatformTextField(
-//                android: (_) => MaterialTextFieldData(
-//                    decoration: InputDecoration(
-//                        labelText: label,
-//                        hintText: hint,
-//                        hintStyle: TextStyle(color: Colors.grey))),
-//                ios: (_) =>
-//                    CupertinoTextFieldData(placeholder: hint, prefix: Text(label)),
-//                controller: controller,
-//                onChanged: (newValue) {
-//                  bloc.onNewValue(newValue);
-//                }),
-              ),
-            ),
+                child: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: PlatformTextField(
+                        textAlign: TextAlign.end,
+                        android: androidBuilder,
+                        ios: iosBuilder,
+                        controller: controller,
+                        onChanged: (newValue) {
+                          bloc.onNewValue(newValue);
+                        }))),
           ],
         ),
         StreamBuilder<ValidationError>(
@@ -135,6 +156,8 @@ buildFormBooleanRow(
               builder: (context, snapshot) {
                 var changed = bloc.enabled ? bloc.onNewValue : null;
                 return PlatformSwitch(
+                  activeColor:
+                      Provider.of<FormSkinBloc>(context).switchActiveColor,
                   value: snapshot.data != false,
                   onChanged: changed,
                 );

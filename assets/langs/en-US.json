@@ -5,6 +5,9 @@
     "no_whitespace": "Field should not have whitespaces",
     "not_unique": "Should be unique"
   },
+  "button": {
+    "ok": "OK"
+  },
   "splash": {
     "loading": "Loading"
   },

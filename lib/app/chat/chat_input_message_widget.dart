@@ -7,6 +7,7 @@ import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_skin_bloc.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_type_ahead_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -28,6 +29,8 @@ class NetworkChannelNewMessageState
 
     var channelBloc = Provider.of<NetworkChannelBloc>(context);
     ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
+    var appSkinTheme = AppSkinBloc.of(context).appSkinTheme;
+    var popupBackgroundColor = appSkinTheme.backgroundColor;
 
     return Container(
       decoration: BoxDecoration(
@@ -52,9 +55,12 @@ class NetworkChannelNewMessageState
                     return suggestions;
                   },
                   itemBuilder: (context, suggestion) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(suggestion),
+                    return Container(
+                      decoration: BoxDecoration(color: popupBackgroundColor),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(suggestion),
+                      ),
                     );
                   },
                   onSuggestionSelected: (suggestion) {
@@ -88,7 +94,7 @@ class NetworkChannelNewMessageState
                             },
                             style: DefaultTextStyle.of(context)
                                 .style
-                                .copyWith(fontStyle: FontStyle.italic),
+                                .copyWith(fontStyle: FontStyle.italic, color: appSkinTheme.textColor),
                             placeholder: hintStr));
                   },
                 ),

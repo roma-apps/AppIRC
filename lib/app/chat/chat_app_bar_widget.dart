@@ -16,7 +16,8 @@ class ChatAppBarWidget extends StatelessWidget {
 
     if (subTitle != null && subTitle.isNotEmpty) {
       return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
+//        mainAxisAlignment: isMaterial ? MainAxisAlignment.center : MainAxisAlignment.start,
         crossAxisAlignment:
             isMaterial ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: <Widget>[

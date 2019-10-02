@@ -12,19 +12,18 @@ import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 
 class NetworkChannelMessagesListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var backendService = Provider.of<ChatOutputBackendService>(context);
     var channelBloc = Provider.of<NetworkChannelBloc>(context);
-    var chatDatabase = Provider
-        .of<ChatDatabaseProvider>(context)
-        .db;
+    var chatDatabase = Provider.of<ChatDatabaseProvider>(context).db;
 
     NetworkChannelMessagesLoaderBloc messagesLoader =
-    NetworkChannelMessagesLoaderBloc(backendService,
-        chatDatabase, channelBloc.network, channelBloc.channel);
+        NetworkChannelMessagesLoaderBloc(backendService, chatDatabase,
+            channelBloc.network, channelBloc.channel);
 
     return StreamBuilder<List<ChatMessage>>(
         stream: messagesLoader.messagesStream,
@@ -40,24 +39,30 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
             return StreamBuilder<NetworkChannelState>(
               stream: channelBloc.networkChannelStateStream,
               initialData: channelBloc.networkChannelState,
-              builder: (BuildContext context, AsyncSnapshot<NetworkChannelState> snapshot) {
+              builder: (BuildContext context,
+                  AsyncSnapshot<NetworkChannelState> snapshot) {
                 var currentChannelState = snapshot.data;
 
-                if(currentChannelState.connected) {
+                if (currentChannelState.connected) {
                   return Center(
                       child: Text(
-                          AppLocalizations.of(context).tr("chat.empty_channel")));
+                          AppLocalizations.of(context).tr("chat.empty_channel"),
+                          style: TextStyle(
+                              color: AppSkinBloc.of(context)
+                                  .appSkinTheme
+                                  .textColor)));
                 } else {
                   return Center(
                       child: Text(
-                          AppLocalizations.of(context).tr("chat.not_connected_channel")));
+                          AppLocalizations.of(context)
+                              .tr("chat.not_connected_channel"),
+                          style: TextStyle(
+                              color: AppSkinBloc.of(context)
+                                  .appSkinTheme
+                                  .textColor)));
                 }
-
-            },
-
+              },
             );
-
-
           } else {
             var scrollController = ScrollController();
 
@@ -89,8 +94,7 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
                         break;
                     }
 
-                    throw Exception(
-                        "Invalid message type = $chatMessageType");
+                    throw Exception("Invalid message type = $chatMessageType");
                   }),
             );
           }
@@ -101,8 +105,7 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
 _isNeedPrint(ChatMessage message) {
   if (message is RegularMessage) {
     var regularMessageType = message.regularMessageType;
-    return
-      regularMessageType != RegularMessageType.RAW;
+    return regularMessageType != RegularMessageType.RAW;
   } else {
     return true;
   }

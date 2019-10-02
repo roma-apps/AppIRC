@@ -92,7 +92,6 @@ class ChatNetworkPreferencesFormWidgetState
                   context,
                   child: Text(
                     buttonText,
-                    style: TextStyle(color: Colors.white),
                   ),
                   onPressed: pressed,
                 );

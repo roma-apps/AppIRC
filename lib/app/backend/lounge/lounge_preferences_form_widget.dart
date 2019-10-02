@@ -37,6 +37,7 @@ class LoungePreferencesFormWidgetState
         Provider.of<LoungePreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         buildFormTitle(
             context, appLocalizations.tr('lounge.connection.settings')),
