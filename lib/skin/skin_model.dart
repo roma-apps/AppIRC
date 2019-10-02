@@ -135,7 +135,7 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   Color get disabledColor => theme.disabledColor;
 
   @override
-  Color get onBackgroundColor => theme.colorScheme.onPrimary;
+  Color get onBackgroundColor => theme.colorScheme.onBackground;
 
   @override
   Color get backgroundColor => theme.backgroundColor;

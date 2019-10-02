@@ -106,7 +106,7 @@ buildFormTextRow(
                 child: Padding(
                     padding: const EdgeInsets.all(2.0),
                     child: PlatformTextField(
-                        textAlign: TextAlign.end,
+                        textAlign: isMaterial? TextAlign.start : TextAlign.end,
                         android: androidBuilder,
                         ios: iosBuilder,
                         controller: controller,
