@@ -70,6 +70,7 @@ buildFormTextRow(
           style: formSkinBloc.textRowEditTextStyle.copyWith(color: Colors.grey),
           decoration: InputDecoration(
               enabled: false,
+
               labelText: label,
               hintText: hint,
               labelStyle: formSkinBloc.textRowInputDecorationLabelTextStyle

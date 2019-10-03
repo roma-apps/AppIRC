@@ -64,4 +64,5 @@ T _$enumDecodeNullable<T>(
 const _$MessagePreviewTypeEnumMap = {
   MessagePreviewType.LINK: 'LINK',
   MessagePreviewType.IMAGE: 'IMAGE',
+  MessagePreviewType.LOADING: 'LOADING',
 };

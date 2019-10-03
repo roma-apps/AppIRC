@@ -82,7 +82,7 @@ class _$ChatDatabase extends ChatDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `RegularMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `command` TEXT, `hostMask` TEXT, `text` TEXT, `paramsJsonEncoded` TEXT, `regularMessageTypeId` INTEGER, `self` INTEGER, `highlight` INTEGER, `previewsJsonEncoded` TEXT, `dateMicrosecondsSinceEpoch` INTEGER, `fromRemoteId` INTEGER, `fromNick` TEXT, `fromMode` TEXT, `newNick` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `RegularMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `command` TEXT, `hostMask` TEXT, `text` TEXT, `paramsJsonEncoded` TEXT, `regularMessageTypeId` INTEGER, `self` INTEGER, `highlight` INTEGER, `previewsJsonEncoded` TEXT, `dateMicrosecondsSinceEpoch` INTEGER, `fromRemoteId` INTEGER, `fromNick` TEXT, `fromMode` TEXT, `newNick` TEXT, `messageRemoteId` INTEGER)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SpecialMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `dataJsonEncoded` TEXT, `specialTypeId` INTEGER, `dateMicrosecondsSinceEpoch` INTEGER)');
 
@@ -127,7 +127,33 @@ class _$RegularMessageDao extends RegularMessageDao {
                   'fromRemoteId': item.fromRemoteId,
                   'fromNick': item.fromNick,
                   'fromMode': item.fromMode,
-                  'newNick': item.newNick
+                  'newNick': item.newNick,
+                  'messageRemoteId': item.messageRemoteId
+                },
+            changeListener),
+        _regularMessageDBUpdateAdapter = UpdateAdapter(
+            database,
+            'RegularMessageDB',
+            ['localId'],
+            (RegularMessageDB item) => <String, dynamic>{
+                  'localId': item.localId,
+                  'channelLocalId': item.channelLocalId,
+                  'chatMessageTypeId': item.chatMessageTypeId,
+                  'channelRemoteId': item.channelRemoteId,
+                  'command': item.command,
+                  'hostMask': item.hostMask,
+                  'text': item.text,
+                  'paramsJsonEncoded': item.paramsJsonEncoded,
+                  'regularMessageTypeId': item.regularMessageTypeId,
+                  'self': item.self,
+                  'highlight': item.highlight,
+                  'previewsJsonEncoded': item.previewsJsonEncoded,
+                  'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch,
+                  'fromRemoteId': item.fromRemoteId,
+                  'fromNick': item.fromNick,
+                  'fromMode': item.fromMode,
+                  'newNick': item.newNick,
+                  'messageRemoteId': item.messageRemoteId
                 },
             changeListener);
 
@@ -155,13 +181,24 @@ class _$RegularMessageDao extends RegularMessageDao {
           row['fromRemoteId'] as int,
           row['fromNick'] as String,
           row['fromMode'] as String,
-          row['newNick'] as String);
+          row['newNick'] as String,
+          row['messageRemoteId'] as int);
 
   final InsertionAdapter<RegularMessageDB> _regularMessageDBInsertionAdapter;
+
+  final UpdateAdapter<RegularMessageDB> _regularMessageDBUpdateAdapter;
 
   @override
   Future<List<RegularMessageDB>> getAllMessages() async {
     return _queryAdapter.queryList('SELECT * FROM RegularMessageDB',
+        mapper: _regularMessageDBMapper);
+  }
+
+  @override
+  Future<RegularMessageDB> findMessageWithRemoteId(int remoteId) async {
+    return _queryAdapter.query(
+        'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ?',
+        arguments: <dynamic>[remoteId],
         mapper: _regularMessageDBMapper);
   }
 
@@ -195,9 +232,15 @@ class _$RegularMessageDao extends RegularMessageDao {
   }
 
   @override
-  Future<int> insertRegularMessage(RegularMessageDB specialMessage) {
+  Future<int> insertRegularMessage(RegularMessageDB regularMessage) {
     return _regularMessageDBInsertionAdapter.insertAndReturnId(
-        specialMessage, sqflite.ConflictAlgorithm.abort);
+        regularMessage, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<int> updateRegularMessage(RegularMessageDB regularMessage) {
+    return _regularMessageDBUpdateAdapter.updateAndReturnChangedRows(
+        regularMessage, sqflite.ConflictAlgorithm.abort);
   }
 }
 

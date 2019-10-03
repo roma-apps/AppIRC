@@ -5,6 +5,8 @@ import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 
 
 class RegularMessage extends ChatMessage {
+
+  final int messageRemoteId;
   final String command;
 
   final String hostMask;
@@ -28,10 +30,11 @@ class RegularMessage extends ChatMessage {
 
   final String newNick;
 
-  final List<MessagePreview> previews;
+   List<MessagePreview> previews;
 
   RegularMessage(
       int channelRemoteId,
+      this.messageRemoteId,
       this.command,
       this.hostMask,
       this.text,
@@ -51,6 +54,7 @@ class RegularMessage extends ChatMessage {
  int channelRemoteId,
       {@required this.command,
       @required this.hostMask,
+      @required this.messageRemoteId,
       @required this.text,
       @required this.params,
       @required this.regularMessageType,

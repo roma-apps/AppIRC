@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/messages_db.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_db.dart';
+import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 
-//part 'messages_special_db_dao.g.dart';
 
 @dao
 abstract class SpecialMessageDao {
@@ -106,3 +108,29 @@ SpecialMessageDB toSpecialMessageDB(SpecialMessage specialMessage) =>
         dataJsonEncoded: json.encode(specialMessage.data),
         specialTypeId: specialMessageTypeTypeToId(specialMessage.specialType),
         dateMicrosecondsSinceEpoch: specialMessage.date.microsecondsSinceEpoch);
+
+
+
+SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
+  var type = specialMessageTypeIdToType(messageDB.specialTypeId);
+  var decodedJson = json.decode(messageDB.dataJsonEncoded);
+  var body;
+  switch (type) {
+    case SpecialMessageType.WHO_IS:
+      body = WhoIsSpecialMessageBody.fromJson(decodedJson);
+      break;
+    case SpecialMessageType.CHANNELS_LIST_ITEM:
+      body = NetworkChannelInfoSpecialMessageBody.fromJson(decodedJson);
+      break;
+    case SpecialMessageType.TEXT:
+      body = TextSpecialMessageBody.fromJson(decodedJson);
+      break;
+  }
+
+  return SpecialMessage.name(
+      channelRemoteId: messageDB.channelRemoteId,
+      data: body,
+      specialType: type,
+      date: DateTime.fromMicrosecondsSinceEpoch(
+          messageDB.dateMicrosecondsSinceEpoch));
+}

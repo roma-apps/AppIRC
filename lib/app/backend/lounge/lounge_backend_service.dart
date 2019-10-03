@@ -13,6 +13,7 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -592,22 +593,19 @@ class LoungeBackendService extends Providable
     return disposable;
   }
 
-
-  Disposable listenForNetworkChannelUsers(Network network,
-      NetworkChannel channel, VoidCallback listener) {
-
+  Disposable listenForNetworkChannelUsers(
+      Network network, NetworkChannel channel, VoidCallback listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable((LoungeResponseEventNames.users), (raw) {
-          var parsed = UsersLoungeResponseBody.fromJson(_preProcessRawData(raw));
+      var parsed = UsersLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-          if (parsed.chan == channel.remoteId) {
-            listener();
-          }
-        }));
+      if (parsed.chan == channel.remoteId) {
+        listener();
+      }
+    }));
 
     return disposable;
-
   }
 
   NetworkChannelState _modifyStateForChannel(
@@ -709,6 +707,22 @@ class LoungeBackendService extends Providable
         listener();
       }
     }));
+
+    return disposable;
+  }
+
+  @override
+  Disposable listenForMessagePreviews(Network network, NetworkChannel channel,
+      NetworkChannelMessagePreviewListener listener) {
+    var disposable = CompositeDisposable([]);
+    disposable.add(
+        createEventListenerDisposable((LoungeResponseEventNames.msgPreview), (raw) {
+          var parsed = MsgPreviewLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+          if (parsed.chan == channel.remoteId) {
+            listener(PreviewForMessage(parsed.id, toMessagePreview(parsed.preview)));
+          }
+        }));
 
     return disposable;
   }
@@ -839,7 +853,7 @@ class LoungeBackendService extends Providable
         createEventListenerDisposable((LoungeResponseEventNames.names), (raw) {
       var parsed = NamesLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-      _logger.d(()=>"listenForNetworkChannelUsers $parsed for $channel");
+      _logger.d(() => "listenForNetworkChannelUsers $parsed for $channel");
 
       if (parsed.id == channel.remoteId) {
         listener(parsed.users
@@ -944,6 +958,8 @@ class LoungeBackendService extends Providable
                 target: channel.remoteId, content: message)),
         isNeedAddRequestToPending: false);
   }
+
+
 }
 
 ChatConnectionState mapState(SocketConnectionState socketState) {

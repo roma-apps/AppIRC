@@ -4,7 +4,9 @@ import 'package:flutter_appirc/app/chat/chat_network_channels_list_listener_bloc
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_db.dart';
+import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_db.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
@@ -33,27 +35,44 @@ class NetworkChannelMessagesSaverBloc
 
     _logger.d(() => "listen for mesasges from channel $channel");
 
-    var channelListener =
-        backendService.listenForMessages(network, channel, (newMessage) {
+    var channelDisposable = CompositeDisposable([]);
+
+    channelDisposable
+        .add(backendService.listenForMessages(network, channel, (newMessage) {
       _logger.d(() => "onNewMessage $newMessage");
       var chatMessageType = newMessage.chatMessageType;
 
       switch (chatMessageType) {
         case ChatMessageType.SPECIAL:
-          db.specialMessagesDao
-              .insertSpecialMessage(toSpecialMessageDB(newMessage));
+          var specialMessageDB = toSpecialMessageDB(newMessage);
+          db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
           break;
         case ChatMessageType.REGULAR:
-          db.regularMessagesDao
-              .insertRegularMessage(toRegularMessageDB(newMessage));
+          var regularMessageDB = toRegularMessageDB(newMessage);
+          db.regularMessagesDao.insertRegularMessage(regularMessageDB);
           break;
       }
-    });
+    }));
 
-    _channelsListeners[channel.remoteId] = channelListener;
+    channelDisposable.add(backendService
+        .listenForMessagePreviews(network, channel, (previewForMessage) async {
+      var oldMessageDB = await db.regularMessagesDao
+          .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
-    addDisposable(disposable: channelListener);
+      var oldMessage = regularMessageDBToChatMessage(oldMessageDB);
+
+      updatePreview(oldMessage, previewForMessage);
+
+      db.regularMessagesDao
+          .updateRegularMessage(toRegularMessageDB(oldMessage));
+    }));
+
+    _channelsListeners[channel.remoteId] = channelDisposable;
+
+    addDisposable(disposable: channelDisposable);
   }
+
+
 
   @override
   void onChannelLeaved(Network network, NetworkChannel channel) {
@@ -62,4 +81,15 @@ class NetworkChannelMessagesSaverBloc
 
     _channelsListeners.remove(channel.remoteId).dispose();
   }
+}
+
+void updatePreview(RegularMessage oldMessage, PreviewForMessage previewForMessage) {
+
+  if (oldMessage.previews == null) {
+    oldMessage.previews = [];
+  }
+
+  oldMessage.previews
+      .removeWhere((preview) => preview.type == MessagePreviewType.LOADING);
+  oldMessage.previews.add(previewForMessage.messagePreview);
 }

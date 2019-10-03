@@ -68,6 +68,7 @@ ChatMessage toChatMessage(
           ? msgLoungeResponseBody.from.mode
           : null,
       newNick: msgLoungeResponseBody.new_nick,
+      messageRemoteId: msgLoungeResponseBody.id,
     );
 
 List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
@@ -342,7 +343,7 @@ MessagePreviewType detectMessagePreviewType(String type) {
     case LoungeResponseMessagePreviewType.link:
       return MessagePreviewType.LINK;
       break;
-      case LoungeResponseMessagePreviewType.loading:
+    case LoungeResponseMessagePreviewType.loading:
       return MessagePreviewType.LOADING;
       break;
   }

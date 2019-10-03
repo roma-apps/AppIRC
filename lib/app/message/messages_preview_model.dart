@@ -3,6 +3,21 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'messages_preview_model.g.dart';
 
+class PreviewForMessage {
+  int remoteMessageId;
+  MessagePreview messagePreview;
+
+  PreviewForMessage(this.remoteMessageId,this.messagePreview);
+
+  @override
+  String toString() {
+    return 'PreviewForMessage{messageId: $remoteMessageId, '
+        'messagePreview: $messagePreview}';
+  }
+
+
+}
+
 @JsonSerializable()
 class MessagePreview {
   final String head;
@@ -34,6 +49,9 @@ class MessagePreview {
 
   factory MessagePreview.fromJson(Map<String, dynamic> json) =>
       _$MessagePreviewFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$MessagePreviewToJson(this);
 }
 
 enum MessagePreviewType { LINK, IMAGE, LOADING }

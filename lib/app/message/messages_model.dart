@@ -1,7 +1,7 @@
 abstract class ChatMessage {
   int messageLocalId;
 
-   int channelLocalId;
+  int channelLocalId;
 
   final ChatMessageType chatMessageType;
 
@@ -18,6 +18,7 @@ abstract class ChatMessage {
   ChatMessage(this.chatMessageType, this.channelRemoteId, this.date);
 
   bool get isSpecial => chatMessageType == ChatMessageType.SPECIAL;
+
   bool get isRegular => chatMessageType == ChatMessageType.REGULAR;
 }
 

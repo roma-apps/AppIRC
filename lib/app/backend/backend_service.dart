@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -16,6 +17,7 @@ typedef NetworkStateListener(NetworkState networkState);
 typedef NetworkChannelListener(NetworkChannelWithState channel);
 typedef NetworkChannelStateListener(NetworkChannelState channelState);
 typedef NetworkChannelMessageListener(ChatMessage message);
+typedef NetworkChannelMessagePreviewListener(PreviewForMessage previewForMessage);
 
 abstract class ChatBackendService implements Providable {
   Stream<ChatConnectionState> get connectionStateStream;
@@ -67,6 +69,10 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 
   Disposable listenForMessages(Network network, NetworkChannel channel,
       NetworkChannelMessageListener listener);
+
+
+  Disposable listenForMessagePreviews(Network network, NetworkChannel channel,
+      NetworkChannelMessagePreviewListener listener);
 
 }
 

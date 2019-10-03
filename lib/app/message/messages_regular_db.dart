@@ -13,6 +13,10 @@ abstract class RegularMessageDao {
   @Query('SELECT * FROM RegularMessageDB')
   Future<List<RegularMessageDB>> getAllMessages();
 
+  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :remoteId')
+  Future<RegularMessageDB> findMessageWithRemoteId(int remoteId);
+
+
   @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
   Future<List<RegularMessageDB>> getChannelMessages(int channelRemoteId);
@@ -22,12 +26,16 @@ abstract class RegularMessageDao {
   Stream<List<RegularMessageDB>> getChannelMessagesStream(int channelRemoteId);
 
   @insert
-  Future<int> insertRegularMessage(RegularMessageDB specialMessage);
+  Future<int> insertRegularMessage(RegularMessageDB regularMessage);
+
+  @update
+  Future<int> updateRegularMessage(RegularMessageDB regularMessage);
 
   @Query('DELETE FROM RegularMessageDB')
   Future<void> deleteAllRegularMessages();
 
-  @Query('DELETE FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
+  @Query(
+      'DELETE FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
   Future<void> deleteChannelRegularMessages(int channelRemoteId);
 }
 
@@ -85,29 +93,20 @@ class RegularMessageDB implements ChatMessageDB {
 
   final String fromMode;
   final String newNick;
+  final int messageRemoteId;
 
-  RegularMessageDB(
-      this.localId,
-      this.channelLocalId,
-      this.chatMessageTypeId,
-      this.channelRemoteId,
-      this.command,
-      this.hostMask,
-      this.text,
-      this.paramsJsonEncoded,
-      this.regularMessageTypeId,
-      this.self,
-      this.highlight,
-      this.previewsJsonEncoded,
-      this.dateMicrosecondsSinceEpoch,
-      this.fromRemoteId,
-      this.fromNick,
-      this.fromMode,
-      this.newNick);
+
+  RegularMessageDB(this.localId, this.channelLocalId, this.chatMessageTypeId,
+      this.channelRemoteId, this.command, this.hostMask, this.text,
+      this.paramsJsonEncoded, this.regularMessageTypeId, this.self,
+      this.highlight, this.previewsJsonEncoded, this.dateMicrosecondsSinceEpoch,
+      this.fromRemoteId, this.fromNick, this.fromMode, this.newNick,
+      this.messageRemoteId);
 
   RegularMessageDB.name(
       {this.localId,
       this.channelLocalId,
+      this.messageRemoteId,
       this.chatMessageTypeId = chatMessageTypeRegularId,
       @required this.channelRemoteId,
       this.command,
@@ -122,8 +121,7 @@ class RegularMessageDB implements ChatMessageDB {
       this.fromRemoteId,
       this.fromNick,
       this.fromMode,
-      this.newNick
-      });
+      this.newNick});
 
   @override
   String toString() {
@@ -138,7 +136,6 @@ class RegularMessageDB implements ChatMessageDB {
         'fromRemoteId: $fromRemoteId, fromNick: $fromNick, '
         'fromMode: $fromMode, newNick: $newNick}';
   } //  RegularMessage(
-
 
 }
 
@@ -263,8 +260,10 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
   throw Exception("Invalid RegularMessageType = $type");
 }
 
-RegularMessageDB toRegularMessageDB(RegularMessage regularMessage) =>
+RegularMessageDB toRegularMessageDB(
+        RegularMessage regularMessage) =>
     RegularMessageDB.name(
+      messageRemoteId: regularMessage.messageRemoteId,
         command: regularMessage.command,
         hostMask: regularMessage.hostMask,
         text: regularMessage.text,
@@ -275,10 +274,63 @@ RegularMessageDB toRegularMessageDB(RegularMessage regularMessage) =>
             ? regularMessage.highlight ? 1 : 0
             : null,
         paramsJsonEncoded: json.encode(regularMessage.params),
-        previewsJsonEncoded: json.encode(regularMessage.previews),
+        previewsJsonEncoded: regularMessage.previews != null
+            ? json.encode(regularMessage.previews
+                .map((preview) => preview.toJson())
+                .toList())
+            : null,
         dateMicrosecondsSinceEpoch: regularMessage.date.microsecondsSinceEpoch,
         fromNick: regularMessage.fromNick,
         fromRemoteId: regularMessage.fromRemoteId,
         fromMode: regularMessage.fromMode,
         newNick: regularMessage.newNick,
         channelRemoteId: regularMessage.channelRemoteId);
+
+
+
+
+RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
+    RegularMessage.name(messageDB.channelRemoteId,
+        messageRemoteId: messageDB.messageRemoteId,
+        command: messageDB.command,
+        hostMask: messageDB.hostMask,
+        text: messageDB.text,
+        params: messageDB.paramsJsonEncoded != null
+            ? _convertParams(messageDB)
+            : null,
+        regularMessageType:
+        regularMessageTypeIdToType(messageDB.regularMessageTypeId),
+        self: messageDB.self != null
+            ? messageDB.self == 0 ? false : true
+            : null,
+        highlight: messageDB.highlight != null
+            ? messageDB.highlight == 0 ? false : true
+            : null,
+        previews: messageDB.previewsJsonEncoded != null
+            ? _convertPreviews(messageDB)
+            : null,
+        date: DateTime.fromMicrosecondsSinceEpoch(
+            messageDB.dateMicrosecondsSinceEpoch),
+        fromRemoteId: messageDB.fromRemoteId,
+        fromNick: messageDB.fromNick,
+        fromMode: messageDB.fromMode,
+        newNick: messageDB.newNick);
+
+List<String> _convertParams(RegularMessageDB messageDB) {
+  var decoded = json.decode(messageDB.paramsJsonEncoded);
+
+  if (decoded == null) {
+    return null;
+  } else if (decoded is List<dynamic>) {
+    decoded =
+        (decoded as List<dynamic>).map((item) => item.toString()).toList();
+  }
+  return decoded;
+}
+
+List<MessagePreview> _convertPreviews(RegularMessageDB messageDB) {
+  var decoded = json.decode(messageDB.previewsJsonEncoded);
+  var list = decoded as List<dynamic>;
+
+  return list.map((listItem) => MessagePreview.fromJson(listItem)).toList();
+}
