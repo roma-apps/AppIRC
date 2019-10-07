@@ -171,6 +171,24 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
 
 
 @JsonSerializable()
+class AuthLoungeResponseBody extends LoungeResponseBody {
+  final bool success;
+  final int serverHash;
+
+  AuthLoungeResponseBody(this.serverHash, this.success);
+
+
+  @override
+  String toString() {
+    return 'AuthLoungeResponseBody{success: $success, serverHash: $serverHash}';
+  }
+
+  factory AuthLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$AuthLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {
   final ChannelLoungeResponseBody chan;
   final int index;

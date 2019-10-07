@@ -46,7 +46,7 @@ class ChatNetworkServerPreferencesFormWidgetState
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
-    var formBloc = Provider.of<ChatNetworkServerPreferencesFormBloc>(context);
+    var formBloc = Provider.of<NetworkServerPreferencesFormBloc>(context);
 
     return Column(
       children: <Widget>[

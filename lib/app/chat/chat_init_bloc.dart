@@ -59,11 +59,14 @@ class ChatInitBloc extends Providable {
     if (isInitNotStarted) {
       _logger.d(() => "_sendStartRequests $state");
       _stateController.add(ChatInitState.IN_PROGRESS);
-      _startPreferences.networks.forEach((network) async {
-        await _backendService.joinNetwork(network, waitForResult: true);
-      });
-      _stateController.add(ChatInitState.FINISHED);
 
+      // server restores state automatically in private mode
+      if (_backendService.chatConfig.public) {
+        _startPreferences.networks.forEach((network) async {
+          await _backendService.joinNetwork(network, waitForResult: true);
+        });
+      }
+      _stateController.add(ChatInitState.FINISHED);
     }
   }
 }

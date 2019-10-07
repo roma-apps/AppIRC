@@ -4,20 +4,14 @@ import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 
 abstract class LoungeException implements Exception {}
 
-class PrivateLoungeNotSupportedException extends LoungeException {
-  final LoungeConnectionPreferences preferences;
-
-  PrivateLoungeNotSupportedException(this.preferences);
-}
-
 class InvalidConnectionResponseException extends LoungeException {
-  final LoungeConnectionPreferences preferences;
+  final LoungePreferences preferences;
 
-  final bool authReceived;
+  final bool authorizedReceived;
   final bool configReceived;
   final bool commandReceived;
 
-  InvalidConnectionResponseException(this.preferences, this.authReceived,
+  InvalidConnectionResponseException(this.preferences, this.authorizedReceived,
       this.configReceived, this.commandReceived);
 }
 

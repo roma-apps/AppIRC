@@ -21,10 +21,7 @@ double _dialogElevation = 8.0, _borderRadius = 8.0;
 Color _backgroundColor = Colors.white;
 Curve _insetAnimCurve = Curves.easeInOut;
 
-Widget _progressWidget = Image.asset(
-  'assets/double_ring_loading_io.gif',
-  package: 'progress_dialog',
-);
+Widget _progressWidget = PlatformCircularProgressIndicator();
 
 class ProgressDialog {
   _Body _dialog;

@@ -123,7 +123,7 @@ class ChatNetworkChannelPreferences extends JsonPreferences {
   Map<String, dynamic> toJson() => _$ChatNetworkChannelPreferencesToJson(this);
 }
 
-typedef PreferencesActionCallback = void Function(
+typedef ChatNetworkPreferencesActionCallback = void Function(
     BuildContext context, ChatNetworkPreferences preferences);
 
 @JsonSerializable()

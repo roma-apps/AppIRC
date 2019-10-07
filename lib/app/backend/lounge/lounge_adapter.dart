@@ -29,7 +29,7 @@ ChatConfig toChatConfig(
                 nickname: loungeConfig.defaults.nick,
                 realName: loungeConfig.defaults.realname,
                 username: loungeConfig.defaults.username,
-                password: null,
+                password: loungeConfig.defaults.password,
                 commands: null)),
         defaultChannels: loungeConfig.defaults.join,
         fileUpload: loungeConfig.fileUpload,
@@ -38,8 +38,7 @@ ChatConfig toChatConfig(
         public: loungeConfig.public,
         useHexIp: loungeConfig.useHexIp,
         fileUploadMaxSize: loungeConfig.fileUploadMaxSize,
-        commands: commands,
-        defaultPassword: loungeConfig.defaults.password);
+        commands: commands);
 
 ChatMessage toChatMessage(
         NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) =>

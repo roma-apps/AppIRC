@@ -1,17 +1,46 @@
+import 'package:flutter_appirc/app/backend/lounge/lounge_auth_preferences_form_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_connection_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:rxdart/rxdart.dart';
 
 class LoungePreferencesFormBloc extends FormBloc {
-  FormValueFieldBloc<String> hostFieldBloc;
+  LoungeConnectionPreferencesFormBloc connectionFormBloc;
+  LoungeAuthPreferencesFormBloc authPreferencesFormBloc;
 
-  LoungePreferencesFormBloc(LoungeConnectionPreferences loungePreferences) {
-    hostFieldBloc = FormValueFieldBloc<String>(loungePreferences.host,
-        validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
+  final LoungePreferences preferences;
+
+  BehaviorSubject<bool> _isAuthFormEnabledController;
+
+  LoungePreferencesFormBloc(this.preferences) {
+    connectionFormBloc =
+        LoungeConnectionPreferencesFormBloc(preferences.connectionPreferences);
+    authPreferencesFormBloc =
+        LoungeAuthPreferencesFormBloc(preferences.authPreferences);
+
+    _isAuthFormEnabledController = BehaviorSubject(seedValue: preferences
+        .authPreferences != null && preferences.authPreferences !=
+        LoungeAuthPreferences.empty);
+
+    addDisposable(subject: _isAuthFormEnabledController);
   }
 
   @override
-  List<FormFieldBloc> get children => [hostFieldBloc];
+  List<FormFieldBloc> get children {
+    if(isAuthFormEnabled) {
+      return [connectionFormBloc, authPreferencesFormBloc];
+    } else {
+      return [connectionFormBloc];
+    }
+  }
 
-  LoungeConnectionPreferences extractData() =>
-      LoungeConnectionPreferences(host: hostFieldBloc.value);
+  bool get isAuthFormEnabled => _isAuthFormEnabledController.value;
+
+  set isAuthFormEnabled(newValue) => _isAuthFormEnabledController.add(newValue);
+
+  get isAuthFormEnabledStream => _isAuthFormEnabledController.stream.distinct();
+
+  LoungePreferences extractData() =>
+      LoungePreferences(connectionFormBloc.extractData(),
+          authPreferences: authPreferencesFormBloc.extractData());
 }

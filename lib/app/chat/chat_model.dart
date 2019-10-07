@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 
 class ChatConfig {
+
   final ChatNetworkConnectionPreferences defaultNetwork;
   final String defaultChannels;
-  final String defaultPassword;
 
   final bool fileUpload;
   final bool ldapEnabled;
@@ -16,26 +16,23 @@ class ChatConfig {
   final List<String> commands;
 
 
-  ChatConfig(this.defaultNetwork, this.defaultChannels, this.defaultPassword,
-      this.fileUpload, this.ldapEnabled,
-      this.prefetch, this.public, this.useHexIp, this.fileUploadMaxSize,
-      this.commands);
+  ChatConfig(this.defaultNetwork, this.defaultChannels, this.fileUpload,
+      this.ldapEnabled, this.prefetch, this.public,
+      this.useHexIp, this.fileUploadMaxSize, this.commands);
 
 
   @override
   String toString() {
     return 'ChatConfig{defaultNetwork: $defaultNetwork,'
-        ' defaultChannels: $defaultChannels, '
-        'defaultPassword: $defaultPassword, fileUpload: $fileUpload, '
-        'ldapEnabled: $ldapEnabled, prefetch: $prefetch, '
-        'public: $public, useHexIp: $useHexIp, '
-        'fileUploadMaxSize: $fileUploadMaxSize, commands: $commands}';
+        ' defaultChannels: $defaultChannels, fileUpload: $fileUpload,'
+        ' ldapEnabled: $ldapEnabled, prefetch: $prefetch, public: $public,'
+        ' useHexIp: $useHexIp, fileUploadMaxSize: '
+        '$fileUploadMaxSize, commands: $commands}';
   }
 
   ChatConfig.name(
       {@required this.defaultNetwork,
       @required this.defaultChannels,
-      @required this.defaultPassword,
       @required this.fileUpload,
       @required this.ldapEnabled,
       @required this.prefetch,
@@ -43,10 +40,13 @@ class ChatConfig {
       @required this.useHexIp,
       @required this.fileUploadMaxSize,
       @required this.commands});
+
+
+
+
 }
 
 class ServerNameNotUniqueException implements Exception {}
-
 
 class ChannelUserInfo {
   final String nick;

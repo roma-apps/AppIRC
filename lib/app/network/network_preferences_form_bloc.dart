@@ -6,7 +6,7 @@ import 'package:flutter_appirc/form/form_blocs.dart';
 class ChatNetworkPreferencesFormBloc extends FormBloc {
   static const channelsNamesSeparator = " ";
   Validator<String> networkValidator;
-  ChatNetworkServerPreferencesFormBloc serverFormBloc;
+  NetworkServerPreferencesFormBloc serverFormBloc;
   NetworkUserPreferencesFormBloc userFormBloc;
 
   FormValueFieldBloc<String> channelsFieldBloc;
@@ -18,7 +18,7 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
     bool isNeedShowChannels,
     bool isNeedShowCommands,
   ) {
-    serverFormBloc = ChatNetworkServerPreferencesFormBloc(
+    serverFormBloc = NetworkServerPreferencesFormBloc(
         preferences.networkConnectionPreferences.serverPreferences,
         networkValidator);
     userFormBloc = NetworkUserPreferencesFormBloc(

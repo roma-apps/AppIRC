@@ -30,42 +30,62 @@
     }
   },
   "lounge": {
-    "connection": {
-      "settings": "Settings",
-      "host_label": "Host",
-      "host_hint": "https://demo.thelounge.chat",
-
-
-      "dialog": {
-        "connection_error": {
-          "title": "Connection error",
-          "content": "Can't connect to host"
+    "preferences": {
+      "title": "Lounge preferences",
+      "connect": "Connect",
+      "connection": {
+      "title": "Connection",
+        "host": {
+          "label": "Host",
+          "hint": "https://demo.thelounge.chat"
         },
-        "invalid_response_error": {
-          "title": "Invalid server response",
-          "content": "Connected to host but correct response not received. Maybe remote server have unsupported Lounge version."
+        "dialog": {
+          "connection_error": {
+            "title": "Connection error",
+            "content": "Can't connect to host",
+            "content_with_error": "Can't connect to host. Error {}"
+          },
+          "invalid_response_error": {
+            "title": "Invalid server response",
+            "content": "Connected to host but correct response not received. Maybe remote server have unsupported Lounge version."
+          },
+          "auth_fail": {
+            "title": "Auth fail",
+            "content": "Invalid username or password"
+          },
+          "timeout": {
+            "title": "Response timeout",
+            "content": "Check your network connection"
+          }
+        }
+      },
+      "auth": {
+        "title": "Authentication",
+        "username": {
+          "label": "Username",
+          "hint": "username"
         },
-        "private_not_supported_error": {
-          "title": "Not supported",
-          "content": "Private servers not supported yet"
+        "password": {
+          "label": "Password",
+          "hint": "(required)"
         }
       },
       "new": {
-        "title": "New lounge connection",
-        "connect": "Connect"
+        "title": "New lounge connection"
       },
       "edit": {
         "title": "Change lounge connection",
         "change": "Change",
-        "confirm_dialog": {
-          "title": "Are you sure?",
-          "content": "You will be disconnected from current Lounge server and all local history will be cleared",
-          "save_reload": "Save & Reload",
-          "cancel": "Cancel"
+        "dialog": {
+          "confirm": {
+            "title": "Are you sure?",
+            "content": "You will be disconnected from current Lounge server and all local history will be cleared",
+            "save_reload": "Save & Reload",
+            "cancel": "Cancel"
+          }
         }
       }
     }
-
   },
   "irc_connection": {
     "title": "New Server connection",
@@ -137,7 +157,6 @@
       "connected_to": "Connected to:",
       "idle_since": "Idle since:"
     },
-
     "sub_message": {
       "mode_short": "mode {}",
       "mode_long": "mode",
@@ -160,7 +179,6 @@
       "title": "Channel users",
       "loading": "Loading"
     }
-
   },
   "channels_list": {
     "users": "{} users"

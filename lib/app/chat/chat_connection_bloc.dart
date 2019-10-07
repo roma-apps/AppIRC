@@ -32,8 +32,6 @@ class ChatConnectionBloc extends Providable {
   Stream<ChatConnectionState> get connectionStateStream =>
       backendService.connectionStateStream;
 
-  Future<RequestResult<bool>> connectToBackend() async =>
-      backendService.connectChat();
 
   reconnect() => _reconnectIfNeeded();
 

@@ -11,6 +11,7 @@ class LoungeRequestEventNames {
   static const String names = "names";
   static const String input = "input";
   static const String open = "open";
+  static const String auth = "auth";
 }
 
 abstract class LoungeRequest extends SocketIOCommand {
@@ -97,6 +98,25 @@ class NamesLoungeRequestBody extends LoungeRequestBody {
 
   @override
   Map<String, dynamic> toJson() => _$NamesLoungeRequestBodyToJson(this);
+}
+
+@JsonSerializable()
+class AuthLoungeRequestBody extends LoungeRequestBody {
+  final String user;
+  final String password;
+
+
+  @override
+  String toString() {
+    return 'AuthLoungeRequestBody{user: $user, password: $password}';
+  }
+
+  AuthLoungeRequestBody(this.user, this.password);
+
+  AuthLoungeRequestBody.name({@required this.user, @required this.password});
+
+  @override
+  Map<String, dynamic> toJson() => _$AuthLoungeRequestBodyToJson(this);
 }
 
 @JsonSerializable()

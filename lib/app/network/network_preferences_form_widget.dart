@@ -2,17 +2,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_server_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/network/network_user_preferences_widget_form.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 
-import 'network_preferences_form_bloc.dart';
 
 class ChatNetworkPreferencesFormWidget extends StatefulWidget {
   final ChatNetworkPreferences startValues;
-  final PreferencesActionCallback callback;
+  final ChatNetworkPreferencesActionCallback callback;
   final String buttonText;
 
   ChatNetworkPreferencesFormWidget(this.startValues, this.callback, this.buttonText);
@@ -24,7 +24,7 @@ class ChatNetworkPreferencesFormWidget extends StatefulWidget {
 
 class ChatNetworkPreferencesFormWidgetState
     extends State<ChatNetworkPreferencesFormWidget> {
-  final PreferencesActionCallback callback;
+  final ChatNetworkPreferencesActionCallback callback;
   final ChatNetworkPreferences startValues;
   final String buttonText;
 

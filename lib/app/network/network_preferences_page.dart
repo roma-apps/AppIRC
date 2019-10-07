@@ -50,7 +50,7 @@ class EditChatNetworkPage extends ChatNetworkPage {
 
 class ChatNetworkPage extends StatefulWidget {
   final ChatNetworkPreferences startValues;
-  final PreferencesActionCallback callback;
+  final ChatNetworkPreferencesActionCallback callback;
 
   final bool isNeedShowChannels;
   final bool isNeedShowCommands;
@@ -69,7 +69,7 @@ class ChatNetworkPage extends StatefulWidget {
 
 class ChatNetworkPageState extends State<ChatNetworkPage> {
   final ChatNetworkPreferences startValues;
-  final PreferencesActionCallback callback;
+  final ChatNetworkPreferencesActionCallback callback;
   final String buttonText;
 
   ChatNetworkPreferencesFormBloc networkPreferencesFormBloc;
@@ -80,6 +80,12 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
       bool isNeedShowChannels, bool isNeedShowCommands, this.buttonText) {
     networkPreferencesFormBloc = ChatNetworkPreferencesFormBloc(
         startValues, isNeedShowChannels, isNeedShowCommands);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    networkPreferencesFormBloc?.dispose();
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/local_preferences/preferences_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -11,8 +12,6 @@ class LoungeConstants {
 
   static const int CHANNEL_STATE_CONNECTED = 1;
   static const int CHANNEL_STATE_DISCONNECTED = 0;
-
-
 }
 
 class LoungeChannelTypeConstants {
@@ -26,18 +25,18 @@ class LoungeChannelTypeConstants {
 class LoungeConnectionPreferences extends JsonPreferences {
   final String host;
 
-  LoungeConnectionPreferences({@required this.host});
+  LoungeConnectionPreferences(this.host);
+  LoungeConnectionPreferences.name({@required this.host});
 
   static LoungeConnectionPreferences empty =
-      LoungeConnectionPreferences(host: null);
-
+      LoungeConnectionPreferences.name(host: null);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is LoungeConnectionPreferences &&
-              runtimeType == other.runtimeType &&
-              host == other.host;
+      other is LoungeConnectionPreferences &&
+          runtimeType == other.runtimeType &&
+          host == other.host;
 
   @override
   int get hashCode => host.hashCode;
@@ -53,3 +52,71 @@ class LoungeConnectionPreferences extends JsonPreferences {
   factory LoungeConnectionPreferences.fromJson(Map<String, dynamic> json) =>
       _$LoungeConnectionPreferencesFromJson(json);
 }
+
+@JsonSerializable()
+class LoungeAuthPreferences extends JsonPreferences {
+  final String username;
+  final String password;
+
+  LoungeAuthPreferences(this.username,this.password);
+  LoungeAuthPreferences.name({@required this.username, @required this.password});
+
+  static LoungeAuthPreferences empty =
+      LoungeAuthPreferences.name(username: null, password: null);
+
+  @override
+  String toString() {
+    return 'LoungeAuthPreferences{username: $username, password: $password}';
+  }
+
+  @override
+  Map<String, dynamic> toJson() => _$LoungeAuthPreferencesToJson(this);
+
+  factory LoungeAuthPreferences.fromJson(Map<String, dynamic> json) =>
+      _$LoungeAuthPreferencesFromJson(json);
+}
+
+@JsonSerializable()
+class LoungePreferences extends JsonPreferences {
+  LoungeConnectionPreferences connectionPreferences;
+  LoungeAuthPreferences authPreferences;
+
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is LoungePreferences &&
+              runtimeType == other.runtimeType &&
+              connectionPreferences == other.connectionPreferences &&
+              authPreferences == other.authPreferences;
+
+  @override
+  int get hashCode =>
+      connectionPreferences.hashCode ^
+      authPreferences.hashCode;
+
+  LoungePreferences(this.connectionPreferences, {this.authPreferences});
+
+  LoungePreferences.name(
+      {@required this.connectionPreferences, @required this.authPreferences});
+
+  static LoungePreferences empty =
+      LoungePreferences.name(connectionPreferences: null, authPreferences: null);
+
+  @override
+  Map<String, dynamic> toJson() => _$LoungePreferencesToJson(this);
+
+  factory LoungePreferences.fromJson(Map<String, dynamic> json) =>
+      _$LoungePreferencesFromJson(json);
+
+  @override
+  String toString() {
+    return 'LoungePreferences{connectionPreferences: $connectionPreferences,'
+        ' authPreferences: $authPreferences}';
+  }
+
+
+}
+
+typedef LoungePreferencesActionCallback = void Function(
+    BuildContext context, LoungePreferences preferences);

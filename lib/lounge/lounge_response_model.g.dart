@@ -126,6 +126,21 @@ Map<String, dynamic> _$ConfigurationLoungeResponseBodyToJson(
       'version': instance.version,
     };
 
+AuthLoungeResponseBody _$AuthLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return AuthLoungeResponseBody(
+    json['serverHash'] as int,
+    json['success'] as bool,
+  );
+}
+
+Map<String, dynamic> _$AuthLoungeResponseBodyToJson(
+        AuthLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'success': instance.success,
+      'serverHash': instance.serverHash,
+    };
+
 JoinLoungeResponseBody _$JoinLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return JoinLoungeResponseBody(

@@ -97,7 +97,7 @@ class AppIRCState extends State<AppIRC> {
 
   Widget createdWidget;
 
-  LoungeConnectionPreferences loungeConnectionPreferences;
+  LoungePreferences loungePreferences;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class AppIRCState extends State<AppIRC> {
 
 
           loungePreferencesBloc
-              .valueStream(defaultValue: LoungeConnectionPreferences.empty)
+              .valueStream(defaultValue: LoungePreferences.empty)
               .listen((newPreferences) {
             _onLoungeChanged(context, newPreferences);
           });
@@ -128,7 +128,7 @@ class AppIRCState extends State<AppIRC> {
 
       return _buildApp(SplashPage());
     } else {
-      if (loungeConnectionPreferences == null) {
+      if (loungePreferences == null) {
         return _buildAppForStartLoungePreferences();
       } else {
         if (loungeBackendService == null) {
@@ -141,18 +141,18 @@ class AppIRCState extends State<AppIRC> {
   }
 
   void _onLoungeChanged(
-      BuildContext context, LoungeConnectionPreferences newPreferences) async {
+      BuildContext context, LoungePreferences newPreferences) async {
     if (newPreferences != null &&
-        newPreferences != LoungeConnectionPreferences.empty &&
-        newPreferences != loungeConnectionPreferences) {
-      loungeConnectionPreferences = newPreferences;
+        newPreferences != LoungePreferences.empty &&
+        newPreferences != loungePreferences) {
+      loungePreferences = newPreferences;
 
       _logger.d(() => "_onLoungeChanged $newPreferences");
 
       var preferencesService = Provider.of<PreferencesService>(context);
       var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
       var loungeBackendService = LoungeBackendService(
-          socketManagerProvider.manager, loungeConnectionPreferences);
+          socketManagerProvider.manager, loungePreferences);
 
       loungeBackendService.init().then((_) {
         this.loungeBackendService = loungeBackendService;

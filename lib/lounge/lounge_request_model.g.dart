@@ -19,6 +19,21 @@ Map<String, dynamic> _$NamesLoungeRequestBodyToJson(
       'target': instance.target,
     };
 
+AuthLoungeRequestBody _$AuthLoungeRequestBodyFromJson(
+    Map<String, dynamic> json) {
+  return AuthLoungeRequestBody(
+    json['user'] as String,
+    json['password'] as String,
+  );
+}
+
+Map<String, dynamic> _$AuthLoungeRequestBodyToJson(
+        AuthLoungeRequestBody instance) =>
+    <String, dynamic>{
+      'user': instance.user,
+      'password': instance.password,
+    };
+
 NetworkNewLoungeRequestBody _$NetworkNewLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return NetworkNewLoungeRequestBody(

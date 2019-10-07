@@ -2,7 +2,7 @@ import 'package:flutter_appirc/form/form_blocs.dart';
 
 import 'network_model.dart';
 
-class ChatNetworkServerPreferencesFormBloc extends FormBloc {
+class NetworkServerPreferencesFormBloc extends FormBloc {
   final Validator<String> networkValidator;
 
   FormValueFieldBloc<String> nameFieldBloc;
@@ -14,7 +14,7 @@ class ChatNetworkServerPreferencesFormBloc extends FormBloc {
   bool enabled;
   bool visible;
 
-  ChatNetworkServerPreferencesFormBloc(
+  NetworkServerPreferencesFormBloc(
       ChatNetworkServerPreferences preferences, this.networkValidator) {
     enabled = preferences.enabled;
     visible = preferences.visible;
