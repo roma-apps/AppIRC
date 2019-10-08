@@ -46,12 +46,12 @@ class LoungePreferencesFormWidgetState
     LoungePreferencesFormBloc formBloc =
     Provider.of<LoungePreferencesFormBloc>(context);
 
-    var currentLoungePreferences = formBloc.extractData();
+
     var connectionFormBloc = formBloc.connectionFormBloc;
 
     var authFormBloc = formBloc.authPreferencesFormBloc;
     var loungeAuthPreferencesFormWidget = LoungeAuthPreferencesFormWidget(
-        currentLoungePreferences.authPreferences);
+        authFormBloc.authPreferences);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -63,7 +63,7 @@ class LoungePreferencesFormWidgetState
                 Provider(
                   providable: connectionFormBloc,
                   child: LoungeConnectionPreferencesFormWidget(
-                      currentLoungePreferences.connectionPreferences),
+                      startValues.connectionPreferences),
                 ),
                 StreamBuilder<bool>(
                   stream: formBloc.isAuthFormEnabledStream,

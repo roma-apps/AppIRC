@@ -18,16 +18,19 @@ class LoungePreferencesFormBloc extends FormBloc {
     authPreferencesFormBloc =
         LoungeAuthPreferencesFormBloc(preferences.authPreferences);
 
-    _isAuthFormEnabledController = BehaviorSubject(seedValue: preferences
-        .authPreferences != null && preferences.authPreferences !=
-        LoungeAuthPreferences.empty);
+//    var authBlockEnabledFromStart = preferences
+//        .authPreferences != null && preferences.authPreferences !=
+//        LoungeAuthPreferences.empty;
+    var authBlockEnabledFromStart = false;
+    _isAuthFormEnabledController =
+        BehaviorSubject(seedValue: authBlockEnabledFromStart);
 
     addDisposable(subject: _isAuthFormEnabledController);
   }
 
   @override
   List<FormFieldBloc> get children {
-    if(isAuthFormEnabled) {
+    if (isAuthFormEnabled) {
       return [connectionFormBloc, authPreferencesFormBloc];
     } else {
       return [connectionFormBloc];
@@ -42,5 +45,6 @@ class LoungePreferencesFormBloc extends FormBloc {
 
   LoungePreferences extractData() =>
       LoungePreferences(connectionFormBloc.extractData(),
-          authPreferences: authPreferencesFormBloc.extractData());
+          authPreferences:
+              isAuthFormEnabled ? authPreferencesFormBloc.extractData() : null);
 }

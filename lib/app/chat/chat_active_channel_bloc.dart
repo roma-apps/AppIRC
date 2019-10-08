@@ -7,11 +7,9 @@ import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _preferenceKey = "chat.activeChannel";
@@ -27,13 +25,14 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
 
   // ignore: close_sinks
   final BehaviorSubject<NetworkChannel> _activeChannelController =
-  new BehaviorSubject();
+      new BehaviorSubject();
 
   Stream<NetworkChannel> get activeChannelStream =>
       _activeChannelController.stream;
 
-  ChatActiveChannelBloc(this._backendService, this._chatInitBloc, this._networksListBloc,
-      PreferencesService preferencesService) :super(_networksListBloc) {
+  ChatActiveChannelBloc(this._backendService, this._chatInitBloc,
+      this._networksListBloc, PreferencesService preferencesService)
+      : super(_networksListBloc) {
     _preferenceBloc = createActiveChannelPreferenceBloc(preferencesService);
 
     _logger.i(() => "start creating");
@@ -46,7 +45,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
   }
 
   void tryRestoreActiveChannel() async {
-    if(_chatInitBloc.state != ChatInitState.FINISHED) {
+    if (_chatInitBloc.state != ChatInitState.FINISHED) {
       return;
     }
 
@@ -54,21 +53,28 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
       return;
     }
 
+    var chatInitActiveChannelRemoteID =
+        _backendService.chatInit.activeChannelRemoteId;
+    if (chatInitActiveChannelRemoteID != null) {
+      var allChannels = await _networksListBloc.allNetworksChannels;
+      var newActiveChannel = allChannels.firstWhere(
+          (channel) => channel.remoteId == chatInitActiveChannelRemoteID);
 
-
-    await tryRestoreFromLocalPreferences();
+      changeActiveChanel(newActiveChannel);
+    } else {
+      await tryRestoreFromLocalPreferences();
+    }
   }
 
   Future tryRestoreFromLocalPreferences() async {
     var allChannels = await _networksListBloc.allNetworksChannels;
 
     if (allChannels != null && allChannels.isNotEmpty) {
-
       var savedLocalId =
-      _preferenceBloc.getValue(defaultValue: allChannels.first.localId);
+          _preferenceBloc.getValue(defaultValue: allChannels.first.localId);
       if (savedLocalId != null) {
         var filtered =
-        allChannels.where((channel) => channel.localId == savedLocalId);
+            allChannels.where((channel) => channel.localId == savedLocalId);
 
         var foundActiveChannel;
         if (filtered.isNotEmpty) {
@@ -87,7 +93,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
   }
 
   changeActiveChanel(NetworkChannel newActiveChannel) async {
-    if(_chatInitBloc.state != ChatInitState.FINISHED) {
+    if (_chatInitBloc.state != ChatInitState.FINISHED) {
       return;
     }
 
@@ -100,7 +106,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
     _activeChannelController.sink.add(newActiveChannel);
 
     Network network =
-    _networksListBloc.findNetworkWithChannel(newActiveChannel);
+        _networksListBloc.findNetworkWithChannel(newActiveChannel);
     _backendService.onOpenNetworkChannel(network, newActiveChannel);
   }
 
@@ -112,13 +118,13 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
     }
   }
 
-
   IntPreferencesBloc createActiveChannelPreferenceBloc(
-      PreferencesService preferencesService) =>
+          PreferencesService preferencesService) =>
       IntPreferencesBloc(preferencesService, _preferenceKey);
 
   @override
-  void onChannelJoined(Network network, NetworkChannelWithState channelWithState) {
+  void onChannelJoined(
+      Network network, NetworkChannelWithState channelWithState) {
     var channel = channelWithState.channel;
     changeActiveChanel(channel);
   }
@@ -128,14 +134,11 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
     if (activeChannel == channel) {
       _onActiveChannelLeaved();
     }
-
   }
 
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {
-
-
-    if(activeChannel == null) {
+    if (activeChannel == null) {
       tryRestoreActiveChannel();
     } else {
       changeActiveChanel(networkWithState.network.lobbyChannel);

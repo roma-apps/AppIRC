@@ -16,9 +16,7 @@ class NetworkServerPreferencesFormBloc extends FormBloc {
 
   NetworkServerPreferencesFormBloc(
       ChatNetworkServerPreferences preferences, this.networkValidator,
-      bool enabled, bool visible) {
-    enabled = enabled;
-    visible = visible;
+      this.enabled, this.visible) {
 
     nameFieldBloc = FormValueFieldBloc<String>(preferences.name,
         validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],

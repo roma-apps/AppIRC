@@ -666,7 +666,7 @@ class NetworkLoungeResponseBody extends LoungeResponseBodyPart {
   final String name;
   final String host;
   final int port;
-  final String tls;
+  final bool tls;
   final bool userDisconnected;
   final bool rejectUnauthorized;
   final bool isCollapsed;

@@ -7,7 +7,7 @@ class NetworkChannel {
 
   set localId(int newId) => channelPreferences.localId = newId;
 
-  final ChatNetworkChannelPreferences channelPreferences;
+   ChatNetworkChannelPreferences channelPreferences;
 
   String get name => channelPreferences.name;
   final NetworkChannelType type;
@@ -43,12 +43,14 @@ enum NetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }
 class NetworkChannelWithState {
   final NetworkChannel channel;
   final NetworkChannelState state;
+  final List<ChatMessage> initMessages;
 
-  NetworkChannelWithState(this.channel, this.state);
+  NetworkChannelWithState(this.channel, this.state, this.initMessages);
 
   @override
   String toString() {
-    return 'NetworkChannelWithState{channel: $channel, state: $state}';
+    return 'NetworkChannelWithState{channel: $channel,'
+        ' state: $state, initMessages: $initMessages}';
   }
 
 

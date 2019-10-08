@@ -35,46 +35,50 @@ class ChatNetworksListBloc extends Providable {
 
     addDisposable(disposable:
         backendService.listenForNetworkJoin((networkWithState) async {
-      var network = networkWithState.network;
+       onNetworkJoined(networkWithState);
+    }));
+  }
 
-      if (network.localId == null) {
-        network.localId = await _nextNetworkLocalId;
+   onNetworkJoined(NetworkWithState networkWithState) async {
+         var network = networkWithState.network;
+
+    if (network.localId == null) {
+      network.localId = await _nextNetworkLocalId;
+    }
+    for (var channel in network.channels) {
+      if (channel.localId == null) {
+        channel.localId = await _nextNetworkChannelLocalId;
       }
-      for (var channel in network.channels) {
-        if (channel.localId == null) {
-          channel.localId = await _nextNetworkChannelLocalId;
-        }
-      }
+    }
 
-      _networksChannelListBlocs[network] = ChatNetworkChannelsListBloc(
-          backendService,
-          network,
-          networkWithState.channelsWithState,
-          nextChannelIdGenerator);
+    _networksChannelListBlocs[network] = ChatNetworkChannelsListBloc(
+        backendService,
+        network,
+        networkWithState.channelsWithState,
+        nextChannelIdGenerator);
 
+    var networks = _currentNetworks;
+
+    Disposable listenForNetworkExit;
+    listenForNetworkExit = backendService.listenForNetworkLeave(network, () {
       var networks = _currentNetworks;
 
-      Disposable listenForNetworkExit;
-      listenForNetworkExit = backendService.listenForNetworkLeave(network, () {
-        var networks = _currentNetworks;
+      _networksChannelListBlocs.remove(network).dispose();
 
-        _networksChannelListBlocs.remove(network).dispose();
+      networks.remove(network);
 
-        networks.remove(network);
-
-        leaveListeners[network].forEach((listener) => listener());
-
-        _onNetworksChanged(networks);
-        listenForNetworkExit.dispose();
-      });
-      addDisposable(disposable: listenForNetworkExit);
-
-      networks.add(network);
-
-      joinListeners.forEach((listener) => listener(networkWithState));
+      leaveListeners[network].forEach((listener) => listener());
 
       _onNetworksChanged(networks);
-    }));
+      listenForNetworkExit.dispose();
+    });
+    addDisposable(disposable: listenForNetworkExit);
+
+    networks.add(network);
+
+    joinListeners.forEach((listener) => listener(networkWithState));
+
+    _onNetworksChanged(networks);
   }
 
   void _onNetworksChanged(List<Network> networks) {

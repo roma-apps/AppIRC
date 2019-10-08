@@ -597,7 +597,7 @@ NetworkLoungeResponseBody _$NetworkLoungeResponseBodyFromJson(
     json['name'] as String,
     json['host'] as String,
     json['port'] as int,
-    json['tls'] as String,
+    json['tls'] as bool,
     json['userDisconnected'] as bool,
     json['rejectUnauthorized'] as bool,
     json['isCollapsed'] as bool,

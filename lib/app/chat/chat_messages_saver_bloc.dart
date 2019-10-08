@@ -35,23 +35,14 @@ class NetworkChannelMessagesSaverBloc
 
     _logger.d(() => "listen for mesasges from channel $channel");
 
+    channelWithState.initMessages?.forEach(_onNewMessage);
+
+
     var channelDisposable = CompositeDisposable([]);
 
     channelDisposable
         .add(backendService.listenForMessages(network, channel, (newMessage) {
-      _logger.d(() => "onNewMessage $newMessage");
-      var chatMessageType = newMessage.chatMessageType;
-
-      switch (chatMessageType) {
-        case ChatMessageType.SPECIAL:
-          var specialMessageDB = toSpecialMessageDB(newMessage);
-          db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
-          break;
-        case ChatMessageType.REGULAR:
-          var regularMessageDB = toRegularMessageDB(newMessage);
-          db.regularMessagesDao.insertRegularMessage(regularMessageDB);
-          break;
-      }
+      _onNewMessage(newMessage);
     }));
 
     channelDisposable.add(backendService
@@ -70,6 +61,22 @@ class NetworkChannelMessagesSaverBloc
     _channelsListeners[channel.remoteId] = channelDisposable;
 
     addDisposable(disposable: channelDisposable);
+  }
+
+  void _onNewMessage(ChatMessage newMessage) {
+         _logger.d(() => "onNewMessage $newMessage");
+    var chatMessageType = newMessage.chatMessageType;
+
+    switch (chatMessageType) {
+      case ChatMessageType.SPECIAL:
+        var specialMessageDB = toSpecialMessageDB(newMessage);
+        db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
+        break;
+      case ChatMessageType.REGULAR:
+        var regularMessageDB = toRegularMessageDB(newMessage);
+        db.regularMessagesDao.insertRegularMessage(regularMessageDB);
+        break;
+    }
   }
 
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
@@ -508,11 +509,12 @@ class LoungeBackendService extends Providable
 
         var loungeChannel = parsed.chan;
 
-        var networkChannel = NetworkChannel(preferences,
-            detectNetworkChannelType(parsed.chan.type), parsed.chan.id);
-        var channelState = toNetworkChannelState(loungeChannel);
-        channelState = _modifyStateForChannel(channelState, networkChannel);
-        listener(NetworkChannelWithState(networkChannel, channelState));
+        var channelWithState = toNetworkChannelWithState(loungeChannel);
+
+        channelWithState.channel.channelPreferences = preferences;
+
+
+        listener(channelWithState);
       }
     }));
 
@@ -550,7 +552,7 @@ class LoungeBackendService extends Providable
         if (data.unread != null) {
           var channelState = currentStateExtractor();
           channelState.unreadCount = data.unread;
-          listener(_modifyStateForChannel(channelState, channel));
+          listener(channelState);
         }
       }
     }));
@@ -562,7 +564,7 @@ class LoungeBackendService extends Providable
       if (channel.remoteId == data.chan) {
         var channelState = currentStateExtractor();
         channelState.topic = data.topic;
-        listener(_modifyStateForChannel(channelState, channel));
+        listener(channelState);
       }
     }));
 
@@ -579,7 +581,7 @@ class LoungeBackendService extends Providable
           channelState.connected = false;
         }
 
-        listener(_modifyStateForChannel(channelState, channel));
+        listener(channelState);
 //        var message = toIRCMessage(data.msg);
 //        listener(message);
       }
@@ -603,20 +605,11 @@ class LoungeBackendService extends Providable
     return disposable;
   }
 
-  NetworkChannelState _modifyStateForChannel(
-      NetworkChannelState channelState, NetworkChannel channel) {
-    if (channel.type == NetworkChannelType.QUERY ||
-        channel.type == NetworkChannelType.SPECIAL) {
-      // lounge send always not connected state for this types
-      channelState.connected = true;
-    }
-
-    return channelState;
-  }
 
   @override
   Disposable listenForNetworkJoin(NetworkListener listener) {
     var disposable = CompositeDisposable([]);
+
     disposable.add(
         createEventListenerDisposable(LoungeResponseEventNames.network, (raw) {
       var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
@@ -1057,7 +1050,6 @@ Future<ConnectResult> _connect(
   var disposable = CompositeDisposable([]);
 
   ConfigurationLoungeResponseBody loungeConfig;
-  ChatInitInformation chatInit;
   List<String> loungeCommands;
   bool authorizedReceived = false;
   bool authResponse;
@@ -1069,7 +1061,7 @@ Future<ConnectResult> _connect(
   disposable.add(
       _listenForAuth(socketIOService, (success) => authResponse = success));
   disposable.add(_listenForInit(
-      socketIOService, (initResponse) => chatInit = initResponse));
+      socketIOService, (initResponse) => result.chatInit = initResponse));
   disposable.add(
       _listenForCommands(socketIOService, (result) => loungeCommands = result));
 
@@ -1107,9 +1099,10 @@ Future<ConnectResult> _connect(
 
       authorizedResponseReceived = (loungeCommands != null &&
           loungeConfig != null &&
-          chatInit != null &&
+          result.chatInit != null &&
           authorizedReceived != false);
-      result.isPrivateModeResponseReceived = authResponse != null;
+      result.isPrivateModeResponseReceived = authResponse != null || result
+          .isAuthRequestSent;
 
       if (result.isPrivateModeResponseReceived &&
           !result.isAuthRequestSent &&
@@ -1129,6 +1122,9 @@ Future<ConnectResult> _connect(
 
       result.isFailAuthResponseReceived =
           authResponse != null ? authResponse == false : false;
+
+
+
     } while (!authorizedResponseReceived &&
         !result.isTimeout &&
         !result.isFailAuthResponseReceived &&
@@ -1136,18 +1132,28 @@ Future<ConnectResult> _connect(
         result.error == null);
   }
 
+
+  _logger.d(() => "_connect end wait "
+      "authorizedResponseReceived = $authorizedResponseReceived "
+      ".isTimeout = ${result.isTimeout} "
+      ".isPrivateModeResponseReceived = ${result
+      .isPrivateModeResponseReceived} "
+      ".isAuthRequestSent = ${result.isAuthRequestSent} "
+      ".error = ${result.error}"
+
+  );
+
   disposable.dispose();
 
   var configReceived = loungeConfig != null;
   var commandsReceived = loungeCommands != null;
-  var chatInitReceived = chatInit != null;
+  var chatInitReceived = result.chatInit != null;
 
   _logger.d(() => "_connect result = $result configReceived = $configReceived"
       " commandsReceived = $commandsReceived authorizedReceived = $authorizedReceived");
 
   if (authorizedResponseReceived) {
     result.config = toChatConfig(loungeConfig, loungeCommands);
-    result.chatInit = chatInit;
   } else {
     if (authorizedReceived ||
         configReceived ||

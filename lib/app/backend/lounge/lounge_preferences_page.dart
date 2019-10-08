@@ -1,17 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/backend_model.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_widget.dart';
-import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "LoungePreferencesPage", enabled: true);
@@ -35,8 +29,6 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
 
   @override
   successCallback(BuildContext context, LoungePreferences preferences) async {
-
-
     var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
 
     var appLocalizations = AppLocalizations.of(context);
@@ -44,31 +36,31 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
         androidBarrierDismissible: true,
         context: context,
         builder: (_) => PlatformAlertDialog(
-          title: Text(appLocalizations
-              .tr("lounge.connection.edit.confirm_dialog.title")),
-          content: Text(appLocalizations
-              .tr("lounge.connection.edit.confirm_dialog.content")),
-          actions: <Widget>[
-            PlatformDialogAction(
-              child: Text(appLocalizations.tr(
-                  "lounge.connection.edit.confirm_dialog.save_reload")),
-              onPressed: () async {
-                // exit dialog
-                Navigator.pop(context);
-                // exit edit page
-                Navigator.pop(context);
-                loungePreferencesBloc.setValue(preferences);
-              },
-            ),
-            PlatformDialogAction(
-              child: Text(appLocalizations
-                  .tr("lounge.connection.edit.confirm_dialog.cancel")),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            )
-          ],
-        ));
+              title: Text(appLocalizations.tr(
+                  "lounge.preferences.edit.dialog.confirm.title")),
+              content: Text(appLocalizations.tr(
+                  "lounge.preferences.edit.dialog.confirm.content")),
+              actions: <Widget>[
+                PlatformDialogAction(
+                  child: Text(appLocalizations.tr(
+                      "lounge.preferences.edit.dialog.confirm.save_reload")),
+                  onPressed: () async {
+                    // exit dialog
+                    Navigator.pop(context);
+                    // exit edit page
+                    Navigator.pop(context);
+                    loungePreferencesBloc.setValue(preferences);
+                  },
+                ),
+                PlatformDialogAction(
+                  child: Text(appLocalizations.tr(
+                      "lounge.preferences.edit.dialog.confirm.cancel")),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            ));
   }
 }
 
@@ -83,7 +75,6 @@ abstract class LoungePreferencesPage extends StatefulWidget {
   State<StatefulWidget> createState() {
     return LoungePreferencesPageState(startPreferences, successCallback);
   }
-
 }
 
 class LoungePreferencesPageState extends State<LoungePreferencesPage> {
@@ -96,7 +87,6 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
     preferencesFormBloc = LoungePreferencesFormBloc(startPreferencesValues);
   }
 
-
   @override
   void dispose() {
     super.dispose();
@@ -105,7 +95,6 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,

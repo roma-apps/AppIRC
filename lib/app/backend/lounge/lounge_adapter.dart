@@ -14,13 +14,19 @@ import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 var _logger = MyLogger(logTag: "lounge_adapter", enabled: true);
 
 ChatInitInformation toChatInit(InitLoungeResponseBody parsed) {
+  var loungeNetworks = parsed.networks;
+  var networksWithState = loungeNetworks?.map((loungeNetwork) =>
+          toNetworkWithState(loungeNetwork))?.toList();
+  int activeChannelRemoteId = parsed.active;
+  var isUndefinedActiveId = activeChannelRemoteId
+      == InitLoungeResponseBody.undefinedActiveID;
+  if(isUndefinedActiveId) {
+    activeChannelRemoteId = null;
+  }
   return ChatInitInformation.name(
       activeChannelRemoteId:
-          parsed.active == InitLoungeResponseBody.undefinedActiveID
-              ? null
-              : parsed.active,
-      networksWithState: parsed.networks
-          ?.map((loungeNetwork) => toNetworkWithState(loungeNetwork)));
+          activeChannelRemoteId,
+      networksWithState: networksWithState);
 }
 
 ChatConfig toChatConfig(
@@ -182,13 +188,16 @@ NetworkChannelType detectNetworkChannelType(String typeString) {
   return type;
 }
 
+
 NetworkChannelState toNetworkChannelState(
-        ChannelLoungeResponseBody loungeChannel) =>
+        ChannelLoungeResponseBody loungeChannel, NetworkChannelType type) =>
     NetworkChannelState.name(
         topic: loungeChannel.topic,
         editTopicPossible: loungeChannel.editTopic,
         unreadCount: loungeChannel.unread,
         connected:
+        type == NetworkChannelType.QUERY ||
+            type == NetworkChannelType.SPECIAL ? true :
             loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED,
         highlighted: loungeChannel.highlight != null);
 
@@ -370,8 +379,10 @@ NetworkChannelWithState toNetworkChannelWithState(
           password: ""),
       detectNetworkChannelType(loungeChannel.type),
       loungeChannel.id);
-  var channelState = toNetworkChannelState((loungeChannel));
-  var networkChannelWithState = NetworkChannelWithState(channel, channelState);
+  var channelState = toNetworkChannelState(loungeChannel, channel.type);
+  var networkChannelWithState = NetworkChannelWithState(channel,
+    channelState, loungeChannel.messages?.map((loungeMessage) =>
+          toChatMessage(channel, loungeMessage))?.toList());
   return networkChannelWithState;
 }
 
@@ -393,7 +404,7 @@ NetworkWithState toNetworkWithState(NetworkLoungeResponseBody loungeNetwork) {
               name: loungeNetwork.name,
               serverHost: loungeNetwork.host,
               serverPort: loungeNetwork.port.toString(),
-              useTls: loungeNetwork.tls == LoungeConstants.on ? true : false,
+              useTls: loungeNetwork.tls,
               useOnlyTrustedCertificates: loungeNetwork.rejectUnauthorized),
           userPreferences: ChatNetworkUserPreferences(
               nickname: nick,

@@ -29,14 +29,13 @@ class ConnectResult<T> {
   bool isAuthRequestSent = false;
   bool isFailAuthResponseReceived = false;
   dynamic error;
-
   @override
   String toString() {
-    return 'ConnectResult{config: $config,'
-        ' isSocketConnected: $isSocketConnected, isTimeout: $isTimeout, '
-        'isPrivateModeResponseReceived: $isPrivateModeResponseReceived, '
-        'isAuthRequestSent: $isAuthRequestSent, '
-        'isFailAuthResponseReceived: $isFailAuthResponseReceived,'
+    return 'ConnectResult{config: $config, chatInit: $chatInit, '
+        'isSocketConnected: $isSocketConnected, isTimeout: $isTimeout,'
+        ' isPrivateModeResponseReceived: $isPrivateModeResponseReceived,'
+        ' isAuthRequestSent: $isAuthRequestSent,'
+        ' isFailAuthResponseReceived: $isFailAuthResponseReceived,'
         ' error: $error}';
   }
 

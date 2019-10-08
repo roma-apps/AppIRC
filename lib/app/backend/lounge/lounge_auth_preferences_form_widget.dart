@@ -24,8 +24,8 @@ class LoungeAuthPreferencesFormWidgetState
   TextEditingController _passwordController;
 
   LoungeAuthPreferencesFormWidgetState(this.startValues) {
-    _usernameController = TextEditingController(text: startValues.username);
-    _passwordController = TextEditingController(text: startValues.password);
+    _usernameController = TextEditingController(text: startValues?.username);
+    _passwordController = TextEditingController(text: startValues?.password);
   }
 
   @override
