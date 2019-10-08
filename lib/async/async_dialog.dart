@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/async/async_dialog_skin_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 
@@ -8,7 +9,7 @@ var _logger = MyLogger(logTag: "doAsyncOperationWithDialog", enabled: true);
 Future<T> doAsyncOperationWithDialog<T>(BuildContext context,
     Future<T> asyncCode()) async {
 //For normal dialog
-  var pr = ProgressDialog(context,
+  var pr = createSkinnedProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
 
   pr.show();

@@ -29,6 +29,7 @@ import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_app_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_async_dialog_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_button_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_skin_bloc.dart';
@@ -39,6 +40,7 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/async/async_dialog_skin_bloc.dart';
 import 'package:flutter_appirc/form/form_skin_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -307,28 +309,32 @@ class AppIRCState extends State<AppIRC> {
                                   child: Provider<ButtonSkinBloc>(
                                     providable:
                                         AppIRCButtonSkinBloc(appSkinTheme),
-                                    child: Provider(
-                                      providable: ColoredNicknamesBloc(
-                                          appSkinTheme.coloredNicknamesData),
-                                      child: PlatformApp(
-                                          title: "AppIRC",
-                                          localizationsDelegates: [
-                                            //app-specific localization
-                                            EasylocaLizationDelegate(
-                                                locale: data.locale,
-                                                path: 'assets/langs'),
-                                          ],
-                                          supportedLocales: [
-                                            Locale('en', 'US')
-                                          ],
-                                          locale: data.savedLocale,
-                                          android: (_) => MaterialAppData(
-                                              theme: appSkinTheme
-                                                  .androidThemeDataCreator()),
-                                          ios: (_) => CupertinoAppData(
-                                              theme: appSkinTheme
-                                                  .iosThemeDataCreator()),
-                                          home: child),
+                                    child: Provider<ProgressDialogSkinBloc>(
+                                      providable:
+                                      AppIRCProgressDialogSkinBloc(appSkinTheme),
+                                      child: Provider(
+                                        providable: ColoredNicknamesBloc(
+                                            appSkinTheme.coloredNicknamesData),
+                                        child: PlatformApp(
+                                            title: "AppIRC",
+                                            localizationsDelegates: [
+                                              //app-specific localization
+                                              EasylocaLizationDelegate(
+                                                  locale: data.locale,
+                                                  path: 'assets/langs'),
+                                            ],
+                                            supportedLocales: [
+                                              Locale('en', 'US')
+                                            ],
+                                            locale: data.savedLocale,
+                                            android: (_) => MaterialAppData(
+                                                theme: appSkinTheme
+                                                    .androidThemeDataCreator()),
+                                            ios: (_) => CupertinoAppData(
+                                                theme: appSkinTheme
+                                                    .iosThemeDataCreator()),
+                                            home: child),
+                                      ),
                                     ),
                                   ),
                                 ),
