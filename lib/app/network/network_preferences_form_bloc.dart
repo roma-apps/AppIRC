@@ -31,7 +31,7 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
             .map((channel) => channel.name)
             .join(channelsNamesSeparator),
         visible: isNeedShowChannels,
-        validators: [NotEmptyTextValidator()]);
+        validators: [NotEmptyTextValidator.instance]);
   }
 
   @override

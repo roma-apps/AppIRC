@@ -7,9 +7,9 @@ class NetworkChannelJoinFormBloc extends FormBloc {
   NetworkChannelJoinFormBloc(
       {String startChannel = "", String startPassword = ""}) {
     channelFieldBloc = FormValueFieldBloc<String>(startChannel,
-        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()]);
+        validators: [NoWhitespaceTextValidator.instance, NotEmptyTextValidator.instance]);
     passwordFieldBloc = FormValueFieldBloc<String>(startPassword,
-        validators: [NoWhitespaceTextValidator()]);
+        validators: [NoWhitespaceTextValidator.instance]);
   }
 
   @override

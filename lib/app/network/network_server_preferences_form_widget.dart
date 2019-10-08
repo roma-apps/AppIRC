@@ -7,7 +7,6 @@ import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class ChatNetworkServerPreferencesFormWidget extends StatefulWidget {
-
   final ChatNetworkServerPreferences startValues;
 
   ChatNetworkServerPreferencesFormWidget(this.startValues);
@@ -19,7 +18,6 @@ class ChatNetworkServerPreferencesFormWidget extends StatefulWidget {
 
 class ChatNetworkServerPreferencesFormWidgetState
     extends State<ChatNetworkServerPreferencesFormWidget> {
-
   final ChatNetworkServerPreferences startValues;
 
   TextEditingController _hostController;
@@ -27,12 +25,9 @@ class ChatNetworkServerPreferencesFormWidgetState
   TextEditingController _nameController;
 
   ChatNetworkServerPreferencesFormWidgetState(this.startValues) {
-    _hostController =
-        TextEditingController(text: startValues.serverHost);
-    _portController =
-        TextEditingController(text: startValues.serverPort);
-    _nameController =
-        TextEditingController(text: startValues.name);
+    _hostController = TextEditingController(text: startValues.serverHost);
+    _portController = TextEditingController(text: startValues.serverPort);
+    _nameController = TextEditingController(text: startValues.name);
   }
 
   @override
@@ -53,27 +48,36 @@ class ChatNetworkServerPreferencesFormWidgetState
         buildFormTitle(
             context, appLocalizations.tr('irc_connection.network_prefs.title')),
         buildFormTextRow(
-            context,
-            appLocalizations.tr('irc_connection.network_prefs.name_label'),
-            appLocalizations.tr('irc_connection.network_prefs.name_hint'),
-            Icons.account_circle,
-            formBloc.nameFieldBloc, _nameController),
+          context,
+          formBloc.nameFieldBloc,
+          _nameController,
+          Icons.account_circle,
+          appLocalizations.tr('irc_connection.network_prefs.name_label'),
+          appLocalizations.tr('irc_connection.network_prefs.name_hint'),
+          textInputAction: TextInputAction.next,
+          nextBloc:   formBloc.hostFieldBloc,
+        ),
+        buildFormTextRow(
+          context,
+          formBloc.hostFieldBloc,
+          _hostController,
+          Icons.cloud,
+          appLocalizations.tr('irc_connection.network_prefs.server_host_label'),
+          appLocalizations.tr('irc_connection.network_prefs.server_host_hint'),
+          textInputAction: TextInputAction.next,
+          nextBloc:   formBloc.portFieldBloc,
+        ),
         buildFormTextRow(
             context,
-            appLocalizations
-                .tr('irc_connection.network_prefs.server_host_label'),
-            appLocalizations
-                .tr('irc_connection.network_prefs.server_host_hint'),
+            formBloc.portFieldBloc,
+            _portController,
             Icons.cloud,
-            formBloc.hostFieldBloc, _hostController),
-        buildFormTextRow(
-            context,
             appLocalizations
                 .tr('irc_connection.network_prefs.server_port_label'),
             appLocalizations
                 .tr('irc_connection.network_prefs.server_port_hint'),
-            Icons.cloud,
-            formBloc.portFieldBloc, _portController),
+            textInputAction: TextInputAction.done,
+            keyboardType: TextInputType.number),
         buildFormBooleanRow(
             context,
             appLocalizations.tr('irc_connection.network_prefs.use_tls'),

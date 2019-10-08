@@ -39,16 +39,17 @@ class LoungeConnectionPreferencesFormWidgetState
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        buildFormTitle(
-            context, appLocalizations.tr(
-            'lounge.preferences.connection.title')),
+        buildFormTitle(context,
+            appLocalizations.tr('lounge.preferences.connection.title')),
         buildFormTextRow(
-            context,
-            appLocalizations.tr('lounge.preferences.connection.host.label'),
-            appLocalizations.tr('lounge.preferences.connection.host.hint'),
-            Icons.cloud,
-            loungePreferencesFormBloc.hostFieldBloc,
-            _hostController)
+          context,
+          loungePreferencesFormBloc.hostFieldBloc,
+          _hostController,
+          Icons.cloud,
+          appLocalizations.tr('lounge.preferences.connection.host.label'),
+          appLocalizations.tr('lounge.preferences.connection.host.hint'),
+          textInputAction: TextInputAction.done,
+        )
       ],
     );
   }

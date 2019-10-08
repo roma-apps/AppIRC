@@ -9,9 +9,9 @@ class LoungeAuthPreferencesFormBloc extends FormBloc {
 
   LoungeAuthPreferencesFormBloc(this.authPreferences) {
     usernameFieldBloc = FormValueFieldBloc<String>(authPreferences?.username,
-        validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
+        validators: [NotEmptyTextValidator.instance, NoWhitespaceTextValidator.instance]);
     passwordFieldBloc = FormValueFieldBloc<String>(authPreferences?.password,
-        validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
+        validators: [NotEmptyTextValidator.instance, NoWhitespaceTextValidator.instance]);
   }
 
   @override

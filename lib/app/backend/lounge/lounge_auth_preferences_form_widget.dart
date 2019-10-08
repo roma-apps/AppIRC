@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_auth_preferences_form_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_connection_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -37,8 +36,7 @@ class LoungeAuthPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var loungePreferencesFormBloc =
-        Provider.of<LoungeAuthPreferencesFormBloc>(context);
+    var formBloc = Provider.of<LoungeAuthPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -46,19 +44,25 @@ class LoungeAuthPreferencesFormWidgetState
         buildFormTitle(
             context, appLocalizations.tr('lounge.preferences.auth.title')),
         buildFormTextRow(
-            context,
-            appLocalizations.tr('lounge.preferences.auth.username.label'),
-            appLocalizations.tr('lounge.preferences.auth.username.hint'),
-            Icons.account_box,
-            loungePreferencesFormBloc.usernameFieldBloc,
-            _usernameController),
+          context,
+          formBloc.usernameFieldBloc,
+          _usernameController,
+          Icons.account_box,
+          appLocalizations.tr('lounge.preferences.auth.username.label'),
+          appLocalizations.tr('lounge.preferences.auth.username.hint'),
+          textInputAction: TextInputAction.next,
+          nextBloc: formBloc.passwordFieldBloc,
+        ),
         buildFormTextRow(
-            context,
-            appLocalizations.tr('lounge.preferences.auth.password.label'),
-            appLocalizations.tr('lounge.preferences.auth.password.hint'),
-            Icons.lock,
-            loungePreferencesFormBloc.passwordFieldBloc,
-            _passwordController)
+          context,
+          formBloc.passwordFieldBloc,
+          _passwordController,
+          Icons.lock,
+          appLocalizations.tr('lounge.preferences.auth.password.label'),
+          appLocalizations.tr('lounge.preferences.auth.password.hint'),
+          obscureText: true,
+          textInputAction: TextInputAction.done,
+        )
       ],
     );
   }

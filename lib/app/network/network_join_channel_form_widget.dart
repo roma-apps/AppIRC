@@ -9,11 +9,11 @@ class NetworkChannelJoinFormWidget extends StatefulWidget {
   final String startChannelName;
   final String startPassword;
 
-
   NetworkChannelJoinFormWidget(this.startChannelName, this.startPassword);
 
   @override
-  State<StatefulWidget> createState() => NetworkChannelJoinFormWidgetState(startChannelName, startPassword);
+  State<StatefulWidget> createState() =>
+      NetworkChannelJoinFormWidgetState(startChannelName, startPassword);
 }
 
 class NetworkChannelJoinFormWidgetState
@@ -24,16 +24,10 @@ class NetworkChannelJoinFormWidgetState
   TextEditingController _channelController;
   TextEditingController _passwordController;
 
-
-  NetworkChannelJoinFormWidgetState(this.startChannelName,
-      this.startPassword) {
-    _channelController =
-        TextEditingController(text: startChannelName);
-    _passwordController =
-        TextEditingController(text: startPassword);
-
+  NetworkChannelJoinFormWidgetState(this.startChannelName, this.startPassword) {
+    _channelController = TextEditingController(text: startChannelName);
+    _passwordController = TextEditingController(text: startPassword);
   }
-
 
   @override
   void dispose() {
@@ -41,7 +35,6 @@ class NetworkChannelJoinFormWidgetState
     _channelController.dispose();
     _passwordController.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -53,16 +46,23 @@ class NetworkChannelJoinFormWidgetState
       children: <Widget>[
         buildFormTextRow(
           context,
-            appLocalizations.tr('join_channel.channel_label'),
-            appLocalizations.tr('join_channel.channel_hint'),
-            Icons.add,
-            formBloc.channelFieldBloc, _channelController),
+          formBloc.channelFieldBloc,
+          _channelController,
+          Icons.add,
+          appLocalizations.tr('join_channel.channel_label'),
+          appLocalizations.tr('join_channel.channel_hint'),
+          textInputAction: TextInputAction.next,
+          nextBloc:   formBloc.passwordFieldBloc,
+        ),
         buildFormTextRow(
             context,
+            formBloc.passwordFieldBloc,
+            _passwordController,
+            Icons.lock,
             appLocalizations.tr('join_channel.password_label'),
             appLocalizations.tr('join_channel.password_hint'),
-            Icons.lock,
-            formBloc.passwordFieldBloc, _passwordController),
+            textInputAction: TextInputAction.done,
+            obscureText: true),
       ],
     );
   }

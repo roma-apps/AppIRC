@@ -12,13 +12,13 @@ class NetworkUserPreferencesFormBloc extends FormBloc {
   NetworkUserPreferencesFormBloc(
       ChatNetworkUserPreferences preferences, bool isNeedShowCommands) {
     nickFieldBloc = FormValueFieldBloc<String>(preferences.nickname,
-        validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
+        validators: [NotEmptyTextValidator.instance, NoWhitespaceTextValidator.instance]);
     passwordFieldBloc = FormValueFieldBloc<String>(preferences.password,
-        validators: [NoWhitespaceTextValidator()]);
+        validators: [NoWhitespaceTextValidator.instance]);
     realNameFieldBloc = FormValueFieldBloc<String>(preferences.realName,
-        validators: [NotEmptyTextValidator()]);
+        validators: [NotEmptyTextValidator.instance]);
     userNameFieldBloc = FormValueFieldBloc<String>(preferences.username,
-        validators: [NotEmptyTextValidator()]);
+        validators: [NotEmptyTextValidator.instance]);
     commandsFieldBloc =
         FormValueFieldBloc<String>(preferences.commands, validators: [], visible: isNeedShowCommands);
   }

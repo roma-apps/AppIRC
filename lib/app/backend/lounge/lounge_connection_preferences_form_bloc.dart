@@ -6,7 +6,7 @@ class LoungeConnectionPreferencesFormBloc extends FormBloc {
 
   LoungeConnectionPreferencesFormBloc(LoungeConnectionPreferences loungePreferences) {
     hostFieldBloc = FormValueFieldBloc<String>(loungePreferences.host,
-        validators: [NotEmptyTextValidator(), NoWhitespaceTextValidator()]);
+        validators: [NotEmptyTextValidator.instance, NoWhitespaceTextValidator.instance]);
   }
 
   @override

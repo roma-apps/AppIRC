@@ -19,16 +19,16 @@ class NetworkServerPreferencesFormBloc extends FormBloc {
       this.enabled, this.visible) {
 
     nameFieldBloc = FormValueFieldBloc<String>(preferences.name,
-        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],
+        validators: [NoWhitespaceTextValidator.instance, NotEmptyTextValidator.instance],
         enabled: enabled,
         visible: visible);
 
     hostFieldBloc = FormValueFieldBloc<String>(preferences.serverHost,
-        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],
+        validators: [NoWhitespaceTextValidator.instance, NotEmptyTextValidator.instance],
         enabled: enabled,
         visible: visible);
     portFieldBloc = FormValueFieldBloc<String>(preferences.serverPort,
-        validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],
+        validators: [NoWhitespaceTextValidator.instance, NotEmptyTextValidator.instance],
         enabled: enabled,
         visible: visible);
 

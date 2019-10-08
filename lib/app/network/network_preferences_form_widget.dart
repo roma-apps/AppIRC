@@ -9,13 +9,13 @@ import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 
-
 class ChatNetworkPreferencesFormWidget extends StatefulWidget {
   final ChatNetworkPreferences startValues;
   final ChatNetworkPreferencesActionCallback callback;
   final String buttonText;
 
-  ChatNetworkPreferencesFormWidget(this.startValues, this.callback, this.buttonText);
+  ChatNetworkPreferencesFormWidget(
+      this.startValues, this.callback, this.buttonText);
 
   @override
   State<StatefulWidget> createState() =>
@@ -30,7 +30,8 @@ class ChatNetworkPreferencesFormWidgetState
 
   TextEditingController _channelsController;
 
-  ChatNetworkPreferencesFormWidgetState(this.startValues, this.callback, this.buttonText) {
+  ChatNetworkPreferencesFormWidgetState(
+      this.startValues, this.callback, this.buttonText) {
     _channelsController = TextEditingController(
         text: startValues.channelsWithoutPassword
             .map((channel) => channel.name)
@@ -68,12 +69,14 @@ class ChatNetworkPreferencesFormWidgetState
                     child: NetworkUserPreferencesFormWidget(startValues
                         .networkConnectionPreferences.userPreferences)),
                 buildFormTextRow(
-                    context,
-                    appLocalizations.tr('irc_connection.channels_title'),
-                    appLocalizations.tr('irc_connection.channels_hint'),
-                    Icons.list,
-                    formBloc.channelsFieldBloc,
-                    _channelsController)
+                  context,
+                  formBloc.channelsFieldBloc,
+                  _channelsController,
+                  Icons.list,
+                  appLocalizations.tr('irc_connection.channels_title'),
+                  appLocalizations.tr('irc_connection.channels_hint'),
+                  textInputAction: TextInputAction.done,
+                )
               ],
             ),
           ),

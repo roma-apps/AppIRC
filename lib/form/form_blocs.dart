@@ -15,7 +15,7 @@ class FormFieldValidator extends Validator<List<FormFieldBloc>> {
   Future<ValidationError> validate(List<FormFieldBloc> value) {
     var error;
     for (var bloc in value) {
-      error = bloc.validate();
+      error = bloc.validate(bloc.value);
       if (error != null) {
         break;
       }
@@ -28,12 +28,10 @@ class FormFieldValidator extends Validator<List<FormFieldBloc>> {
 class CustomValidator<T> extends Validator<T> {
   final ValidatorFunction validator;
 
-
   CustomValidator(this.validator);
 
   @override
   Future<ValidationError> validate(T value) async => await validator(value);
-
 }
 
 abstract class ValidationError {
@@ -59,9 +57,10 @@ abstract class FormFieldBloc<T> extends Providable {
   T get value;
 
   var _validationErrorController =
-  BehaviorSubject<ValidationError>(seedValue: null);
+      BehaviorSubject<ValidationError>(seedValue: null);
 
-  Stream<ValidationError> get errorStream => _validationErrorController.stream;
+  Stream<ValidationError> get errorStream =>
+      _validationErrorController.stream.distinct();
 
   ValidationError get error => _validationErrorController.value;
 
@@ -77,14 +76,11 @@ abstract class FormFieldBloc<T> extends Providable {
   }
 
   void onNewError(ValidationError newError) {
-    if (error != newError) {
-      _validationErrorController.add(newError);
-    }
+    _validationErrorController.add(newError);
   }
 
-  Future<ValidationError> validate() async {
+  Future<ValidationError> validate(newValue) async {
     var error;
-    var newValue = value;
     for (var validator in validators) {
       error = await validator.validate(newValue);
       if (error != null) {
@@ -93,18 +89,26 @@ abstract class FormFieldBloc<T> extends Providable {
     }
     return error;
   }
-
 }
 
 abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
   var listeners = <StreamSubscription>[];
 
   FormBloc() : super([FormFieldValidator()]) {
-    Future.delayed(Duration(milliseconds: 1), () {
-      children.forEach((child) {
-        listeners.add(child.errorStream.listen((_) => onDataChanged()));
-      });
+    Timer.run(() {
+      resubscribeInternalFormsErrors();
     });
+  }
+
+  void resubscribeInternalFormsErrors() {
+    listeners.forEach((listener) {
+      listener.cancel();
+    });
+     children.forEach((child) {
+      listeners.add(child.errorStream.listen((_) => onDataChanged()));
+    });
+
+    onDataChanged();
   }
 
   List<FormFieldBloc> get children;
@@ -132,44 +136,57 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
   }
 }
 
-
 class FormValueFieldBloc<T> extends FormFieldBloc<T> {
   final bool enabled;
   final bool visible;
-  T _currentValue;
 
+  final focusNode = FocusNode();
 
-  BehaviorSubject<T> _valueController = BehaviorSubject<T>();
+  BehaviorSubject<T> _valueController;
 
   Stream<T> get valueStream => _valueController.stream;
 
-  T get value => _currentValue;
+  T get value => _valueController.value;
 
-  FormValueFieldBloc(T startValue, {List<Validator<T>> validators = const [], this.enabled = true, this.visible = true})
+  FormValueFieldBloc(T startValue,
+      {List<Validator<T>> validators = const [],
+      this.enabled = true,
+      this.visible = true})
       : super(validators) {
-    addDisposable(streamSubscription: valueStream.listen((newValue) async =>
-        onNewError(await validate())));
+    _valueController = BehaviorSubject<T>(seedValue: startValue);
+    Timer.run(() async {
+      onNewError(await validate(startValue));
+    });
+
+    addDisposable(streamSubscription: valueStream.listen((newValue) async {
+      onNewError(await validate(newValue));
+    }));
     addDisposable(subject: _valueController);
-    onNewValue(startValue);
   }
 
   void onNewValue(T newValue) {
-    if (_currentValue != newValue) {
-      _currentValue = newValue;
+    if (value != newValue) {
       _valueController.add(newValue);
     }
   }
-
 }
 
 class NotEmptyTextValidator extends Validator<String> {
+  static final NotEmptyTextValidator instance =
+      NotEmptyTextValidator._internal();
   @override
   Future<ValidationError> validate(String value) async =>
-      value.isEmpty ? IsEmptyValidationError() : null;
+      value == null || value.isEmpty ? IsEmptyValidationError() : null;
+
+  NotEmptyTextValidator._internal();
 }
 
 class NoWhitespaceTextValidator extends Validator<String> {
+  static final NoWhitespaceTextValidator instance =
+      NoWhitespaceTextValidator._internal();
   @override
   Future<ValidationError> validate(String value) async =>
-      value.contains(" ") ? NoWhitespacesValidationError() : null;
+      value?.contains(" ") == true ? NoWhitespacesValidationError() : null;
+
+  NoWhitespaceTextValidator._internal();
 }

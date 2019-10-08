@@ -30,16 +30,19 @@ class LoungePreferencesFormBloc extends FormBloc {
 
   @override
   List<FormFieldBloc> get children {
-    if (isAuthFormEnabled) {
+    if (isAuthFormEnabled == true) {
       return [connectionFormBloc, authPreferencesFormBloc];
     } else {
       return [connectionFormBloc];
     }
   }
 
-  bool get isAuthFormEnabled => _isAuthFormEnabledController.value;
+  bool get isAuthFormEnabled => _isAuthFormEnabledController?.value;
 
-  set isAuthFormEnabled(newValue) => _isAuthFormEnabledController.add(newValue);
+  set isAuthFormEnabled(newValue) {
+    _isAuthFormEnabledController.add(newValue);
+    resubscribeInternalFormsErrors();
+  }
 
   get isAuthFormEnabledStream => _isAuthFormEnabledController.stream.distinct();
 
