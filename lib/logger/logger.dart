@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter/foundation.dart';
 
 const bool logEnabled = true;
 
@@ -16,7 +17,7 @@ class MyLogger {
   final bool colors;
   final int lineLength;
 
-  bool get globalAndLoggerEnabled => enabled && logEnabled;
+  bool get globalAndLoggerEnabled => enabled && logEnabled && !kReleaseMode;
 
   Logger _logger;
 
