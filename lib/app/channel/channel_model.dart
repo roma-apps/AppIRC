@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 
@@ -44,13 +45,14 @@ class NetworkChannelWithState {
   final NetworkChannel channel;
   final NetworkChannelState state;
   final List<ChatMessage> initMessages;
+  final List<NetworkChannelUser> initUsers;
 
-  NetworkChannelWithState(this.channel, this.state, this.initMessages);
+  NetworkChannelWithState(this.channel, this.state, this.initMessages, this.initUsers);
 
   @override
   String toString() {
-    return 'NetworkChannelWithState{channel: $channel,'
-        ' state: $state, initMessages: $initMessages}';
+    return 'NetworkChannelWithState{channel: $channel, state: $state,'
+        ' initMessages: $initMessages, initUsers: $initUsers}';
   }
 
 

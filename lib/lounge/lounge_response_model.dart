@@ -733,7 +733,7 @@ class ChannelLoungeResponseBody extends LoungeResponseBodyPart {
   final int firstUnread;
   final int unread;
   final int highlight;
-  final List<dynamic> users;
+  final List<UserLoungeResponseBodyPart> users;
 
   @override
   String toString() {

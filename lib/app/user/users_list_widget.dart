@@ -23,11 +23,11 @@ class ChannelUsersInfoState extends State<ChannelUsersInfoWidget> {
     ColoredNicknamesBloc coloredNicknamesBloc = Provider.of(context);
     NetworkChannelBloc channelBloc = Provider.of<NetworkChannelBloc>(context);
 
-    return StreamBuilder<List<ChannelUserInfo>>(
+    return StreamBuilder<List<NetworkChannelUser>>(
         stream: channelBloc.usersStream,
         initialData: channelBloc.currentNotUpdateUsers,
         builder: (BuildContext context,
-            AsyncSnapshot<List<ChannelUserInfo>> snapshot) {
+            AsyncSnapshot<List<NetworkChannelUser>> snapshot) {
           var users = snapshot.data;
 
           if (users != null && users.isNotEmpty) {
@@ -48,7 +48,7 @@ class ChannelUsersInfoState extends State<ChannelUsersInfoWidget> {
   }
 }
 
-Widget _buildUserListItem(BuildContext context, ChannelUserInfo user,
+Widget _buildUserListItem(BuildContext context, NetworkChannelUser user,
     ColoredNicknamesBloc coloredNicknamesBloc) {
   var nick = user.nick;
   var color = coloredNicknamesBloc.getColorForNick(nick);

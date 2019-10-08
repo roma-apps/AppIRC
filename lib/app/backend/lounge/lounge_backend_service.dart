@@ -228,7 +228,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<List<ChannelUserInfo>>> getNetworkChannelUsers(
+  Future<RequestResult<List<NetworkChannelUser>>> requestNetworkChannelUsers(
       Network network, NetworkChannel channel,
       {bool waitForResult = false}) async {
     if (waitForResult) {
@@ -245,7 +245,7 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<ChannelUserInfo>> printUserInfo(
+  Future<RequestResult<NetworkChannelUser>> printUserInfo(
       Network network, NetworkChannel channel, String userNick,
       {bool waitForResult = false}) async {
     if (waitForResult) {
@@ -817,7 +817,7 @@ class LoungeBackendService extends Providable
 
   @override
   Disposable listenForNetworkChannelNames(Network network,
-      NetworkChannel channel, Function(List<ChannelUserInfo>) listener) {
+      NetworkChannel channel, Function(List<NetworkChannelUser>) listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable((LoungeResponseEventNames.names), (raw) {
@@ -827,8 +827,7 @@ class LoungeBackendService extends Providable
 
       if (parsed.id == channel.remoteId) {
         listener(parsed.users
-            .map((loungeUser) => ChannelUserInfo.name(
-                nick: loungeUser.nick, mode: loungeUser.mode))
+            .map((loungeUser) => toNetworkChannelUser(loungeUser))
             .toList());
       }
     }));
@@ -840,6 +839,8 @@ class LoungeBackendService extends Providable
 //    _usersController.sink.add(parsed);
 //  }
   }
+
+
 
   _sendRequest(LoungeRequest request,
       {@required bool isNeedAddRequestToPending}) async {

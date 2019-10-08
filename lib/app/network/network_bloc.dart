@@ -65,8 +65,10 @@ class NetworkBloc extends Providable {
       var channelState = channelsStateBloc.getNetworkChannelState(
           network, alreadyJoinedChannel);
       var initMessages = [];
+      var initUsers = [];
       return RequestResult<NetworkChannelWithState>(
-          true, NetworkChannelWithState(alreadyJoinedChannel, channelState, initMessages));
+          true, NetworkChannelWithState(alreadyJoinedChannel, channelState,
+        initMessages, initUsers));
     } else {
       return await backendService.joinNetworkChannel(network, preferences,
           waitForResult: waitForResult);

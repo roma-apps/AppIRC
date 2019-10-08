@@ -60,7 +60,7 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 
 
   Disposable listenForNetworkChannelNames(Network network,
-      NetworkChannel channel, Function(List<ChannelUserInfo>) listener);
+      NetworkChannel channel, Function(List<NetworkChannelUser>) listener);
 
 
 
@@ -121,7 +121,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
       Network network, NetworkChannel channel,
       {bool waitForResult: false});
 
-  Future<RequestResult<ChannelUserInfo>> printUserInfo(
+  Future<RequestResult<NetworkChannelUser>> printUserInfo(
       Network network, NetworkChannel channel, String userNick,
       {bool waitForResult: false});
 
@@ -129,7 +129,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
       Network network, NetworkChannel channel,
       {bool waitForResult: false});
 
-  Future<RequestResult<List<ChannelUserInfo>>> getNetworkChannelUsers(
+  Future<RequestResult<List<NetworkChannelUser>>> requestNetworkChannelUsers(
       Network network, NetworkChannel channel,
       {bool waitForResult: false});
 

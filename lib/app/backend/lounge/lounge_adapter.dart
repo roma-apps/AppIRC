@@ -380,10 +380,18 @@ NetworkChannelWithState toNetworkChannelWithState(
       detectNetworkChannelType(loungeChannel.type),
       loungeChannel.id);
   var channelState = toNetworkChannelState(loungeChannel, channel.type);
+  var initMessages = loungeChannel.messages?.map((loungeMessage) =>
+          toChatMessage(channel, loungeMessage))?.toList();
+  var initUsers = loungeChannel.users?.map((loungeUser) =>
+          toNetworkChannelUser(loungeUser))?.toList();
   var networkChannelWithState = NetworkChannelWithState(channel,
-    channelState, loungeChannel.messages?.map((loungeMessage) =>
-          toChatMessage(channel, loungeMessage))?.toList());
+    channelState, initMessages, initUsers);
   return networkChannelWithState;
+}
+
+NetworkChannelUser toNetworkChannelUser(UserLoungeResponseBodyPart loungeUser) {
+  return NetworkChannelUser.name(
+      nick: loungeUser.nick, mode: loungeUser.mode);
 }
 
 NetworkWithState toNetworkWithState(NetworkLoungeResponseBody loungeNetwork) {

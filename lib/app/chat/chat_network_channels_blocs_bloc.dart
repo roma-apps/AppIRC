@@ -34,9 +34,8 @@ class ChatNetworkChannelsBlocsBloc extends ChatNetworkChannelsListListenerBloc {
   @override
   void onChannelJoined(
       Network network, NetworkChannelWithState channelWithState) {
-    var channel = channelWithState.channel;
-    _blocs[channel] = NetworkChannelBloc(
-        _backendService, network, channel, _channelsStatesBloc);
+    _blocs[channelWithState.channel] = NetworkChannelBloc(
+        _backendService, network, channelWithState, _channelsStatesBloc);
   }
 
   @override

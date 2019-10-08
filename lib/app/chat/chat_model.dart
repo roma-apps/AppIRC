@@ -53,7 +53,7 @@ class ChatConfig {
 
 class ServerNameNotUniqueException implements Exception {}
 
-class ChannelUserInfo {
+class NetworkChannelUser {
   final String nick;
   final String hostMask;
   final String realName;
@@ -65,7 +65,7 @@ class ChannelUserInfo {
 
   String mode;
 
-  ChannelUserInfo(
+  NetworkChannelUser(
       this.nick,
       this.hostMask,
       this.realName,
@@ -75,7 +75,7 @@ class ChannelUserInfo {
       this.connectedAt,
       this.idleSince);
 
-  ChannelUserInfo.name(
+  NetworkChannelUser.name(
       {this.nick,
       this.hostMask,
       this.realName,

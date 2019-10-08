@@ -667,7 +667,11 @@ ChannelLoungeResponseBody _$ChannelLoungeResponseBodyFromJson(
     json['firstUnread'] as int,
     json['unread'] as int,
     json['highlight'] as int,
-    json['users'] as List,
+    (json['users'] as List)
+        ?.map((e) => e == null
+            ? null
+            : UserLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
   );
 }
 

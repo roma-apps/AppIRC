@@ -14,15 +14,19 @@ import 'package:rxdart/rxdart.dart';
 class NetworkChannelBloc extends Providable {
   final ChatInputOutputBackendService backendService;
   final Network network;
-  final NetworkChannel channel;
+  NetworkChannel channel;
   final ChatNetworkChannelsStateBloc channelsStatesBloc;
 
   ChatInputMessageBloc _inputMessageBloc;
 
   ChatInputMessageBloc get inputMessageBloc => _inputMessageBloc;
 
-  NetworkChannelBloc(this.backendService, this.network, this.channel,
-      this.channelsStatesBloc) {
+  NetworkChannelBloc(this.backendService, this.network,
+      NetworkChannelWithState channelWithState, this.channelsStatesBloc) {
+    channel = channelWithState.channel;
+    _usersController =
+        BehaviorSubject(seedValue: channelWithState.initUsers ?? []);
+
     addDisposable(subject: _usersController);
     addDisposable(
         disposable: backendService
@@ -32,23 +36,22 @@ class NetworkChannelBloc extends Providable {
     addDisposable(
         disposable:
             backendService.listenForNetworkChannelUsers(network, channel, () {
-      backendService.getNetworkChannelUsers(network, channel);
+      backendService.requestNetworkChannelUsers(network, channel);
     }));
     _inputMessageBloc = ChatInputMessageBloc(backendService.chatConfig, this);
     addDisposable(disposable: _inputMessageBloc);
   }
 
   // ignore: close_sinks
-  final BehaviorSubject<List<ChannelUserInfo>> _usersController =
-      BehaviorSubject(seedValue: []);
+  BehaviorSubject<List<NetworkChannelUser>> _usersController;
 
-  Stream<List<ChannelUserInfo>> get usersStream => _usersController.stream;
+  Stream<List<NetworkChannelUser>> get usersStream => _usersController.stream;
 
   DateTime _lastUsersRefreshDate;
 
-  List<ChannelUserInfo> get currentNotUpdateUsers => _usersController.value;
+  List<NetworkChannelUser> get currentNotUpdateUsers => _usersController.value;
 
-  Future<List<ChannelUserInfo>> getUsers({forceRefresh: false}) async {
+  Future<List<NetworkChannelUser>> getUsers({forceRefresh: false}) async {
     if (forceRefresh || _lastUsersRefreshDate == null) {
       await refreshUsers();
     } else {
@@ -66,7 +69,7 @@ class NetworkChannelBloc extends Providable {
 
   refreshUsers() async {
     _lastUsersRefreshDate = DateTime.now();
-    await backendService.getNetworkChannelUsers(network, channel,
+    await backendService.requestNetworkChannelUsers(network, channel,
         waitForResult: false);
   }
 
@@ -81,7 +84,7 @@ class NetworkChannelBloc extends Providable {
       await backendService.leaveNetworkChannel(network, channel,
           waitForResult: waitForResult);
 
-  Future<RequestResult<ChannelUserInfo>> printUserInfo(String userNick,
+  Future<RequestResult<NetworkChannelUser>> printUserInfo(String userNick,
           {bool waitForResult: false}) async =>
       await backendService.printUserInfo(network, channel, userNick,
           waitForResult: waitForResult);
@@ -116,5 +119,6 @@ class NetworkChannelBloc extends Providable {
       await backendService.openDirectMessagesChannel(network, channel, nick);
 
   static NetworkChannelBloc of(BuildContext context, NetworkChannel channel) =>
-      Provider.of<ChatNetworkChannelsBlocsBloc>(context).getNetworkChannelBloc(channel);
+      Provider.of<ChatNetworkChannelsBlocsBloc>(context)
+          .getNetworkChannelBloc(channel);
 }

@@ -108,6 +108,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
     Network network =
         _networksListBloc.findNetworkWithChannel(newActiveChannel);
     _backendService.onOpenNetworkChannel(network, newActiveChannel);
+    _backendService.requestNetworkChannelUsers(network, newActiveChannel);
   }
 
   _onActiveChannelLeaved() async {
