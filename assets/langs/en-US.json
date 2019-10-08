@@ -173,7 +173,8 @@
       "quit": "quit",
       "part": "part",
       "nick": "change nick to {}",
-      "channel_mode": "Channel mode: {}"
+      "channel_mode": "Channel mode: {}",
+      "ctcp_request": "CTCP request"
     },
     "users": {
       "title": "Channel users",

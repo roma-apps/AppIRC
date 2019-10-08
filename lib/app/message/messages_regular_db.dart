@@ -195,6 +195,9 @@ RegularMessageType regularMessageTypeIdToType(int id) {
     case 18:
       return RegularMessageType.NICK;
       break;
+      case 19:
+      return RegularMessageType.CTCP_REQUEST;
+      break;
   }
 
   throw Exception("Invalid RegularMessageType id $id");
@@ -255,6 +258,9 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
       break;
     case RegularMessageType.NICK:
       return 18;
+      break;
+    case RegularMessageType.CTCP_REQUEST:
+      return 19;
       break;
   }
   throw Exception("Invalid RegularMessageType = $type");

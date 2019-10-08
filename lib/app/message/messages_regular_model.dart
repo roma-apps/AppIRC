@@ -106,8 +106,6 @@ enum RegularMessageType {
   QUIT,
   PART,
   NICK,
+  CTCP_REQUEST,
 
-
-  // ccttp
-// flutter: │ 🐛 'LoungeService': onNewMessage for {MessageLoungeResponseBody{chan: 1, highlight: null, unread: null, msg: MsgLoungeResponseBody{from: MsgFromLoungeResponseBodyPart{id: null, mode: , nick: freenode-connect}, command: null, type: ctcp_request, time: 2019-10-02T11:43:53.208Z, new_nick: null, text: , hostmask: frigg@freenode/utility-bot/frigg, self: false, highlight: null, showInActive: null, users: null, previews: [], params: null, id: 24, whois: null}}.chan}  MessageLoungeResponseBody{chan: 1, highlight: null, unread: null, msg: MsgLoungeResponseBody{from: MsgFromLoungeResponseBodyPart{id: null, mode: , nick: freenode-connect}, command: null, type: ctcp_request, time: 2019-10-02T11:43:53.208Z, new_nick: null, text: , hostmask: frigg@freenode/utility-bot/frigg, self: false, highlight: null, showInActive: null, users: null, previews: [], params: null, id: 24, whois: null}}
 }

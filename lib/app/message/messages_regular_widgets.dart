@@ -239,6 +239,10 @@ class NetworkChannelMessageWidget extends StatelessWidget {
         str = appLocalizations
             .tr("chat.sub_message.nick", args: [message.newNick]);
         break;
+        case RegularMessageType.CTCP_REQUEST:
+        str = appLocalizations
+            .tr("chat.sub_message.ctcp_request");
+        break;
     }
 
     if (str != null) {
@@ -351,6 +355,9 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
       break;
     case RegularMessageType.NICK:
       icon = Icons.accessibility_new;
+      break;
+    case RegularMessageType.CTCP_REQUEST:
+      icon = Icons.info;
       break;
   }
   return icon;

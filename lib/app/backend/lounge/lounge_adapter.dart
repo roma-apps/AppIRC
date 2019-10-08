@@ -267,6 +267,9 @@ RegularMessageType detectRegularMessageType(String stringType) {
     case "nick":
       type = RegularMessageType.NICK;
       break;
+    case "ctcp_request":
+      type = RegularMessageType.CTCP_REQUEST;
+      break;
 
     default:
       type = RegularMessageType.UNKNOWN;

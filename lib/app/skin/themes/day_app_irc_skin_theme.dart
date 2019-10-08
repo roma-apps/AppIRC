@@ -76,6 +76,9 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
       case RegularMessageType.NICK:
         color = Colors.lightBlue;
         break;
+      case RegularMessageType.CTCP_REQUEST:
+        color = Colors.lightBlue;
+        break;
     }
     return color;
   }
