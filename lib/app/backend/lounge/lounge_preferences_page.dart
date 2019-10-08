@@ -97,7 +97,7 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: true,
-      iosContentPadding: true,
+      iosContentPadding: false,
       appBar: PlatformAppBar(
         title:
             Text(AppLocalizations.of(context).tr('lounge.preferences.title')),

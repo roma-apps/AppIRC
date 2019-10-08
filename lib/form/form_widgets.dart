@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Divider;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -55,6 +56,7 @@ buildFormTextRow(
             padding: EdgeInsets.all(8),
             style: formSkinBloc.textRowEditTextStyle,
             placeholder: hint,
+        prefixMode: OverlayVisibilityMode.notEditing,
             prefix: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(label,
@@ -69,7 +71,7 @@ buildFormTextRow(
           enabled: bloc.enabled,
           style: formSkinBloc.textRowEditTextStyle.copyWith(color: Colors.grey),
           decoration: InputDecoration(
-              enabled: false,
+              enabled: bloc.enabled,
 
               labelText: label,
               hintText: hint,
@@ -83,6 +85,7 @@ buildFormTextRow(
           placeholder: hint,
           padding: EdgeInsets.all(8),
           style: formSkinBloc.textRowEditTextStyle.copyWith(color: Colors.grey),
+          prefixMode: OverlayVisibilityMode.notEditing,
           prefix: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
@@ -105,9 +108,10 @@ buildFormTextRow(
             ),
             Flexible(
                 child: Padding(
-                    padding: const EdgeInsets.all(2.0),
+                    padding: const EdgeInsets.all(4.0),
                     child: PlatformTextField(
-                        textAlign: isMaterial? TextAlign.start : TextAlign.end,
+
+                        textAlign: TextAlign.start,
                         android: androidBuilder,
                         ios: iosBuilder,
                         controller: controller,

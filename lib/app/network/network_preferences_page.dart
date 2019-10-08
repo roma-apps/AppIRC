@@ -137,7 +137,7 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
 
     return PlatformScaffold(
       iosContentBottomPadding: true,
-      iosContentPadding: true,
+      iosContentPadding: false,
       appBar: PlatformAppBar(
         title: Text(titleText),
       ),
