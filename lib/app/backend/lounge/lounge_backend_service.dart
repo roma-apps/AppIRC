@@ -1129,7 +1129,7 @@ Future<ConnectResult> _connect(
     } while (!authorizedResponseReceived &&
         !result.isTimeout &&
         !result.isFailAuthResponseReceived &&
-        (result.isPrivateModeResponseReceived && result.isAuthRequestSent) &&
+        !(result.isPrivateModeResponseReceived && result.isAuthRequestSent) &&
         result.error == null);
   }
 
