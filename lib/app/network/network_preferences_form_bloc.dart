@@ -9,19 +9,23 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
   NetworkServerPreferencesFormBloc serverFormBloc;
   NetworkUserPreferencesFormBloc userFormBloc;
 
+  final bool serverPreferencesVisible;
+
   FormValueFieldBloc<String> channelsFieldBloc;
 
   final ChatNetworkPreferences preferences;
 
   ChatNetworkPreferencesFormBloc(
-    this.preferences,
-    bool isNeedShowChannels,
-    bool isNeedShowCommands,
-      bool serverPreferencesEnabled, bool serverPreferencesVisible
-  ) {
+      this.preferences,
+      bool isNeedShowChannels,
+      bool isNeedShowCommands,
+      bool serverPreferencesEnabled,
+      this.serverPreferencesVisible) {
     serverFormBloc = NetworkServerPreferencesFormBloc(
         preferences.networkConnectionPreferences.serverPreferences,
-        networkValidator, serverPreferencesEnabled, serverPreferencesVisible);
+        networkValidator,
+        serverPreferencesEnabled,
+        serverPreferencesVisible);
     userFormBloc = NetworkUserPreferencesFormBloc(
         preferences.networkConnectionPreferences.userPreferences,
         isNeedShowCommands);
@@ -35,11 +39,13 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
   }
 
   @override
-  List<FormFieldBloc> get children => [serverFormBloc, userFormBloc];
+  List<FormFieldBloc> get children {
+    return serverPreferencesVisible ? [serverFormBloc, userFormBloc] : [userFormBloc];
+  }
 
   ChatNetworkPreferences extractData() => ChatNetworkPreferences(
       ChatNetworkConnectionPreferences(
-        localId: preferences.localId,
+          localId: preferences.localId,
           serverPreferences: serverFormBloc.extractData(),
           userPreferences: userFormBloc.extractData()),
       channelsFieldBloc.value
