@@ -23,7 +23,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
   final Network network;
   final NetworkChannel networkChannel;
 
-  List<ChatMessage> _currentMessages = [];
+  List<ChatMessage> currentMessages = [];
 
   // ignore: close_sinks
   var _messagesController =
@@ -44,9 +44,9 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
               .getChannelMessages(networkChannel.remoteId))
           .map(specialMessageDBToChatMessage);
 
-      _currentMessages.addAll(regularMessages);
-      _currentMessages.addAll(specialMessages);
-      _currentMessages.sort((a, b) {
+      currentMessages.addAll(regularMessages);
+      currentMessages.addAll(specialMessages);
+      currentMessages.sort((a, b) {
         return a.date.compareTo(b.date);
       });
       _onMessagesChanged();
@@ -54,7 +54,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
       addDisposable(
           disposable: backendService.listenForMessages(network, networkChannel,
               (newMessage) {
-        _currentMessages.add(newMessage);
+        currentMessages.add(newMessage);
         if (newMessage.chatMessageType == ChatMessageType.SPECIAL) {
           _onSpecialMessagesChanged();
         }
@@ -64,7 +64,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
       addDisposable(
           disposable: backendService.listenForMessagePreviews(
               network, networkChannel, (previewForMessage) {
-        var oldMessage = _currentMessages.firstWhere((message) {
+        var oldMessage = currentMessages.firstWhere((message) {
 
           if (message is RegularMessage) {
             var regularMessage = message;
@@ -87,11 +87,11 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
   }
 
   void _onMessagesChanged() {
-    _messagesController.add(_currentMessages);
+    _messagesController.add(currentMessages);
   }
 
   void _onSpecialMessagesChanged() {
-    SpecialMessage latestTextMessage = _currentMessages.lastWhere((message) {
+    SpecialMessage latestTextMessage = currentMessages.lastWhere((message) {
       if (message.isSpecial) {
         var specialMessage = message as SpecialMessage;
         if (specialMessage.specialType == SpecialMessageType.TEXT) {
@@ -105,7 +105,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
     }, orElse: () => null);
 
     if (latestTextMessage != null) {
-      _currentMessages.removeWhere((message) {
+      currentMessages.removeWhere((message) {
         if (message.isSpecial) {
           var specialMessage = message as SpecialMessage;
           if (specialMessage.specialType == SpecialMessageType.TEXT) {

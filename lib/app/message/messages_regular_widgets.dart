@@ -16,29 +16,29 @@ import 'package:url_launcher/url_launcher.dart';
 var todayDateFormatter = new DateFormat().add_Hm();
 var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
 
-class NetworkChannelMessageWidget extends StatelessWidget {
-  final RegularMessage message;
+//class NetworkChannelMessageWidget extends StatelessWidget {
+//  final RegularMessage message;
+//
+//  NetworkChannelMessageWidget(this.message);
+//
 
-  NetworkChannelMessageWidget(this.message);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildRegularMessage(BuildContext context, RegularMessage message) {
     var needHighlight = isNeedHighlight(message);
 
     var channelBloc = Provider.of<NetworkChannelBloc>(context);
 
-    var body = _buildMessageBody(context);
-    var title = _buildMessageTitle(context, channelBloc);
+    var body = _buildMessageBody(context, message);
+    var title = _buildMessageTitle(context, channelBloc, message);
 
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
     var color =
         messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
-    return buildRegularMessage(title, body, needHighlight, color);
+    return buildRegularMessageWidget(title, body, needHighlight, color);
   }
 
-  Widget _buildMessageBody(BuildContext context) {
+  Widget _buildMessageBody(BuildContext context, RegularMessage message) {
     var regularMessageType = message.regularMessageType;
 
     if (regularMessageType == RegularMessageType.AWAY ||
@@ -71,6 +71,9 @@ class NetworkChannelMessageWidget extends StatelessWidget {
     if (message.text != null) {
       var text = message.text;
 
+//      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
+//      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
+
       rows.add(Linkify(
         onOpen: (link) async {
           if (await canLaunch(link.url)) {
@@ -98,15 +101,15 @@ class NetworkChannelMessageWidget extends StatelessWidget {
   }
 
   Widget _buildMessageTitle(
-      BuildContext context, NetworkChannelBloc channelBloc) {
+      BuildContext context, NetworkChannelBloc channelBloc, RegularMessage message) {
     var icon = _buildTitleIcon(context, message);
 
     var startPart;
 
-    var subMessage = _buildTitleSubMessage(context);
+    var subMessage = _buildTitleSubMessage(context, message);
 
     if (message.isHaveFromNick) {
-      var messageTitleNick = _buildMessageTitleNick(context, channelBloc);
+      var messageTitleNick = _buildMessageTitleNick(context, channelBloc, message);
       if (subMessage != null) {
         startPart = Row(children: <Widget>[
           messageTitleNick,
@@ -145,7 +148,7 @@ class NetworkChannelMessageWidget extends StatelessWidget {
   }
 
   Widget _buildMessageTitleNick(
-      BuildContext context, NetworkChannelBloc channelBloc) {
+      BuildContext context, NetworkChannelBloc channelBloc, RegularMessage message) {
     var nick = message.fromNick;
 
     var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
@@ -169,7 +172,7 @@ class NetworkChannelMessageWidget extends StatelessWidget {
     return buildMessageIcon(iconData, color);
   }
 
-  Widget _buildTitleSubMessage(BuildContext context) {
+  Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
     var regularMessageType = message.regularMessageType;
@@ -288,7 +291,7 @@ class NetworkChannelMessageWidget extends StatelessWidget {
   Widget _buildPreviewThumb(BuildContext context, String thumb) {
     return Image.network(thumb);
   }
-}
+
 
 isNeedHighlight(RegularMessage message) =>
     message.highlight == true ||
@@ -363,7 +366,7 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
   return icon;
 }
 
-Widget buildRegularMessage(
+Widget buildRegularMessageWidget(
     Widget title, Widget body, bool needHighlight, Color color) {
   var decoration;
   if (needHighlight) {

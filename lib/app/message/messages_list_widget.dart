@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
@@ -15,6 +16,8 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 
 class NetworkChannelMessagesListWidget extends StatelessWidget {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     var backendService = Provider.of<ChatOutputBackendService>(context);
@@ -27,6 +30,7 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
 
     return StreamBuilder<List<ChatMessage>>(
         stream: messagesLoader.messagesStream,
+        initialData: messagesLoader.currentMessages,
         builder:
             (BuildContext context, AsyncSnapshot<List<ChatMessage>> snapshot) {
           var messages = snapshot.data;
@@ -64,20 +68,11 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
               },
             );
           } else {
-            var scrollController = ScrollController();
-
-            SchedulerBinding.instance.addPostFrameCallback((_) {
-              scrollController.animateTo(
-                  scrollController.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOut);
-            });
-
-            return Padding(
+            var result = Padding(
               padding: const EdgeInsets.all(10.0),
               child: ListView.builder(
                   itemCount: messages.length,
-                  controller: scrollController,
+                  controller: _scrollController,
                   itemBuilder: (BuildContext context, int index) {
                     var message = messages[index];
 
@@ -90,13 +85,28 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
                             context, specialMessage);
                         break;
                       case ChatMessageType.REGULAR:
-                        return NetworkChannelMessageWidget(message);
+                        return buildRegularMessage(context, message);
                         break;
                     }
 
                     throw Exception("Invalid message type = $chatMessageType");
                   }),
             );
+
+         Timer.run( () {
+              var bottomOffset = _scrollController.position.maxScrollExtent * 3;
+              // TODO: Remove magic 3 number
+              // Looks like bug in ListView _scrollController.position
+              // .maxScrollExtent should be always bottom value
+              // However it is not true when list view contains Text
+              // with new lines characters
+              _scrollController.animateTo(bottomOffset,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut);
+//              _scrollController.jumpTo(
+//                  _scrollController.position.maxScrollExtent);
+            });
+            return result;
           }
         });
   }

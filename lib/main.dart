@@ -61,7 +61,7 @@ import 'app/skin/themes/day_app_irc_skin_theme.dart';
 var _logger = MyLogger(logTag: "Main", enabled: true);
 
 Future main() async {
-//  changeToCupertinoPlatformAware();
+  changeToCupertinoPlatformAware();
 
   var preferencesService = PreferencesService();
 
