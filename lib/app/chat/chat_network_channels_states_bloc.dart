@@ -9,9 +9,21 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
-  final Map<String, Map<int, BehaviorSubject<NetworkChannelState>>> _states =
+  final Map<String, Map<int, BehaviorSubject<NetworkChannelState>>> _statesMap =
       Map();
+  List<NetworkChannelState> get states {
+    var states = <NetworkChannelState>[];
+    _statesMap.values.forEach((Map<int, BehaviorSubject<NetworkChannelState>>
+    entry) {
+      states.addAll(entry.values.map((subject) => subject.value));
 
+    });
+    return states;
+  }
+
+  // ignore: close_sinks
+  final BehaviorSubject _anyStateChangedController = BehaviorSubject();
+  Stream get anyStateChangedStream => _anyStateChangedController.stream;
 
   final ChatActiveChannelBloc activeChannelBloc;
   final ChatOutputBackendService backendService;
@@ -21,6 +33,7 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
     ChatNetworksListBloc networksListBloc,
     this.activeChannelBloc,
   ) : super(networksListBloc) {
+    addDisposable(subject: _anyStateChangedController);
     addDisposable(streamSubscription:
         activeChannelBloc.activeChannelStream.listen((newActiveChannel) {
       Network networkForChannel =
@@ -32,23 +45,21 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
     }));
   }
 
-
   BehaviorSubject<NetworkChannelState> _getStateControllerForNetworkChannel(
       Network network, NetworkChannel channel) {
     var networkKey = _calculateNetworkKey(network);
     var channelKey = _calculateChannelKey(channel);
-    if (!_states.containsKey(networkKey)) {
-      _states[networkKey] = Map<int, BehaviorSubject<NetworkChannelState>>();
+    if (!_statesMap.containsKey(networkKey)) {
+      _statesMap[networkKey] = Map<int, BehaviorSubject<NetworkChannelState>>();
     }
 
-    if (!_states[networkKey].containsKey(channelKey)) {
-      _states[networkKey][channelKey] = BehaviorSubject<NetworkChannelState>(
+    if (!_statesMap[networkKey].containsKey(channelKey)) {
+      _statesMap[networkKey][channelKey] = BehaviorSubject<NetworkChannelState>(
           seedValue: NetworkChannelState.empty);
     }
 
-    return _states[networkKey][_calculateChannelKey(channel)];
+    return _statesMap[networkKey][_calculateChannelKey(channel)];
   }
-
 
   void _updateState(
       Network network, NetworkChannel channel, NetworkChannelState state) {
@@ -57,6 +68,9 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
     }
 
     _getStateControllerForNetworkChannel(network, channel).add(state);
+
+
+    _anyStateChangedController.add(null);
   }
 
   String _calculateNetworkKey(Network network) => network.remoteId;
@@ -65,11 +79,11 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
 
   Stream<NetworkChannelState> getNetworkChannelStateStream(
           Network network, NetworkChannel networkChannel) =>
-      _states[_calculateNetworkKey(network)][networkChannel.remoteId].stream;
+      _statesMap[_calculateNetworkKey(network)][networkChannel.remoteId].stream;
 
   NetworkChannelState getNetworkChannelState(
           Network network, NetworkChannel networkChannel) =>
-      _states[_calculateNetworkKey(network)][networkChannel.remoteId].value;
+      _statesMap[_calculateNetworkKey(network)][networkChannel.remoteId].value;
 
   @override
   void onChannelJoined(
@@ -93,7 +107,7 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
     var stateController =
         _getStateControllerForNetworkChannel(network, channel);
     stateController.close();
-    _states[_calculateNetworkKey(network)]
+    _statesMap[_calculateNetworkKey(network)]
         .remove(_calculateChannelKey(channel));
 //    });
   }
