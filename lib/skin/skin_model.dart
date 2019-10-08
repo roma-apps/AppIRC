@@ -183,7 +183,7 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
 
   @override
   TextStyle get textBoldSmallStyle =>
-      textTheme.navTitleTextStyle.copyWith(fontSize: 14);
+      textTheme.navTitleTextStyle.copyWith(fontSize: 12);
 
   @override
   TextStyle get textEditTextStyle => textTheme.textStyle;
