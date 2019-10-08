@@ -454,6 +454,10 @@ InitLoungeResponseBody _$InitLoungeResponseBodyFromJson(
             ? null
             : NetworkLoungeResponseBody.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    json['pushSubscription'] == null
+        ? null
+        : PushSubscriptionLoungeResponseBodyPart.fromJson(
+            json['pushSubscription'] as Map<String, dynamic>),
   );
 }
 
@@ -464,6 +468,25 @@ Map<String, dynamic> _$InitLoungeResponseBodyToJson(
       'applicationServerKey': instance.applicationServerKey,
       'token': instance.token,
       'networks': instance.networks,
+      'pushSubscription': instance.pushSubscription,
+    };
+
+PushSubscriptionLoungeResponseBodyPart
+    _$PushSubscriptionLoungeResponseBodyPartFromJson(
+        Map<String, dynamic> json) {
+  return PushSubscriptionLoungeResponseBodyPart(
+    json['agent'] as String,
+    json['ip'] as String,
+    json['lastUse'] as int,
+  );
+}
+
+Map<String, dynamic> _$PushSubscriptionLoungeResponseBodyPartToJson(
+        PushSubscriptionLoungeResponseBodyPart instance) =>
+    <String, dynamic>{
+      'agent': instance.agent,
+      'ip': instance.ip,
+      'lastUse': instance.lastUse,
     };
 
 NamesLoungeResponseBody _$NamesLoungeResponseBodyFromJson(
@@ -574,7 +597,7 @@ NetworkLoungeResponseBody _$NetworkLoungeResponseBodyFromJson(
     json['name'] as String,
     json['host'] as String,
     json['port'] as int,
-    json['lts'] as String,
+    json['tls'] as String,
     json['userDisconnected'] as bool,
     json['rejectUnauthorized'] as bool,
     json['isCollapsed'] as bool,
@@ -606,7 +629,7 @@ Map<String, dynamic> _$NetworkLoungeResponseBodyToJson(
       'name': instance.name,
       'host': instance.host,
       'port': instance.port,
-      'lts': instance.lts,
+      'tls': instance.tls,
       'userDisconnected': instance.userDisconnected,
       'rejectUnauthorized': instance.rejectUnauthorized,
       'isCollapsed': instance.isCollapsed,

@@ -1,4 +1,5 @@
 import 'package:flutter_appirc/app/channel/channel_model.dart';
+import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_preview_model.dart';
@@ -12,6 +13,16 @@ import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 
 var _logger = MyLogger(logTag: "lounge_adapter", enabled: true);
 
+ChatInitInformation toChatInit(InitLoungeResponseBody parsed) {
+  return ChatInitInformation.name(
+      activeChannelRemoteId:
+          parsed.active == InitLoungeResponseBody.undefinedActiveID
+              ? null
+              : parsed.active,
+      networksWithState: parsed.networks
+          ?.map((loungeNetwork) => toNetworkWithState(loungeNetwork)));
+}
+
 ChatConfig toChatConfig(
         ConfigurationLoungeResponseBody loungeConfig, List<String> commands) =>
     ChatConfig.name(
@@ -22,9 +33,7 @@ ChatConfig toChatConfig(
                 serverPort: loungeConfig.defaults.port.toString(),
                 useTls: loungeConfig.defaults.tls,
                 useOnlyTrustedCertificates:
-                    loungeConfig.defaults.rejectUnauthorized,
-                visible: loungeConfig.displayNetwork,
-                enabled: !loungeConfig.lockNetwork),
+                    loungeConfig.defaults.rejectUnauthorized),
             userPreferences: ChatNetworkUserPreferences(
                 nickname: loungeConfig.defaults.nick,
                 realName: loungeConfig.defaults.realname,
@@ -33,6 +42,8 @@ ChatConfig toChatConfig(
                 commands: null)),
         defaultChannels: loungeConfig.defaults.join,
         fileUpload: loungeConfig.fileUpload,
+        displayNetwork: loungeConfig.displayNetwork,
+        lockNetwork: loungeConfig.lockNetwork,
         ldapEnabled: loungeConfig.ldapEnabled,
         prefetch: loungeConfig.prefetch,
         public: loungeConfig.public,
@@ -348,4 +359,55 @@ MessagePreviewType detectMessagePreviewType(String type) {
   }
 
   throw Exception("Invalid MessagePreviewType type $type");
+}
+
+NetworkChannelWithState toNetworkChannelWithState(
+    ChannelLoungeResponseBody loungeChannel) {
+  var channel = NetworkChannel(
+      ChatNetworkChannelPreferences.name(
+          name: loungeChannel.name,
+          // Network start channels always without password
+          password: ""),
+      detectNetworkChannelType(loungeChannel.type),
+      loungeChannel.id);
+  var channelState = toNetworkChannelState((loungeChannel));
+  var networkChannelWithState = NetworkChannelWithState(channel, channelState);
+  return networkChannelWithState;
+}
+
+NetworkWithState toNetworkWithState(NetworkLoungeResponseBody loungeNetwork) {
+  var channelsWithState = <NetworkChannelWithState>[];
+
+  for (var loungeChannel in loungeNetwork.channels) {
+    channelsWithState.add(toNetworkChannelWithState(loungeChannel));
+  }
+
+  var channels = channelsWithState
+      .map((channelWithState) => channelWithState.channel)
+      .toList();
+
+  var nick = loungeNetwork.nick;
+  ChatNetworkConnectionPreferences connectionPreferences =
+      ChatNetworkConnectionPreferences(
+          serverPreferences: ChatNetworkServerPreferences(
+              name: loungeNetwork.name,
+              serverHost: loungeNetwork.host,
+              serverPort: loungeNetwork.port.toString(),
+              useTls: loungeNetwork.tls == LoungeConstants.on ? true : false,
+              useOnlyTrustedCertificates: loungeNetwork.rejectUnauthorized),
+          userPreferences: ChatNetworkUserPreferences(
+              nickname: nick,
+              password: null,
+              commands: null,
+              realName: loungeNetwork.realname,
+              username: loungeNetwork.username));
+  var network = Network(connectionPreferences, loungeNetwork.uuid, channels);
+
+  var loungeNetworkStatus = loungeNetwork.status;
+
+  var networkState = toNetworkState(loungeNetworkStatus, nick, network.name);
+
+  var networkWithState =
+      NetworkWithState(network, networkState, channelsWithState);
+  return networkWithState;
 }

@@ -226,6 +226,7 @@ class ChatPage extends StatelessWidget {
 
   Widget _buildConnectToNetworkWidget(BuildContext context) {
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
+    ChatBackendService backendService = Provider.of(context);
     return StreamBuilder<ChatConnectionState>(
         stream: connectionBloc.connectionStateStream,
         initialData: connectionBloc.connectionState,
@@ -248,7 +249,9 @@ class ChatPage extends StatelessWidget {
                       var startValues = createDefaultNetworkPreferences(context);
                       return Provider(
                         providable:
-                        ChatNetworkPreferencesFormBloc(startValues, true, false),
+                        ChatNetworkPreferencesFormBloc(startValues, true,
+                          false, !backendService.chatConfig.lockNetwork,
+                            backendService.chatConfig.displayNetwork),
                         child: ChatNetworkPreferencesFormWidget(startValues,
                                 (context, preferences) async {
                               var networksBloc = Provider.of<ChatNetworksListBloc>(context);

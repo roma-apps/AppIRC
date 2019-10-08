@@ -8,8 +8,8 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_page.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/network_preferences_page.dart';
 import 'package:flutter_appirc/app/network/networks_list_widget.dart';
-import 'package:flutter_appirc/skin/skin_day_night_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/skin_day_night_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ChatDrawerWidget extends StatelessWidget {
@@ -45,13 +45,20 @@ class ChatDrawerWidget extends StatelessWidget {
 
   Widget _buildNewNetworkButton(BuildContext context) => PlatformIconButton(
         onPressed: () {
-          Navigator.push(
+          ChatBackendService backendService = Provider.of(context);
+
+          Navigator.push(context, platformPageRoute(builder: (context) {
+            var newChatNetworkPage = NewChatNetworkPage(
               context,
-              platformPageRoute(
-                  builder: (context) => NewChatNetworkPage(context,
-                          createDefaultNetworkPreferences(context), () {
-                        Navigator.pop(context);
-                      })));
+              createDefaultNetworkPreferences(context),
+              !backendService.chatConfig.lockNetwork,
+              backendService.chatConfig.displayNetwork,
+              () {
+                Navigator.pop(context);
+              },
+            );
+            return newChatNetworkPage;
+          }));
         },
         androidIcon: Icon(Icons.add),
         iosIcon: Icon(CupertinoIcons.add),

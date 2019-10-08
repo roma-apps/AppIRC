@@ -10,9 +10,10 @@ class InvalidConnectionResponseException extends LoungeException {
   final bool authorizedReceived;
   final bool configReceived;
   final bool commandReceived;
+  final bool chatInitReceived;
 
   InvalidConnectionResponseException(this.preferences, this.authorizedReceived,
-      this.configReceived, this.commandReceived);
+      this.configReceived, this.commandReceived, this.chatInitReceived);
 }
 
 class NotImplementedYetException implements LoungeException {}

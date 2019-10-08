@@ -14,7 +14,11 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class NewChatNetworkPage extends ChatNetworkPage {
   final VoidCallback successCallback;
 
-  NewChatNetworkPage(BuildContext context, ChatNetworkPreferences startValues,
+  NewChatNetworkPage(
+      BuildContext context,
+      ChatNetworkPreferences startValues,
+      bool serverPreferencesEnabled,
+      bool serverPreferencesVisible,
       this.successCallback)
       : super(AppLocalizations.of(context).tr('irc_connection.title'),
             startValues, (context, preferences) async {
@@ -28,12 +32,13 @@ class NewChatNetworkPage extends ChatNetworkPage {
 
             return result;
           });
-        }, true, false,
+        }, true, false, serverPreferencesEnabled, serverPreferencesVisible,
             AppLocalizations.of(context).tr('irc_connection.connect'));
 }
 
 class EditChatNetworkPage extends ChatNetworkPage {
-  EditChatNetworkPage(BuildContext context, ChatNetworkPreferences startValues)
+  EditChatNetworkPage(BuildContext context, ChatNetworkPreferences startValues,
+      bool serverPreferencesEnabled, bool serverPreferencesVisible)
       : super(AppLocalizations.of(context).tr('irc_connection.title_edit'),
             startValues, (context, preferences) async {
           final NetworkBloc networkBloc = Provider.of<NetworkBloc>(context);
@@ -45,7 +50,8 @@ class EditChatNetworkPage extends ChatNetworkPage {
           Navigator.pop(context);
 
           return result;
-        }, false, true, AppLocalizations.of(context).tr('irc_connection.save'));
+        }, false, true, serverPreferencesEnabled, serverPreferencesVisible,
+            AppLocalizations.of(context).tr('irc_connection.save'));
 }
 
 class ChatNetworkPage extends StatefulWidget {
@@ -54,16 +60,32 @@ class ChatNetworkPage extends StatefulWidget {
 
   final bool isNeedShowChannels;
   final bool isNeedShowCommands;
+  final bool serverPreferencesEnabled;
+  final bool serverPreferencesVisible;
   final String buttonText;
   final String titleText;
 
-  ChatNetworkPage(this.titleText, this.startValues, this.callback,
-      this.isNeedShowChannels, this.isNeedShowCommands, this.buttonText);
+  ChatNetworkPage(
+      this.titleText,
+      this.startValues,
+      this.callback,
+      this.isNeedShowChannels,
+      this.isNeedShowCommands,
+      this.serverPreferencesEnabled,
+      this.serverPreferencesVisible,
+      this.buttonText);
 
   @override
   State<StatefulWidget> createState() {
-    return ChatNetworkPageState(titleText, startValues, callback,
-        isNeedShowChannels, isNeedShowCommands, buttonText);
+    return ChatNetworkPageState(
+        titleText,
+        startValues,
+        callback,
+        isNeedShowChannels,
+        isNeedShowCommands,
+        serverPreferencesEnabled,
+        serverPreferencesVisible,
+        buttonText);
   }
 }
 
@@ -76,10 +98,21 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
 
   final String titleText;
 
-  ChatNetworkPageState(this.titleText, this.startValues, this.callback,
-      bool isNeedShowChannels, bool isNeedShowCommands, this.buttonText) {
+  ChatNetworkPageState(
+      this.titleText,
+      this.startValues,
+      this.callback,
+      bool isNeedShowChannels,
+      bool isNeedShowCommands,
+      bool serverPreferencesEnabled,
+      bool serverPreferencesVisible,
+      this.buttonText) {
     networkPreferencesFormBloc = ChatNetworkPreferencesFormBloc(
-        startValues, isNeedShowChannels, isNeedShowCommands);
+        startValues,
+        isNeedShowChannels,
+        isNeedShowCommands,
+        serverPreferencesEnabled,
+        serverPreferencesVisible);
   }
 
   @override

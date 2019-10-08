@@ -8,6 +8,8 @@ class ChatConfig {
 
   final bool fileUpload;
   final bool ldapEnabled;
+  final bool displayNetwork;
+  final bool lockNetwork;
 
   final bool prefetch;
   final bool public;
@@ -17,17 +19,18 @@ class ChatConfig {
 
 
   ChatConfig(this.defaultNetwork, this.defaultChannels, this.fileUpload,
-      this.ldapEnabled, this.prefetch, this.public,
-      this.useHexIp, this.fileUploadMaxSize, this.commands);
+      this.ldapEnabled, this.displayNetwork, this.lockNetwork, this.prefetch,
+      this.public, this.useHexIp, this.fileUploadMaxSize, this.commands);
 
 
   @override
   String toString() {
-    return 'ChatConfig{defaultNetwork: $defaultNetwork,'
-        ' defaultChannels: $defaultChannels, fileUpload: $fileUpload,'
-        ' ldapEnabled: $ldapEnabled, prefetch: $prefetch, public: $public,'
-        ' useHexIp: $useHexIp, fileUploadMaxSize: '
-        '$fileUploadMaxSize, commands: $commands}';
+    return 'ChatConfig{defaultNetwork: $defaultNetwork, defaultChannels: '
+        '$defaultChannels, fileUpload: $fileUpload, '
+        'ldapEnabled: $ldapEnabled, displayNetwork: $displayNetwork, '
+        'lockNetwork: $lockNetwork, prefetch: $prefetch, public: $public, '
+        'useHexIp: $useHexIp, fileUploadMaxSize: $fileUploadMaxSize, '
+        'commands: $commands}';
   }
 
   ChatConfig.name(
@@ -35,6 +38,8 @@ class ChatConfig {
       @required this.defaultChannels,
       @required this.fileUpload,
       @required this.ldapEnabled,
+      @required this.displayNetwork,
+      @required this.lockNetwork,
       @required this.prefetch,
       @required this.public,
       @required this.useHexIp,

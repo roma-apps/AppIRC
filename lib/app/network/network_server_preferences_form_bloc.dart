@@ -15,9 +15,10 @@ class NetworkServerPreferencesFormBloc extends FormBloc {
   bool visible;
 
   NetworkServerPreferencesFormBloc(
-      ChatNetworkServerPreferences preferences, this.networkValidator) {
-    enabled = preferences.enabled;
-    visible = preferences.visible;
+      ChatNetworkServerPreferences preferences, this.networkValidator,
+      bool enabled, bool visible) {
+    enabled = enabled;
+    visible = visible;
 
     nameFieldBloc = FormValueFieldBloc<String>(preferences.name,
         validators: [NoWhitespaceTextValidator(), NotEmptyTextValidator()],
@@ -49,7 +50,5 @@ class NetworkServerPreferencesFormBloc extends FormBloc {
       serverHost: hostFieldBloc.value,
       serverPort: portFieldBloc.value,
       useTls: tlsFieldBloc.value,
-      useOnlyTrustedCertificates: trustedFieldBloc.value,
-      enabled: enabled,
-      visible: visible);
+      useOnlyTrustedCertificates: trustedFieldBloc.value);
 }

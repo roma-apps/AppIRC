@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_join_channel_page.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -28,6 +29,8 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
     BuildContext context, bool connected, NetworkBloc networkBloc) {
   var appLocalizations = AppLocalizations.of(context);
 
+  ChatBackendService backendService = Provider.of(context);
+
   var items = <PlatformAwarePopupMenuAction>[
     PlatformAwarePopupMenuAction(
         text: appLocalizations.tr("settings.network_dropdown_menu.edit"),
@@ -41,7 +44,11 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
                         child: EditChatNetworkPage(
                             context,
                             ChatNetworkPreferences(
-                                networkBloc.network.connectionPreferences, [])),
+                                networkBloc.network.connectionPreferences,
+                                []),
+                          !backendService.chatConfig.lockNetwork,
+                          backendService.chatConfig.displayNetwork
+                        ),
                       )));
         }),
     PlatformAwarePopupMenuAction(

@@ -1,5 +1,6 @@
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 
 class RequestResult<T> {
@@ -21,6 +22,7 @@ class RequestResult<T> {
 class ConnectResult<T> {
   
   ChatConfig config;
+  ChatInitInformation chatInit;
   bool isSocketConnected = false;
   bool isTimeout = false;
   bool isPrivateModeResponseReceived = false;

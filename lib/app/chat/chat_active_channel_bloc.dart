@@ -54,9 +54,16 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
       return;
     }
 
+
+
+    await tryRestoreFromLocalPreferences();
+  }
+
+  Future tryRestoreFromLocalPreferences() async {
     var allChannels = await _networksListBloc.allNetworksChannels;
 
     if (allChannels != null && allChannels.isNotEmpty) {
+
       var savedLocalId =
       _preferenceBloc.getValue(defaultValue: allChannels.first.localId);
       if (savedLocalId != null) {

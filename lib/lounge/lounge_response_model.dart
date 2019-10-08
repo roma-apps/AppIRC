@@ -510,23 +510,50 @@ class MsgPreviewLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class InitLoungeResponseBody extends LoungeResponseBody {
+
+  static final int undefinedActiveID = -1;
+
   final int active;
   final String applicationServerKey;
   final String token;
   final List<NetworkLoungeResponseBody> networks;
+  final PushSubscriptionLoungeResponseBodyPart pushSubscription;
 
   InitLoungeResponseBody(
-      this.active, this.applicationServerKey, this.token, this.networks);
+      this.active, this.applicationServerKey, this.token, this.networks,
+      this.pushSubscription);
 
   factory InitLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$InitLoungeResponseBodyFromJson(json);
 
   @override
   String toString() {
-    return 'InitLoungeResponseBody{active: $active,'
-        ' applicationServerKey: $applicationServerKey,'
-        ' token: $token, networks: $networks}';
+    return 'InitLoungeResponseBody{active: $active, applicationServerKey: '
+        '$applicationServerKey, token: $token, networks: $networks, '
+        'pushSubscription: $pushSubscription}';
   }
+
+
+}
+
+@JsonSerializable()
+class PushSubscriptionLoungeResponseBodyPart extends LoungeResponseBodyPart {
+  final String agent;
+  final String ip;
+  final int lastUse;
+
+
+  PushSubscriptionLoungeResponseBodyPart(this.agent, this.ip, this.lastUse);
+
+
+  @override
+  String toString() {
+    return 'PushSubscriptionLoungeResponseBodyPart{agent: $agent,'
+        ' ip: $ip, lastUse: $lastUse}';
+  }
+
+  factory PushSubscriptionLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$PushSubscriptionLoungeResponseBodyPartFromJson(json);
 }
 
 @JsonSerializable()
@@ -639,7 +666,7 @@ class NetworkLoungeResponseBody extends LoungeResponseBodyPart {
   final String name;
   final String host;
   final int port;
-  final String lts;
+  final String tls;
   final bool userDisconnected;
   final bool rejectUnauthorized;
   final bool isCollapsed;
@@ -657,7 +684,7 @@ class NetworkLoungeResponseBody extends LoungeResponseBodyPart {
       this.name,
       this.host,
       this.port,
-      this.lts,
+      this.tls,
       this.userDisconnected,
       this.rejectUnauthorized,
       this.isCollapsed,
@@ -673,7 +700,7 @@ class NetworkLoungeResponseBody extends LoungeResponseBodyPart {
   @override
   String toString() {
     return 'NetworkLoungeResponseBody{uuid: $uuid, name: $name,'
-        ' host: $host, port: $port, lts: $lts,'
+        ' host: $host, port: $port, lts: $tls,'
         ' userDisconnected: $userDisconnected,'
         ' rejectUnauthorized: $rejectUnauthorized,'
         ' isCollapsed: $isCollapsed, '

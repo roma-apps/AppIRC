@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
+import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_preview_model.dart';
@@ -27,6 +28,7 @@ abstract class ChatBackendService implements Providable {
   ChatConnectionState get connectionState;
 
   ChatConfig get chatConfig;
+  ChatInitInformation get chatInit;
 
   bool get isReadyToConnect;
 }

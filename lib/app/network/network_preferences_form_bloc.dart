@@ -17,10 +17,11 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
     this.preferences,
     bool isNeedShowChannels,
     bool isNeedShowCommands,
+      bool serverPreferencesEnabled, bool serverPreferencesVisible
   ) {
     serverFormBloc = NetworkServerPreferencesFormBloc(
         preferences.networkConnectionPreferences.serverPreferences,
-        networkValidator);
+        networkValidator, serverPreferencesEnabled, serverPreferencesVisible);
     userFormBloc = NetworkUserPreferencesFormBloc(
         preferences.networkConnectionPreferences.userPreferences,
         isNeedShowCommands);

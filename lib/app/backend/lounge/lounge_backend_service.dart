@@ -11,6 +11,7 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_adapter.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
+import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_preview_model.dart';
@@ -45,6 +46,9 @@ class LoungeBackendService extends Providable
 
   @override
   ChatConfig chatConfig;
+
+  @override
+  ChatInitInformation chatInit;
 
   // lounge don't response properly to edit request
   // ignore: close_sinks
@@ -126,6 +130,7 @@ class LoungeBackendService extends Providable
 
     if (connectResult.config != null) {
       this.chatConfig = connectResult.config;
+      this.chatInit = connectResult.chatInit;
       _connectionStateController.add(ChatConnectionState.CONNECTED);
     } else {
       _connectionStateController.add(ChatConnectionState.DISCONNECTED);
@@ -642,44 +647,24 @@ class LoungeBackendService extends Providable
         var nick = loungeNetwork.nick;
         connectionPreferences.userPreferences.nickname = nick;
 
-        var channelsWithState = <NetworkChannelWithState>[];
+        NetworkWithState networkWithState = toNetworkWithState(loungeNetwork);
 
-        for (var loungeChannel in loungeNetwork.channels) {
+        networkWithState.network.localId = request.networkPreferences.localId;
+
+        networkWithState.network.channels.forEach((channel) {
           var networkChannelPreferences = request.networkPreferences.channels
               .firstWhere((channelPreferences) {
-            return loungeChannel.name == channelPreferences.name;
+            return channel.name == channelPreferences.name;
           }, orElse: () => null);
-          int localId;
+
           if (networkChannelPreferences != null) {
-            localId = networkChannelPreferences.localId;
+            channel.localId = networkChannelPreferences.localId;
           }
-          var channel = NetworkChannel(
-              ChatNetworkChannelPreferences.name(
-                  localId: localId,
-                  name: loungeChannel.name,
-                  // Network start channels always without password
-                  password: ""),
-              detectNetworkChannelType(loungeChannel.type),
-              loungeChannel.id);
-          var channelState = toNetworkChannelState((loungeChannel));
-          channelsWithState.add(NetworkChannelWithState(channel, channelState));
-        }
+        });
 
-        var channels = channelsWithState
-            .map((channelWithState) => channelWithState.channel)
-            .toList();
+        networkWithState.network.connectionPreferences = connectionPreferences;
 
-        var network =
-            Network(connectionPreferences, loungeNetwork.uuid, channels);
-
-        network.localId = request.networkPreferences.localId;
-
-        var loungeNetworkStatus = loungeNetwork.status;
-
-        var networkState =
-            toNetworkState(loungeNetworkStatus, nick, network.name);
-
-        listener(NetworkWithState(network, networkState, channelsWithState));
+        listener(networkWithState);
       }
     }));
 
@@ -1025,6 +1010,20 @@ Disposable _listenForAuthorized(
   return disposable;
 }
 
+Disposable _listenForInit(SocketIOService _socketIOService,
+    Function(ChatInitInformation init) listener) {
+  var disposable = CompositeDisposable([]);
+  disposable.add(_createEventListenerDisposable(
+      _socketIOService, (LoungeResponseEventNames.init), (raw) {
+    _logger.d(() => "_listenForInit = $raw}");
+    var parsed = InitLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+    listener(toChatInit(parsed));
+  }));
+
+  return disposable;
+}
+
 Disposable _createEventListenerDisposable(SocketIOService _socketIOService,
     String eventName, Function(dynamic raw) listener) {
   _socketIOService.on(eventName, listener);
@@ -1058,6 +1057,7 @@ Future<ConnectResult> _connect(
   var disposable = CompositeDisposable([]);
 
   ConfigurationLoungeResponseBody loungeConfig;
+  ChatInitInformation chatInit;
   List<String> loungeCommands;
   bool authorizedReceived = false;
   bool authResponse;
@@ -1068,6 +1068,8 @@ Future<ConnectResult> _connect(
       _listenForAuthorized(socketIOService, () => authorizedReceived = true));
   disposable.add(
       _listenForAuth(socketIOService, (success) => authResponse = success));
+  disposable.add(_listenForInit(
+      socketIOService, (initResponse) => chatInit = initResponse));
   disposable.add(
       _listenForCommands(socketIOService, (result) => loungeCommands = result));
 
@@ -1105,6 +1107,7 @@ Future<ConnectResult> _connect(
 
       authorizedResponseReceived = (loungeCommands != null &&
           loungeConfig != null &&
+          chatInit != null &&
           authorizedReceived != false);
       result.isPrivateModeResponseReceived = authResponse != null;
 
@@ -1130,23 +1133,28 @@ Future<ConnectResult> _connect(
         !result.isTimeout &&
         !result.isFailAuthResponseReceived &&
         (result.isPrivateModeResponseReceived && result.isAuthRequestSent) &&
-        result.error == null );
+        result.error == null);
   }
 
   disposable.dispose();
 
   var configReceived = loungeConfig != null;
   var commandsReceived = loungeCommands != null;
+  var chatInitReceived = chatInit != null;
 
   _logger.d(() => "_connect result = $result configReceived = $configReceived"
       " commandsReceived = $commandsReceived authorizedReceived = $authorizedReceived");
 
   if (authorizedResponseReceived) {
     result.config = toChatConfig(loungeConfig, loungeCommands);
+    result.chatInit = chatInit;
   } else {
-    if (authorizedReceived || configReceived || commandsReceived) {
-      throw InvalidConnectionResponseException(
-          preferences, authorizedReceived, configReceived, commandsReceived);
+    if (authorizedReceived ||
+        configReceived ||
+        commandsReceived ||
+        chatInitReceived) {
+      throw InvalidConnectionResponseException(preferences, authorizedReceived,
+          configReceived, commandsReceived, chatInitReceived);
     }
   }
 

@@ -10,7 +10,7 @@ class Network {
   int get localId => connectionPreferences.localId;
 
   set localId(int newId) => connectionPreferences.localId = newId;
-  final ChatNetworkConnectionPreferences connectionPreferences;
+  ChatNetworkConnectionPreferences connectionPreferences;
 
   String get name => connectionPreferences.name;
   final String remoteId;
@@ -44,22 +44,20 @@ class ChatNetworkServerPreferences extends JsonPreferences {
   bool useTls;
   bool useOnlyTrustedCertificates;
 
-  bool visible;
-  bool enabled;
-
   ChatNetworkServerPreferences({
     @required this.name,
     @required this.serverHost,
     @required this.serverPort,
     @required this.useTls,
     @required this.useOnlyTrustedCertificates,
-    @required this.enabled,
-    @required this.visible,
   });
+
 
   @override
   String toString() {
-    return 'ChatNetworkServerPreferences{name: $name}';
+    return 'ChatNetworkServerPreferences{name: $name, serverHost: '
+        '$serverHost, serverPort: $serverPort, useTls: $useTls, '
+        'useOnlyTrustedCertificates: $useOnlyTrustedCertificates}';
   }
 
   factory ChatNetworkServerPreferences.fromJson(Map<String, dynamic> json) =>
