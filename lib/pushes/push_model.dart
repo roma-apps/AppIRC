@@ -12,5 +12,5 @@ class PushMessage {
 }
 
 enum PushMessageType {
-  DEFAULT, LAUNCH, BACKGROUND, RESUME
+  DEFAULT, LAUNCH, RESUME
 }

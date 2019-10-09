@@ -42,11 +42,7 @@ dependencies:
   connectivity: ^0.4.4
 
   # FCM for push notifications
-  firebase_core: ^0.4.0
-  firebase_auth: ^0.11.1+6
-  cloud_firestore: ^0.12.5
-
-  firebase_messaging: 5.0.0
+  firebase_messaging: 5.1.5
 
 
   # sqlite orm
