@@ -99,6 +99,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
       Network network,
       {bool waitForResult: false});
 
+
   Future<RequestResult<bool>> enableNetwork(Network network,
       {bool waitForResult: false});
 
@@ -139,6 +140,10 @@ abstract class ChatInputBackendService implements ChatBackendService {
 
   Future<RequestResult<bool>> onOpenNetworkChannel(
       Network network, NetworkChannel channel);
+
+
+  Future<RequestResult<bool>> onNewDevicePushToken(String newToken,
+      {bool waitForResult: false});
 
   Future<RequestResult<RegularMessage>> sendNetworkChannelRawMessage(
       Network network, NetworkChannel channel, String rawMessage,

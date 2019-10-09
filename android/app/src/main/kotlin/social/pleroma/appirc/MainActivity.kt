@@ -1,4 +1,4 @@
-package com.appirc.flutter_appirc
+package social.pleroma.appirc
 
 import android.os.Bundle
 

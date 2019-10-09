@@ -6,6 +6,19 @@ part of 'lounge_request_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+PushTokenLoungeRequestBody _$PushTokenLoungeRequestBodyFromJson(
+    Map<String, dynamic> json) {
+  return PushTokenLoungeRequestBody(
+    token: json['token'] as String,
+  );
+}
+
+Map<String, dynamic> _$PushTokenLoungeRequestBodyToJson(
+        PushTokenLoungeRequestBody instance) =>
+    <String, dynamic>{
+      'token': instance.token,
+    };
+
 NamesLoungeRequestBody _$NamesLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return NamesLoungeRequestBody(

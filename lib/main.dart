@@ -23,6 +23,7 @@ import 'package:flutter_appirc/app/chat/chat_page.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_saver_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_pushes_service.dart';
 import 'package:flutter_appirc/app/chat/chat_unread_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/default_values.dart';
@@ -48,6 +49,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/pushes/push_service.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
@@ -60,6 +62,8 @@ import 'app/skin/app_irc_chat_input_message_skin_bloc.dart';
 import 'app/skin/themes/day_app_irc_skin_theme.dart';
 
 var _logger = MyLogger(logTag: "Main", enabled: true);
+
+
 
 Future main() async {
 //  changeToCupertinoPlatformAware();
@@ -97,6 +101,8 @@ class AppIRCState extends State<AppIRC> {
 
   LoungePreferences loungePreferences;
 
+  PushesService pushesService = PushesService();
+
   @override
   Widget build(BuildContext context) {
     var preferencesService = Provider.of<PreferencesService>(context);
@@ -112,6 +118,8 @@ class AppIRCState extends State<AppIRC> {
 
           database.regularMessagesDao.deleteAllRegularMessages();
           database.specialMessagesDao.deleteAllSpecialMessages();
+
+          pushesService.init();
 
           loungePreferencesBloc
               .valueStream(defaultValue: LoungePreferences.empty)
@@ -188,6 +196,9 @@ class AppIRCState extends State<AppIRC> {
             channelsStatesBloc,
             activeChannelBloc);
 
+        var chatPushesService = ChatPushesService(pushesService,
+            loungeBackendService);
+
 
         var chatUnreadBloc = ChatUnreadBloc(channelsStatesBloc);
         createdWidget = Provider(
@@ -223,19 +234,22 @@ class AppIRCState extends State<AppIRC> {
                                       child: Provider(
                                         providable: chatUnreadBloc,
                                         child: Provider(
-                                          providable:
-                                              NetworkChannelMessagesSaverBloc(
-                                                  loungeBackendService,
-                                                  networksListBloc,
-                                                  database),
+                                          providable: chatPushesService,
                                           child: Provider(
-                                            providable: ChatPreferencesSaverBloc(
-                                                loungeBackendService,
-                                                networkStatesBloc,
-                                                networksListBloc,
-                                                chatPreferencesBloc,
-                                                chatInitBloc),
-                                            child: _buildApp(ChatPage()),
+                                            providable:
+                                                NetworkChannelMessagesSaverBloc(
+                                                    loungeBackendService,
+                                                    networksListBloc,
+                                                    database),
+                                            child: Provider(
+                                              providable: ChatPreferencesSaverBloc(
+                                                  loungeBackendService,
+                                                  networkStatesBloc,
+                                                  networksListBloc,
+                                                  chatPreferencesBloc,
+                                                  chatInitBloc),
+                                              child: _buildApp(ChatPage()),
+                                            ),
                                           ),
                                         ),
                                       ),

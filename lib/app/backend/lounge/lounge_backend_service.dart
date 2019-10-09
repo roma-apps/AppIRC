@@ -772,6 +772,18 @@ class LoungeBackendService extends Providable
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
+
+  @override
+  Future<RequestResult<bool>> onNewDevicePushToken(String newToken, {bool
+  waitForResult = false}) async {
+    _sendRequest(
+        LoungeJsonRequest(
+            name: LoungeRequestEventNames.pushToken, body:
+        PushTokenLoungeRequestBody(token: newToken)),
+        isNeedAddRequestToPending: false);
+    return RequestResult.name(isSentSuccessfully: true, result: null);
+  }
+
   @override
   Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
       Network network,
@@ -929,6 +941,7 @@ class LoungeBackendService extends Providable
                 target: channel.remoteId, content: message)),
         isNeedAddRequestToPending: false);
   }
+
 }
 
 ChatConnectionState mapState(SocketConnectionState socketState) {

@@ -11,6 +11,7 @@ class LoungeRequestEventNames {
   static const String names = "names";
   static const String input = "input";
   static const String open = "open";
+  static const String pushToken = "pushToken";
   static const String auth = "auth";
 }
 
@@ -81,6 +82,23 @@ class InputLoungeRequestBody extends LoungeRequestBody {
   String toString() {
     return 'InputLoungeRequestBody{target: $target, content: $content}';
   }
+}
+
+@JsonSerializable()
+class PushTokenLoungeRequestBody extends LoungeRequestBody {
+  final String token;
+
+  PushTokenLoungeRequestBody({@required this.token});
+
+  @override
+  Map<String, dynamic> toJson() => _$PushTokenLoungeRequestBodyToJson(this);
+
+  @override
+  String toString() {
+    return 'PushTokenLoungeRequestBody{token: $token}';
+  }
+
+
 }
 
 @JsonSerializable()
