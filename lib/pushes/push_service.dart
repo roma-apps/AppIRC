@@ -9,7 +9,6 @@ import 'package:rxdart/rxdart.dart';
 var _logger = MyLogger(logTag: "PushesService", enabled: true);
 
 class PushesService extends Providable {
-//  Firestore _db;
   FirebaseMessaging _fcm;
 
   // ignore: close_sinks
@@ -54,8 +53,8 @@ class PushesService extends Providable {
   }
 
   void onNewMessage(PushMessage pushMessage) {
-    _messageController.add(pushMessage);
     _logger.d(() => "pushMessage $pushMessage");
+    _messageController.add(pushMessage);
   }
 
   Future _updateToken() async {

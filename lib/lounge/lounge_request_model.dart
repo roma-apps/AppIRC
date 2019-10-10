@@ -11,7 +11,7 @@ class LoungeRequestEventNames {
   static const String names = "names";
   static const String input = "input";
   static const String open = "open";
-  static const String pushToken = "pushToken";
+  static const String pushToken = "push:fcmToken";
   static const String auth = "auth";
 }
 

@@ -159,6 +159,10 @@ class AppIRCState extends State<AppIRC> {
       var loungeBackendService = LoungeBackendService(
           socketManagerProvider.manager, loungePreferences);
 
+
+      var chatPushesService = ChatPushesService(pushesService,
+          loungeBackendService);
+
       loungeBackendService.init().then((_) {
         this.loungeBackendService = loungeBackendService;
 
@@ -182,7 +186,7 @@ class AppIRCState extends State<AppIRC> {
             networksListBloc, _startPreferences);
 
         var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,
-            chatInitBloc, networksListBloc, preferencesService);
+            chatInitBloc, networksListBloc, preferencesService, chatPushesService);
 
         var channelsStatesBloc = ChatNetworkChannelsStateBloc(
             loungeBackendService, networksListBloc, activeChannelBloc);
@@ -196,8 +200,6 @@ class AppIRCState extends State<AppIRC> {
             channelsStatesBloc,
             activeChannelBloc);
 
-        var chatPushesService = ChatPushesService(pushesService,
-            loungeBackendService);
 
 
         var chatUnreadBloc = ChatUnreadBloc(channelsStatesBloc);
