@@ -119,7 +119,10 @@ class AppIRCState extends State<AppIRC> {
           database.regularMessagesDao.deleteAllRegularMessages();
           database.specialMessagesDao.deleteAllSpecialMessages();
 
-          pushesService.init();
+          await pushesService.init();
+          await pushesService.askPermissions();
+          await pushesService.configure();
+
 
           loungePreferencesBloc
               .valueStream(defaultValue: LoungePreferences.empty)

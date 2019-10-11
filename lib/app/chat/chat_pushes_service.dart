@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
@@ -15,6 +17,20 @@ class ChatPushesService extends Providable {
       _pushesService.messageStream.map((pushMessage) {
         Map<String, dynamic> data = pushMessage.data
             .map((key, value) => MapEntry(key.toString(), value));
+
+        if(Platform.isIOS) {
+
+
+          return ChatPushMessage(
+              pushMessage.type,
+              data?.isNotEmpty == true
+                  ? ChatPushMessageNotification.fromJson(data)
+                  : null,
+              data?.isNotEmpty == true
+                  ? ChatPushMessageData.fromJson(data)
+                  : null);
+        } else if(Platform.isAndroid) {
+
         var messageNotification = remapForJson(data["notification"]);
         var messageData = remapForJson(data["data"]);
         return ChatPushMessage(
@@ -25,11 +41,14 @@ class ChatPushesService extends Providable {
             messageData?.isNotEmpty == true
                 ? ChatPushMessageData.fromJson(messageData)
                 : null);
+        } else {
+          throw Exception("Platform not supported");
+        }
       });
 
   // Json serialization accepts Map<String, dynamic>
   // but we have Map<dynamic, dynamic> originally
-  Map<String, dynamic> remapForJson(raw) => (raw as Map).map((key, value) =>
+  Map<String, dynamic> remapForJson(raw) => (raw as Map)?.map((key, value) =>
       MapEntry<String,
       dynamic>(key.toString(),
       value));

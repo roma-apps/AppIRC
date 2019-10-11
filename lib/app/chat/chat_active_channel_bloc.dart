@@ -48,15 +48,22 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
         pushesService.chatPushMessageStream.listen((chatPushMessage) async {
       _logger.d(() => "chatPushMessageStream $chatPushMessage");
 
-      var chanIdString = chatPushMessage.data.chanId;
-      var channelRemoteId = int.parse(chanIdString);
-      if (chatPushMessage.type == PushMessageType.RESUME) {
-        var channel = await findChannelWithRemoteID(channelRemoteId);
+      var chanIdString = chatPushMessage.data?.chanId;
+      if(chanIdString != null) {
+        var channelRemoteId = int.parse(chanIdString);
+        if (chatPushMessage.type == PushMessageType.RESUME) {
+          var channel = await findChannelWithRemoteID(channelRemoteId);
 
-        changeActiveChanel(channel);
-      } else if (chatPushMessage.type == PushMessageType.LAUNCH) {
-        _channelRemoteIdFromLaunchPushMessage = channelRemoteId;
+          changeActiveChanel(channel);
+        } else if (chatPushMessage.type == PushMessageType.LAUNCH) {
+          _channelRemoteIdFromLaunchPushMessage = channelRemoteId;
+        }
+      } else {
+        _logger.e(() => "Error during handling $chatPushMessage");
       }
+
+
+
     }));
 
     _logger.i(() => "start creating");

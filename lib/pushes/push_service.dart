@@ -26,8 +26,11 @@ class PushesService extends Providable {
 
   init() async {
     _fcm = FirebaseMessaging();
-
     _logger.d(() => "init");
+  }
+
+  configure() async {
+
 
     addDisposable(streamSubscription: _fcm.onTokenRefresh.listen((newToken) {
       onNewToken(newToken);
@@ -64,11 +67,11 @@ class PushesService extends Providable {
   }
 
   askPermissions() async {
-    if (Platform.isIOS) {
+//    if (Platform.isIOS) {
 //      iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
-      // save the token  OR subscribe to a topic here
+//       save the token  OR subscribe to a topic here
 //      }
-    }
+//    }
 
     _fcm.requestNotificationPermissions(IosNotificationSettings());
   }
