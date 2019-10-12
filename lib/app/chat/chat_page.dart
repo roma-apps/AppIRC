@@ -87,27 +87,53 @@ class ChatPage extends StatelessWidget {
   Widget _buildMenuIcon(BuildContext context, Function() onPressed) {
     ChatUnreadBloc chatUnreadBloc = Provider.of<ChatUnreadBloc>(context);
 
-    return StreamBuilder<bool>(
-        stream: chatUnreadBloc.isHaveUnreadMessagesStream,
-        initialData: chatUnreadBloc.isHaveUnreadMessages,
+    return StreamBuilder<int>(
+        stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
+        initialData: chatUnreadBloc.channelsWithUnreadMessagesCount,
         builder: (context, snapshot) {
-          var isHaveUnreadMessages = snapshot.data;
+          var unreadCount = snapshot.data;
 
-          var icon;
-          if (isHaveUnreadMessages) {
-            icon = Icon(Icons.playlist_add,
+          var platformIconButton = PlatformIconButton(
+            icon: Icon(Icons.menu,
                 color:
-                    Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
-          } else {
-            icon = Icon(Icons.menu,
-                color:
-                    Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor);
-          }
-
-          return PlatformIconButton(
-            icon: icon,
+                    Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor),
             onPressed: onPressed,
           );
+          if (unreadCount > 0) {
+
+            // badge hide part of button clickable area
+            return GestureDetector(
+              onTap: onPressed,
+              child: Stack(children: <Widget>[
+                platformIconButton,
+                new Positioned(
+                  right: 15,
+                  top: 10,
+                  child: new Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: new BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: new Text(
+                      "$unreadCount",
+                      style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              ]),
+            );
+          } else {
+            return platformIconButton;
+          }
         });
   }
 

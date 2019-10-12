@@ -4,15 +4,16 @@ import 'package:rxdart/rxdart.dart';
 
 class ChatUnreadBloc extends Providable {
   // ignore: close_sinks
-  final BehaviorSubject<bool> _haveUnreadMessagesController =
-      BehaviorSubject(seedValue: false);
-  Stream<bool> get isHaveUnreadMessagesStream =>
-      _haveUnreadMessagesController.stream.distinct();
-  bool get isHaveUnreadMessages => _haveUnreadMessagesController.value;
+  final BehaviorSubject<int> _channelsWithUnreadMessagesCountController =
+      BehaviorSubject(seedValue: 0);
+  Stream<int> get channelsWithUnreadMessagesCountStream =>
+      _channelsWithUnreadMessagesCountController.stream.distinct();
+  int get channelsWithUnreadMessagesCount =>
+      _channelsWithUnreadMessagesCountController.value;
 
   final ChatNetworkChannelsStateBloc channelsStateBloc;
   ChatUnreadBloc(this.channelsStateBloc) {
-    addDisposable(subject: _haveUnreadMessagesController);
+    addDisposable(subject: _channelsWithUnreadMessagesCountController);
 
     addDisposable(
         streamSubscription: channelsStateBloc.anyStateChangedStream.listen((_) {
@@ -22,13 +23,13 @@ class ChatUnreadBloc extends Providable {
   }
 
   void _update() {
-    var haveUnread = false;
+    var unreadCount = 0;
     for(var state in channelsStateBloc.states) {
-      haveUnread = state.unreadCount > 0;
+      var  haveUnread = state.unreadCount > 0;
       if(haveUnread) {
-        break;
+        unreadCount++;
       }
     }
-    _haveUnreadMessagesController.add(haveUnread);
+    _channelsWithUnreadMessagesCountController.add(unreadCount);
   }
 }

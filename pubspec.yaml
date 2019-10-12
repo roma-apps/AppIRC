@@ -64,7 +64,6 @@ dependencies:
   chewie: ^0.9.8+1
   video_player: ^0.10.2+3
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
