@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
-import 'package:flutter_appirc/app/channel/channel_topic_widget.dart';
+import 'package:flutter_appirc/app/channel/channel_topic_app_bar_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_app_bar_widget.dart';

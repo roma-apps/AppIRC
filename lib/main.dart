@@ -66,7 +66,7 @@ var _logger = MyLogger(logTag: "Main", enabled: true);
 
 
 Future main() async {
-//  changeToCupertinoPlatformAware();
+  changeToCupertinoPlatformAware();
 
   var preferencesService = PreferencesService();
 

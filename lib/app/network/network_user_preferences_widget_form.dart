@@ -70,6 +70,7 @@ class NetworkUserPreferencesFormState
           appLocalizations.tr('irc_connection.user_prefs.password_label'),
           appLocalizations.tr('irc_connection.user_prefs.password_hint'),
           textInputAction: TextInputAction.next,
+          textCapitalization: TextCapitalization.none,
           obscureText: true,
           nextBloc: formBloc.realNameFieldBloc,
         ),

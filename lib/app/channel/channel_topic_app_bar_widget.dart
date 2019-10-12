@@ -2,9 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_topic_form_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_app_bar_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
+import 'package:flutter_appirc/platform_widgets/platform_alert_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -29,7 +31,8 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
             builder: (BuildContext context,
                 AsyncSnapshot<NetworkChannelState> snapshot) {
               NetworkChannelState state = snapshot.data;
-              var channelName = channelBloc.channel.name;
+              var channel = channelBloc.channel;
+              var channelName = channel.name;
 
               String topic = state.topic;
 
@@ -49,7 +52,8 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
                   break;
               }
 
-              if (connectionState == ChatConnectionState.CONNECTED) {
+              if (connectionState == ChatConnectionState.CONNECTED &&
+                  channel.isCanHaveTopic) {
                 return GestureDetector(
                     onTap: () {
                       showTopicDialog(context, channelBloc);
@@ -62,36 +66,4 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
           );
         });
   }
-}
-
-class NetworkChannelTopicWidget extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => NetworkChannelTopicWidgetState();
-}
-
-class NetworkChannelTopicWidgetState extends State<NetworkChannelTopicWidget> {
-  @override
-  Widget build(BuildContext context) {
-    var channelBloc = Provider.of<NetworkChannelBloc>(context);
-
-    return StreamBuilder<NetworkChannelState>(
-      stream: channelBloc.networkChannelStateStream,
-      initialData: channelBloc.networkChannelState,
-      builder:
-          (BuildContext context, AsyncSnapshot<NetworkChannelState> snapshot) {
-        var state = snapshot.data;
-        var topic = state.topic;
-
-        return Text(topic);
-      },
-    );
-  }
-}
-
-void showTopicDialog(BuildContext context, NetworkChannelBloc channelBloc) {
-  showPlatformDialog(
-      context: context,
-      builder: (_) =>
-          Provider(providable: channelBloc, child: NetworkChannelTopicWidget()),
-      androidBarrierDismissible: true);
 }

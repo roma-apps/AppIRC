@@ -3,6 +3,7 @@ import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
@@ -64,8 +65,8 @@ class NetworkBloc extends Providable {
 
       var channelState = channelsStateBloc.getNetworkChannelState(
           network, alreadyJoinedChannel);
-      var initMessages = [];
-      var initUsers = [];
+      var initMessages = <ChatMessage>[];
+      var initUsers = <NetworkChannelUser>[];
       return RequestResult<NetworkChannelWithState>(
           true, NetworkChannelWithState(alreadyJoinedChannel, channelState,
         initMessages, initUsers));

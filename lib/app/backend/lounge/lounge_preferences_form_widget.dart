@@ -12,6 +12,7 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.d
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:flutter_appirc/platform_widgets/platform_alert_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
@@ -197,7 +198,7 @@ class LoungePreferencesFormWidgetState
     return PlatformAlertDialog(
         title: Text(title),
         content: Text(content),
-        actions: <Widget>[okPlatformDialogAction(context)]);
+        actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
 
   PlatformAlertDialog buildLoungeAuthFailAlertDialog(
@@ -214,7 +215,7 @@ class LoungePreferencesFormWidgetState
     return PlatformAlertDialog(
         title: Text(title),
         content: Text(content),
-        actions: <Widget>[okPlatformDialogAction(context)]);
+        actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
   PlatformAlertDialog buildLoungeTimeoutAlertDialog(
       BuildContext context) {
@@ -229,7 +230,7 @@ class LoungePreferencesFormWidgetState
     return PlatformAlertDialog(
         title: Text(title),
         content: Text(content),
-        actions: <Widget>[okPlatformDialogAction(context)]);
+        actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
 
   PlatformAlertDialog buildLoungeConnectionInvalidResponseDialog(
@@ -245,15 +246,10 @@ class LoungePreferencesFormWidgetState
     return PlatformAlertDialog(
         title: Text(title),
         content: Text(content),
-        actions: <Widget>[okPlatformDialogAction(context)]);
+        actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
 
-  PlatformDialogAction okPlatformDialogAction(BuildContext context) {
-    return PlatformDialogAction(
-      child: Text(AppLocalizations.of(context).tr("button.ok")),
-      onPressed: () => Navigator.pop(context),
-    );
-  }
+
 
 
 

@@ -6,7 +6,8 @@
     "not_unique": "Should be unique"
   },
   "button": {
-    "ok": "OK"
+    "ok": "OK",
+    "cancel": "Cancel"
   },
   "splash": {
     "loading": "Loading"
@@ -179,6 +180,14 @@
     "users": {
       "title": "Channel users",
       "loading": "Loading"
+    },
+    "channel": {
+      "topic": {
+        "title": "{}:",
+        "label": "Topic",
+        "hint": "Lorem ipsum...",
+        "change": "Change"
+      }
     }
   },
   "channels_list": {

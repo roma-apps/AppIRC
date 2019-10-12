@@ -8,7 +8,7 @@ class NetworkChannel {
 
   set localId(int newId) => channelPreferences.localId = newId;
 
-   ChatNetworkChannelPreferences channelPreferences;
+  ChatNetworkChannelPreferences channelPreferences;
 
   String get name => channelPreferences.name;
   final NetworkChannelType type;
@@ -16,7 +16,10 @@ class NetworkChannel {
   final int remoteId;
 
   bool get isLobby => type == NetworkChannelType.LOBBY;
+
   bool get isCanHaveSeveralUsers => type == NetworkChannelType.CHANNEL;
+
+  bool get isCanHaveTopic => type == NetworkChannelType.CHANNEL;
 
   NetworkChannel(this.channelPreferences, this.type, this.remoteId);
 
@@ -35,8 +38,6 @@ class NetworkChannel {
     return 'NetworkChannel{channelPreferences: $channelPreferences,'
         ' type: $type, remoteId: $remoteId}';
   }
-
-
 }
 
 enum NetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }
@@ -47,15 +48,14 @@ class NetworkChannelWithState {
   final List<ChatMessage> initMessages;
   final List<NetworkChannelUser> initUsers;
 
-  NetworkChannelWithState(this.channel, this.state, this.initMessages, this.initUsers);
+  NetworkChannelWithState(
+      this.channel, this.state, this.initMessages, this.initUsers);
 
   @override
   String toString() {
     return 'NetworkChannelWithState{channel: $channel, state: $state,'
         ' initMessages: $initMessages, initUsers: $initUsers}';
   }
-
-
 }
 
 class NetworkChannelState {
@@ -89,7 +89,4 @@ class NetworkChannelState {
         'unreadCount: $unreadCount,'
         ' connected: $connected, highlighted: $highlighted}';
   }
-
-
 }
-

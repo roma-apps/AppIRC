@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_auth_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
@@ -51,6 +52,7 @@ class LoungeAuthPreferencesFormWidgetState
           appLocalizations.tr('lounge.preferences.auth.username.label'),
           appLocalizations.tr('lounge.preferences.auth.username.hint'),
           textInputAction: TextInputAction.next,
+          textCapitalization: TextCapitalization.none,
           nextBloc: formBloc.passwordFieldBloc,
         ),
         buildFormTextRow(
@@ -61,6 +63,7 @@ class LoungeAuthPreferencesFormWidgetState
           appLocalizations.tr('lounge.preferences.auth.password.label'),
           appLocalizations.tr('lounge.preferences.auth.password.hint'),
           obscureText: true,
+          textCapitalization: TextCapitalization.none,
           textInputAction: TextInputAction.done,
         )
       ],
