@@ -2,7 +2,10 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
+
+var _logger = MyLogger(logTag: "ChatNetworksStateBloc", enabled: true);
 
 class ChatNetworksStateBloc extends ChatNetworksListListenerBloc {
   final ChatOutputBackendService _backendService;
@@ -31,6 +34,8 @@ class ChatNetworksStateBloc extends ChatNetworksListListenerBloc {
         disposable: _backendService.listenForNetworkState(
             network, () => _states[_calculateNetworkKey(network)].value,
             (state) {
+      _logger.d(() => "onNewNetworkState $state");
+
       _states[_calculateNetworkKey(network)].add(state);
     }));
   }

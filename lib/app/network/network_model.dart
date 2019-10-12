@@ -209,6 +209,14 @@ class NetworkState {
       @required this.secure,
       @required this.nick,
       @required this.name});
+
+  @override
+  String toString() {
+    return 'NetworkState{connected: $connected, secure: $secure,'
+        ' nick: $nick, name: $name}';
+  }
+
+
 }
 
 class NetworkWithState {

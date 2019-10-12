@@ -437,6 +437,12 @@ NetworkWithState toNetworkWithState(NetworkLoungeResponseBody loungeNetwork) {
 
   var networkState = toNetworkState(loungeNetworkStatus, nick, network.name);
 
+
+  // TODO: open ticket for lounge
+  // Strange field, it should be inside networkStatus.
+  // Sometimes network status connected == false but actually connected
+  networkState.connected = !loungeNetwork.userDisconnected;
+
   var networkWithState =
       NetworkWithState(network, networkState, channelsWithState);
   return networkWithState;
