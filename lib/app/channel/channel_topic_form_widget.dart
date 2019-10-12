@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware_text_field.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 

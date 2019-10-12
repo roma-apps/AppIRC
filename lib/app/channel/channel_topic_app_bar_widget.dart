@@ -6,7 +6,7 @@ import 'package:flutter_appirc/app/channel/channel_topic_form_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_app_bar_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
-import 'package:flutter_appirc/platform_widgets/platform_alert_dialog.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware_alert_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
