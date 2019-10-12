@@ -69,7 +69,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
           if (message is RegularMessage) {
             var regularMessage = message;
 
-            if (regularMessage.messageRemoteId == message.messageRemoteId) {
+            if (regularMessage.messageRemoteId == previewForMessage.remoteMessageId) {
               return true;
             } else {
               return false;

@@ -15,17 +15,17 @@ var _logger = MyLogger(logTag: "lounge_adapter", enabled: true);
 
 ChatInitInformation toChatInit(InitLoungeResponseBody parsed) {
   var loungeNetworks = parsed.networks;
-  var networksWithState = loungeNetworks?.map((loungeNetwork) =>
-          toNetworkWithState(loungeNetwork))?.toList();
+  var networksWithState = loungeNetworks
+      ?.map((loungeNetwork) => toNetworkWithState(loungeNetwork))
+      ?.toList();
   int activeChannelRemoteId = parsed.active;
-  var isUndefinedActiveId = activeChannelRemoteId
-      == InitLoungeResponseBody.undefinedActiveID;
-  if(isUndefinedActiveId) {
+  var isUndefinedActiveId =
+      activeChannelRemoteId == InitLoungeResponseBody.undefinedActiveID;
+  if (isUndefinedActiveId) {
     activeChannelRemoteId = null;
   }
   return ChatInitInformation.name(
-      activeChannelRemoteId:
-          activeChannelRemoteId,
+      activeChannelRemoteId: activeChannelRemoteId,
       networksWithState: networksWithState);
 }
 
@@ -188,17 +188,16 @@ NetworkChannelType detectNetworkChannelType(String typeString) {
   return type;
 }
 
-
 NetworkChannelState toNetworkChannelState(
         ChannelLoungeResponseBody loungeChannel, NetworkChannelType type) =>
     NetworkChannelState.name(
         topic: loungeChannel.topic,
         editTopicPossible: loungeChannel.editTopic,
         unreadCount: loungeChannel.unread,
-        connected:
-        type == NetworkChannelType.QUERY ||
-            type == NetworkChannelType.SPECIAL ? true :
-            loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED,
+        connected: type == NetworkChannelType.QUERY ||
+                type == NetworkChannelType.SPECIAL
+            ? true
+            : loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED,
         highlighted: loungeChannel.highlight != null);
 
 NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
@@ -355,7 +354,9 @@ MessagePreview toMessagePreview(
         shown: loungePreview.shown,
         link: loungePreview.link,
         thumb: loungePreview.thumb,
-        type: detectMessagePreviewType(loungePreview.type));
+        type: detectMessagePreviewType(loungePreview.type),
+        media: loungePreview.media,
+        mediaType: loungePreview.mediaType);
 
 MessagePreviewType detectMessagePreviewType(String type) {
   switch (type) {
@@ -367,6 +368,12 @@ MessagePreviewType detectMessagePreviewType(String type) {
       break;
     case LoungeResponseMessagePreviewType.loading:
       return MessagePreviewType.LOADING;
+      break;
+    case LoungeResponseMessagePreviewType.audio:
+      return MessagePreviewType.AUDIO;
+      break;
+    case LoungeResponseMessagePreviewType.video:
+      return MessagePreviewType.VIDEO;
       break;
   }
 
@@ -383,18 +390,19 @@ NetworkChannelWithState toNetworkChannelWithState(
       detectNetworkChannelType(loungeChannel.type),
       loungeChannel.id);
   var channelState = toNetworkChannelState(loungeChannel, channel.type);
-  var initMessages = loungeChannel.messages?.map((loungeMessage) =>
-          toChatMessage(channel, loungeMessage))?.toList();
-  var initUsers = loungeChannel.users?.map((loungeUser) =>
-          toNetworkChannelUser(loungeUser))?.toList();
-  var networkChannelWithState = NetworkChannelWithState(channel,
-    channelState, initMessages, initUsers);
+  var initMessages = loungeChannel.messages
+      ?.map((loungeMessage) => toChatMessage(channel, loungeMessage))
+      ?.toList();
+  var initUsers = loungeChannel.users
+      ?.map((loungeUser) => toNetworkChannelUser(loungeUser))
+      ?.toList();
+  var networkChannelWithState =
+      NetworkChannelWithState(channel, channelState, initMessages, initUsers);
   return networkChannelWithState;
 }
 
 NetworkChannelUser toNetworkChannelUser(UserLoungeResponseBodyPart loungeUser) {
-  return NetworkChannelUser.name(
-      nick: loungeUser.nick, mode: loungeUser.mode);
+  return NetworkChannelUser.name(nick: loungeUser.nick, mode: loungeUser.mode);
 }
 
 NetworkWithState toNetworkWithState(NetworkLoungeResponseBody loungeNetwork) {

@@ -26,10 +26,13 @@ class MessagePreview {
   final bool shown;
   final String link;
   final String thumb;
+  final String media;
+  final String mediaType;
   final MessagePreviewType type;
 
+
   MessagePreview(this.head, this.body, this.canDisplay, this.shown, this.link,
-      this.thumb, this.type);
+      this.thumb, this.media, this.mediaType, this.type);
 
   MessagePreview.name(
       {@required this.head,
@@ -38,13 +41,17 @@ class MessagePreview {
       @required this.shown,
       @required this.link,
       @required this.thumb,
+      @required this.media,
+      @required this.mediaType,
       @required this.type});
+
 
   @override
   String toString() {
     return 'MessagePreview{head: $head, body: $body, '
-        'canDisplay: $canDisplay, shown: $shown,'
-        ' link: $link, thumb: $thumb, type: $type}';
+        'canDisplay: $canDisplay, shown: $shown, '
+        'link: $link, thumb: $thumb, '
+        'media: $media, mediaType: $mediaType, type: $type}';
   }
 
   factory MessagePreview.fromJson(Map<String, dynamic> json) =>
@@ -54,4 +61,4 @@ class MessagePreview {
   Map<String, dynamic> toJson() => _$MessagePreviewToJson(this);
 }
 
-enum MessagePreviewType { LINK, IMAGE, LOADING }
+enum MessagePreviewType { LINK, IMAGE, LOADING, AUDIO, VIDEO }

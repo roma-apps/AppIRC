@@ -1,3 +1,4 @@
+import 'package:chewie/chewie.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 var todayDateFormatter = new DateFormat().add_Hm();
 var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
@@ -22,276 +24,286 @@ var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
 //  NetworkChannelMessageWidget(this.message);
 //
 
-  Widget buildRegularMessage(BuildContext context, RegularMessage message) {
-    var needHighlight = isNeedHighlight(message);
+Widget buildRegularMessage(BuildContext context, RegularMessage message) {
+  var needHighlight = isNeedHighlight(message);
 
-    var channelBloc = Provider.of<NetworkChannelBloc>(context);
+  var channelBloc = Provider.of<NetworkChannelBloc>(context);
 
-    var body = _buildMessageBody(context, message);
-    var title = _buildMessageTitle(context, channelBloc, message);
+  var body = _buildMessageBody(context, message);
+  var title = _buildMessageTitle(context, channelBloc, message);
 
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
-    var color =
-        messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
+  var color =
+      messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
-    return buildRegularMessageWidget(title, body, needHighlight, color);
+  return buildRegularMessageWidget(title, body, needHighlight, color);
+}
+
+Widget _buildMessageBody(BuildContext context, RegularMessage message) {
+  var regularMessageType = message.regularMessageType;
+
+  if (regularMessageType == RegularMessageType.AWAY ||
+      regularMessageType == RegularMessageType.JOIN ||
+      regularMessageType == RegularMessageType.TOPIC_SET_BY ||
+      regularMessageType == RegularMessageType.MOTD ||
+      regularMessageType == RegularMessageType.MODE_CHANNEL ||
+      regularMessageType == RegularMessageType.BACK) {
+    return Container();
   }
-
-  Widget _buildMessageBody(BuildContext context, RegularMessage message) {
-    var regularMessageType = message.regularMessageType;
-
-    if (regularMessageType == RegularMessageType.AWAY ||
-        regularMessageType == RegularMessageType.JOIN ||
-        regularMessageType == RegularMessageType.TOPIC_SET_BY ||
-        regularMessageType == RegularMessageType.MOTD ||
-        regularMessageType == RegularMessageType.MODE_CHANNEL ||
-        regularMessageType == RegularMessageType.BACK) {
+  if (regularMessageType == RegularMessageType.MODE) {
+    if (!isHaveLongText(message)) {
       return Container();
     }
-    if (regularMessageType == RegularMessageType.MODE) {
-      if (!isHaveLongText(message)) {
-        return Container();
-      }
-    }
+  }
 
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
-    var rows = <Widget>[
+  var rows = <Widget>[
 //      Text("${message.type}"),
-    ];
+  ];
 
-    var params = message.params;
+  var params = message.params;
 
-    if (params != null) {
-      rows.add(Text("${params.join(", ")}",
-          style: messagesSkin.regularMessageBodyTextStyle));
-    }
+  if (params != null) {
+    rows.add(Text("${params.join(", ")}",
+        style: messagesSkin.regularMessageBodyTextStyle));
+  }
 
-    if (message.text != null) {
-      var text = message.text;
+  if (message.text != null) {
+    var text = message.text;
 
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 
-      rows.add(Linkify(
-        onOpen: (link) async {
-          if (await canLaunch(link.url)) {
-            await launch(link.url);
-          } else {
-            throw 'Could not launch $link';
-          }
-        },
-        text: text,
-        style: messagesSkin.regularMessageBodyTextStyle,
-        linkStyle: messagesSkin
-            .modifyToLinkTextStyle(messagesSkin.regularMessageBodyTextStyle),
-      ));
-    }
-
-    if (message.previews != null) {
-      message.previews.forEach((preview) => rows.add(buildPreview(context, preview)));
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: rows,
-    );
-  }
-
-  Widget _buildMessageTitle(
-      BuildContext context, NetworkChannelBloc channelBloc, RegularMessage message) {
-    var icon = _buildTitleIcon(context, message);
-
-    var startPart;
-
-    var subMessage = _buildTitleSubMessage(context, message);
-
-    if (message.isHaveFromNick) {
-      var messageTitleNick = _buildMessageTitleNick(context, channelBloc, message);
-      if (subMessage != null) {
-        startPart = Row(children: <Widget>[
-          messageTitleNick,
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: subMessage,
-          )
-        ]);
-      } else {
-        startPart = messageTitleNick;
-      }
-    } else {
-      if (subMessage != null) {
-        startPart = subMessage;
-      }
-    }
-
-    var endPart;
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-    var color =
-        messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
-
-    if (icon != null) {
-      endPart = Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          buildMessageTitleDate(context, message, color),
-          icon,
-        ],
-      );
-    } else {
-      endPart = buildMessageTitleDate(context, message, color);
-    }
-
-    return buildMessageTitle(startPart, endPart);
-  }
-
-  Widget _buildMessageTitleNick(
-      BuildContext context, NetworkChannelBloc channelBloc, RegularMessage message) {
-    var nick = message.fromNick;
-
-    var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-    var child = Text(
-      nick,
-      style:
-          messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
-    );
-
-    return buildUserNickWithPopupMenu(context, child, nick, channelBloc);
-  }
-
-  _buildTitleIcon(BuildContext context, RegularMessage message) {
-    var iconData = _findTitleIconDataForMessage(message);
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-
-    var color =
-        messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
-
-    return buildMessageIcon(iconData, color);
-  }
-
-  Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-
-    var regularMessageType = message.regularMessageType;
-    var appLocalizations = AppLocalizations.of(context);
-    String str;
-    switch (regularMessageType) {
-      case RegularMessageType.TOPIC_SET_BY:
-        str = appLocalizations.tr("chat.sub_message.topic_set_by");
-        break;
-      case RegularMessageType.TOPIC:
-        str = appLocalizations.tr("chat.sub_message.topic");
-        break;
-      case RegularMessageType.WHO_IS:
-        str = appLocalizations.tr("chat.sub_message.who_is");
-        break;
-      case RegularMessageType.UNHANDLED:
-        str = null;
-        break;
-      case RegularMessageType.UNKNOWN:
-        str = appLocalizations.tr("chat.sub_message.unknown");
-        break;
-      case RegularMessageType.MESSAGE:
-        str = null;
-        break;
-      case RegularMessageType.JOIN:
-        str = appLocalizations.tr("chat.sub_message.join");
-        break;
-      case RegularMessageType.MODE:
-        if (isHaveLongText(message)) {
-          str = appLocalizations.tr("chat.sub_message.mode_long");
+    rows.add(Linkify(
+      onOpen: (link) async {
+        if (await canLaunch(link.url)) {
+          await launch(link.url);
         } else {
-          str = appLocalizations
-              .tr("chat.sub_message.mode_short", args: [message.text]);
+          throw 'Could not launch $link';
         }
+      },
+      text: text,
+      style: messagesSkin.regularMessageBodyTextStyle,
+      linkStyle: messagesSkin
+          .modifyToLinkTextStyle(messagesSkin.regularMessageBodyTextStyle),
+    ));
+  }
 
-        break;
-      case RegularMessageType.MOTD:
-        str =
-            appLocalizations.tr("chat.sub_message.motd", args: [message.text]);
-        break;
-      case RegularMessageType.NOTICE:
-        str = appLocalizations.tr("chat.sub_message.notice");
-        break;
-      case RegularMessageType.ERROR:
-        str = appLocalizations.tr("chat.sub_message.error");
-        break;
-      case RegularMessageType.AWAY:
-        str = appLocalizations.tr("chat.sub_message.away");
-        break;
-      case RegularMessageType.BACK:
-        str = appLocalizations.tr("chat.sub_message.back");
-        break;
-      case RegularMessageType.MODE_CHANNEL:
-        str = appLocalizations
-            .tr("chat.sub_message.channel_mode", args: [message.text]);
-        break;
-      case RegularMessageType.QUIT:
-        str = appLocalizations.tr("chat.sub_message.quit");
-        break;
-      case RegularMessageType.RAW:
-        str = null;
-        break;
-      case RegularMessageType.PART:
-        str = appLocalizations.tr("chat.sub_message.part");
-        break;
-      case RegularMessageType.NICK:
-        str = appLocalizations
-            .tr("chat.sub_message.nick", args: [message.newNick]);
-        break;
-        case RegularMessageType.CTCP_REQUEST:
-        str = appLocalizations
-            .tr("chat.sub_message.ctcp_request");
-        break;
-    }
+  if (message.previews != null) {
+    message.previews
+        .forEach((preview) => rows.add(buildPreview(context, preview)));
+  }
 
-    if (str != null) {
-      var color = messagesSkin.findTitleColorDataForMessage(regularMessageType);
-      return Text(str, style: messagesSkin.createDateTextStyle(color));
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: rows,
+  );
+}
+
+Widget _buildMessageTitle(BuildContext context, NetworkChannelBloc channelBloc,
+    RegularMessage message) {
+  var icon = _buildTitleIcon(context, message);
+
+  var startPart;
+
+  var subMessage = _buildTitleSubMessage(context, message);
+
+  if (message.isHaveFromNick) {
+    var messageTitleNick =
+        _buildMessageTitleNick(context, channelBloc, message);
+    if (subMessage != null) {
+      startPart = Row(children: <Widget>[
+        messageTitleNick,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: subMessage,
+        )
+      ]);
     } else {
-      return null;
+      startPart = messageTitleNick;
+    }
+  } else {
+    if (subMessage != null) {
+      startPart = subMessage;
     }
   }
 
-  Widget buildPreview(BuildContext context, MessagePreview preview) {
-    switch (preview.type) {
-      case MessagePreviewType.LINK:
-        return buildMessageLinkPreview(context, preview);
+  var endPart;
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+  var color =
+      messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
-        break;
-      case MessagePreviewType.IMAGE:
-        return buildMessageImagePreview(context, preview);
-        break;
-      case MessagePreviewType.LOADING:
-        return Text("Loading");
-        break;
-    }
+  if (icon != null) {
+    endPart = Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        buildMessageTitleDate(context, message, color),
+        icon,
+      ],
+    );
+  } else {
+    endPart = buildMessageTitleDate(context, message, color);
   }
 
-  Widget buildMessageLinkPreview(BuildContext context, MessagePreview preview) {
-    var rows = <Widget>[
-      Text(preview.head),
-      Text(preview.body),
-    ];
+  return buildMessageTitle(startPart, endPart);
+}
 
-    if (preview.thumb != null) {
-      rows.add(_buildPreviewThumb(context, preview.thumb));
-    }
-    return Column(children: rows);
+Widget _buildMessageTitleNick(BuildContext context,
+    NetworkChannelBloc channelBloc, RegularMessage message) {
+  var nick = message.fromNick;
+
+  var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+  var child = Text(
+    nick,
+    style:
+        messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+  );
+
+  return buildUserNickWithPopupMenu(context, child, nick, channelBloc);
+}
+
+_buildTitleIcon(BuildContext context, RegularMessage message) {
+  var iconData = _findTitleIconDataForMessage(message);
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+
+  var color =
+      messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
+
+  return buildMessageIcon(iconData, color);
+}
+
+Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
+  var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+
+  var regularMessageType = message.regularMessageType;
+  var appLocalizations = AppLocalizations.of(context);
+  String str;
+  switch (regularMessageType) {
+    case RegularMessageType.TOPIC_SET_BY:
+      str = appLocalizations.tr("chat.sub_message.topic_set_by");
+      break;
+    case RegularMessageType.TOPIC:
+      str = appLocalizations.tr("chat.sub_message.topic");
+      break;
+    case RegularMessageType.WHO_IS:
+      str = appLocalizations.tr("chat.sub_message.who_is");
+      break;
+    case RegularMessageType.UNHANDLED:
+      str = null;
+      break;
+    case RegularMessageType.UNKNOWN:
+      str = appLocalizations.tr("chat.sub_message.unknown");
+      break;
+    case RegularMessageType.MESSAGE:
+      str = null;
+      break;
+    case RegularMessageType.JOIN:
+      str = appLocalizations.tr("chat.sub_message.join");
+      break;
+    case RegularMessageType.MODE:
+      if (isHaveLongText(message)) {
+        str = appLocalizations.tr("chat.sub_message.mode_long");
+      } else {
+        str = appLocalizations
+            .tr("chat.sub_message.mode_short", args: [message.text]);
+      }
+
+      break;
+    case RegularMessageType.MOTD:
+      str = appLocalizations.tr("chat.sub_message.motd", args: [message.text]);
+      break;
+    case RegularMessageType.NOTICE:
+      str = appLocalizations.tr("chat.sub_message.notice");
+      break;
+    case RegularMessageType.ERROR:
+      str = appLocalizations.tr("chat.sub_message.error");
+      break;
+    case RegularMessageType.AWAY:
+      str = appLocalizations.tr("chat.sub_message.away");
+      break;
+    case RegularMessageType.BACK:
+      str = appLocalizations.tr("chat.sub_message.back");
+      break;
+    case RegularMessageType.MODE_CHANNEL:
+      str = appLocalizations
+          .tr("chat.sub_message.channel_mode", args: [message.text]);
+      break;
+    case RegularMessageType.QUIT:
+      str = appLocalizations.tr("chat.sub_message.quit");
+      break;
+    case RegularMessageType.RAW:
+      str = null;
+      break;
+    case RegularMessageType.PART:
+      str = appLocalizations.tr("chat.sub_message.part");
+      break;
+    case RegularMessageType.NICK:
+      str =
+          appLocalizations.tr("chat.sub_message.nick", args: [message.newNick]);
+      break;
+    case RegularMessageType.CTCP_REQUEST:
+      str = appLocalizations.tr("chat.sub_message.ctcp_request");
+      break;
   }
 
-  Widget buildMessageImagePreview(
-      BuildContext context, MessagePreview preview) {
-    return _buildPreviewThumb(context, preview.thumb);
+  if (str != null) {
+    var color = messagesSkin.findTitleColorDataForMessage(regularMessageType);
+    return Text(str, style: messagesSkin.createDateTextStyle(color));
+  } else {
+    return null;
   }
+}
 
-  Widget _buildPreviewThumb(BuildContext context, String thumb) {
-    return Image.network(thumb);
+Widget buildPreview(BuildContext context, MessagePreview preview) {
+  switch (preview.type) {
+    case MessagePreviewType.LINK:
+      return buildMessageLinkPreview(context, preview);
+
+      break;
+    case MessagePreviewType.IMAGE:
+      return buildMessageImagePreview(context, preview);
+      break;
+    case MessagePreviewType.LOADING:
+      return Text("Loading");
+      break;
+    case MessagePreviewType.AUDIO:
+      return buildMessageAudioPreview(context, preview);
+      break;
+    case MessagePreviewType.VIDEO:
+      return buildMessageVideoPreview(context, preview);
+      break;
   }
+}
 
+Widget buildMessageVideoPreview(BuildContext context, MessagePreview preview) =>
+    MessageMediaPreviewWidget(preview.media);
+
+Widget buildMessageAudioPreview(BuildContext context, MessagePreview preview) =>
+    MessageMediaPreviewWidget(preview.media);
+
+Widget buildMessageLinkPreview(BuildContext context, MessagePreview preview) {
+  var rows = <Widget>[
+    Text(preview.head),
+    Text(preview.body),
+  ];
+
+  if (preview.thumb != null) {
+    rows.add(_buildPreviewThumb(context, preview.thumb));
+  }
+  return Column(children: rows);
+}
+
+Widget buildMessageImagePreview(BuildContext context, MessagePreview preview) {
+  return _buildPreviewThumb(context, preview.thumb);
+}
+
+Widget _buildPreviewThumb(BuildContext context, String thumb) {
+  return Image.network(thumb);
+}
 
 isNeedHighlight(RegularMessage message) =>
     message.highlight == true ||
@@ -435,4 +447,65 @@ Widget buildMessageTitleDate(
 
 Icon buildMessageIcon(IconData iconData, Color color) {
   return Icon(iconData, color: color);
+}
+
+class MessageMediaPreviewWidget extends StatefulWidget {
+  String _mediaURL;
+
+  MessageMediaPreviewWidget(this._mediaURL);
+
+  @override
+  State<StatefulWidget> createState() {
+    return MessageMediaPreviewWidgetState(_mediaURL);
+  }
+}
+
+class MessageMediaPreviewWidgetState extends State<MessageMediaPreviewWidget> {
+  String _mediaURL;
+
+  MessageMediaPreviewWidgetState(this._mediaURL);
+
+  VideoPlayerController _videoPlayerController1;
+  ChewieController _chewieController;
+
+  @override
+  void dispose() {
+    _videoPlayerController1.dispose();
+    _chewieController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _videoPlayerController1 = VideoPlayerController.network(_mediaURL);
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController1,
+      allowFullScreen: false,
+
+
+
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      // materialProgressColors: ChewieProgressColors(
+      //   playedColor: Colors.red,
+      //   handleColor: Colors.blue,
+      //   backgroundColor: Colors.grey,
+      //   bufferedColor: Colors.lightGreen,
+      // ),
+      // placeholder: Container(
+      //   color: Colors.grey,
+      // ),
+       autoInitialize: true,
+//      autoPlay: true,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Chewie(
+      controller: _chewieController,
+    );
+  }
 }

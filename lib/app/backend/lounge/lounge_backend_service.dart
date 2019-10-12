@@ -1108,6 +1108,8 @@ Future<ConnectResult> _connect(
   bool authorizedResponseReceived = false;
 
   if (result.isSocketConnected) {
+
+    bool isNeedWait;
     do {
       await Future.delayed(_timeBetweenCheckingConnectionResponse);
 
@@ -1138,13 +1140,20 @@ Future<ConnectResult> _connect(
           authResponse != null ? authResponse == false : false;
 
 
+      isNeedWait = !result.isTimeout;
+      isNeedWait &= !result.isFailAuthResponseReceived;
+      isNeedWait &= result.error == null;
+      isNeedWait &= !authorizedResponseReceived;
 
-    } while (!authorizedResponseReceived &&
-        !result.isTimeout &&
-        !result.isFailAuthResponseReceived &&
-        (result.isPrivateModeResponseReceived && result.isAuthRequestSent && !result.isFailAuthResponseReceived
-        ) &&
-        result.error == null);
+//      var isWaitForAuthResponse =  (result.isPrivateModeResponseReceived &&
+//          result.isAuthRequestSent && !result.isFailAuthResponseReceived && !authorizedResponseReceived);
+//
+//      if(!isWaitForAuthResponse) {
+//        isNeedWait &= !authorizedResponseReceived;
+//      }
+
+
+    } while (isNeedWait);
   }
 
 

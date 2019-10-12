@@ -407,6 +407,8 @@ MsgPreviewLoungeResponseBodyPart _$MsgPreviewLoungeResponseBodyPartFromJson(
     json['shown'] as bool,
     json['link'] as String,
     json['thumb'] as String,
+    json['media'] as String,
+    json['mediaType'] as String,
     json['type'] as String,
   );
 }
@@ -420,6 +422,8 @@ Map<String, dynamic> _$MsgPreviewLoungeResponseBodyPartToJson(
       'shown': instance.shown,
       'link': instance.link,
       'thumb': instance.thumb,
+      'media': instance.media,
+      'mediaType': instance.mediaType,
       'type': instance.type,
     };
 

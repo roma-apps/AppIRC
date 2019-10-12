@@ -60,6 +60,10 @@ dependencies:
   # autocomplete
   flutter_typeahead: ^1.6.1
 
+  # video/audio player for preview render
+  chewie: ^0.9.8+1
+  video_player: ^0.10.2+3
+
 
 dev_dependencies:
   flutter_test:

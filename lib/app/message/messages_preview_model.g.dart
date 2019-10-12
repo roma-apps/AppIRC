@@ -14,6 +14,8 @@ MessagePreview _$MessagePreviewFromJson(Map<String, dynamic> json) {
     json['shown'] as bool,
     json['link'] as String,
     json['thumb'] as String,
+    json['media'] as String,
+    json['mediaType'] as String,
     _$enumDecodeNullable(_$MessagePreviewTypeEnumMap, json['type']),
   );
 }
@@ -26,6 +28,8 @@ Map<String, dynamic> _$MessagePreviewToJson(MessagePreview instance) =>
       'shown': instance.shown,
       'link': instance.link,
       'thumb': instance.thumb,
+      'media': instance.media,
+      'mediaType': instance.mediaType,
       'type': _$MessagePreviewTypeEnumMap[instance.type],
     };
 
@@ -65,4 +69,6 @@ const _$MessagePreviewTypeEnumMap = {
   MessagePreviewType.LINK: 'LINK',
   MessagePreviewType.IMAGE: 'IMAGE',
   MessagePreviewType.LOADING: 'LOADING',
+  MessagePreviewType.AUDIO: 'AUDIO',
+  MessagePreviewType.VIDEO: 'VIDEO',
 };

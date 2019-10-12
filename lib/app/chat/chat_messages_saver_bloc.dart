@@ -54,8 +54,10 @@ class NetworkChannelMessagesSaverBloc
 
       updatePreview(oldMessage, previewForMessage);
 
+      var newMessageDB = toRegularMessageDB(oldMessage);
+      newMessageDB.localId = oldMessageDB.localId;
       db.regularMessagesDao
-          .updateRegularMessage(toRegularMessageDB(oldMessage));
+          .updateRegularMessage(newMessageDB);
     }));
 
     _channelsListeners[channel.remoteId] = channelDisposable;

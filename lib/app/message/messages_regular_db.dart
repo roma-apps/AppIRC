@@ -42,7 +42,7 @@ abstract class RegularMessageDao {
 @Entity(tableName: "RegularMessageDB")
 class RegularMessageDB implements ChatMessageDB {
   @PrimaryKey(autoGenerate: true)
-  final int localId;
+   int localId;
 
   int channelLocalId;
 

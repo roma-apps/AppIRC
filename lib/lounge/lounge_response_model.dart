@@ -30,6 +30,8 @@ class LoungeResponseMessagePreviewType {
   static const String link = "link";
   static const String loading = "loading";
   static const String image = "image";
+  static const String audio = "audio";
+  static const String video = "video";
 }
 
 abstract class LoungeRequestBody {
@@ -471,17 +473,20 @@ class MsgPreviewLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final bool shown;
   final String link;
   final String thumb;
-  final String type; // image or link
+  final String media;
+  final String mediaType;
+  final String type;
+
 
   MsgPreviewLoungeResponseBodyPart(this.head, this.body, this.canDisplay,
-      this.shown, this.link, this.thumb, this.type);
+      this.shown, this.link, this.thumb, this.media, this.mediaType, this.type);
 
 
   @override
   String toString() {
-    return 'MsgPreviewLoungeResponseBodyPart{head: $head, body: $body, '
-        'canDisplay: $canDisplay, shown: $shown,'
-        ' link: $link, thumb: $thumb, type: $type}';
+    return 'MsgPreviewLoungeResponseBodyPart{head: $head, body: $body,'
+        ' canDisplay: $canDisplay, shown: $shown, link: $link,'
+        ' thumb: $thumb, media: $media, mediaType: $mediaType, type: $type}';
   }
 
   factory MsgPreviewLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
