@@ -1,10 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_app_bar_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'channel_model.dart';
 
@@ -47,56 +49,49 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
                   break;
               }
 
-              return ChatAppBarWidget(channelName, subTitleText);
+              if (connectionState == ChatConnectionState.CONNECTED) {
+                return GestureDetector(
+                    onTap: () {
+                      showTopicDialog(context, channelBloc);
+                    },
+                    child: ChatAppBarWidget(channelName, subTitleText));
+              } else {
+                return ChatAppBarWidget(channelName, subTitleText);
+              }
             },
           );
         });
   }
 }
 
-class NetworkChannelTopicEditWidget extends StatefulWidget {
-  final NetworkChannel channel;
-
-  NetworkChannelTopicEditWidget(this.channel);
-
+class NetworkChannelTopicWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() =>
-      NetworkChannelTopicEditWidgetState(channel);
+  State<StatefulWidget> createState() => NetworkChannelTopicWidgetState();
 }
 
-class NetworkChannelTopicEditWidgetState
-    extends State<NetworkChannelTopicEditWidget> {
-  final NetworkChannel channel;
-
-  NetworkChannelTopicEditWidgetState(this.channel);
-
+class NetworkChannelTopicWidgetState extends State<NetworkChannelTopicWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container();
-//    var channelBloc = Provider.of<IRCNetworkChannelBloc>(context);
-//    var lounge = Provider.of<LoungeService>(context);
-//    var topicBloc = IRCNetworkChannelTopicBloc(lounge, channelBloc.channel);
-//
-//    return StreamBuilder<String>(
-//      stream: topicBloc.outTopic,
-//      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-//        var topic = snapshot.data;
-//        var channelName = topicBloc.channel.name;
-//        if (topic == null || topic.isEmpty) {
-//          return Text(channelName);
-//        } else {
-//          var topicStyle = UISkin.of(context).topicTextStyle;
-//
-//          return Column(
-//            crossAxisAlignment: CrossAxisAlignment.start,
-//            mainAxisAlignment: MainAxisAlignment.center,
-//            children: <Widget>[
-//              Text(channelName),
-//              Text(topic, style: topicStyle)
-//            ],
-//          );
-//        }
-//      },
-//    );
+    var channelBloc = Provider.of<NetworkChannelBloc>(context);
+
+    return StreamBuilder<NetworkChannelState>(
+      stream: channelBloc.networkChannelStateStream,
+      initialData: channelBloc.networkChannelState,
+      builder:
+          (BuildContext context, AsyncSnapshot<NetworkChannelState> snapshot) {
+        var state = snapshot.data;
+        var topic = state.topic;
+
+        return Text(topic);
+      },
+    );
   }
+}
+
+void showTopicDialog(BuildContext context, NetworkChannelBloc channelBloc) {
+  showPlatformDialog(
+      context: context,
+      builder: (_) =>
+          Provider(providable: channelBloc, child: NetworkChannelTopicWidget()),
+      androidBarrierDismissible: true);
 }

@@ -10,6 +10,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_popup_menu_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
+import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "buildChannelPopupMenuButton", enabled: true);
@@ -53,10 +54,6 @@ List<PlatformAwarePopupMenuAction> _buildMenuItems(BuildContext context,
       break;
   }
 
-  if (channelState.editTopicPossible == true) {
-    menuItems.insert(0, _buildEditTopicMenuItem(context, channelBloc));
-  }
-
   return menuItems;
 }
 
@@ -66,6 +63,12 @@ List<PlatformAwarePopupMenuAction> _buildChannelMenuItems(
     _buildBannedUsersMenuItem(context, channelBloc),
     _buildCloseMenuItem(context, channelBloc),
   ];
+
+  // TODO: report bug to lounge. Lounge have field "editTopic" in channel state
+  //  but it is  false even if user can access to change topic for current channel
+//  if (channelBloc.networkChannelState.editTopicPossible == true) {
+  items.insert(0, _buildEditTopicMenuItem(context, channelBloc));
+//  }
 
   return items;
 }
@@ -119,9 +122,6 @@ PlatformAwarePopupMenuAction _buildEditTopicMenuItem(
       text: appLocalizations.tr("settings.channel_dropdown_menu.topic"),
       iconData: Icons.edit,
       actionCallback: (action) {
-        showPlatformDialog(
-            context: context,
-            builder: (_) => NetworkChannelTopicEditWidget(channelBloc.channel),
-            androidBarrierDismissible: true);
+        showTopicDialog(context, channelBloc);
       });
 }
