@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_auth_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_auth_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
@@ -25,8 +24,8 @@ class LoungePreferencesFormWidget extends StatefulWidget {
   final LoungePreferencesActionCallback callback;
   final String buttonText;
 
-  LoungePreferencesFormWidget(this.startPreferences, this.callback,
-      this.buttonText);
+  LoungePreferencesFormWidget(
+      this.startPreferences, this.callback, this.buttonText);
 
   @override
   State<StatefulWidget> createState() =>
@@ -39,6 +38,7 @@ class LoungePreferencesFormWidgetState
   final LoungePreferencesActionCallback successCallback;
   final String buttonText;
 
+
   LoungePreferencesFormWidgetState(this.startValues, this.successCallback,
       this.buttonText);
 
@@ -47,12 +47,11 @@ class LoungePreferencesFormWidgetState
     LoungePreferencesFormBloc formBloc =
     Provider.of<LoungePreferencesFormBloc>(context);
 
-
     var connectionFormBloc = formBloc.connectionFormBloc;
 
     var authFormBloc = formBloc.authPreferencesFormBloc;
-    var loungeAuthPreferencesFormWidget = LoungeAuthPreferencesFormWidget(
-        authFormBloc.authPreferences);
+    var loungeAuthPreferencesFormWidget =
+    LoungeAuthPreferencesFormWidget(authFormBloc.authPreferences);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -67,26 +66,22 @@ class LoungePreferencesFormWidgetState
                       startValues.connectionPreferences),
                 ),
                 StreamBuilder<bool>(
-                  stream: formBloc.isAuthFormEnabledStream,
-                  initialData: formBloc.isAuthFormEnabled,
-                  builder: (context, snapshot) {
-
-                    var enabled = snapshot.data;
-                    if(enabled) {
-
-
-                      return Provider(
-                        providable: authFormBloc,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: loungeAuthPreferencesFormWidget,
-                        ),
-                      );
-                    } else {
-                      return SizedBox.shrink();
-                    }
-                  }
-                )
+                    stream: formBloc.isAuthFormEnabledStream,
+                    initialData: formBloc.isAuthFormEnabled,
+                    builder: (context, snapshot) {
+                      var enabled = snapshot.data;
+                      if (enabled) {
+                        return Provider(
+                          providable: authFormBloc,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            child: loungeAuthPreferencesFormWidget,
+                          ),
+                        );
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    }),
               ],
             ),
           ),
@@ -104,14 +99,13 @@ class LoungePreferencesFormWidgetState
                       await doAsyncOperationWithDialog(
                           context,
                               () async =>
-                          await tryConnect(context, currentLoungePreferences));
-
+                          await tryConnect(
+                              context, currentLoungePreferences));
 
                       if (connectResult.config != null) {
                         successCallback(context, currentLoungePreferences);
                       } else {
-
-                        if(connectResult.isPrivateModeResponseReceived &&
+                        if (connectResult.isPrivateModeResponseReceived &&
                             !formBloc.isAuthFormEnabled) {
                           formBloc.isAuthFormEnabled = true;
                         } else {
@@ -122,10 +116,12 @@ class LoungePreferencesFormWidgetState
                             } else if (connectResult.isTimeout) {
                               dialog = buildLoungeTimeoutAlertDialog(context);
                             } else {
-                              dialog = buildLoungeConnectionErrorAlertDialog(context, connectResult.error);
+                              dialog = buildLoungeConnectionErrorAlertDialog(
+                                  context, connectResult.error);
                             }
                           } else {
-                            dialog = buildLoungeConnectionErrorAlertDialog(context, connectResult.error);
+                            dialog = buildLoungeConnectionErrorAlertDialog(
+                                context, connectResult.error);
                           }
 
                           showPlatformDialog(
@@ -133,16 +129,14 @@ class LoungePreferencesFormWidgetState
                               context: context,
                               builder: (_) => dialog);
                         }
-
-
                       }
                     } on InvalidConnectionResponseException catch (e) {
                       showPlatformDialog(
                           androidBarrierDismissible: true,
                           context: context,
                           builder: (_) =>
-                              buildLoungeConnectionInvalidResponseDialog
-                                (context, e));
+                              buildLoungeConnectionInvalidResponseDialog(
+                                  context, e));
                     }
                   };
                 }
@@ -181,8 +175,8 @@ class LoungePreferencesFormWidgetState
       BuildContext context, dynamic error) {
     var appLocalizations = AppLocalizations.of(context);
 
-    String title =
-    appLocalizations.tr('lounge.preferences.connection.dialog.connection_error.title');
+    String title = appLocalizations
+        .tr('lounge.preferences.connection.dialog.connection_error.title');
 
     String content;
     if (error != null) {
@@ -201,28 +195,26 @@ class LoungePreferencesFormWidgetState
         actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
 
-  PlatformAlertDialog buildLoungeAuthFailAlertDialog(
-      BuildContext context) {
+  PlatformAlertDialog buildLoungeAuthFailAlertDialog(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
 
-    String title =
-    appLocalizations.tr('lounge.preferences.connection.dialog.auth_fail.title');
+    String title = appLocalizations
+        .tr('lounge.preferences.connection.dialog.auth_fail.title');
 
     String content = appLocalizations
         .tr('lounge.preferences.connection.dialog.auth_fail.content');
-
 
     return PlatformAlertDialog(
         title: Text(title),
         content: Text(content),
         actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
-  PlatformAlertDialog buildLoungeTimeoutAlertDialog(
-      BuildContext context) {
+
+  PlatformAlertDialog buildLoungeTimeoutAlertDialog(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
 
-    String title =
-    appLocalizations.tr('lounge.preferences.connection.dialog.timeout.title');
+    String title = appLocalizations
+        .tr('lounge.preferences.connection.dialog.timeout.title');
 
     String content = appLocalizations
         .tr('lounge.preferences.connection.dialog.timeout.content');
@@ -237,20 +229,16 @@ class LoungePreferencesFormWidgetState
       BuildContext context, InvalidConnectionResponseException exception) {
     var appLocalizations = AppLocalizations.of(context);
 
-    String title = appLocalizations
-        .tr('lounge.preferences.connection.dialog.invalid_response_error.title');
+    String title = appLocalizations.tr(
+        'lounge.preferences.connection.dialog.invalid_response_error.title');
 
-    String content = appLocalizations
-        .tr('lounge.preferences.connection.dialog.invalid_response_error.content');
+    String content = appLocalizations.tr(
+        'lounge.preferences.connection.dialog.invalid_response_error.content');
 
     return PlatformAlertDialog(
         title: Text(title),
         content: Text(content),
         actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
-
-
-
-
 
 }

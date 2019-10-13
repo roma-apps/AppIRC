@@ -23,7 +23,7 @@ class LoungeChannelTypeConstants {
 
 @JsonSerializable()
 class LoungeConnectionPreferences extends JsonPreferences {
-  final String host;
+   String host;
 
   LoungeConnectionPreferences(this.host);
   LoungeConnectionPreferences.name({@required this.host});

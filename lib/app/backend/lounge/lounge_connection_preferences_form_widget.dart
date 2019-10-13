@@ -36,6 +36,7 @@ class LoungeConnectionPreferencesFormWidgetState
     var loungePreferencesFormBloc =
         Provider.of<LoungeConnectionPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
+    _hostController.text = loungePreferencesFormBloc.hostFieldBloc.value;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
