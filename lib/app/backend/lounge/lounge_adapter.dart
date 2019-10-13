@@ -57,21 +57,35 @@ ChatConfig toChatConfig(
         fileUploadMaxSize: loungeConfig.fileUploadMaxSize,
         commands: commands);
 
+
 ChatMessage toChatMessage(
-        NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) =>
-    RegularMessage.name(
+    NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) {
+  var regularMessageType = detectRegularMessageType(msgLoungeResponseBody.type);
+
+  if (regularMessageType == RegularMessageType.WHO_IS) {
+    var whoIsSpecialBody = toSpecialMessageWhoIs(msgLoungeResponseBody.whois);
+    return SpecialMessage.name(
+        channelRemoteId: channel.remoteId,
+        data: whoIsSpecialBody,
+        specialType: SpecialMessageType.WHO_IS,
+        date: DateTime.now());
+  } else {
+    var text = regularMessageType == RegularMessageType.CTCP_REQUEST ?
+    msgLoungeResponseBody.ctcpMessage :
+    msgLoungeResponseBody.text;
+    return RegularMessage.name(
       channel.remoteId,
       command: msgLoungeResponseBody.command,
       hostMask: msgLoungeResponseBody.hostmask,
-      text: msgLoungeResponseBody.text,
-      regularMessageType: detectRegularMessageType(msgLoungeResponseBody.type),
+      text: text,
+      regularMessageType: regularMessageType,
       self: msgLoungeResponseBody.self,
       highlight: msgLoungeResponseBody.highlight,
       params: msgLoungeResponseBody.params,
       previews: msgLoungeResponseBody.previews != null
           ? msgLoungeResponseBody.previews
-              .map((loungePreview) => toMessagePreview(loungePreview))
-              .toList()
+          .map((loungePreview) => toMessagePreview(loungePreview))
+          .toList()
           : null,
       date: DateTime.parse(msgLoungeResponseBody.time),
       fromNick: msgLoungeResponseBody.from != null
@@ -86,6 +100,8 @@ ChatMessage toChatMessage(
       newNick: msgLoungeResponseBody.new_nick,
       messageRemoteId: msgLoungeResponseBody.id,
     );
+  }
+}
 
 List<SpecialMessage> toSpecialMessages(NetworkChannel channel,
     MessageSpecialLoungeResponseBody messageSpecialLoungeResponseBody) {

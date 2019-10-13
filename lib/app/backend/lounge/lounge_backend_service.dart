@@ -513,7 +513,6 @@ class LoungeBackendService extends Providable
 
         channelWithState.channel.channelPreferences = preferences;
 
-
         listener(channelWithState);
       }
     }));
@@ -604,7 +603,6 @@ class LoungeBackendService extends Providable
 
     return disposable;
   }
-
 
   @override
   Disposable listenForNetworkJoin(NetworkListener listener) {
@@ -772,14 +770,13 @@ class LoungeBackendService extends Providable
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
-
   @override
-  Future<RequestResult<bool>> onNewDevicePushToken(String newToken, {bool
-  waitForResult = false}) async {
+  Future<RequestResult<bool>> onNewDevicePushToken(String newToken,
+      {bool waitForResult = false}) async {
     _sendRequest(
         LoungeJsonRequest(
-            name: LoungeRequestEventNames.pushToken, body:
-        PushTokenLoungeRequestBody(token: newToken)),
+            name: LoungeRequestEventNames.pushToken,
+            body: PushTokenLoungeRequestBody(token: newToken)),
         isNeedAddRequestToPending: false);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
@@ -851,8 +848,6 @@ class LoungeBackendService extends Providable
 //    _usersController.sink.add(parsed);
 //  }
   }
-
-
 
   _sendRequest(LoungeRequest request,
       {@required bool isNeedAddRequestToPending}) async {
@@ -941,7 +936,6 @@ class LoungeBackendService extends Providable
                 target: channel.remoteId, content: message)),
         isNeedAddRequestToPending: false);
   }
-
 }
 
 ChatConnectionState mapState(SocketConnectionState socketState) {
@@ -1108,7 +1102,6 @@ Future<ConnectResult> _connect(
   bool authorizedResponseReceived = false;
 
   if (result.isSocketConnected) {
-
     bool isNeedWait;
     do {
       await Future.delayed(_timeBetweenCheckingConnectionResponse);
@@ -1117,8 +1110,8 @@ Future<ConnectResult> _connect(
           loungeConfig != null &&
           result.chatInit != null &&
           authorizedReceived != false);
-      result.isPrivateModeResponseReceived = authResponse != null || result
-          .isAuthRequestSent;
+      result.isPrivateModeResponseReceived =
+          authResponse != null || result.isAuthRequestSent;
 
       if (result.isPrivateModeResponseReceived &&
           !result.isAuthRequestSent &&
@@ -1139,33 +1132,22 @@ Future<ConnectResult> _connect(
       result.isFailAuthResponseReceived =
           authResponse != null ? authResponse == false : false;
 
-
       isNeedWait = !result.isTimeout;
       isNeedWait &= !result.isFailAuthResponseReceived;
       isNeedWait &= result.error == null;
       isNeedWait &= !authorizedResponseReceived;
-
-//      var isWaitForAuthResponse =  (result.isPrivateModeResponseReceived &&
-//          result.isAuthRequestSent && !result.isFailAuthResponseReceived && !authorizedResponseReceived);
-//
-//      if(!isWaitForAuthResponse) {
-//        isNeedWait &= !authorizedResponseReceived;
-//      }
-
-
+      // private mode but login/password not specified
+      isNeedWait &=
+          result.isPrivateModeResponseReceived && result.isAuthRequestSent;
     } while (isNeedWait);
   }
-
 
   _logger.d(() => "_connect end wait "
       "authorizedResponseReceived = $authorizedResponseReceived "
       ".isTimeout = ${result.isTimeout} "
-      ".isPrivateModeResponseReceived = ${result
-      .isPrivateModeResponseReceived} "
+      ".isPrivateModeResponseReceived = ${result.isPrivateModeResponseReceived} "
       ".isAuthRequestSent = ${result.isAuthRequestSent} "
-      ".error = ${result.error}"
-
-  );
+      ".error = ${result.error}");
 
   disposable.dispose();
 

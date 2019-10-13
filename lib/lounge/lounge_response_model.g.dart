@@ -304,7 +304,12 @@ MsgLoungeResponseBody _$MsgLoungeResponseBodyFromJson(
     json['self'] as bool,
     json['highlight'] as bool,
     json['showInActive'] as bool,
-    json['users'] as List,
+    (json['users'] as List)
+        ?.map((e) => e == null
+            ? null
+            : UserLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+    json['ctcpMessage'] as String,
     (json['previews'] as List)
         ?.map((e) => e == null
             ? null
@@ -329,6 +334,7 @@ Map<String, dynamic> _$MsgLoungeResponseBodyToJson(
       'time': instance.time,
       'new_nick': instance.new_nick,
       'text': instance.text,
+      'ctcpMessage': instance.ctcpMessage,
       'hostmask': instance.hostmask,
       'self': instance.self,
       'highlight': instance.highlight,

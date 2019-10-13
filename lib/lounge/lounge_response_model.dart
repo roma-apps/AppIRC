@@ -352,11 +352,12 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
   final String time;
   final String new_nick;
   final String text;
+  final String ctcpMessage;
   final String hostmask;
   final bool self;
   final bool highlight;
   final bool showInActive;
-  final List<dynamic> users;
+  final List<UserLoungeResponseBodyPart> users;
   final List<MsgPreviewLoungeResponseBodyPart> previews;
   final List<String> params;
   final int id;
@@ -374,6 +375,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
       this.highlight,
       this.showInActive,
       this.users,
+      this.ctcpMessage,
       this.previews,
       this.params,
       this.id,
@@ -387,6 +389,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
         'text: $text, hostmask: $hostmask, self: $self, '
         'highlight: $highlight, showInActive: $showInActive, '
         'users: $users, previews: $previews, params: $params, '
+        'ctcpMessage: $ctcpMessage'
         'id: $id, whois: $whois}';
   }
 
