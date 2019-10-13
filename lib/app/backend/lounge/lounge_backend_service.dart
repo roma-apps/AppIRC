@@ -1137,8 +1137,8 @@ Future<ConnectResult> _connect(
       isNeedWait &= result.error == null;
       isNeedWait &= !authorizedResponseReceived;
       // private mode but login/password not specified
-      isNeedWait &=
-          result.isPrivateModeResponseReceived && result.isAuthRequestSent;
+      isNeedWait &= !result.isPrivateModeResponseReceived ||
+          (result.isPrivateModeResponseReceived && result.isAuthRequestSent);
     } while (isNeedWait);
   }
 
