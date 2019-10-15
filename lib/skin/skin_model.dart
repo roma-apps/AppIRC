@@ -76,6 +76,7 @@ abstract class PlatformSkinTheme {
   Color get onBackgroundColor;
 
   Color get backgroundColor;
+
 }
 
 class AndroidAppSkinTheme extends PlatformSkinTheme {
@@ -139,6 +140,7 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
 
   @override
   Color get backgroundColor => theme.backgroundColor;
+
 }
 
 class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {

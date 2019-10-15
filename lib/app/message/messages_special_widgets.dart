@@ -108,7 +108,7 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
           buildMessageIcon(Icons.account_box, color)
         ],
       ));
-  return buildRegularMessageWidget(title, body, false, null);
+  return buildRegularMessageWidget(context, title, body, false, null);
 }
 
 Widget _buildWhoIsRow(String label, String value) {

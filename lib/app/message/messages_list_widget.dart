@@ -69,7 +69,7 @@ class NetworkChannelMessagesListWidget extends StatelessWidget {
             );
           } else {
             var result = Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.symmetric(vertical:10.0),
               child: ListView.builder(
                   itemCount: messages.length,
                   controller: _scrollController,

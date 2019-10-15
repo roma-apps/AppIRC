@@ -23,4 +23,7 @@ class AppIRCMessagesRegularSkinBloc extends MessagesRegularSkinBloc {
 
   Color findTitleColorDataForMessage(RegularMessageType messageType) =>
       theme.findMessageColorByType(messageType);
+
+  @override
+  Color get highlightBackgroundColor =>   theme.highlightBackgroundColor;
 }

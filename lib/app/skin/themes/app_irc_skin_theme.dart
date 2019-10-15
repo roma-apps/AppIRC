@@ -30,6 +30,8 @@ abstract class AppIRCSkinTheme extends AppSkinTheme {
 
   Color get onNotActiveListItemColor;
 
+  Color get highlightBackgroundColor;
+
   Color findMessageColorByType(RegularMessageType regularMessageType);
 
   AppIRCSkinTheme(String id, this.coloredNicknamesData, androidThemeDataCreator,

@@ -50,6 +50,9 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   @override
   Color get onNotActiveListItemColor => onAppBackgroundColor;
 
+  @override
+  Color get highlightBackgroundColor => _androidNightThemeData.primaryColorLight;
+
   NightAppSkinTheme()
       : super(
             ID,

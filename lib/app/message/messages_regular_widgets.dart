@@ -47,7 +47,7 @@ Widget buildRegularMessage(BuildContext context, RegularMessage message) {
   var color =
       messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
-  return buildRegularMessageWidget(title, body, needHighlight, color);
+  return buildRegularMessageWidget(context, title, body, needHighlight, color);
 }
 
 Widget _buildMessageBody(BuildContext context, RegularMessage message) {
@@ -389,16 +389,21 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
 }
 
 Widget buildRegularMessageWidget(
+    BuildContext context,
     Widget title, Widget body, bool needHighlight, Color color) {
+
+
+
   var decoration;
   if (needHighlight) {
-    decoration = BoxDecoration(border: Border.all(color: color));
+    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
+    decoration = BoxDecoration(color: messagesSkin.highlightBackgroundColor);
   }
 
   return Container(
     decoration: decoration,
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.all(4.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
