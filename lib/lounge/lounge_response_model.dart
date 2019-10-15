@@ -357,7 +357,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
   final bool self;
   final bool highlight;
   final bool showInActive;
-  final List<UserLoungeResponseBodyPart> users;
+  final List<String> users;
   final List<MsgPreviewLoungeResponseBodyPart> previews;
   final List<String> params;
   final int id;
