@@ -1,10 +1,12 @@
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -43,7 +45,6 @@ Widget buildRegularMessageBody(BuildContext context, String text,
         return handleLinkClick(word);
       }
     }),
-
   ];
 
   if (nicknames != null) {
@@ -100,13 +101,12 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
       builderToRegExpMatches.forEach((builder, matches) {
         matches.forEach((match) {
           if (match.start == index) {
-
             currentSpanBuilder = builder;
             currentSpanMatch = match;
 
             if (lastSpanMatchEndIndex != index) {
-              spans.add(TextSpan(
-                  text: text.substring(lastSpanMatchEndIndex, index)));
+              spans.add(
+                  TextSpan(text: text.substring(lastSpanMatchEndIndex, index)));
             }
           }
         });
@@ -117,19 +117,34 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
           text.substring(currentSpanMatch.start, currentSpanMatch.end)));
     } else {
       if (lastSpanMatchEndIndex < text.length) {
-        spans.add(TextSpan(
-            text: text.substring(lastSpanMatchEndIndex, text.length)));
+        spans.add(
+            TextSpan(text: text.substring(lastSpanMatchEndIndex, text.length)));
       }
     }
 
-    return RichText(
-      text: TextSpan(
-        style: textStyle,
-        children: spans,
-      ),
-    );
+    if (isMaterial) {
+      return SelectableText.rich(
+        TextSpan(
+          style: textStyle,
+          children: spans,
+        ),
+      );
+    } else {
+      // TODO: enable text selection for cupertino when it will be available
+      return RichText(
+        text: TextSpan(
+          style: textStyle,
+          children: spans,
+        ),
+      );
+    }
   } else {
-    return Text(text, style: textStyle);
+    if (isMaterial) {
+      return SelectableText(text, style: textStyle);
+    } else {
+      // TODO: enable text selection for cupertino when it will be available
+      return Text(text, style: textStyle);
+    }
   }
 
 //    var splitRegex = "";
