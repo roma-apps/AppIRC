@@ -72,19 +72,24 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
 
   var body = Column(
     children: <Widget>[
-
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.hostmask"), "${whoIsBody.ident}@${whoIsBody.hostname}"),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.actual_hostname"), actualHostNameValue),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.real_name"), whoIsBody.realName),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.channels"), whoIsBody.channels),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.secure_connection"), whoIsBody.secure.toString()),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.hostmask"),
+          "${whoIsBody.ident}@${whoIsBody.hostname}"),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.actual_hostname"),
+          actualHostNameValue),
       _buildWhoIsRow(
-          appLocalizations.tr("chat.who_is.connected_to"), "${whoIsBody.server} (${whoIsBody.serverInfo})"),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.account"), whoIsBody.account),
+          appLocalizations.tr("chat.who_is.real_name"), whoIsBody.realName),
       _buildWhoIsRow(
-          appLocalizations.tr("chat.who_is.connected_at"), regularDateFormatter.format(whoIsBody.logonTime)),
+          appLocalizations.tr("chat.who_is.channels"), whoIsBody.channels),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.secure_connection"),
+          whoIsBody.secure.toString()),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.connected_to"),
+          "${whoIsBody.server} (${whoIsBody.serverInfo})"),
       _buildWhoIsRow(
-          appLocalizations.tr("chat.who_is.idle_since"), regularDateFormatter.format(whoIsBody.idleTime)),
+          appLocalizations.tr("chat.who_is.account"), whoIsBody.account),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.connected_at"),
+          regularDateFormatter.format(whoIsBody.logonTime)),
+      _buildWhoIsRow(appLocalizations.tr("chat.who_is.idle_since"),
+          regularDateFormatter.format(whoIsBody.idleTime)),
 //      _buildWhoIsRow("Logon", whoIsBody.logon),
     ],
   );
@@ -117,7 +122,13 @@ Widget _buildWhoIsRow(String label, String value) {
       padding: const EdgeInsets.all(8.0),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[Text(label), Flexible(child: Text(value))]),
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
+              child: Text(label),
+            ),
+            Flexible(child: Text(value))
+          ]),
     );
   } else {
     return SizedBox.shrink();
