@@ -61,7 +61,7 @@ class ChatNetworkChannelsListBloc extends Providable {
 
       _onChannelsChanged(network.channels);
 
-      leaveListeners[channel].forEach((listener) => listener());
+      leaveListeners[channel]?.forEach((listener) => listener());
 
       _onChannelsChanged(networkChannels);
       listenForNetworkChannelLeave.dispose();
