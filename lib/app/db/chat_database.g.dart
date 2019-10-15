@@ -82,7 +82,7 @@ class _$ChatDatabase extends ChatDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `RegularMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `command` TEXT, `hostMask` TEXT, `text` TEXT, `paramsJsonEncoded` TEXT, `regularMessageTypeId` INTEGER, `self` INTEGER, `highlight` INTEGER, `previewsJsonEncoded` TEXT, `dateMicrosecondsSinceEpoch` INTEGER, `fromRemoteId` INTEGER, `fromNick` TEXT, `fromMode` TEXT, `newNick` TEXT, `messageRemoteId` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `RegularMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `command` TEXT, `hostMask` TEXT, `text` TEXT, `paramsJsonEncoded` TEXT, `nicknamesJsonEncoded` TEXT, `regularMessageTypeId` INTEGER, `self` INTEGER, `highlight` INTEGER, `previewsJsonEncoded` TEXT, `dateMicrosecondsSinceEpoch` INTEGER, `fromRemoteId` INTEGER, `fromNick` TEXT, `fromMode` TEXT, `newNick` TEXT, `messageRemoteId` INTEGER)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SpecialMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `dataJsonEncoded` TEXT, `specialTypeId` INTEGER, `dateMicrosecondsSinceEpoch` INTEGER)');
 
@@ -119,6 +119,7 @@ class _$RegularMessageDao extends RegularMessageDao {
                   'hostMask': item.hostMask,
                   'text': item.text,
                   'paramsJsonEncoded': item.paramsJsonEncoded,
+                  'nicknamesJsonEncoded': item.nicknamesJsonEncoded,
                   'regularMessageTypeId': item.regularMessageTypeId,
                   'self': item.self,
                   'highlight': item.highlight,
@@ -144,6 +145,7 @@ class _$RegularMessageDao extends RegularMessageDao {
                   'hostMask': item.hostMask,
                   'text': item.text,
                   'paramsJsonEncoded': item.paramsJsonEncoded,
+                  'nicknamesJsonEncoded': item.nicknamesJsonEncoded,
                   'regularMessageTypeId': item.regularMessageTypeId,
                   'self': item.self,
                   'highlight': item.highlight,
@@ -173,6 +175,7 @@ class _$RegularMessageDao extends RegularMessageDao {
           row['hostMask'] as String,
           row['text'] as String,
           row['paramsJsonEncoded'] as String,
+          row['nicknamesJsonEncoded'] as String,
           row['regularMessageTypeId'] as int,
           row['self'] as int,
           row['highlight'] as int,

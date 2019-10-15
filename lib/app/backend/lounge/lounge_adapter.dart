@@ -99,6 +99,9 @@ ChatMessage toChatMessage(
           : null,
       newNick: msgLoungeResponseBody.new_nick,
       messageRemoteId: msgLoungeResponseBody.id,
+      nicknames: msgLoungeResponseBody.users != null
+          ? msgLoungeResponseBody.users
+          : null,
     );
   }
 }

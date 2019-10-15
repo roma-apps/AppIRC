@@ -32,6 +32,8 @@ class RegularMessage extends ChatMessage {
 
    List<MessagePreview> previews;
 
+  List<String> nicknames;
+
   RegularMessage(
       int channelRemoteId,
       this.messageRemoteId,
@@ -45,6 +47,7 @@ class RegularMessage extends ChatMessage {
       this.previews,
       DateTime date,
       this.newNick,
+      this.nicknames,
       this.fromRemoteId,
       this.fromNick,
       this.fromMode)
@@ -65,6 +68,7 @@ class RegularMessage extends ChatMessage {
       @required this.fromRemoteId,
       @required this.fromNick,
       @required this.newNick,
+      @required this.nicknames,
       @required this.fromMode})
       : super(ChatMessageType.REGULAR, channelRemoteId, date);
 
@@ -81,6 +85,7 @@ class RegularMessage extends ChatMessage {
         ' previews: $previews, date: $date,'
         ' fromRemoteId: $fromRemoteId,'
         ' fromNick: $fromNick,'
+        ' nicknames: $nicknames,'
         ' fromMode: $fromMode, newNick: $newNick}';
   }
 

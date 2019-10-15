@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/message/messages_regular_body_widget.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Widget buildSpecialMessageWidget(
@@ -35,7 +35,7 @@ Widget buildSpecialMessageWidget(
                 _buildUsersCount(context, channelInfoItem),
               ],
             ),
-            _buildTopic(channelInfoItem.topic),
+            _buildTopic(context, channelInfoItem.topic),
           ],
         ),
       );
@@ -160,17 +160,19 @@ Widget _buildChannelName(BuildContext context,
       ));
 }
 
-Widget _buildTopic(String topic) {
+Widget _buildTopic(BuildContext context, String topic) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
-    child: Linkify(
-        onOpen: (link) async {
-          if (await canLaunch(link.url)) {
-            await launch(link.url);
-          } else {
-            throw 'Could not launch $link';
-          }
-        },
-        text: topic),
+child: buildRegularMessageBody(context, topic),
+//    child: Linkify(
+//        onOpen: (link) async {
+//          if (await canLaunch(link.url)) {
+//            await launch(link.url);
+//          } else {
+//            throw 'Could not launch $link';
+//          }
+//        },
+//        text: topic
+//    ),
   );
 }

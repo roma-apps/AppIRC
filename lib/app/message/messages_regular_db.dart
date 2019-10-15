@@ -16,7 +16,6 @@ abstract class RegularMessageDao {
   @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :remoteId')
   Future<RegularMessageDB> findMessageWithRemoteId(int remoteId);
 
-
   @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
   Future<List<RegularMessageDB>> getChannelMessages(int channelRemoteId);
@@ -42,7 +41,7 @@ abstract class RegularMessageDao {
 @Entity(tableName: "RegularMessageDB")
 class RegularMessageDB implements ChatMessageDB {
   @PrimaryKey(autoGenerate: true)
-   int localId;
+  int localId;
 
   int channelLocalId;
 
@@ -57,6 +56,8 @@ class RegularMessageDB implements ChatMessageDB {
   final String text;
 
   final String paramsJsonEncoded;
+
+  final String nicknamesJsonEncoded;
 
   static List<String> params(RegularMessageDB message) =>
       json.decode(message.paramsJsonEncoded);
@@ -95,12 +96,25 @@ class RegularMessageDB implements ChatMessageDB {
   final String newNick;
   final int messageRemoteId;
 
-
-  RegularMessageDB(this.localId, this.channelLocalId, this.chatMessageTypeId,
-      this.channelRemoteId, this.command, this.hostMask, this.text,
-      this.paramsJsonEncoded, this.regularMessageTypeId, this.self,
-      this.highlight, this.previewsJsonEncoded, this.dateMicrosecondsSinceEpoch,
-      this.fromRemoteId, this.fromNick, this.fromMode, this.newNick,
+  RegularMessageDB(
+      this.localId,
+      this.channelLocalId,
+      this.chatMessageTypeId,
+      this.channelRemoteId,
+      this.command,
+      this.hostMask,
+      this.text,
+      this.paramsJsonEncoded,
+      this.nicknamesJsonEncoded,
+      this.regularMessageTypeId,
+      this.self,
+      this.highlight,
+      this.previewsJsonEncoded,
+      this.dateMicrosecondsSinceEpoch,
+      this.fromRemoteId,
+      this.fromNick,
+      this.fromMode,
+      this.newNick,
       this.messageRemoteId);
 
   RegularMessageDB.name(
@@ -121,7 +135,8 @@ class RegularMessageDB implements ChatMessageDB {
       this.fromRemoteId,
       this.fromNick,
       this.fromMode,
-      this.newNick});
+      this.newNick,
+      this.nicknamesJsonEncoded});
 
   @override
   String toString() {
@@ -134,6 +149,7 @@ class RegularMessageDB implements ChatMessageDB {
         'previewsJsonEncoded: $previewsJsonEncoded, '
         'dateMicrosecondsSinceEpoch: $dateMicrosecondsSinceEpoch, '
         'fromRemoteId: $fromRemoteId, fromNick: $fromNick, '
+        'nicknamesJsonEncoded: $nicknamesJsonEncoded'
         'fromMode: $fromMode, newNick: $newNick}';
   } //  RegularMessage(
 
@@ -195,7 +211,7 @@ RegularMessageType regularMessageTypeIdToType(int id) {
     case 18:
       return RegularMessageType.NICK;
       break;
-      case 19:
+    case 19:
       return RegularMessageType.CTCP_REQUEST;
       break;
   }
@@ -269,7 +285,7 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
 RegularMessageDB toRegularMessageDB(
         RegularMessage regularMessage) =>
     RegularMessageDB.name(
-      messageRemoteId: regularMessage.messageRemoteId,
+        messageRemoteId: regularMessage.messageRemoteId,
         command: regularMessage.command,
         hostMask: regularMessage.hostMask,
         text: regularMessage.text,
@@ -280,6 +296,7 @@ RegularMessageDB toRegularMessageDB(
             ? regularMessage.highlight ? 1 : 0
             : null,
         paramsJsonEncoded: json.encode(regularMessage.params),
+        nicknamesJsonEncoded: json.encode(regularMessage.nicknames),
         previewsJsonEncoded: regularMessage.previews != null
             ? json.encode(regularMessage.previews
                 .map((preview) => preview.toJson())
@@ -292,9 +309,6 @@ RegularMessageDB toRegularMessageDB(
         newNick: regularMessage.newNick,
         channelRemoteId: regularMessage.channelRemoteId);
 
-
-
-
 RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
     RegularMessage.name(messageDB.channelRemoteId,
         messageRemoteId: messageDB.messageRemoteId,
@@ -305,10 +319,9 @@ RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
             ? _convertParams(messageDB)
             : null,
         regularMessageType:
-        regularMessageTypeIdToType(messageDB.regularMessageTypeId),
-        self: messageDB.self != null
-            ? messageDB.self == 0 ? false : true
-            : null,
+            regularMessageTypeIdToType(messageDB.regularMessageTypeId),
+        self:
+            messageDB.self != null ? messageDB.self == 0 ? false : true : null,
         highlight: messageDB.highlight != null
             ? messageDB.highlight == 0 ? false : true
             : null,
@@ -320,7 +333,22 @@ RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
         fromRemoteId: messageDB.fromRemoteId,
         fromNick: messageDB.fromNick,
         fromMode: messageDB.fromMode,
-        newNick: messageDB.newNick);
+        newNick: messageDB.newNick,
+        nicknames: messageDB.nicknamesJsonEncoded != null
+            ? _convertNicknames(messageDB)
+            : null);
+
+List<String> _convertNicknames(RegularMessageDB messageDB) {
+  var decoded = json.decode(messageDB.nicknamesJsonEncoded);
+
+  if (decoded == null) {
+    return null;
+  } else if (decoded is List<dynamic>) {
+    decoded =
+        (decoded as List<dynamic>).map((item) => item.toString()).toList();
+  }
+  return decoded;
+}
 
 List<String> _convertParams(RegularMessageDB messageDB) {
   var decoded = json.decode(messageDB.paramsJsonEncoded);

@@ -28,28 +28,59 @@ Widget createPlatformPopupMenuButton(BuildContext context,
   throw Exception("invalid platform");
 }
 
-Widget _buildCupertinoPopupButton(
-BuildContext context,
-    Widget child, List<PlatformAwarePopupMenuAction> actions) {
-  return GestureDetector( onTap: () {
-    showCupertinoModalPopup(context: context, builder: (_) {
-      return CupertinoActionSheet(
-        actions: actions
-            .map((action) => CupertinoActionSheetAction(
-          child: _buildRow(action.iconData, action.text),
-          onPressed: () {
-            Navigator.pop(context);
-            action.actionCallback(action);
-          },
-        ))
-            .toList(),
-      );
-    });
-  },child: Padding(
-    padding: const EdgeInsets.all(4.0),
-    child: child,
-  ));
+Widget _buildCupertinoPopupButton(BuildContext context, Widget child,
+    List<PlatformAwarePopupMenuAction> actions) {
+  return GestureDetector(
+      onTap: () {
+        showCupertinoPopup(context, actions);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: child,
+      ));
+}
 
+showPlatformAwarePopup(BuildContext context, RelativeRect position,
+    List<PlatformAwarePopupMenuAction> actions) {
+  switch (detectCurrentUIPlatform()) {
+    case UIPlatform.MATERIAL:
+      return showMaterialPopup(context, position, actions);
+      break;
+    case UIPlatform.CUPERTINO:
+      return showCupertinoPopup(context, actions);
+      break;
+  }
+  throw Exception("invalid platform");
+}
+
+showMaterialPopup(BuildContext context, RelativeRect position,
+    List<PlatformAwarePopupMenuAction> actions) async {
+  showMenu(
+          context: context,
+          position: position,
+          items: convertToMaterialActions(actions))
+      .then((selected) {
+    selected?.actionCallback(selected);
+  });
+}
+
+showCupertinoPopup(
+    BuildContext context, List<PlatformAwarePopupMenuAction> actions) {
+  return showCupertinoModalPopup(
+      context: context,
+      builder: (_) {
+        return CupertinoActionSheet(
+          actions: actions
+              .map((action) => CupertinoActionSheetAction(
+                    child: _buildRow(action.iconData, action.text),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      action.actionCallback(action);
+                    },
+                  ))
+              .toList(),
+        );
+      });
 }
 
 PopupMenuButton<PlatformAwarePopupMenuAction> _buildMaterialPopupButton(
@@ -59,14 +90,19 @@ PopupMenuButton<PlatformAwarePopupMenuAction> _buildMaterialPopupButton(
       padding: const EdgeInsets.all(4.0),
       child: child,
     ),
-    itemBuilder: (_) => actions
-        .map((action) => buildDropdownMenuItemRow(
-            text: action.text, iconData: action.iconData, value: action))
-        .toList(),
+    itemBuilder: (_) => convertToMaterialActions(actions),
     onSelected: (PlatformAwarePopupMenuAction selectedItem) {
       selectedItem.actionCallback(selectedItem);
     },
   );
+}
+
+List<PopupMenuItem<PlatformAwarePopupMenuAction>> convertToMaterialActions(
+    List<PlatformAwarePopupMenuAction> actions) {
+  return actions
+      .map((action) => buildDropdownMenuItemRow(
+          text: action.text, iconData: action.iconData, value: action))
+      .toList();
 }
 
 PopupMenuItem<T> buildDropdownMenuItemRow<T>(

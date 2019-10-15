@@ -5,12 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_preview_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_body_widget.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
@@ -86,19 +86,22 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message) {
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 
-    rows.add(Linkify(
-      onOpen: (link) async {
-        if (await canLaunch(link.url)) {
-          await launch(link.url);
-        } else {
-          throw 'Could not launch $link';
-        }
-      },
-      text: text,
-      style: messagesSkin.regularMessageBodyTextStyle,
-      linkStyle: messagesSkin
-          .modifyToLinkTextStyle(messagesSkin.regularMessageBodyTextStyle),
-    ));
+    rows.add(buildRegularMessageBody(context, text, nicknames: message
+        .nicknames));
+//
+//    rows.add(Linkify(
+//      onOpen: (link) async {
+//        if (await canLaunch(link.url)) {
+//          await launch(link.url);
+//        } else {
+//          throw 'Could not launch $link';
+//        }
+//      },
+//      text: text,
+//      style: messagesSkin.regularMessageBodyTextStyle,
+//      linkStyle: messagesSkin
+//          .modifyToLinkTextStyle(messagesSkin.regularMessageBodyTextStyle),
+//    ));
   }
 
   if (message.previews != null) {

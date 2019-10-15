@@ -34,8 +34,9 @@ dependencies:
   json_annotation: ^3.0.0
   logger: ^0.7.0+2
   rxdart: ^0.18.1
-  # support links in messages
-  flutter_linkify: ^2.1.0
+
+
+  # open links in messages
   url_launcher: ^5.1.2
 
   # checking network connection

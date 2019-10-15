@@ -108,7 +108,7 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textRegularMediumStyle => textTheme.body1;
 
   @override
-  TextStyle get textRegularSmallStyle => textTheme.body2.copyWith(fontSize: 12);
+  TextStyle get textRegularSmallStyle => textTheme.body2.copyWith(fontSize: 14);
 
   @override
   TextStyle get textTitleStyle =>
