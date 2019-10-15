@@ -32,6 +32,16 @@ Widget buildRegularMessage(BuildContext context, RegularMessage message) {
   var body = _buildMessageBody(context, message);
   var title = _buildMessageTitle(context, channelBloc, message);
 
+  var subMessage = _buildTitleSubMessage(context, message);
+
+  if (subMessage != null) {
+    // todo: rework
+    body = Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[subMessage, body]);
+  }
+
   var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
   var color =
@@ -109,27 +119,27 @@ Widget _buildMessageTitle(BuildContext context, NetworkChannelBloc channelBloc,
 
   var startPart;
 
-  var subMessage = _buildTitleSubMessage(context, message);
-
   if (message.isHaveFromNick) {
     var messageTitleNick =
         _buildMessageTitleNick(context, channelBloc, message);
-    if (subMessage != null) {
-      startPart = Row(children: <Widget>[
-        messageTitleNick,
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: subMessage,
-        )
-      ]);
-    } else {
-      startPart = messageTitleNick;
-    }
+//    if (subMessage != null) {
+//      startPart = Row(children: <Widget>[
+//        messageTitleNick,
+//        Padding(
+//          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+//          child: subMessage,
+//        )
+//      ]);
+//    } else {
+    startPart = messageTitleNick;
+//    }
   } else {
-    if (subMessage != null) {
-      startPart = subMessage;
-    }
+    startPart = SizedBox.shrink();
+//    if (subMessage != null) {
+//      startPart = subMessage;
+//    }
   }
+  // todo: rework
 
   var endPart;
   var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
@@ -483,8 +493,6 @@ class MessageMediaPreviewWidgetState extends State<MessageMediaPreviewWidget> {
       videoPlayerController: _videoPlayerController1,
       allowFullScreen: false,
 
-
-
       // Try playing around with some of these other options:
 
       // showControls: false,
@@ -497,7 +505,7 @@ class MessageMediaPreviewWidgetState extends State<MessageMediaPreviewWidget> {
       // placeholder: Container(
       //   color: Colors.grey,
       // ),
-       autoInitialize: true,
+      autoInitialize: true,
 //      autoPlay: true,
     );
   }
