@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie_audio/chewie_audio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -10,10 +11,12 @@ import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+
+var _logger = MyLogger(logTag: "messages_regular_widgets.dart", enabled: true);
 
 var todayDateFormatter = new DateFormat().add_Hm();
 var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
@@ -86,8 +89,8 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message) {
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 
-    rows.add(buildRegularMessageBody(context, text, nicknames: message
-        .nicknames));
+    rows.add(
+        buildRegularMessageBody(context, text, nicknames: message.nicknames));
 //
 //    rows.add(Linkify(
 //      onOpen: (link) async {
@@ -272,6 +275,8 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
 }
 
 Widget buildPreview(BuildContext context, MessagePreview preview) {
+  _logger.d((() => " build preview for $preview"));
+
   switch (preview.type) {
     case MessagePreviewType.LINK:
       return buildMessageLinkPreview(context, preview);
@@ -293,10 +298,10 @@ Widget buildPreview(BuildContext context, MessagePreview preview) {
 }
 
 Widget buildMessageVideoPreview(BuildContext context, MessagePreview preview) =>
-    MessageMediaPreviewWidget(preview.media);
+    MessageVideoPreviewWidget(preview.media);
 
 Widget buildMessageAudioPreview(BuildContext context, MessagePreview preview) =>
-    MessageMediaPreviewWidget(preview.media);
+    MessageAudioPreviewWidget(preview.media);
 
 Widget buildMessageLinkPreview(BuildContext context, MessagePreview preview) {
   var rows = <Widget>[
@@ -391,12 +396,8 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
   return icon;
 }
 
-Widget buildRegularMessageWidget(
-    BuildContext context,
-    Widget title, Widget body, bool needHighlight, Color color) {
-
-
-
+Widget buildRegularMessageWidget(BuildContext context, Widget title,
+    Widget body, bool needHighlight, Color color) {
   var decoration;
   if (needHighlight) {
     var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
@@ -467,21 +468,21 @@ Icon buildMessageIcon(IconData iconData, Color color) {
   return Icon(iconData, color: color);
 }
 
-class MessageMediaPreviewWidget extends StatefulWidget {
-  String _mediaURL;
+class MessageVideoPreviewWidget extends StatefulWidget {
+  String _videoURL;
 
-  MessageMediaPreviewWidget(this._mediaURL);
+  MessageVideoPreviewWidget(this._videoURL);
 
   @override
   State<StatefulWidget> createState() {
-    return MessageMediaPreviewWidgetState(_mediaURL);
+    return MessageVideoPreviewWidgetState(_videoURL);
   }
 }
 
-class MessageMediaPreviewWidgetState extends State<MessageMediaPreviewWidget> {
-  String _mediaURL;
+class MessageVideoPreviewWidgetState extends State<MessageVideoPreviewWidget> {
+  String _videoURL;
 
-  MessageMediaPreviewWidgetState(this._mediaURL);
+  MessageVideoPreviewWidgetState(this._videoURL);
 
   VideoPlayerController _videoPlayerController1;
   ChewieController _chewieController;
@@ -496,7 +497,7 @@ class MessageMediaPreviewWidgetState extends State<MessageMediaPreviewWidget> {
   @override
   void initState() {
     super.initState();
-    _videoPlayerController1 = VideoPlayerController.network(_mediaURL);
+    _videoPlayerController1 = VideoPlayerController.network(_videoURL);
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController1,
       allowFullScreen: false,
@@ -523,5 +524,49 @@ class MessageMediaPreviewWidgetState extends State<MessageMediaPreviewWidget> {
     return Chewie(
       controller: _chewieController,
     );
+  }
+}
+
+class MessageAudioPreviewWidget extends StatefulWidget {
+  String _audioURL;
+
+  MessageAudioPreviewWidget(this._audioURL);
+
+  @override
+  State<StatefulWidget> createState() {
+    return MessageAudioPreviewWidgetState(_audioURL);
+  }
+}
+
+class MessageAudioPreviewWidgetState extends State<MessageAudioPreviewWidget> {
+  String _audioURL;
+
+  MessageAudioPreviewWidgetState(this._audioURL);
+
+  VideoPlayerController _videoPlayerController1;
+  ChewieAudioController chewieAudioController;
+
+  @override
+  void dispose() {
+    _videoPlayerController1.dispose();
+    chewieAudioController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _videoPlayerController1 = VideoPlayerController.network(_audioURL);
+    chewieAudioController = ChewieAudioController(
+        videoPlayerController: _videoPlayerController1,
+        autoInitialize: true,
+        errorBuilder: (context, str) {
+          return Text("$str");
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChewieAudio(controller: chewieAudioController);
   }
 }

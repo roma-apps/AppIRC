@@ -65,6 +65,7 @@ dependencies:
 
   # video/audio player for preview render
   chewie: ^0.9.8+1
+  chewie_audio: ^1.0.0+1
   video_player: ^0.10.2+3
 
 dev_dependencies:
