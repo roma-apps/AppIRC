@@ -56,7 +56,7 @@ class ChatInitBloc extends Providable {
     }
   }
 
-  void _sendStartRequests() {
+  void _sendStartRequests() async {
     _logger.d(() => "_sendStartRequests $state");
     if (isInitNotStarted) {
       _logger.d(() => "_sendStartRequests $state");
@@ -64,12 +64,14 @@ class ChatInitBloc extends Providable {
 
       // server restores state automatically in private mode
       if (_backendService.chatConfig.public) {
-        _startPreferences.networks.forEach((network) async {
+
+        for(var network in _startPreferences.networks) {
           await _backendService.joinNetwork(network, waitForResult: true);
-        });
+        }
       } else {
-        _backendService.chatInit?.networksWithState?.forEach(
-            _networksListBloc.onNetworkJoined);
+        for(var network in _backendService.chatInit?.networksWithState ??= []) {
+          await _networksListBloc.onNetworkJoined(network);
+        }
       }
       _stateController.add(ChatInitState.FINISHED);
     }

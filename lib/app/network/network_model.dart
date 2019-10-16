@@ -191,6 +191,8 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
   @override
   Map<String, dynamic> toJson() =>
       _$ChatNetworkConnectionPreferencesToJson(this);
+
+
 }
 
 class NetworkState {

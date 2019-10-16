@@ -57,28 +57,28 @@ class ChatNetworksListBloc extends Providable {
         networkWithState.channelsWithState,
         nextChannelIdGenerator);
 
-    var networks = _currentNetworks;
+
 
     Disposable listenForNetworkExit;
     listenForNetworkExit = backendService.listenForNetworkLeave(network, () {
-      var networks = _currentNetworks;
+
 
       _networksChannelListBlocs.remove(network).dispose();
 
-      networks.remove(network);
+      _networks.remove(network);
 
       leaveListeners[network].forEach((listener) => listener());
 
-      _onNetworksChanged(networks);
+      _onNetworksChanged(_networks);
       listenForNetworkExit.dispose();
     });
     addDisposable(disposable: listenForNetworkExit);
 
-    networks.add(network);
+    _networks.add(network);
 
     joinListeners.forEach((listener) => listener(networkWithState));
 
-    _onNetworksChanged(networks);
+    _onNetworksChanged(_networks);
   }
 
   void _onNetworksChanged(List<Network> networks) {
@@ -127,9 +127,10 @@ class ChatNetworksListBloc extends Providable {
           .map((networks) => UnmodifiableListView(networks));
 
   UnmodifiableListView<Network> get networks =>
-      UnmodifiableListView(_networksController.value);
+      UnmodifiableListView(_networks);
 
-  List<Network> get _currentNetworks => _networksController.value;
+  List<Network> get _networks => _networksController.value;
+
 
   Stream<int> get networksCountStream => networksStream.map((networks) {
         if (networks != null) {
@@ -139,7 +140,7 @@ class ChatNetworksListBloc extends Providable {
         }
       });
 
-  bool get isNetworksEmpty => networks.isEmpty;
+  bool get isNetworksEmpty => _networks.isEmpty;
 
   Stream<bool> get isNetworksEmptyStream => networksStream.map((networks) {
         if (networks != null) {
