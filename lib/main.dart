@@ -121,6 +121,8 @@ class AppIRCState extends State<AppIRC> {
           await pushesService.askPermissions();
           await pushesService.configure();
 
+
+
           loungePreferencesBloc
               .valueStream(defaultValue: LoungePreferences.empty)
               .listen((newPreferences) {
@@ -162,107 +164,106 @@ class AppIRCState extends State<AppIRC> {
       var chatPushesService =
           ChatPushesService(pushesService, loungeBackendService);
 
-      loungeBackendService.init().then((_) {
-        this.loungeBackendService = loungeBackendService;
+      await loungeBackendService.init();
+      this.loungeBackendService = loungeBackendService;
 
-        var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);
+      var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);
 
-        var networksListBloc = ChatNetworksListBloc(
+      var networksListBloc = ChatNetworksListBloc(
+        loungeBackendService,
+        nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
+        nextChannelIdGenerator:
+        chatPreferencesBloc.getNextNetworkChannelLocalId,
+      );
+
+      var connectionBloc = ChatConnectionBloc(loungeBackendService);
+      var networkStatesBloc =
+      ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+
+      var _startPreferences =
+      chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+
+      var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
+          networksListBloc, _startPreferences);
+
+      var activeChannelBloc = ChatActiveChannelBloc(
           loungeBackendService,
-          nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
-          nextChannelIdGenerator:
-              chatPreferencesBloc.getNextNetworkChannelLocalId,
-        );
+          chatInitBloc,
+          networksListBloc,
+          preferencesService,
+          chatPushesService);
 
-        var connectionBloc = ChatConnectionBloc(loungeBackendService);
-        var networkStatesBloc =
-            ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+      var channelsStatesBloc = ChatNetworkChannelsStateBloc(
+          loungeBackendService, networksListBloc, activeChannelBloc);
 
-        var _startPreferences =
-            chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+      var channelsBlocsBloc = ChatNetworkChannelsBlocsBloc(
+          loungeBackendService, networksListBloc, channelsStatesBloc);
+      var networksBlocsBloc = ChatNetworksBlocsBloc(
+          loungeBackendService,
+          networksListBloc,
+          networkStatesBloc,
+          channelsStatesBloc,
+          activeChannelBloc);
 
-        var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
-            networksListBloc, _startPreferences);
+      var chatDeepLinkBloc = ChatDeepLinkBloc(
+          loungeBackendService,
+          chatInitBloc,
+          networksListBloc,
+          networksBlocsBloc,
+          activeChannelBloc);
 
-        var activeChannelBloc = ChatActiveChannelBloc(
-            loungeBackendService,
-            chatInitBloc,
-            networksListBloc,
-            preferencesService,
-            chatPushesService);
-
-        var channelsStatesBloc = ChatNetworkChannelsStateBloc(
-            loungeBackendService, networksListBloc, activeChannelBloc);
-
-        var channelsBlocsBloc = ChatNetworkChannelsBlocsBloc(
-            loungeBackendService, networksListBloc, channelsStatesBloc);
-        var networksBlocsBloc = ChatNetworksBlocsBloc(
-            loungeBackendService,
-            networksListBloc,
-            networkStatesBloc,
-            channelsStatesBloc,
-            activeChannelBloc);
-
-        var chatDeepLinkBloc = ChatDeepLinkBloc(
-            loungeBackendService,
-            chatInitBloc,
-            networksListBloc,
-            networksBlocsBloc,
-            activeChannelBloc);
-
-        var chatUnreadBloc = ChatUnreadBloc(channelsStatesBloc);
-        createdWidget = Provider(
-          providable: chatDeepLinkBloc,
-          child: Provider(
-            providable: ChatDatabaseProvider(database),
-            child: Provider<ChatBackendService>(
+      var chatUnreadBloc = ChatUnreadBloc(channelsStatesBloc);
+      createdWidget = Provider(
+        providable: chatDeepLinkBloc,
+        child: Provider(
+          providable: ChatDatabaseProvider(database),
+          child: Provider<ChatBackendService>(
+            providable: loungeBackendService,
+            child: Provider<LoungeBackendService>(
               providable: loungeBackendService,
-              child: Provider<LoungeBackendService>(
+              child: Provider<ChatInputOutputBackendService>(
                 providable: loungeBackendService,
-                child: Provider<ChatInputOutputBackendService>(
+                child: Provider<ChatOutputBackendService>(
                   providable: loungeBackendService,
-                  child: Provider<ChatOutputBackendService>(
+                  child: Provider<ChatInputBackendService>(
                     providable: loungeBackendService,
-                    child: Provider<ChatInputBackendService>(
-                      providable: loungeBackendService,
+                    child: Provider(
+                      providable: chatPreferencesBloc,
                       child: Provider(
-                        providable: chatPreferencesBloc,
+                        providable: connectionBloc,
                         child: Provider(
-                          providable: connectionBloc,
+                          providable: networksListBloc,
                           child: Provider(
-                            providable: networksListBloc,
+                            providable: networkStatesBloc,
                             child: Provider(
-                              providable: networkStatesBloc,
+                              providable: channelsStatesBloc,
                               child: Provider(
-                                providable: channelsStatesBloc,
+                                providable: networksBlocsBloc,
                                 child: Provider(
-                                  providable: networksBlocsBloc,
+                                  providable: channelsBlocsBloc,
                                   child: Provider(
-                                    providable: channelsBlocsBloc,
+                                    providable: activeChannelBloc,
                                     child: Provider(
-                                      providable: activeChannelBloc,
+                                      providable: chatInitBloc,
                                       child: Provider(
-                                        providable: chatInitBloc,
+                                        providable: chatUnreadBloc,
                                         child: Provider(
-                                          providable: chatUnreadBloc,
+                                          providable: chatPushesService,
                                           child: Provider(
-                                            providable: chatPushesService,
+                                            providable:
+                                            NetworkChannelMessagesSaverBloc(
+                                                loungeBackendService,
+                                                networksListBloc,
+                                                database),
                                             child: Provider(
                                               providable:
-                                                  NetworkChannelMessagesSaverBloc(
-                                                      loungeBackendService,
-                                                      networksListBloc,
-                                                      database),
-                                              child: Provider(
-                                                providable:
-                                                    ChatPreferencesSaverBloc(
-                                                        loungeBackendService,
-                                                        networkStatesBloc,
-                                                        networksListBloc,
-                                                        chatPreferencesBloc,
-                                                        chatInitBloc),
-                                                child: _buildApp(ChatPage()),
-                                              ),
+                                              ChatPreferencesSaverBloc(
+                                                  loungeBackendService,
+                                                  networkStatesBloc,
+                                                  networksListBloc,
+                                                  chatPreferencesBloc,
+                                                  chatInitBloc),
+                                              child: _buildApp(ChatPage()),
                                             ),
                                           ),
                                         ),
@@ -281,10 +282,10 @@ class AppIRCState extends State<AppIRC> {
               ),
             ),
           ),
-        );
+        ),
+      );
 
-        setState(() {});
-      });
+      setState(() {});
     }
   }
 
