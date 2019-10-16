@@ -49,7 +49,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
       _logger.d(() => "chatPushMessageStream $chatPushMessage");
 
       var chanIdString = chatPushMessage.data?.chanId;
-      if(chanIdString != null) {
+      if (chanIdString != null) {
         var channelRemoteId = int.parse(chanIdString);
         if (chatPushMessage.type == PushMessageType.RESUME) {
           var channel = await findChannelWithRemoteID(channelRemoteId);
@@ -61,12 +61,16 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
       } else {
         _logger.e(() => "Error during handling $chatPushMessage");
       }
-
-
-
     }));
 
     _logger.i(() => "start creating");
+
+    addDisposable(
+        streamSubscription: _chatInitBloc.stateStream.listen((state) {
+          if(state == ChatInitState.FINISHED && _networksListBloc.networks.isNotEmpty) {
+            tryRestoreActiveChannel();
+          }
+        }));
 
     addDisposable(disposable: _preferenceBloc);
 
@@ -94,12 +98,10 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
   }
 
   Future _restoreFromLaunchPushMessage() async =>
-    await _restoreByRemoteID(_channelRemoteIdFromLaunchPushMessage);
+      await _restoreByRemoteID(_channelRemoteIdFromLaunchPushMessage);
 
-
-  Future _restoreFromChatInitMessage() async  =>
-    await _restoreByRemoteID( _backendService.chatInit.activeChannelRemoteId);
-
+  Future _restoreFromChatInitMessage() async =>
+      await _restoreByRemoteID(_backendService.chatInit.activeChannelRemoteId);
 
   Future _restoreByRemoteID(int chatInitActiveChannelRemoteID) async {
     NetworkChannel newActiveChannel =
