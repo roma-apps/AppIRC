@@ -13,6 +13,7 @@ class LoungeRequestEventNames {
   static const String open = "open";
   static const String pushToken = "push:fcmToken";
   static const String auth = "auth";
+  static const String uploadAuth = "upload:auth";
 }
 
 abstract class LoungeRequest extends SocketIOCommand {

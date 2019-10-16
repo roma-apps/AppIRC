@@ -102,7 +102,7 @@ ConfigurationLoungeResponseBody _$ConfigurationLoungeResponseBodyFromJson(
     json['public'] as bool,
     json['useHexIp'] as bool,
     json['themes'] as List,
-    json['fileUploadMaxSize'] as int,
+    json['fileUploadMaxFileSize'] as int,
     json['gitCommit'] as String,
     json['version'] as String,
   );
@@ -121,7 +121,7 @@ Map<String, dynamic> _$ConfigurationLoungeResponseBodyToJson(
       'public': instance.public,
       'useHexIp': instance.useHexIp,
       'themes': instance.themes,
-      'fileUploadMaxSize': instance.fileUploadMaxSize,
+      'fileUploadMaxFileSize': instance.fileUploadMaxFileSize,
       'gitCommit': instance.gitCommit,
       'version': instance.version,
     };

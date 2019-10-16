@@ -211,7 +211,8 @@ abstract class WordSpanBuilder {
 
 class LinkWordSpanBuilder extends WordSpanBuilder {
   static final _regex = RegExp(
-    r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
+    r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z0-9]{2,6}\b"
+    r"([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
     caseSensitive: false,
   );
 

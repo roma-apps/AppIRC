@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
@@ -148,6 +150,8 @@ abstract class ChatInputBackendService implements ChatBackendService {
   Future<RequestResult<RegularMessage>> sendNetworkChannelRawMessage(
       Network network, NetworkChannel channel, String rawMessage,
       {bool waitForResult: false});
+
+  Future<RequestResult<String>> uploadFile(File file);
 }
 
 abstract class ChatInputOutputBackendService

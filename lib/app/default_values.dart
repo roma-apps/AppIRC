@@ -11,10 +11,11 @@ LoungePreferences createDefaultLoungePreferences(
 //LoungeConnectionPreferences(host: "http://192.168.0.102:9000/");
 //    LoungeConnectionPreferences(host: "http://192.168.0.103:9000/");
 //    LoungeConnectionPreferences(host: "http://192.168.0.103:9000/");
+LoungePreferences(LoungeConnectionPreferences("http://192.168.1.102:9000/"));
 //LoungePreferences(LoungeConnectionPreferences("http://192.168.1.103:9000/"));
 //LoungePreferences(LoungeConnectionPreferences("http://192.168.0.104:9000/"));
 //LoungePreferences(LoungeConnectionPreferences("http://167.71.55.184:9000/"));
-LoungePreferences(LoungeConnectionPreferences("https://irc.pleroma.social/"));
+//LoungePreferences(LoungeConnectionPreferences("https://irc.pleroma.social/"));
 //LoungePreferences(LoungeConnectionPreferences("https://demo.thelounge.chat/"));
 
 

@@ -26,6 +26,7 @@ import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/chat/chat_preferences_saver_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_pushes_service.dart';
 import 'package:flutter_appirc/app/chat/chat_unread_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_upload_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
@@ -212,6 +213,8 @@ class AppIRCState extends State<AppIRC> {
           networksBlocsBloc,
           activeChannelBloc);
 
+      var chatUploadBloc = ChatUploadBloc(loungeBackendService);
+
       var chatUnreadBloc = ChatUnreadBloc(channelsStatesBloc);
       createdWidget = Provider(
         providable: chatDeepLinkBloc,
@@ -250,20 +253,23 @@ class AppIRCState extends State<AppIRC> {
                                         child: Provider(
                                           providable: chatPushesService,
                                           child: Provider(
-                                            providable:
-                                            NetworkChannelMessagesSaverBloc(
-                                                loungeBackendService,
-                                                networksListBloc,
-                                                database),
+                                            providable: chatUploadBloc,
                                             child: Provider(
                                               providable:
-                                              ChatPreferencesSaverBloc(
+                                              NetworkChannelMessagesSaverBloc(
                                                   loungeBackendService,
-                                                  networkStatesBloc,
                                                   networksListBloc,
-                                                  chatPreferencesBloc,
-                                                  chatInitBloc),
-                                              child: _buildApp(ChatPage()),
+                                                  database),
+                                              child: Provider(
+                                                providable:
+                                                ChatPreferencesSaverBloc(
+                                                    loungeBackendService,
+                                                    networkStatesBloc,
+                                                    networksListBloc,
+                                                    chatPreferencesBloc,
+                                                    chatInitBloc),
+                                                child: _buildApp(ChatPage()),
+                                              ),
                                             ),
                                           ),
                                         ),

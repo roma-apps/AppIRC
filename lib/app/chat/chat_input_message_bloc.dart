@@ -70,6 +70,10 @@ class ChatInputMessageBloc extends Providable {
     _logger.d(() =>
         "after onAutoCompleteSelected $currentMessage replaceText = $replaceText newMessage = $newMessage");
   }
+
+  void appendText(String remoteURL) {
+    messageController.text += remoteURL;
+  }
 }
 
 abstract class AutoCompleteProvider extends Providable {

@@ -10,6 +10,7 @@ import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_adapter.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_upload_helper.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/chat_init_model.dart';
@@ -936,7 +937,41 @@ class LoungeBackendService extends Providable
                 target: channel.remoteId, content: message)),
         isNeedAddRequestToPending: false);
   }
+
+  @override
+  Future<RequestResult<String>> uploadFile(File file) async {
+
+    String uploadFileToken;
+    var tokenListener = (raw) {
+      if (raw is String && raw.isNotEmpty) {
+        uploadFileToken = raw;
+      }
+    };
+    _socketIOService.on(LoungeResponseEventNames
+        .uploadAuth, tokenListener);
+    _socketIOService.emit(LoungeRawRequest(name: LoungeRequestEventNames.uploadAuth));
+
+
+    await Future.delayed(Duration(seconds: 1));
+
+    _socketIOService.off(LoungeResponseEventNames
+        .uploadAuth, tokenListener);
+
+
+    if(uploadFileToken != null) {
+      String loungeUrl = _loungePreferences.connectionPreferences.host;
+      var uploadedFileRemoteURL  = await uploadFileToLounge(loungeUrl,
+          uploadFileToken,
+          file);
+
+      return RequestResult.name(isSentSuccessfully: true, result:
+      uploadedFileRemoteURL);
+    } else {
+      throw ServerAuthUploadException();
+    }
+  }
 }
+
 
 ChatConnectionState mapState(SocketConnectionState socketState) {
   switch (socketState) {

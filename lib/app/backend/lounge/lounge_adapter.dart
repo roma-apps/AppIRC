@@ -54,7 +54,7 @@ ChatConfig toChatConfig(
         prefetch: loungeConfig.prefetch,
         public: loungeConfig.public,
         useHexIp: loungeConfig.useHexIp,
-        fileUploadMaxSize: loungeConfig.fileUploadMaxSize,
+        fileUploadMaxSizeInBytes: loungeConfig.fileUploadMaxFileSize,
         commands: commands);
 
 

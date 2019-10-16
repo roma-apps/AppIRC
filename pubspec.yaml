@@ -27,13 +27,22 @@ dependencies:
 
   # socket io protocol implementation for lounge
   adhara_socket_io: ^0.3.5
+  # Support different languages
   easy_localization: ^1.3.1
   # date formatter & locales
   intl: ^0.15.8
   # for lounge commands serialization & local settings serialization
   json_annotation: ^3.0.0
+  # logging wrapper for Android/iOS
   logger: ^0.7.0+2
+  # Reactive progreamming
   rxdart: ^0.18.1
+
+  # file picker UI for upload
+  file_picker: ^1.4.2
+
+  # upload files via post
+  http: ^0.12.0+2
 
 
   # open links in messages
@@ -48,7 +57,7 @@ dependencies:
   # handle click on irc:// links
   uni_links: ^0.2.0
 
-  # sqlite orm
+  # sqlite orm to store messages in DB instead of RAM
   floor: ^0.8.0
 
 
@@ -60,7 +69,7 @@ dependencies:
   # used for connection/channels settings
   streaming_shared_preferences: ^1.0.1
 
-  # autocomplete
+  # send message autocomplete
   flutter_typeahead: ^1.6.1
 
   # video/audio player for preview render
@@ -72,7 +81,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # run dev tools like JSON or ORM code generators
   build_runner: ^1.0.0
+
   # for socket io commands serialization
   json_serializable: ^3.2.0
   # sqlite orm

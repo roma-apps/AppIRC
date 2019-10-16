@@ -23,6 +23,7 @@ class LoungeResponseEventNames {
   static const String networkOptions = "network:options";
   static const String channelState = "channel:state";
   static const String init = "init";
+  static const String uploadAuth = "upload:auth";
 }
 
 class LoungeResponseMessagePreviewType {
@@ -56,6 +57,8 @@ class ChanLoungeResponseBody extends LoungeResponseBody {
   factory ChanLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ChanLoungeResponseBodyFromJson(json);
 }
+
+
 
 @JsonSerializable()
 class MessageLoungeResponseBody extends LoungeResponseBody {
@@ -136,7 +139,7 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
   final bool public;
   final bool useHexIp;
   final List<dynamic> themes;
-  final int fileUploadMaxSize;
+  final int fileUploadMaxFileSize;
   final String gitCommit;
   final String version;
 
@@ -151,7 +154,7 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
       this.public,
       this.useHexIp,
       this.themes,
-      this.fileUploadMaxSize,
+      this.fileUploadMaxFileSize,
       this.gitCommit,
       this.version);
 
@@ -162,7 +165,7 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
         ' fileUpload: $fileUpload, ldapEnabled: $ldapEnabled,'
         ' lockNetwork: $lockNetwork, prefetch: $prefetch,'
         ' public: $public, useHexIp: $useHexIp, themes: $themes,'
-        ' fileUploadMaxSize: $fileUploadMaxSize, '
+        ' fileUploadMaxFileSize: $fileUploadMaxFileSize, '
         'gitCommit: $gitCommit, version: $version}';
   }
 

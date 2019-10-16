@@ -14,13 +14,13 @@ class ChatConfig {
   final bool prefetch;
   final bool public;
   final bool useHexIp;
-  final int fileUploadMaxSize;
+  final int fileUploadMaxSizeInBytes;
   final List<String> commands;
 
 
   ChatConfig(this.defaultNetwork, this.defaultChannels, this.fileUpload,
       this.ldapEnabled, this.displayNetwork, this.lockNetwork, this.prefetch,
-      this.public, this.useHexIp, this.fileUploadMaxSize, this.commands);
+      this.public, this.useHexIp, this.fileUploadMaxSizeInBytes, this.commands);
 
 
   @override
@@ -29,7 +29,7 @@ class ChatConfig {
         '$defaultChannels, fileUpload: $fileUpload, '
         'ldapEnabled: $ldapEnabled, displayNetwork: $displayNetwork, '
         'lockNetwork: $lockNetwork, prefetch: $prefetch, public: $public, '
-        'useHexIp: $useHexIp, fileUploadMaxSize: $fileUploadMaxSize, '
+        'useHexIp: $useHexIp, fileUploadMaxSize: $fileUploadMaxSizeInBytes, '
         'commands: $commands}';
   }
 
@@ -43,7 +43,7 @@ class ChatConfig {
       @required this.prefetch,
       @required this.public,
       @required this.useHexIp,
-      @required this.fileUploadMaxSize,
+      @required this.fileUploadMaxSizeInBytes,
       @required this.commands});
 
 
