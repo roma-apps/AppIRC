@@ -1,42 +1,83 @@
-import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
+import 'package:flutter_appirc/app/user/users_list_bloc.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware_text_field.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 
-class ChannelUsersInfoWidget extends StatefulWidget {
+class ChannelUsersListWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => ChannelUsersInfoState();
+  State<StatefulWidget> createState() => ChannelUsersListWidgetState();
 }
 
-class ChannelUsersInfoState extends State<ChannelUsersInfoWidget> {
+class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
+  TextEditingController filterController;
+
+  @override
+  void initState() {
+    filterController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    filterController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
 
     ColoredNicknamesBloc coloredNicknamesBloc = Provider.of(context);
-    NetworkChannelBloc channelBloc = Provider.of<NetworkChannelBloc>(context);
+    ChannelUsersListBloc channelUsersListBloc =
+        Provider.of<ChannelUsersListBloc>(context);
 
     return StreamBuilder<List<NetworkChannelUser>>(
-        stream: channelBloc.usersStream,
-        initialData: channelBloc.currentNotUpdateUsers,
+        stream: channelUsersListBloc.usersStream,
+        initialData: channelUsersListBloc.users,
         builder: (BuildContext context,
             AsyncSnapshot<List<NetworkChannelUser>> snapshot) {
           var users = snapshot.data;
 
-          if (users != null && users.isNotEmpty) {
-            return ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return _buildUserListItem(
-                      context, users[index], coloredNicknamesBloc);
-                });
+          if (users != null) {
+            Widget body;
+            if (users.isEmpty) {
+              body = Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                    child: Text(appLocalizations.tr("chat.users.not_found"),
+                        style: TextStyle(
+                            color:
+                                AppSkinBloc.of(context).appSkinTheme.textColor))),
+              );
+            } else {
+              body = Flexible(
+                child: ListView.builder(
+                    itemCount: users.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return _buildUserListItem(
+                          context, users[index], coloredNicknamesBloc);
+                    }),
+              );
+            }
+            return Column(
+              children: <Widget>[
+                buildPlatformTextField(
+                  context,
+                  channelUsersListBloc.filterFieldBloc,
+                  filterController,
+                  AppLocalizations.of(context).tr("chat.users_list.filter"
+                      ".name"),
+                  AppLocalizations.of(context).tr("chat.users_list.filter"
+                      ".hint"),
+                ),
+                body,
+              ],
+            );
           } else {
             return Center(
                 child: Text(appLocalizations.tr("chat.users.loading"),

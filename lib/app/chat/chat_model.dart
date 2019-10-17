@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 
 class ChatConfig {
-
   final ChatNetworkConnectionPreferences defaultNetwork;
   final String defaultChannels;
 
@@ -17,11 +16,18 @@ class ChatConfig {
   final int fileUploadMaxSizeInBytes;
   final List<String> commands;
 
-
-  ChatConfig(this.defaultNetwork, this.defaultChannels, this.fileUpload,
-      this.ldapEnabled, this.displayNetwork, this.lockNetwork, this.prefetch,
-      this.public, this.useHexIp, this.fileUploadMaxSizeInBytes, this.commands);
-
+  ChatConfig(
+      this.defaultNetwork,
+      this.defaultChannels,
+      this.fileUpload,
+      this.ldapEnabled,
+      this.displayNetwork,
+      this.lockNetwork,
+      this.prefetch,
+      this.public,
+      this.useHexIp,
+      this.fileUploadMaxSizeInBytes,
+      this.commands);
 
   @override
   String toString() {
@@ -45,10 +51,6 @@ class ChatConfig {
       @required this.useHexIp,
       @required this.fileUploadMaxSizeInBytes,
       @required this.commands});
-
-
-
-
 }
 
 class ServerNameNotUniqueException implements Exception {}
@@ -85,4 +87,12 @@ class NetworkChannelUser {
       this.connectedAt,
       this.idleSince,
       this.mode});
+
+  @override
+  String toString() {
+    return 'NetworkChannelUser{nick: $nick, hostMask: $hostMask, '
+        'realName: $realName, channels: $channels, '
+        'secureConnection: $secureConnection, connectedTo: $connectedTo, '
+        'connectedAt: $connectedAt, idleSince: $idleSince, mode: $mode}';
+  }
 }

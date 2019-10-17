@@ -35,7 +35,7 @@ class NetworkChannelTopicWidgetState extends State<NetworkChannelTopicWidget> {
   Widget build(BuildContext context) {
     var formBloc = Provider.of<ChannelTopicFormBloc>(context);
 
-    return buildTextField(
+    return buildPlatformTextField(
         context,
         formBloc.topicFieldBloc,
         _topicController,

@@ -8,7 +8,7 @@ import 'package:flutter_appirc/form/form_skin_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-PlatformTextField buildTextField(
+PlatformTextField buildPlatformTextField(
     BuildContext context,
     FormValueFieldBloc<String> bloc,
     TextEditingController controller,

@@ -47,9 +47,9 @@ class NetworkChannelBloc extends Providable {
 
   Stream<List<NetworkChannelUser>> get usersStream => _usersController.stream;
 
+  List<NetworkChannelUser> get users => _usersController.value;
   DateTime _lastUsersRefreshDate;
 
-  List<NetworkChannelUser> get currentNotUpdateUsers => _usersController.value;
 
   Future<List<NetworkChannelUser>> getUsers({forceRefresh: false}) async {
     if (forceRefresh || _lastUsersRefreshDate == null) {

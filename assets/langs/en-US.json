@@ -141,6 +141,12 @@
     "enter_message": {
       "hint": "Enter message..."
     },
+    "users_list": {
+      "filter": {
+        "name": "Search",
+        "hint": "Nickname"
+      }
+    },
     "connection": {
       "connected": "Connected to server",
       "connecting": "Connecting to server",
@@ -179,7 +185,8 @@
     },
     "users": {
       "title": "Channel users",
-      "loading": "Loading"
+      "loading": "Loading",
+      "not_found": "Users not found"
     },
     "channel": {
       "topic": {

@@ -61,7 +61,7 @@ buildFormTextRow(
   }
 
   if (bloc.visible) {
-    PlatformTextField platformTextField = buildTextField(
+    PlatformTextField platformTextField = buildPlatformTextField(
         context, bloc, controller, labelText, hint,
         keyboardType: keyboardType,
         formatters: formatters,
