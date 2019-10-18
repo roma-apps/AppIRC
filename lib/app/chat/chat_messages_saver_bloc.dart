@@ -11,6 +11,7 @@ import 'package:flutter_appirc/app/message/messages_special_db.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
+import 'package:rxdart/rxdart.dart';
 
 var _logger =
     MyLogger(logTag: "NetworkChannelMessagesSaverBloc", enabled: true);
@@ -37,7 +38,6 @@ class NetworkChannelMessagesSaverBloc
 
     channelWithState.initMessages?.forEach(_onNewMessage);
 
-
     var channelDisposable = CompositeDisposable([]);
 
     channelDisposable
@@ -56,32 +56,47 @@ class NetworkChannelMessagesSaverBloc
 
       var newMessageDB = toRegularMessageDB(oldMessage);
       newMessageDB.localId = oldMessageDB.localId;
-      db.regularMessagesDao
-          .updateRegularMessage(newMessageDB);
+      db.regularMessagesDao.updateRegularMessage(newMessageDB);
     }));
 
     _channelsListeners[channel.remoteId] = channelDisposable;
 
     addDisposable(disposable: channelDisposable);
+    addDisposable(subject: _realtimeMessagesController);
   }
 
-  void _onNewMessage(ChatMessage newMessage) {
-         _logger.d(() => "onNewMessage $newMessage");
+  void _onNewMessage(ChatMessage newMessage) async {
+    _logger.d(() => "onNewMessage $newMessage");
     var chatMessageType = newMessage.chatMessageType;
 
+    int id;
     switch (chatMessageType) {
       case ChatMessageType.SPECIAL:
         var specialMessageDB = toSpecialMessageDB(newMessage);
-        db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
+        id = await db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
         break;
       case ChatMessageType.REGULAR:
         var regularMessageDB = toRegularMessageDB(newMessage);
-        db.regularMessagesDao.insertRegularMessage(regularMessageDB);
+        id = await db.regularMessagesDao.insertRegularMessage(regularMessageDB);
         break;
     }
+
+    newMessage.messageLocalId = id;
+    _realtimeMessagesController.add(newMessage);
   }
 
+  // ignore: close_sinks
+  BehaviorSubject<ChatMessage> _realtimeMessagesController = BehaviorSubject();
 
+  Disposable listenForMessages(Network network, NetworkChannel channel,
+      NetworkChannelMessageListener listener) {
+    return StreamSubscriptionDisposable(
+        _realtimeMessagesController.stream.listen((newMessage) {
+      if (newMessage.channelRemoteId == channel.remoteId) {
+        listener(newMessage);
+      }
+    }));
+  }
 
   @override
   void onChannelLeaved(Network network, NetworkChannel channel) {
@@ -92,8 +107,8 @@ class NetworkChannelMessagesSaverBloc
   }
 }
 
-void updatePreview(RegularMessage oldMessage, PreviewForMessage previewForMessage) {
-
+void updatePreview(
+    RegularMessage oldMessage, PreviewForMessage previewForMessage) {
   if (oldMessage.previews == null) {
     oldMessage.previews = [];
   }

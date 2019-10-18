@@ -130,6 +130,10 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
     }
     return color;
   }
+
+
+  @override
+  Color get searchBackgroundColor => _androidNightThemeData.primaryColorDark;
 }
 
 ThemeData _androidNightThemeData = ThemeData(

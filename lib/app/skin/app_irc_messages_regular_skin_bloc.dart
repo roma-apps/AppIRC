@@ -10,6 +10,9 @@ class AppIRCMessagesRegularSkinBloc extends MessagesRegularSkinBloc {
 
   TextStyle get regularMessageBodyTextStyle => theme.platformSkinTheme.textRegularSmallStyle;
 
+
+  @override
+  Color get searchBackgroundColor => theme.searchBackgroundColor;
   TextStyle modifyToLinkTextStyle(TextStyle textStyle) => textStyle.copyWith(color: theme.linkColor);
 
   TextStyle createNickTextStyle(Color color) =>

@@ -1,23 +1,33 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/channel/channel_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-class NetworkChannelBloc extends Providable {
+/// It is not possible to simple use NetworkChannelBloc as Provider
+/// app shouldn't dispose NetworkChannelBloc instances during UI changes
+/// NetworkChannelBloc disposed in ChatNetworkChannelsBlocsBloc
+class NetworkChannelBlocProvider extends Providable {
+  NetworkChannelBloc networkChannelBloc;
+  NetworkChannelBlocProvider(this.networkChannelBloc);
+}
+
+class NetworkChannelBloc extends DisposableOwner {
   final ChatInputOutputBackendService backendService;
   final Network network;
   NetworkChannel channel;
   final ChatNetworkChannelsStateBloc channelsStatesBloc;
 
   ChatInputMessageBloc _inputMessageBloc;
+
+  ChannelMessagesListBloc messagesBloc;
 
   ChatInputMessageBloc get inputMessageBloc => _inputMessageBloc;
 
@@ -26,6 +36,9 @@ class NetworkChannelBloc extends Providable {
     channel = channelWithState.channel;
     _usersController =
         BehaviorSubject(seedValue: channelWithState.initUsers ?? []);
+
+    messagesBloc = ChannelMessagesListBloc();
+    addDisposable(disposable: messagesBloc);
 
     addDisposable(subject: _usersController);
     addDisposable(
@@ -49,7 +62,6 @@ class NetworkChannelBloc extends Providable {
 
   List<NetworkChannelUser> get users => _usersController.value;
   DateTime _lastUsersRefreshDate;
-
 
   Future<List<NetworkChannelUser>> getUsers({forceRefresh: false}) async {
     if (forceRefresh || _lastUsersRefreshDate == null) {
@@ -118,7 +130,7 @@ class NetworkChannelBloc extends Providable {
           String nick) async =>
       await backendService.openDirectMessagesChannel(network, channel, nick);
 
-  static NetworkChannelBloc of(BuildContext context, NetworkChannel channel) =>
-      Provider.of<ChatNetworkChannelsBlocsBloc>(context)
-          .getNetworkChannelBloc(channel);
+  static NetworkChannelBloc of(BuildContext context) {
+    return Provider.of<NetworkChannelBlocProvider>(context).networkChannelBloc;
+  }
 }

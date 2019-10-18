@@ -66,14 +66,14 @@ PlatformTextField buildPlatformTextField(
       padding: EdgeInsets.all(8),
       style: formSkinBloc.textRowEditTextStyle.copyWith(color: textEditColor),
       prefixMode: OverlayVisibilityMode.notEditing,
-      prefix: Padding(
+      prefix: labelText != null ? Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Text(
           labelText,
           style: formSkinBloc.textRowInputDecorationLabelTextStyle
               .copyWith(color: labelColor),
         ),
-      ),
+      ) : null,
       placeholderStyle: formSkinBloc.textRowInputDecorationHintTextStyle
           .copyWith(color: hintColor));
 

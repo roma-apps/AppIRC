@@ -310,7 +310,10 @@ RegularMessageDB toRegularMessageDB(
         channelRemoteId: regularMessage.channelRemoteId);
 
 RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
-    RegularMessage.name(messageDB.channelRemoteId,
+    RegularMessage.name(
+
+        messageDB.channelRemoteId,
+        messageLocalId: messageDB.localId,
         messageRemoteId: messageDB.messageRemoteId,
         command: messageDB.command,
         hostMask: messageDB.hostMask,

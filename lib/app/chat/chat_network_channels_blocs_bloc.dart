@@ -23,10 +23,13 @@ class ChatNetworkChannelsBlocsBloc extends ChatNetworkChannelsListListenerBloc {
       ChatNetworksListBloc networksListBloc, this._channelsStatesBloc)
       : super(networksListBloc) {
     addDisposable(disposable: CustomDisposable(() {
-      _blocs.values.forEach((bloc) => bloc.dispose());
+      _blocs.values.forEach((bloc) => disposeChannelBloc(bloc));
       _blocs.clear();
     }));
   }
+
+  void disposeChannelBloc(NetworkChannelBloc bloc) => bloc.dispose();
+
 
   NetworkChannelBloc getNetworkChannelBloc(NetworkChannel channel) =>
       _blocs[channel];
@@ -40,6 +43,6 @@ class ChatNetworkChannelsBlocsBloc extends ChatNetworkChannelsListListenerBloc {
 
   @override
   void onChannelLeaved(Network network, NetworkChannel channel) {
-    _blocs.remove(channel).dispose();
+    disposeChannelBloc(_blocs.remove(channel));
   }
 }

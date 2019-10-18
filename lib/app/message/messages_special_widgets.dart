@@ -94,7 +94,7 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
     ],
   );
   var color = Colors.blue;
-  var channelBloc = Provider.of<NetworkChannelBloc>(context);
+  var channelBloc = NetworkChannelBloc.of(context);
 
   var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
   var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
@@ -149,7 +149,7 @@ Widget _buildChannelName(BuildContext context,
       Provider.of<MessagesSpecialSkinBloc>(context);
   return GestureDetector(
       onTap: () {
-        NetworkBloc networkBloc = Provider.of<NetworkBloc>(context);
+        NetworkBloc networkBloc = NetworkBloc.of(context);
 
         networkBloc.joinNetworkChannel(ChatNetworkChannelPreferences.name(
             name: channelName, password: password));

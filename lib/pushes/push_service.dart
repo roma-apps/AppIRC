@@ -62,8 +62,10 @@ class PushesService extends Providable {
 
   Future _updateToken() async {
     var token = await _fcm.getToken();
-    assert(token != null);
+    if(token != null) {
     onNewToken(token);
+
+    }
   }
 
   askPermissions() async {

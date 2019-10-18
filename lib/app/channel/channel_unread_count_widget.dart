@@ -24,7 +24,7 @@ Widget _buildChannelUnreadBadgeCount(BuildContext context, bool isChannelActive,
 
 buildChannelUnreadCountBadge(BuildContext context, bool isChannelActive) {
 
-  var channelBloc = Provider.of<NetworkChannelBloc>(context);
+  var channelBloc = NetworkChannelBloc.of(context);
 
   return StreamBuilder<NetworkChannelState>(
     stream: channelBloc.networkChannelStateStream,

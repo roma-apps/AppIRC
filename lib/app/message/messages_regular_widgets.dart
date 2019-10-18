@@ -30,7 +30,7 @@ var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
 Widget buildRegularMessage(BuildContext context, RegularMessage message) {
   var needHighlight = isNeedHighlight(message);
 
-  var channelBloc = Provider.of<NetworkChannelBloc>(context);
+  var channelBloc = NetworkChannelBloc.of(context);
 
   var body = _buildMessageBody(context, message);
   var title = _buildMessageTitle(context, channelBloc, message);

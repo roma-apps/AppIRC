@@ -16,6 +16,7 @@
     "title": "Settings",
     "channel_dropdown_menu": {
       "leave": "Leave",
+      "users": "Users",
       "list_banned": "List banned users",
       "topic": "Topic",
       "user_information": "User information"
@@ -145,6 +146,14 @@
       "filter": {
         "name": "Search",
         "hint": "Nickname"
+      }
+    },
+    "messages": {
+      "search": {
+        "label_empty": "Nothing found",
+        "label_not_empty": "Found {}/{}",
+        "hint": "Text, nickname, or status..."
+
       }
     },
     "connection": {

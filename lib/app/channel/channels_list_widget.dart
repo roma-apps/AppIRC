@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart'
     show Colors, Icons, PopupMenuButton, PopupMenuEntry, PopupMenuItem;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_connection_status_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_widgets/flutter_widgets.dart';
 
 var _logger = MyLogger(logTag: "NetworkChannelsListWidget", enabled: true);
 
@@ -22,6 +24,7 @@ class NetworkChannelsListWidget extends StatelessWidget {
   final VoidCallback onActionCallback;
 
   NetworkChannelsListWidget(this.network, this.onActionCallback);
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +82,7 @@ class NetworkChannelsListWidget extends StatelessWidget {
       Network network,
       NetworkChannel channel,
       bool isChannelActive) {
-    var networkBloc = Provider.of<NetworkBloc>(context);
+    var networkBloc = NetworkBloc.of(context);
 
     var iconData = Icons.message;
 
@@ -106,7 +109,7 @@ class NetworkChannelsListWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Provider(
-        providable: channelBloc,
+        providable: NetworkChannelBlocProvider(channelBloc),
         child: StreamBuilder(
             initialData: channelBloc.networkChannelState,
             stream: channelBloc.networkChannelStateStream,

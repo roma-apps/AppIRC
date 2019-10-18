@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization_delegate.dart';
 import 'package:flutter/material.dart'
     show Divider, Icons, PopupMenuButton, PopupMenuEntry;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_connection_status_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_unread_count_widget.dart';
@@ -71,8 +72,8 @@ class NetworksListWidget extends StatelessWidget {
     var expandBloc = ChatNetworkExpandStateBloc(preferencesService, network);
 
     var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
-    return Provider<NetworkBloc>(
-      providable: networkBloc,
+    return Provider(
+      providable: NetworkBlocProvider(networkBloc),
       child: StreamBuilder<bool>(
         stream: expandBloc.expandedStream,
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -117,7 +118,7 @@ class NetworksListWidget extends StatelessWidget {
     var networkListSkinBloc = Provider.of<NetworkListSkinBloc>(context);
 
     var row = Provider(
-        providable: channelBloc,
+        providable: NetworkChannelBlocProvider(channelBloc),
         child: StreamBuilder<NetworkState>(
             stream: networkBloc.networkStateStream,
             initialData: networkBloc.networkState,

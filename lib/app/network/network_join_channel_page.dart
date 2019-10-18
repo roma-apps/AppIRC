@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_join_channel_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_join_channel_form_widget.dart';
@@ -33,14 +34,14 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
     var networkChannelJoinFormBloc = NetworkChannelJoinFormBloc();
-    var networkBloc = NetworkBloc.of(context, network);
+    var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: Text(appLocalizations.tr('join_channel.title')),
       ),
       body: SafeArea(
-          child: Provider<NetworkBloc>(
-        providable: networkBloc,
+          child: Provider(
+        providable: NetworkBlocProvider(networkBloc),
         child: Provider<NetworkChannelJoinFormBloc>(
           providable: networkChannelJoinFormBloc,
           child: ListView(children: <Widget>[

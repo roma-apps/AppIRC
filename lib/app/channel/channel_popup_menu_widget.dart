@@ -4,11 +4,12 @@ import 'package:flutter/material.dart'
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/channel/channel_topic_app_bar_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_form_widget.dart';
+import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_popup_menu_widget.dart';
+import 'package:flutter_appirc/app/user/users_list_page.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -35,7 +36,9 @@ List<PlatformAwarePopupMenuAction> _buildMenuItems(BuildContext context,
     Network network, NetworkChannel channel, NetworkChannelState channelState) {
   List<PlatformAwarePopupMenuAction> menuItems;
 
-  var channelBloc = NetworkChannelBloc.of(context, channel);
+  NetworkChannelBloc channelBloc =
+  Provider.of<ChatNetworkChannelsBlocsBloc>(context)
+      .getNetworkChannelBloc(channel);
 
   switch (channel.type) {
     case NetworkChannelType.LOBBY:
@@ -61,6 +64,7 @@ List<PlatformAwarePopupMenuAction> _buildMenuItems(BuildContext context,
 List<PlatformAwarePopupMenuAction> _buildChannelMenuItems(
     BuildContext context, NetworkChannelBloc channelBloc) {
   var items = <PlatformAwarePopupMenuAction>[
+    _buildMembersMenuItem(context, channelBloc),
     _buildBannedUsersMenuItem(context, channelBloc),
     _buildCloseMenuItem(context, channelBloc),
   ];
@@ -90,6 +94,21 @@ PlatformAwarePopupMenuAction _buildCloseMenuItem(
       iconData: Icons.clear,
       actionCallback: (action) {
         channelBloc.leaveNetworkChannel();
+      });
+}
+
+PlatformAwarePopupMenuAction _buildMembersMenuItem(
+    BuildContext context, NetworkChannelBloc channelBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("settings.channel_dropdown_menu.users"),
+      iconData: Icons.group,
+      actionCallback: (action) {
+        Navigator.push(
+            context,
+            platformPageRoute(
+                builder: (context) => NetworkChannelUsersPage(
+                    channelBloc.network, channelBloc.channel)));
       });
 }
 

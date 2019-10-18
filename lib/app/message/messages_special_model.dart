@@ -17,14 +17,17 @@ class SpecialMessage extends ChatMessage {
       {@required int channelRemoteId,
       @required this.data,
       @required this.specialType,
+        int messageLocalId,
       @required DateTime date})
-      : super(ChatMessageType.SPECIAL, channelRemoteId, date);
+      : super(ChatMessageType.SPECIAL, channelRemoteId, date, messageLocalId: messageLocalId);
 }
 
 enum SpecialMessageType { WHO_IS, CHANNELS_LIST_ITEM, TEXT }
 
 abstract class SpecialMessageBody {
   Map<String, dynamic> toJson();
+
+  bool isContainsText(String searchTerm);
 }
 
 @JsonSerializable()
@@ -95,6 +98,11 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
 
   @override
   Map<String, dynamic> toJson() => _$WhoIsSpecialMessageBodyToJson(this);
+
+  @override
+  bool isContainsText(String searchTerm) {
+    return nick.contains(searchTerm);
+  }
 }
 
 @JsonSerializable()
@@ -102,6 +110,11 @@ class NetworkChannelInfoSpecialMessageBody extends SpecialMessageBody {
   final String name;
   final String topic;
   final int usersCount;
+
+  @override
+  bool isContainsText(String searchTerm) {
+    return topic.contains(searchTerm) || name.contains(searchTerm);
+  }
 
   @override
   String toString() {
@@ -127,6 +140,11 @@ class NetworkChannelInfoSpecialMessageBody extends SpecialMessageBody {
 class TextSpecialMessageBody extends SpecialMessageBody {
   final String message;
 
+
+  @override
+  bool isContainsText(String searchTerm) {
+    return message.contains(searchTerm);
+  }
   TextSpecialMessageBody(this.message);
 
   @override

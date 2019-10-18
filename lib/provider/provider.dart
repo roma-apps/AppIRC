@@ -4,14 +4,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:rxdart/rxdart.dart';
 
-abstract class Providable extends Disposable {
+class DisposableOwner extends Disposable {
   final CompositeDisposable _compositeDisposable = CompositeDisposable([]);
 
 
   void addDisposable(
       {Disposable disposable,
-      StreamSubscription streamSubscription,
-      TextEditingController textEditingController, Subject subject, Timer timer}) {
+        StreamSubscription streamSubscription,
+        TextEditingController textEditingController, Subject subject, Timer timer}) {
     if (disposable != null) {
       _compositeDisposable.children.add(disposable);
     }
@@ -43,6 +43,11 @@ abstract class Providable extends Disposable {
     _compositeDisposable.dispose();
   }
 }
+
+abstract class Providable extends DisposableOwner {
+
+}
+
 
 class Provider<T extends Providable> extends StatefulWidget {
   Provider({

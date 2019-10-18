@@ -31,7 +31,7 @@ class NetworkChannelNewMessageState
 
     var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
 
-    var channelBloc = Provider.of<NetworkChannelBloc>(context);
+    var channelBloc = NetworkChannelBloc.of(context);
     ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
     var appSkinTheme = AppSkinBloc.of(context).appSkinTheme;
     var popupBackgroundColor = appSkinTheme.backgroundColor;

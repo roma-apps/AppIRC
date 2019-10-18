@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/channel/channel_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_saver_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
@@ -18,10 +19,13 @@ var _logger =
     MyLogger(logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
 
 class NetworkChannelMessagesLoaderBloc extends Providable {
+
   final ChatOutputBackendService backendService;
+  final NetworkChannelMessagesSaverBloc messagesSaverBloc;
   final ChatDatabase db;
   final Network network;
   final NetworkChannel networkChannel;
+
 
   List<ChatMessage> currentMessages = [];
 
@@ -32,7 +36,8 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
   Stream<List<ChatMessage>> get messagesStream => _messagesController.stream;
 
   NetworkChannelMessagesLoaderBloc(
-      this.backendService, this.db, this.network, this.networkChannel) {
+      this.backendService, this.db, this.messagesSaverBloc, this.network,
+      this.networkChannel) {
     addDisposable(subject: _messagesController);
 
     Timer.run(() async {
@@ -52,7 +57,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
       _onMessagesChanged();
       // socket listener
       addDisposable(
-          disposable: backendService.listenForMessages(network, networkChannel,
+          disposable: messagesSaverBloc.listenForMessages(network, networkChannel,
               (newMessage) {
         currentMessages.add(newMessage);
         if (newMessage.chatMessageType == ChatMessageType.SPECIAL) {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart'
     show AppBar, Colors, Drawer, Icons, Scaffold, ScaffoldState;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
 import 'package:flutter_appirc/app/channel/channel_topic_app_bar_widget.dart';
@@ -18,20 +19,24 @@ import 'package:flutter_appirc/app/chat/chat_drawer_page.dart';
 import 'package:flutter_appirc/app/chat/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_init_model.dart';
+import 'package:flutter_appirc/app/chat/chat_messages_loader_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_messages_saver_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_unread_bloc.dart';
+import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
-import 'package:flutter_appirc/app/user/users_list_page.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
 import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+import 'chat_messages_list_bloc.dart';
 
 class ChatPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -100,7 +105,6 @@ class ChatPage extends StatelessWidget {
             onPressed: onPressed,
           );
           if (unreadCount > 0) {
-
             // badge hide part of button clickable area
             return GestureDetector(
               onTap: onPressed,
@@ -163,19 +167,15 @@ class ChatPage extends StatelessWidget {
                 Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor)
           ];
 
-          if (channel.type == NetworkChannelType.CHANNEL) {
-            items.add(PlatformIconButton(
-                icon: Icon(Icons.group,
-                    color: Provider.of<ChatAppBarSkinBloc>(context)
-                        .iconAppBarColor),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      platformPageRoute(
-                          builder: (context) =>
-                              NetworkChannelUsersPage(network, channel)));
-                }));
-          }
+          items.insert(
+              0,
+              PlatformIconButton(
+                  icon: Icon(Icons.search,
+                      color: Provider.of<ChatAppBarSkinBloc>(context)
+                          .iconAppBarColor),
+                  onPressed: () {
+                    channelBloc.messagesBloc.onNeedToggleSearch();
+                  }));
 
           return Row(mainAxisSize: MainAxisSize.min, children: items);
         }
@@ -225,7 +225,7 @@ class ChatPage extends StatelessWidget {
           var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
               .getNetworkChannelBloc(channel);
           return Provider(
-              providable: channelBloc,
+              providable: NetworkChannelBlocProvider(channelBloc),
               child: NetworkChannelTopicTitleAppBarWidget());
         }
       },
@@ -265,11 +265,30 @@ class ChatPage extends StatelessWidget {
                   var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
                       .getNetworkChannelBloc(activeChannel);
 
+                  ChatOutputBackendService backendService =
+                      Provider.of(context);
+                  ChatDatabaseProvider chatDatabaseProvider =
+                      Provider.of(context);
+
+                  var messagesLoaderBloc = NetworkChannelMessagesLoaderBloc(
+                      backendService,
+                      chatDatabaseProvider.db,
+                      Provider.of<NetworkChannelMessagesSaverBloc>(context),
+                      channelBloc.network,
+                      channelBloc.channel);
+
+                  var chatListMessagesBloc = ChatMessagesListBloc(
+                      channelBloc.messagesBloc, messagesLoaderBloc);
+
                   return Provider(
-                    providable: channelBloc,
-                    child: Provider(
-                        providable: channelBloc, child: NetworkChannelWidget()),
-                  );
+                      providable: NetworkChannelBlocProvider(channelBloc),
+                      child: Provider(
+                        providable: chatListMessagesBloc,
+                        child: NetworkChannelWidget((minIndex, maxIndex) {
+                          chatListMessagesBloc.onMessagesScrolled(
+                              minIndex, maxIndex);
+                        }),
+                      ));
                 }
               }
             }));

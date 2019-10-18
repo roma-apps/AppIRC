@@ -69,8 +69,9 @@ class RegularMessage extends ChatMessage {
       @required this.fromNick,
       @required this.newNick,
       @required this.nicknames,
+       int messageLocalId,
       @required this.fromMode})
-      : super(ChatMessageType.REGULAR, channelRemoteId, date);
+      : super(ChatMessageType.REGULAR, channelRemoteId, date, messageLocalId: messageLocalId);
 
   bool get isHaveFromNick => fromNick != null;
 

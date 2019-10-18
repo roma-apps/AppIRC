@@ -41,7 +41,7 @@ class EditChatNetworkPage extends ChatNetworkPage {
       bool serverPreferencesEnabled, bool serverPreferencesVisible)
       : super(AppLocalizations.of(context).tr('irc_connection.title_edit'),
             startValues, (context, preferences) async {
-          final NetworkBloc networkBloc = Provider.of<NetworkBloc>(context);
+          final NetworkBloc networkBloc = NetworkBloc.of(context);
 
           var result = await doAsyncOperationWithDialog(context, () async {
             return await networkBloc.editNetworkSettings(preferences);

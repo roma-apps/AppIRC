@@ -128,6 +128,7 @@ SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
   }
 
   return SpecialMessage.name(
+      messageLocalId: messageDB.localId,
       channelRemoteId: messageDB.channelRemoteId,
       data: body,
       specialType: type,

@@ -36,6 +36,7 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
     ChannelUsersListBloc channelUsersListBloc =
         Provider.of<ChannelUsersListBloc>(context);
 
+
     return StreamBuilder<List<NetworkChannelUser>>(
         stream: channelUsersListBloc.usersStream,
         initialData: channelUsersListBloc.users,

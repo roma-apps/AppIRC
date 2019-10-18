@@ -15,11 +15,19 @@ abstract class ChatMessage {
     return todayStart.isBefore(date);
   }
 
-  ChatMessage(this.chatMessageType, this.channelRemoteId, this.date);
+  ChatMessage(this.chatMessageType, this.channelRemoteId, this.date, {this.messageLocalId});
 
   bool get isSpecial => chatMessageType == ChatMessageType.SPECIAL;
 
   bool get isRegular => chatMessageType == ChatMessageType.REGULAR;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatMessage &&
+          runtimeType == other.runtimeType &&
+          messageLocalId == other.messageLocalId;
+  @override
+  int get hashCode => messageLocalId.hashCode;
 }
 
 enum ChatMessageType { SPECIAL, REGULAR }

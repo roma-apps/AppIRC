@@ -15,7 +15,7 @@ import 'channel_model.dart';
 class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var channelBloc = Provider.of<NetworkChannelBloc>(context);
+    var channelBloc = NetworkChannelBloc.of(context);
     var chatBloc = Provider.of<ChatConnectionBloc>(context);
 
     return StreamBuilder<ChatConnectionState>(

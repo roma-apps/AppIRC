@@ -40,7 +40,7 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
               context,
               platformPageRoute(
                   builder: (_) => Provider(
-                        providable: networkBloc,
+                        providable: NetworkBlocProvider(networkBloc),
                         child: EditChatNetworkPage(
                             context,
                             ChatNetworkPreferences(

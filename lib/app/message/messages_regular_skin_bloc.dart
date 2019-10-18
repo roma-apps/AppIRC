@@ -7,6 +7,9 @@ abstract class MessagesRegularSkinBloc extends SkinBloc {
   TextStyle get regularMessageBodyTextStyle;
   Color get highlightBackgroundColor;
 
+
+  Color get searchBackgroundColor;
+
   TextStyle modifyToLinkTextStyle(TextStyle textStyle);
 
   TextStyle createNickTextStyle(Color color);
