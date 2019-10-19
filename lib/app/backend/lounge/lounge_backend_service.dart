@@ -776,7 +776,7 @@ class LoungeBackendService extends Providable
       {bool waitForResult = false}) async {
     _sendRequest(
         LoungeJsonRequest(
-            name: LoungeRequestEventNames.pushToken,
+            name: LoungeRequestEventNames.pushFCMToken,
             body: PushTokenLoungeRequestBody(token: newToken)),
         isNeedAddRequestToPending: false);
     return RequestResult.name(isSentSuccessfully: true, result: null);

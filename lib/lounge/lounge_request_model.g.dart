@@ -6,6 +6,40 @@ part of 'lounge_request_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+MoreLoungeRequestBody _$MoreLoungeRequestBodyFromJson(
+    Map<String, dynamic> json) {
+  return MoreLoungeRequestBody(
+    json['target'] as int,
+    json['lastId'] as int,
+  );
+}
+
+Map<String, dynamic> _$MoreLoungeRequestBodyToJson(
+        MoreLoungeRequestBody instance) =>
+    <String, dynamic>{
+      'target': instance.target,
+      'lastId': instance.lastId,
+    };
+
+MsgPreviewToggleLoungeRequestBody _$MsgPreviewToggleLoungeRequestBodyFromJson(
+    Map<String, dynamic> json) {
+  return MsgPreviewToggleLoungeRequestBody(
+    json['target'] as int,
+    json['msgId'] as int,
+    json['link'] as String,
+    json['shown'] as bool,
+  );
+}
+
+Map<String, dynamic> _$MsgPreviewToggleLoungeRequestBodyToJson(
+        MsgPreviewToggleLoungeRequestBody instance) =>
+    <String, dynamic>{
+      'target': instance.target,
+      'msgId': instance.msgId,
+      'link': instance.link,
+      'shown': instance.shown,
+    };
+
 PushTokenLoungeRequestBody _$PushTokenLoungeRequestBodyFromJson(
     Map<String, dynamic> json) {
   return PushTokenLoungeRequestBody(

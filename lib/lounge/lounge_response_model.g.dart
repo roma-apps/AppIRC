@@ -19,6 +19,119 @@ Map<String, dynamic> _$ChanLoungeResponseBodyToJson(
       'chan': instance.chan,
     };
 
+MessagePreviewToggleLoungeResponseBody
+    _$MessagePreviewToggleLoungeResponseBodyFromJson(
+        Map<String, dynamic> json) {
+  return MessagePreviewToggleLoungeResponseBody(
+    json['target'] as int,
+    json['msgId'] as int,
+    json['link'] as String,
+    json['shown'] as bool,
+  );
+}
+
+Map<String, dynamic> _$MessagePreviewToggleLoungeResponseBodyToJson(
+        MessagePreviewToggleLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'target': instance.target,
+      'msgId': instance.msgId,
+      'link': instance.link,
+      'shown': instance.shown,
+    };
+
+MoreLoungeResponseBody _$MoreLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return MoreLoungeResponseBody(
+    json['chan'] as int,
+    (json['messages'] as List)
+        ?.map((e) => e == null
+            ? null
+            : MsgLoungeResponseBody.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+    json['moreHistoryAvailable'] as bool,
+  );
+}
+
+Map<String, dynamic> _$MoreLoungeResponseBodyToJson(
+        MoreLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'chan': instance.chan,
+      'messages': instance.messages,
+      'moreHistoryAvailable': instance.moreHistoryAvailable,
+    };
+
+ChangelogLoungeResponseBody _$ChangelogLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return ChangelogLoungeResponseBody(
+    json['current'],
+    json['latest'],
+    json['packages'],
+  );
+}
+
+Map<String, dynamic> _$ChangelogLoungeResponseBodyToJson(
+        ChangelogLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'current': instance.current,
+      'latest': instance.latest,
+      'packages': instance.packages,
+    };
+
+SyncSortLoungeResponseBody _$SyncSortLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return SyncSortLoungeResponseBody(
+    (json['order'] as List)?.map((e) => e as int)?.toList(),
+    json['type'] as String,
+    json['target'] as String,
+  );
+}
+
+Map<String, dynamic> _$SyncSortLoungeResponseBodyToJson(
+        SyncSortLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'order': instance.order,
+      'type': instance.type,
+      'target': instance.target,
+    };
+
+SettingsNewLoungeResponseBody _$SettingsNewLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return SettingsNewLoungeResponseBody(
+    json['name'] as String,
+    json['value'],
+  );
+}
+
+Map<String, dynamic> _$SettingsNewLoungeResponseBodyToJson(
+        SettingsNewLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'value': instance.value,
+    };
+
+SessionsListLoungeResponseBodyPart _$SessionsListLoungeResponseBodyPartFromJson(
+    Map<String, dynamic> json) {
+  return SessionsListLoungeResponseBodyPart(
+    json['current'] as bool,
+    json['active'] as int,
+    json['lastUse'] as int,
+    json['ip'] as String,
+    json['agent'] as String,
+    json['token'] as String,
+  );
+}
+
+Map<String, dynamic> _$SessionsListLoungeResponseBodyPartToJson(
+        SessionsListLoungeResponseBodyPart instance) =>
+    <String, dynamic>{
+      'current': instance.current,
+      'active': instance.active,
+      'lastUse': instance.lastUse,
+      'ip': instance.ip,
+      'agent': instance.agent,
+      'token': instance.token,
+    };
+
 MessageLoungeResponseBody _$MessageLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MessageLoungeResponseBody(

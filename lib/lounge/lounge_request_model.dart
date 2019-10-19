@@ -11,9 +11,19 @@ class LoungeRequestEventNames {
   static const String names = "names";
   static const String input = "input";
   static const String open = "open";
-  static const String pushToken = "push:fcmToken";
   static const String auth = "auth";
   static const String uploadAuth = "upload:auth";
+
+
+  static const String more = "more";
+  static const String msgPreviewToggle = "msg:preview:toggle";
+  static const String signOut = "sign-out";
+  static const String networkGet = "network:get";
+  static const String pushFCMToken = "push:fcmToken";
+  static const String pushRegister = "push:register";
+  static const String pushUnregister = "push:unegister";
+
+
 }
 
 abstract class LoungeRequest extends SocketIOCommand {
@@ -84,6 +94,49 @@ class InputLoungeRequestBody extends LoungeRequestBody {
     return 'InputLoungeRequestBody{target: $target, content: $content}';
   }
 }
+@JsonSerializable()
+class MoreLoungeRequestBody extends LoungeRequestBody {
+  final int target;
+  final int lastId;
+
+
+  MoreLoungeRequestBody(this.target, this.lastId);
+
+  @override
+  Map<String, dynamic> toJson() => _$MoreLoungeRequestBodyToJson(this);
+
+  @override
+  String toString() {
+    return 'MoreLoungeRequestBody{target: $target, lastId: $lastId}';
+  }
+
+
+}
+
+
+@JsonSerializable()
+class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
+  final int target;
+  final int msgId;
+  final String link;
+  final bool shown;
+
+
+  MsgPreviewToggleLoungeRequestBody(this.target, this.msgId, this.link,
+      this.shown);
+
+
+  @override
+  String toString() {
+    return 'MsgPreviewToggleLoungeRequestBody{target: $target, '
+        'msgId: $msgId, link: $link, shown: $shown}';
+  }
+
+  @override
+  Map<String, dynamic> toJson() => _$MsgPreviewToggleLoungeRequestBodyToJson(this);
+
+}
+
 
 @JsonSerializable()
 class PushTokenLoungeRequestBody extends LoungeRequestBody {

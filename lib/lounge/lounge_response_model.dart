@@ -24,6 +24,18 @@ class LoungeResponseEventNames {
   static const String channelState = "channel:state";
   static const String init = "init";
   static const String uploadAuth = "upload:auth";
+
+  static const String settingNew = "setting:new";
+  static const String settingAll = "setting:all";
+  static const String sessionsList = "sessions:list";
+  static const String open = "open";
+  static const String networkInfo = "network:info";
+  static const String changelog = "changelog";
+  static const String signOut = "sign-out";
+  static const String changePassword = "change-password";
+  static const String syncSort = "sync_sort";
+  static const String more = "more";
+  static const String msgPreviewToggle = "msg:preview:toggle";
 }
 
 class LoungeResponseMessagePreviewType {
@@ -43,6 +55,8 @@ abstract class LoungeResponseBody extends LoungeResponseBodyPart {}
 
 abstract class LoungeResponseBodyPart {}
 
+
+
 @JsonSerializable()
 class ChanLoungeResponseBody extends LoungeResponseBody {
   int chan;
@@ -58,6 +72,124 @@ class ChanLoungeResponseBody extends LoungeResponseBody {
       _$ChanLoungeResponseBodyFromJson(json);
 }
 
+@JsonSerializable()
+class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
+  final int target;
+  final int msgId;
+  final String link;
+  final bool shown;
+
+
+  MessagePreviewToggleLoungeResponseBody(this.target, this.msgId, this.link,
+      this.shown);
+
+
+  @override
+  String toString() {
+    return 'MessagePreviewToggleLoungeResponseBody{target: $target, '
+        'msgId: $msgId, link: $link, shown: $shown}';
+  }
+
+  factory MessagePreviewToggleLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$MessagePreviewToggleLoungeResponseBodyFromJson(json);
+}
+
+@JsonSerializable()
+class MoreLoungeResponseBody extends LoungeResponseBody {
+  final int chan;
+  final List<MsgLoungeResponseBody> messages;
+  final bool moreHistoryAvailable;
+
+
+  MoreLoungeResponseBody(this.chan, this.messages, this.moreHistoryAvailable);
+
+
+  @override
+  String toString() {
+    return 'MoreLoungeResponseBody{chan: $chan, messages: $messages,'
+        ' moreHistoryAvailable: $moreHistoryAvailable}';
+  }
+
+  factory MoreLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$MoreLoungeResponseBodyFromJson(json);
+}
+
+@JsonSerializable()
+class ChangelogLoungeResponseBody extends LoungeResponseBody {
+  final dynamic current;
+  final dynamic latest;
+  final dynamic packages;
+
+
+  ChangelogLoungeResponseBody(this.current, this.latest, this.packages);
+
+  @override
+  String toString() {
+    return 'ChangelogLoungeResponseBody{current: $current,'
+        ' latest: $latest, packages: $packages}';
+  }
+
+  factory ChangelogLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$ChangelogLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
+class SyncSortLoungeResponseBody extends LoungeResponseBody {
+  final List<int> order;
+  final String type;
+  final String target;
+
+
+  SyncSortLoungeResponseBody(this.order, this.type, this.target);
+
+  @override
+  String toString() {
+    return 'SyncSortLoungeResponseBody{order: $order, type: $type, target: $target}';
+  }
+
+  factory SyncSortLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$SyncSortLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
+class SettingsNewLoungeResponseBody extends LoungeResponseBody {
+
+  final String name;
+  final dynamic value;
+
+
+  SettingsNewLoungeResponseBody(this.name, this.value);
+
+
+  @override
+  String toString() {
+    return 'SettingsNewLoungeResponseBody{name: $name, value: $value}';
+  }
+
+  factory SettingsNewLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$SettingsNewLoungeResponseBodyFromJson(json);
+}
+
+
+@JsonSerializable()
+class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
+
+  final bool current;
+  final int active;
+  final int lastUse;
+  final String ip;
+  final String agent;
+  final String token;
+
+  
+  SessionsListLoungeResponseBodyPart(this.current, this.active, this.lastUse,
+      this.ip, this.agent, this.token);
+
+  factory SessionsListLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$SessionsListLoungeResponseBodyPartFromJson(json);
+}
 
 
 @JsonSerializable()
