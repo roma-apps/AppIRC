@@ -7,25 +7,27 @@ import 'package:flutter_appirc/provider/provider.dart';
 
 import 'channels_list_skin_bloc.dart';
 
-
-Widget _buildChannelUnreadBadgeCount(BuildContext context, bool isChannelActive, int unreadCount) {
+Widget _buildChannelUnreadBadgeCount(
+    BuildContext context, bool isChannelActive, int unreadCount) {
   if (unreadCount > 0) {
     var channelSkinBloc = Provider.of<ChannelsListSkinBloc>(context);
     return Container(
-        decoration: BoxDecoration(color: channelSkinBloc.getChannelUnreadItemBackgroundColor(isChannelActive)),
+        decoration: BoxDecoration(
+            color: channelSkinBloc
+                .getChannelUnreadItemBackgroundColor(isChannelActive)),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(unreadCount.toString(), style: channelSkinBloc.getChannelUnreadTextStyle(isChannelActive)),
+          child: Text(unreadCount.toString(),
+              style:
+                  channelSkinBloc.getChannelUnreadTextStyle(isChannelActive)),
         ));
   } else {
     return Container();
   }
 }
 
-buildChannelUnreadCountBadge(BuildContext context, bool isChannelActive) {
-
-  var channelBloc = NetworkChannelBloc.of(context);
-
+buildChannelUnreadCountBadge(BuildContext context,
+    NetworkChannelBloc channelBloc, bool isChannelActive) {
   return StreamBuilder<int>(
     stream: channelBloc.networkChannelUnreadCountStream,
     initialData: channelBloc.networkChannelUnreadCount,
@@ -33,7 +35,8 @@ buildChannelUnreadCountBadge(BuildContext context, bool isChannelActive) {
       var unreadCount = snapshot.data;
 
       if (unreadCount != null && unreadCount > 0) {
-        return _buildChannelUnreadBadgeCount(context, isChannelActive, unreadCount);
+        return _buildChannelUnreadBadgeCount(
+            context, isChannelActive, unreadCount);
       } else {
         return Container();
       }

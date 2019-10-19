@@ -143,20 +143,21 @@ class NetworkChannelsListWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                StreamBuilder<NetworkState>(
-                    stream: networkBloc.networkStateStream,
-                    initialData: networkBloc.networkState,
+                StreamBuilder<bool>(
+                    stream: networkBloc.networkConnectedStream,
+                    initialData: networkBloc.networkConnected,
                     builder: (BuildContext context,
-                        AsyncSnapshot<NetworkState> snapshot) {
-                      var networkState = snapshot.data;
+                        AsyncSnapshot<bool> snapshot) {
+                      var networkConnected = snapshot.data;
 
                       return buildConnectionIcon(
                           context,
                           channelsListSkinBloc
                               .getChannelItemIconColor(isChannelActive),
-                          networkState.connected && channelConnected);
+                          networkConnected && channelConnected);
                     }),
-                buildChannelUnreadCountBadge(context, isChannelActive),
+                buildChannelUnreadCountBadge(context, channelBloc,
+                    isChannelActive),
                 buildChannelPopupMenuButton(
                     context,
                     networkBloc,

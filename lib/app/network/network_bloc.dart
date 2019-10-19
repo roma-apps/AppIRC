@@ -25,6 +25,14 @@ class NetworkBlocProvider extends Providable {
 
 }
 
+class NetworkTitle {
+  String name;
+  String nick;
+  NetworkTitle(this.name, this.nick);
+
+
+}
+
 class NetworkBloc extends DisposableOwner {
   final ChatInputBackendService backendService;
   final Network network;
@@ -32,10 +40,32 @@ class NetworkBloc extends DisposableOwner {
   final ChatNetworkChannelsStateBloc channelsStateBloc;
   final ChatActiveChannelBloc activeChannelBloc;
 
-  NetworkState get networkState => networksStateBloc.getNetworkState(network);
+  NetworkState get _networkState => networksStateBloc.getNetworkState(network);
 
-  Stream<NetworkState> get networkStateStream =>
+  Stream<NetworkState> get _networkStateStream =>
       networksStateBloc.getNetworkStateStream(network);
+
+
+  NetworkTitle get networkTitle => NetworkTitle(_networkState.name,
+    _networkState.nick);
+  Stream<NetworkTitle> get networkTitleStream => _networkStateStream.map(
+          (state) => NetworkTitle(_networkState.name,
+              _networkState.nick)).distinct();
+  
+  String get networkNick => _networkState.nick;
+
+  Stream<String> get networkNickStream => _networkStateStream.map((state) =>
+  state?.nick).distinct();
+  
+  String get networkName => _networkState.name;
+
+  Stream<String> get networkNameStream => _networkStateStream.map((state) =>
+  state?.name).distinct();
+  
+  bool get networkConnected => _networkState.connected;
+
+  Stream<bool> get networkConnectedStream => _networkStateStream.map(
+          (state) => state?.connected).distinct();
 
   NetworkBloc(this.backendService, this.network, this.networksStateBloc,
       this.channelsStateBloc, this.activeChannelBloc);

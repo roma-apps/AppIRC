@@ -21,7 +21,7 @@ Widget buildNetworkPopupMenuButton(
       color: iconColor,
     ),
     actions: _buildDropdownItems(
-        context, networkBloc.networkState.connected, networkBloc),
+        context, networkBloc.networkConnected, networkBloc),
   );
 }
 

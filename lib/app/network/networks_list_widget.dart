@@ -22,7 +22,6 @@ import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class NetworksListWidget extends StatelessWidget {
-
   final VoidCallback onActionCallback;
 
   NetworksListWidget(this.onActionCallback);
@@ -54,10 +53,10 @@ class NetworksListWidget extends StatelessWidget {
             );
           } else {
             return Center(
-              child: Text(AppLocalizations.of(context)
-                  .tr("irc_connection.no_networks"), style: TextStyle(
-                  color:
-                  AppSkinBloc.of(context).appSkinTheme.textColor)),
+              child: Text(
+                  AppLocalizations.of(context).tr("irc_connection.no_networks"),
+                  style: TextStyle(
+                      color: AppSkinBloc.of(context).appSkinTheme.textColor)),
             );
           }
         });
@@ -76,6 +75,7 @@ class NetworksListWidget extends StatelessWidget {
       providable: NetworkBlocProvider(networkBloc),
       child: StreamBuilder<bool>(
         stream: expandBloc.expandedStream,
+        initialData: expandBloc.expanded,
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           var expanded = snapshot.data;
           return StreamBuilder<NetworkChannel>(
@@ -119,59 +119,60 @@ class NetworksListWidget extends StatelessWidget {
 
     var row = Provider(
         providable: NetworkChannelBlocProvider(channelBloc),
-        child: StreamBuilder<NetworkState>(
-            stream: networkBloc.networkStateStream,
-            initialData: networkBloc.networkState,
-            builder:
-                (BuildContext context, AsyncSnapshot<NetworkState> snapshot) {
-              var state = snapshot.data;
-              var connected = state.connected;
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            PlatformIconButton(
+              icon: Icon(networkExpandedStateIcon,
+                  color: networkListSkinBloc
+                      .getNetworkItemIconColor(isChannelActive)),
+              onPressed: () {
+                if (expanded) {
+                  expandBloc.collapse();
+                } else {
+                  expandBloc.expand();
+                }
+              },
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () async {
+                  if (onActionCallback != null) {
+                    onActionCallback();
+                  }
 
-              var networkTitle = "${state.name} (${state.nick})";
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  PlatformIconButton(
-                    icon: Icon(networkExpandedStateIcon,
-                        color: networkListSkinBloc
-                            .getNetworkItemIconColor(isChannelActive)),
-                    onPressed: () {
-                      if (expanded) {
-                        expandBloc.collapse();
-                      } else {
-                        expandBloc.expand();
-                      }
-                    },
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        if(onActionCallback != null) {
-                          onActionCallback();
-                        }
+                  ircChatActiveChannelBloc.changeActiveChanel(channel);
+                },
+                child: StreamBuilder<NetworkTitle>(
+                    stream: networkBloc.networkTitleStream,
+                    initialData: networkBloc.networkTitle,
+                    builder: (context, snapshot) {
+                      var title = snapshot.data;
 
-                        ircChatActiveChannelBloc.changeActiveChanel(channel);
-                      },
-                      child: Text(networkTitle,
+                      var networkTitle = "${title.name} (${title.nick})";
+                      return Text(networkTitle,
                           style: networkListSkinBloc
-                              .getNetworkItemTextStyle(isChannelActive)),
-                    ),
-                  ),
-                  buildConnectionIcon(
+                              .getNetworkItemTextStyle(isChannelActive));
+                    }),
+              ),
+            ),
+            StreamBuilder(
+                stream: networkBloc.networkConnectedStream,
+                initialData: networkBloc.networkConnected,
+                builder: (context, snapshot) {
+                  var connected = snapshot.data;
+                  return buildConnectionIcon(
                       context,
                       networkListSkinBloc
                           .getNetworkItemIconColor(isChannelActive),
-                      connected),
-                  buildChannelUnreadCountBadge(context, isChannelActive),
-                  buildNetworkPopupMenuButton(
-                      context,
-                      networkBloc,
-                      networkListSkinBloc
-                          .getNetworkItemIconColor(isChannelActive))
-                ],
-              );
-            }));
+                      connected);
+                }),
+            buildChannelUnreadCountBadge(context, channelBloc, isChannelActive),
+            buildNetworkPopupMenuButton(context, networkBloc,
+                networkListSkinBloc.getNetworkItemIconColor(isChannelActive))
+          ],
+        ));
     var rowContainer = Container(
         decoration: BoxDecoration(
             color: networkListSkinBloc
@@ -182,7 +183,10 @@ class NetworksListWidget extends StatelessWidget {
       return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[rowContainer, NetworkChannelsListWidget(network, onActionCallback)]);
+          children: <Widget>[
+            rowContainer,
+            NetworkChannelsListWidget(network, onActionCallback)
+          ]);
     } else {
       return rowContainer;
     }

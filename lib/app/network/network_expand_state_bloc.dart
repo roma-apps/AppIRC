@@ -11,6 +11,7 @@ class ChatNetworkExpandStateBloc extends Providable {
   BoolPreferencesBloc preferenceBloc;
 
   Stream<bool> get expandedStream => preferenceBloc.valueStream(defaultValue: true);
+  bool get expanded => preferenceBloc.getValue(defaultValue: true);
 
   ChatNetworkExpandStateBloc(
       PreferencesService preferencesService, Network network) {
