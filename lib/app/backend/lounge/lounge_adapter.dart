@@ -1,3 +1,4 @@
+import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
@@ -226,6 +227,12 @@ NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
         secure: loungeNetworkStatus.secure,
         nick: nick,
         name: name);
+
+ChatLoadMore toChatLoadMore(NetworkChannel channel, MoreLoungeResponseBody
+moreLoungeResponseBody) =>
+ChatLoadMore.name(messages: moreLoungeResponseBody.messages.map(
+    (loungeMessage) => toChatMessage(channel, loungeMessage)),
+    moreHistoryAvailable: moreLoungeResponseBody.moreHistoryAvailable);
 
 RegularMessageType detectRegularMessageType(String stringType) {
   var type;

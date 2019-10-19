@@ -20,7 +20,8 @@ typedef NetworkStateListener(NetworkState networkState);
 typedef NetworkChannelListener(NetworkChannelWithState channel);
 typedef NetworkChannelStateListener(NetworkChannelState channelState);
 typedef NetworkChannelMessageListener(ChatMessage message);
-typedef NetworkChannelMessagePreviewListener(PreviewForMessage previewForMessage);
+typedef NetworkChannelMessagePreviewListener(
+    PreviewForMessage previewForMessage);
 
 abstract class ChatBackendService implements Providable {
   Stream<ChatConnectionState> get connectionStateStream;
@@ -30,13 +31,13 @@ abstract class ChatBackendService implements Providable {
   ChatConnectionState get connectionState;
 
   ChatConfig get chatConfig;
+
   ChatInitInformation get chatInit;
 
   bool get isReadyToConnect;
 }
 
 abstract class ChatOutputBackendService implements ChatBackendService {
-
   Disposable listenForNetworkState(
       Network network,
       NetworkState Function() currentStateExtractor,
@@ -45,7 +46,9 @@ abstract class ChatOutputBackendService implements ChatBackendService {
   Disposable listenForNetworkJoin(NetworkListener listener);
 
   Disposable listenForNetworkLeave(Network network, VoidCallback listener);
-  Disposable listenForNetworkEdit(Network network, NetworkConnectionListener listener);
+
+  Disposable listenForNetworkEdit(
+      Network network, NetworkConnectionListener listener);
 
   Disposable listenForNetworkChannelJoin(
       Network network, NetworkChannelListener listener);
@@ -59,48 +62,37 @@ abstract class ChatOutputBackendService implements ChatBackendService {
       NetworkChannelState Function() currentStateExtractor,
       NetworkChannelStateListener listener);
 
-
-
   Disposable listenForNetworkChannelNames(Network network,
       NetworkChannel channel, Function(List<NetworkChannelUser>) listener);
 
-
-
-  Disposable listenForNetworkChannelUsers(Network network,
-      NetworkChannel channel, VoidCallback listener);
-
-
+  Disposable listenForNetworkChannelUsers(
+      Network network, NetworkChannel channel, VoidCallback listener);
 
   Disposable listenForMessages(Network network, NetworkChannel channel,
       NetworkChannelMessageListener listener);
 
-
   Disposable listenForMessagePreviews(Network network, NetworkChannel channel,
       NetworkChannelMessagePreviewListener listener);
-
 }
 
 abstract class ChatInputBackendService implements ChatBackendService {
-
-
   Future<RequestResult<ConnectResult>> connectChat();
 
   Future<RequestResult<bool>> disconnectChat({bool waitForResult: false});
 
-  Future<RequestResult<NetworkWithState>> joinNetwork(ChatNetworkPreferences preferences,
+  Future<RequestResult<NetworkWithState>> joinNetwork(
+      ChatNetworkPreferences preferences,
       {bool waitForResult: false});
 
   Future<RequestResult<bool>> leaveNetwork(Network network,
       {bool waitForResult: false});
 
-  Future<RequestResult<List<SpecialMessage>>>
-      printNetworkAvailableChannels(Network network,
-          {bool waitForResult: false});
-
-  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
+  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
       Network network,
       {bool waitForResult: false});
 
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(Network network,
+      {bool waitForResult: false});
 
   Future<RequestResult<bool>> enableNetwork(Network network,
       {bool waitForResult: false});
@@ -143,7 +135,6 @@ abstract class ChatInputBackendService implements ChatBackendService {
   Future<RequestResult<bool>> onOpenNetworkChannel(
       Network network, NetworkChannel channel);
 
-
   Future<RequestResult<bool>> onNewDevicePushToken(String newToken,
       {bool waitForResult: false});
 
@@ -151,24 +142,20 @@ abstract class ChatInputBackendService implements ChatBackendService {
       Network network, NetworkChannel channel, String rawMessage,
       {bool waitForResult: false});
 
+  Future<RequestResult<ChatLoadMore>> loadMoreHistory(
+      Network network, NetworkChannel channel, int lastMessageId);
+
   Future<RequestResult<String>> uploadFile(File file);
 }
 
 abstract class ChatInputOutputBackendService
-    implements ChatInputBackendService, ChatOutputBackendService {
+    implements ChatInputBackendService, ChatOutputBackendService {}
 
-}
-
-ChatNetworkPreferences createDefaultNetworkPreferences(
-    BuildContext context)
-{
-  var backendService =
-  Provider.of<ChatOutputBackendService>(context);
+ChatNetworkPreferences createDefaultNetworkPreferences(BuildContext context) {
+  var backendService = Provider.of<ChatOutputBackendService>(context);
   var chatConfig = backendService.chatConfig;
   var channels = chatConfig.defaultChannels;
 
-  return ChatNetworkPreferences(
-      chatConfig.defaultNetwork, [
-    ChatNetworkChannelPreferences.name(name: channels, password: "")
-  ]);
+  return ChatNetworkPreferences(chatConfig.defaultNetwork,
+      [ChatNetworkChannelPreferences.name(name: channels, password: "")]);
 }

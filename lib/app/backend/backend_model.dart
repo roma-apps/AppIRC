@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
+import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -16,6 +17,19 @@ class ChatPushMessage {
   String toString() {
     return 'ChatPushMessage{type: $type, notification: $notification, data: $data}';
   }
+}
+
+
+
+class ChatLoadMore {
+  List<ChatMessage> messages;
+  bool moreHistoryAvailable;
+  ChatLoadMore(this.messages, this.moreHistoryAvailable);
+
+  ChatLoadMore.name({@required this.messages, @required this
+      .moreHistoryAvailable});
+
+
 }
 
 @JsonSerializable()

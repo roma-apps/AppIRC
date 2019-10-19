@@ -940,38 +940,75 @@ class LoungeBackendService extends Providable
 
   @override
   Future<RequestResult<String>> uploadFile(File file) async {
-
     String uploadFileToken;
     var tokenListener = (raw) {
       if (raw is String && raw.isNotEmpty) {
         uploadFileToken = raw;
       }
     };
-    _socketIOService.on(LoungeResponseEventNames
-        .uploadAuth, tokenListener);
-    _socketIOService.emit(LoungeRawRequest(name: LoungeRequestEventNames.uploadAuth));
-
+    _socketIOService.on(LoungeResponseEventNames.uploadAuth, tokenListener);
+    _socketIOService
+        .emit(LoungeRawRequest(name: LoungeRequestEventNames.uploadAuth));
 
     await Future.delayed(Duration(seconds: 1));
 
-    _socketIOService.off(LoungeResponseEventNames
-        .uploadAuth, tokenListener);
+    _socketIOService.off(LoungeResponseEventNames.uploadAuth, tokenListener);
 
-
-    if(uploadFileToken != null) {
+    if (uploadFileToken != null) {
       String loungeUrl = _loungePreferences.connectionPreferences.host;
-      var uploadedFileRemoteURL  = await uploadFileToLounge(loungeUrl,
-          uploadFileToken,
-          file);
+      var uploadedFileRemoteURL =
+          await uploadFileToLounge(loungeUrl, uploadFileToken, file);
 
-      return RequestResult.name(isSentSuccessfully: true, result:
-      uploadedFileRemoteURL);
+      return RequestResult.name(
+          isSentSuccessfully: true, result: uploadedFileRemoteURL);
     } else {
       throw ServerAuthUploadException();
     }
   }
-}
 
+  Disposable listenForLoadMore(Network network, NetworkChannel channel,
+      Function(ChatLoadMore) callback) {
+    var disposable = CompositeDisposable([]);
+
+    disposable.add(
+        createEventListenerDisposable((LoungeResponseEventNames.more), (raw) {
+      var parsed = MoreLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+      _logger.d(() => "loadMoreHistory $parsed for $channel");
+
+      var chatLoadMore = toChatLoadMore(channel, parsed);
+      callback(chatLoadMore);
+
+    }));
+
+    return disposable;
+  }
+
+  @override
+  Future<RequestResult<ChatLoadMore>> loadMoreHistory(
+      Network network, NetworkChannel channel, int lastMessageId) async {
+    var disposable = CompositeDisposable([]);
+
+    ChatLoadMore chatLoadMore;
+
+    disposable.add(listenForLoadMore(network, channel, (loadMoreResponse) {
+      chatLoadMore = loadMoreResponse;
+    }));
+
+    _sendRequest(
+        LoungeJsonRequest(
+            name: LoungeRequestEventNames.more,
+            body: MoreLoungeRequestBody(channel.remoteId, lastMessageId)),
+        isNeedAddRequestToPending: false);
+
+    // todo: rework to timeout
+    await Future.delayed(Duration(seconds: 1));
+
+    disposable.dispose();
+
+    return RequestResult.name(isSentSuccessfully: true, result: chatLoadMore);
+  }
+}
 
 ChatConnectionState mapState(SocketConnectionState socketState) {
   switch (socketState) {

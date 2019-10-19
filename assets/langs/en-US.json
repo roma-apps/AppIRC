@@ -154,7 +154,8 @@
         "label_not_empty": "Found {}/{}",
         "hint": "Text, nickname, or status..."
 
-      }
+      },
+      "load_more" : "Load more..."
     },
     "connection": {
       "connected": "Connected to server",

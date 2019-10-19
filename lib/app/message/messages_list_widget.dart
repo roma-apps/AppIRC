@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_channel_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
@@ -12,13 +11,15 @@ import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_widgets.dart';
+import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
+import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
-var _logger =
-    MyLogger(logTag: "NetworkChannelMessagesListWidget", enabled: true);
+var _logger = MyLogger(
+    logTag: "NetworkChannelMessagesListWidget", enabled: true);
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
   final VisibleAreaCallback visibleAreaCallback;
@@ -29,20 +30,19 @@ class NetworkChannelMessagesListWidget extends StatefulWidget {
       _NetworkChannelMessagesListWidgetState(visibleAreaCallback);
 }
 
-class _NetworkChannelMessagesListWidgetState extends State<NetworkChannelMessagesListWidget> {
+class _NetworkChannelMessagesListWidgetState
+    extends State<NetworkChannelMessagesListWidget> {
   final VisibleAreaCallback visibleAreaCallback;
 
-  final ItemPositionsListener positionsListener = ItemPositionsListener.create();
+  final ItemPositionsListener positionsListener = ItemPositionsListener
+      .create();
 
   final ItemScrollController scrollController = ItemScrollController();
-
-
 
   @override
   void dispose() {
     super.dispose();
     positionsListener.itemPositions.removeListener(onVisiblePositionsChanged);
-
   }
 
   @override
@@ -77,54 +77,66 @@ class _NetworkChannelMessagesListWidgetState extends State<NetworkChannelMessage
           var chatMessagesWrapperState = snapshot.data;
           var messagesWrappers = chatMessagesWrapperState.messages;
           if (messagesWrappers != null) {
-            messagesWrappers = messagesWrappers
-                .where((messageWrapper) => _isNeedPrint(messageWrapper))
-                .toList();
+            messagesWrappers = messagesWrappers.where((messageWrapper) =>
+                _isNeedPrint(messageWrapper)).toList();
           }
 
-          if (messagesWrappers == null || messagesWrappers.length == 0) {
+          if (messagesWrappers == null || messagesWrappers.isEmpty) {
             return StreamBuilder<bool>(
               stream: channelBloc.networkChannelConnectedStream,
               initialData: channelBloc.networkChannelConnected,
-              builder: (BuildContext context,
-                  AsyncSnapshot<bool> snapshot) {
+              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                 var connected = snapshot.data;
 
                 if (connected) {
-                  return Center(
-                      child: Text(
-                          AppLocalizations.of(context).tr("chat.empty_channel"),
-                          style: TextStyle(
-                              color: AppSkinBloc.of(context)
-                                  .appSkinTheme
-                                  .textColor)));
+                  return Center(child: Text(
+                      AppLocalizations.of(context).tr("chat.empty_channel"),
+                      style: TextStyle(color: AppSkinBloc
+                          .of(context)
+                          .appSkinTheme
+                          .textColor)));
                 } else {
-                  return Center(
-                      child: Text(
-                          AppLocalizations.of(context)
-                              .tr("chat.not_connected_channel"),
-                          style: TextStyle(
-                              color: AppSkinBloc.of(context)
-                                  .appSkinTheme
-                                  .textColor)));
+                  return Center(child: Text(AppLocalizations.of(context).tr(
+                      "chat.not_connected_channel"),
+                      style: TextStyle(color: AppSkinBloc
+                          .of(context)
+                          .appSkinTheme
+                          .textColor)));
                 }
-              },
-            );
+              },);
           } else {
             var result = Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child:
+              padding: const EdgeInsets.symmetric(vertical: 10.0), child:
 
 //              ListView.builder(
 
-                  ScrollablePositionedList.builder(
-                      itemCount: messagesWrappers.length,
+            StreamBuilder<bool>(
+                stream: channelBloc.networkChannelMoreHistoryAvailableStream,
+                initialData: channelBloc.networkChannelMoreHistoryAvailable,
+                builder: (context, snapshot) {
+                  var moreHistoryAvailable = snapshot.data;
+
+                  var itemCount = messagesWrappers.length;
+
+                  if (moreHistoryAvailable) {
+                    itemCount += 1;
+                  }
+
+                  return ScrollablePositionedList.builder(itemCount: itemCount,
                       itemScrollController: scrollController,
                       itemPositionsListener: positionsListener,
-
-//                  controller: messagesBloc.scrollController,
                       itemBuilder: (BuildContext context, int index) {
-                        if(index >= messagesWrappers.length || index < 0) {
+                        if (moreHistoryAvailable && index == 0) {
+                          // return the header
+                          return _buildLoadMoreButton(
+                              context, channelBloc, messagesWrappers);
+                        }
+                        index -= 1;
+
+                        if (index >= itemCount || index < 0) {
+                          // hack for ScrollablePositionedList
+                          // sometimes it is ask for widgets outside
+                          // original bounds
                           return SizedBox.shrink();
                         }
 //                        _logger.d(() => "$index");
@@ -154,30 +166,26 @@ class _NetworkChannelMessagesListWidgetState extends State<NetworkChannelMessage
                         if (messageWrapper.includedInSearchResult) {
                           border = Border.all(color: Colors.red);
                         } else {
-
                           border = Border.all(color: Colors.transparent);
                         }
                         return Container(
                             decoration: BoxDecoration(border: border),
                             child: messageBody);
-                      }),
-            );
+                      });
+                }),);
 
-            var forcedMessagesListIndex = chatMessagesWrapperState.newScrollIndex;
-            if(forcedMessagesListIndex != null) {
+            var forcedMessagesListIndex = chatMessagesWrapperState
+                .newScrollIndex;
+            if (forcedMessagesListIndex != null) {
 //            scrollController.scrollTo(
 //                index: forcedMessagesListIndex,
 //                duration: Duration(seconds: 1),
 //                curve: Curves.easeInOutCubic);
 
-            Timer.run(() {
-
-            scrollController.jumpTo(
-                index: forcedMessagesListIndex);
-            });
-
+              Timer.run(() {
+                scrollController.jumpTo(index: forcedMessagesListIndex);
+              });
             }
-
 
 //            var itemScrollPosition = messagesBloc.itemScrollPosition;
 //            if (itemScrollPosition != null && itemScrollPosition > 0 &&
@@ -185,7 +193,6 @@ class _NetworkChannelMessagesListWidgetState extends State<NetworkChannelMessage
 //              itemScrollController.jumpTo(
 //                  index: itemScrollPosition, alignment: 1.0);
 //            }
-
 
 //         Timer.run( () {
 //              var bottomOffset = _scrollController.position.maxScrollExtent * 3;
@@ -204,6 +211,20 @@ class _NetworkChannelMessagesListWidgetState extends State<NetworkChannelMessage
           }
         });
   }
+
+  Widget _buildLoadMoreButton(BuildContext context,
+      NetworkChannelBloc channelBloc,
+      List<ChatMessageWrapper> messageWrappers) =>
+      createSkinnedPlatformButton(context, onPressed: () {
+        doAsyncOperationWithDialog(context, () async {
+          var oldestRegularMessage = messageWrappers.firstWhere((
+              messageWrapper) => messageWrapper.message.chatMessageType ==
+              ChatMessageType.REGULAR).message as RegularMessage;
+
+          return await channelBloc.loadMoreHistory(oldestRegularMessage);
+        });
+      }, child: Text(AppLocalizations.of(context).tr("chat.messages"
+          ".load_more")));
 }
 
 _isNeedPrint(ChatMessageWrapper messageWrapper) {
