@@ -163,10 +163,28 @@ class AppIRCState extends State<AppIRC> {
       var loungeBackendService = LoungeBackendService(
           socketManagerProvider.manager, loungePreferences);
 
-      var chatPushesService =
-          ChatPushesService(pushesService, loungeBackendService);
 
       await loungeBackendService.init();
+
+
+      loungeBackendService.listenForSignOut(() {
+
+        loungeBackendService.dispose();
+        this.loungeBackendService = null;
+        this.loungePreferences.authPreferences = null;
+
+        var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
+        loungePreferencesBloc.setValue(LoungePreferences.empty);
+        setState(() {
+
+        });
+      });
+
+
+      var chatPushesService =
+      ChatPushesService(pushesService, loungeBackendService);
+
+
       this.loungeBackendService = loungeBackendService;
 
       var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);

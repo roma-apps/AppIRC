@@ -1,7 +1,6 @@
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter_appirc/async/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/main.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:rxdart/rxdart.dart';
@@ -107,7 +106,7 @@ class SocketIOService extends Providable {
   Future init() async {
     _socketIO = await _manager.createInstance(_createSocketOptions(uri));
 
-    _logger.d(()=> "init _socketIO = $_socketIO");
+    _logger.d(() => "init _socketIO = $_socketIO");
 
     addDisposable(
         disposable: _listenConnectionState(
@@ -167,14 +166,30 @@ class SocketIOService extends Providable {
       await _socketIO.emit(command.getName(), command.getBody());
 
   disconnect() async {
+    _connectionStateController.add(SocketConnectionState.DISCONNECTED);
     return await _manager.clearInstance(_socketIO);
+  }
+
+  var disposed = false;
+  @override
+  void dispose() {
+    if (!disposed) {
+      disposed = true;
+      super.dispose();
+      if (connectionState == SocketConnectionState.CONNECTED) {
+        try {
+          _manager.clearInstance(_socketIO);
+        } on Exception catch (e) {
+          _logger.d(() => "error during disposing $e");
+        }
+      }
+    }
   }
 
   SocketOptions _createSocketOptions(String host) {
     return SocketOptions(
         //Socket IO server URI
-        host,
-        //Enable or disable platform channel logging
+        host, //Enable or disable platform channel logging
         enableLogging: true,
         transports: [
           Transports.WEB_SOCKET,

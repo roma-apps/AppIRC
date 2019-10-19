@@ -10,4 +10,5 @@ LoungePreferences _jsonConverter(Map<String, dynamic> json) =>
 class LoungePreferencesBloc extends JsonPreferencesBloc<LoungePreferences> {
   LoungePreferencesBloc(PreferencesService preferencesService)
       : super(preferencesService, _preferencesStorageKey, 1, _jsonConverter);
+
 }

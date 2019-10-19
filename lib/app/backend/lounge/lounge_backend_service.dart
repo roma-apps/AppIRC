@@ -52,6 +52,9 @@ class LoungeBackendService extends Providable
   @override
   ChatInitInformation chatInit;
 
+  // ignore: close_sinks
+  BehaviorSubject<bool> _signOutController = BehaviorSubject();
+
   // lounge don't response properly to edit request
   // ignore: close_sinks
   BehaviorSubject<ChatNetworkPreferences> _editNetworkRequests =
@@ -67,6 +70,7 @@ class LoungeBackendService extends Providable
   final List<LoungeRequest> _pendingRequests = [];
 
   LoungeBackendService(this.socketIOManager, this._loungePreferences) {
+    addDisposable(subject: _signOutController);
     addDisposable(subject: _connectionStateController);
     addDisposable(subject: _editNetworkRequests);
   }
@@ -920,9 +924,7 @@ class LoungeBackendService extends Providable
   void dispose() {
     super.dispose();
 
-    if (connectionState == ChatConnectionState.CONNECTED) {
-      disconnect();
-    }
+    _socketIOService.dispose();
   }
 
 //  sendSettingsGetRequest() async =>
@@ -978,7 +980,24 @@ class LoungeBackendService extends Providable
 
       var chatLoadMore = toChatLoadMore(channel, parsed);
       callback(chatLoadMore);
+    }));
 
+    return disposable;
+  }
+
+  Disposable listenForSignOut(VoidCallback callback) {
+    var disposable = CompositeDisposable([]);
+
+    disposable.add(
+        StreamSubscriptionDisposable(_signOutController.stream.listen((manualSignOut) {
+      if (manualSignOut == true) {
+        callback();
+      }
+    })));
+    disposable.add(createEventListenerDisposable(
+        (LoungeResponseEventNames.signOut), (raw) {
+      _logger.d(() => "listenForSignOut $raw");
+      callback();
     }));
 
     return disposable;
@@ -1007,6 +1026,13 @@ class LoungeBackendService extends Providable
     disposable.dispose();
 
     return RequestResult.name(isSentSuccessfully: true, result: chatLoadMore);
+  }
+
+  void signOut() {
+    _signOutController.add(true);
+
+    _sendRequest(LoungeRawRequest(name: LoungeRequestEventNames.signOut),
+        isNeedAddRequestToPending: false);
   }
 }
 
