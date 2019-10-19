@@ -137,14 +137,9 @@ class NetworkChannelsListWidget extends StatelessWidget {
                         }
                         return activeChannelBloc.changeActiveChanel(channel);
                       },
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(channel.name,
-                                style: channelsListSkinBloc
-                                    .getChannelItemTextStyle(isChannelActive))
-                          ]),
+                      child: Text(channel.name,
+                          style: channelsListSkinBloc
+                              .getChannelItemTextStyle(isChannelActive)),
                     ),
                   ),
                 ),
