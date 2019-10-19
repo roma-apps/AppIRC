@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' show Colors, Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,12 +11,14 @@ import 'package:flutter_appirc/app/chat/chat_input_message_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_upload_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_upload_file_picker.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
+import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_type_ahead_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NetworkChannelNewMessageWidget extends StatefulWidget {
   NetworkChannelNewMessageWidget();
@@ -39,7 +43,7 @@ class NetworkChannelNewMessageState
     var children = <Widget>[
       Flexible(
           child: Container(
-//              decoration: BoxDecoration(border: Border.all(color: inputMessageSkinBloc.inputMessageCursorColor)),
+        //              decoration: BoxDecoration(border: Border.all(color: inputMessageSkinBloc.inputMessageCursorColor)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: createPlatformTypeAhead(
@@ -126,42 +130,12 @@ class NetworkChannelNewMessageState
     if (chatUploadBloc.isUploadSupported) {
       children.insert(
           0,
-          PlatformIconButton(
-              icon: Icon(Icons.attach_file),
-              onPressed: () async {
-                pickFileForUpload().then((pickedFile) async {
-                  if (pickedFile != null) {
-                    try {
-                      await doAsyncOperationWithDialog(context, () async {
-                        var uploadRequestResult =
-                            await chatUploadBloc.uploadFile(pickedFile);
-                        var remoteURL = uploadRequestResult.result;
-
-                        if (remoteURL != null) {
-                          inputMessageBloc.appendText(remoteURL);
-                        }
-                      });
-                    } on ServerAuthUploadException {
-                      showPlatformDialog(
-                          context: context,
-                          builder: (_) => PlatformAlertDialog(
-                              title: Text("Server auth error")));
-                    } on FileSizeUploadException {
-                      showPlatformDialog(
-                          context: context,
-                          builder: (_) => PlatformAlertDialog(
-                              title: Text("File size error")));
-                    } on HttpUploadException {
-                      showPlatformDialog(
-                          context: context,
-                          builder: (_) => PlatformAlertDialog(
-                              title: Text("Http error")));
-                    }
-                  }
-                });
-//            inputMessageBloc.sendMessage();
-              }));
+          createPlatformPopupMenuButton(context,
+              child: Icon(Icons.attach_file),
+              actions: _buildAttachMenuItems(
+                  context, chatUploadBloc, inputMessageBloc)));
     }
+
     return Container(
       decoration: BoxDecoration(
           color: inputMessageSkinBloc.inputMessageBackgroundColor),
@@ -172,5 +146,100 @@ class NetworkChannelNewMessageState
         ),
       ),
     );
+  }
+
+  _buildAttachMenuItems(BuildContext context, ChatUploadBloc chatUploadBloc,
+      ChatInputMessageBloc inputMessageBloc) {
+    return <PlatformAwarePopupMenuAction>[
+      PlatformAwarePopupMenuAction(
+        text: "File",
+        iconData: Icons.insert_drive_file,
+        actionCallback: (PlatformAwarePopupMenuAction action) {
+          pickAndUploadFile(
+              FileType.ANY, context, chatUploadBloc, inputMessageBloc);
+        },
+      ),
+      PlatformAwarePopupMenuAction(
+        text: "Audio",
+        iconData: Icons.audiotrack,
+        actionCallback: (PlatformAwarePopupMenuAction action) {
+          pickAndUploadFile(
+              FileType.AUDIO, context, chatUploadBloc, inputMessageBloc);
+        },
+      ),
+      PlatformAwarePopupMenuAction(
+        text: "Image from library",
+        iconData: Icons.image,
+        actionCallback: (PlatformAwarePopupMenuAction action) {
+          pickAndUploadFile(
+              FileType.IMAGE, context, chatUploadBloc, inputMessageBloc);
+        },
+      ),
+      PlatformAwarePopupMenuAction(
+        text: "Photo from camera",
+        iconData: Icons.camera_alt,
+        actionCallback: (PlatformAwarePopupMenuAction action) async {
+          var pickedPhoto = await ImagePicker.pickImage(source: ImageSource
+              .camera);
+          if(pickedPhoto != null) {
+            _uploadFile(context, chatUploadBloc, pickedPhoto, inputMessageBloc);
+          }
+        },
+      ),
+      PlatformAwarePopupMenuAction(
+        text: "Video",
+        iconData: Icons.video_library,
+        actionCallback: (PlatformAwarePopupMenuAction action) {
+          pickAndUploadFile(
+              FileType.VIDEO, context, chatUploadBloc, inputMessageBloc);
+        },
+      ),
+    ];
+  }
+
+  Future pickAndUploadFile(
+      FileType fileType,
+      BuildContext context,
+      ChatUploadBloc chatUploadBloc,
+      ChatInputMessageBloc inputMessageBloc) async {
+    pickFileForUpload(fileType).then((pickedFile) async {
+      if (pickedFile != null) {
+        _uploadFile(context, chatUploadBloc, pickedFile, inputMessageBloc);
+      } else {
+        showPlatformDialog(
+            context: context,
+            builder: (_) => PlatformAlertDialog(
+                title: Text("Can't access "
+                    "file")));
+      }
+    });
+  }
+
+  Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc, File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
+    try {
+      await doAsyncOperationWithDialog(context, () async {
+        var uploadRequestResult =
+            await chatUploadBloc.uploadFile(pickedFile);
+        var remoteURL = uploadRequestResult.result;
+
+        if (remoteURL != null) {
+          inputMessageBloc.appendText(remoteURL);
+        }
+      });
+    } on ServerAuthUploadException {
+      showPlatformDialog(
+          context: context,
+          builder: (_) =>
+              PlatformAlertDialog(title: Text("Server auth error")));
+    } on FileSizeUploadException {
+      showPlatformDialog(
+          context: context,
+          builder: (_) =>
+              PlatformAlertDialog(title: Text("File size error")));
+    } on HttpUploadException {
+      showPlatformDialog(
+          context: context,
+          builder: (_) => PlatformAlertDialog(title: Text("Http error")));
+    }
   }
 }

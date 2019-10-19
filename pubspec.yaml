@@ -40,6 +40,8 @@ dependencies:
 
   # file picker UI for upload
   file_picker: ^1.4.2
+  # photo picker
+  image_picker: ^0.6.1+8
 
   # upload files via post
   http: ^0.12.0+2
