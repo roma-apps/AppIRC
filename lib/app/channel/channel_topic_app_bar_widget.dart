@@ -25,16 +25,16 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
             AsyncSnapshot<ChatConnectionState> snapshot) {
           ChatConnectionState connectionState = snapshot.data;
 
-          return StreamBuilder<NetworkChannelState>(
-            stream: channelBloc.networkChannelStateStream,
-            initialData: channelBloc.networkChannelState,
+          return StreamBuilder<String>(
+            stream: channelBloc.networkChannelTopicStream,
+            initialData: channelBloc.networkChannelTopic,
             builder: (BuildContext context,
-                AsyncSnapshot<NetworkChannelState> snapshot) {
-              NetworkChannelState state = snapshot.data;
+                AsyncSnapshot<String> snapshot) {
+              String topic = snapshot.data;
+
               var channel = channelBloc.channel;
               var channelName = channel.name;
 
-              String topic = state.topic;
 
               String subTitleText;
 

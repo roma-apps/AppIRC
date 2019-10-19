@@ -56,7 +56,7 @@ void showTopicDialog(BuildContext context, NetworkChannelBloc channelBloc) {
   showPlatformDialog(
       context: context,
       builder: (_) {
-        var topicString = channelBloc.networkChannelState.topic;
+        var topicString = channelBloc.networkChannelTopic;
         ChannelTopicFormBloc topicFormBloc = ChannelTopicFormBloc(topicString);
 
         return PlatformAlertDialog(

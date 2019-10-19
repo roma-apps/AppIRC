@@ -20,7 +20,6 @@ var _logger = MyLogger(logTag: "buildChannelPopupMenuButton", enabled: true);
 Widget buildChannelPopupMenuButton(BuildContext context,
     NetworkBloc networkBloc, NetworkChannelBloc channelBloc, Color iconColor) {
   var channel = channelBloc.channel;
-  var channelState = channelBloc.networkChannelState;
   var network = networkBloc.network;
 
   if (channel.type == NetworkChannelType.LOBBY) {
@@ -29,11 +28,11 @@ Widget buildChannelPopupMenuButton(BuildContext context,
 
   return createPlatformPopupMenuButton(context,
       child: Icon(Icons.more_vert, color: iconColor),
-      actions: _buildMenuItems(context, network, channel, channelState));
+      actions: _buildMenuItems(context, network, channel));
 }
 
 List<PlatformAwarePopupMenuAction> _buildMenuItems(BuildContext context,
-    Network network, NetworkChannel channel, NetworkChannelState channelState) {
+    Network network, NetworkChannel channel) {
   List<PlatformAwarePopupMenuAction> menuItems;
 
   NetworkChannelBloc channelBloc =

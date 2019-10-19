@@ -64,23 +64,26 @@ class NetworkChannelState {
   int unreadCount;
   bool connected;
   bool highlighted;
+  bool moreHistoryAvailable;
 
   NetworkChannelState(this.topic, this.editTopicPossible, this.unreadCount,
-      this.connected, this.highlighted);
+      this.connected, this.highlighted, this.moreHistoryAvailable);
 
   NetworkChannelState.name(
       {@required this.topic,
       @required this.editTopicPossible,
       @required this.unreadCount,
       @required this.connected,
-      @required this.highlighted});
+      @required this.highlighted,
+      @required this.moreHistoryAvailable});
 
   static final NetworkChannelState empty = NetworkChannelState.name(
       topic: null,
       editTopicPossible: false,
       unreadCount: 0,
       connected: false,
-      highlighted: false);
+      highlighted: false,
+      moreHistoryAvailable: false);
 
   @override
   String toString() {

@@ -111,12 +111,12 @@ class NetworkChannelsListWidget extends StatelessWidget {
       child: Provider(
         providable: NetworkChannelBlocProvider(channelBloc),
         child: StreamBuilder(
-            initialData: channelBloc.networkChannelState,
-            stream: channelBloc.networkChannelStateStream,
+            initialData: channelBloc.networkChannelConnected,
+            stream: channelBloc.networkChannelConnectedStream,
             builder: (context, snapshot) {
-              NetworkChannelState channelState = snapshot.data;
+              bool channelConnected = snapshot.data;
 
-              _logger.d(() => "new state for channelItem $channelState");
+              _logger.d(() => "new state for channelItem $channelConnected");
 
               var channelsListSkinBloc =
                   Provider.of<ChannelsListSkinBloc>(context);
@@ -154,7 +154,7 @@ class NetworkChannelsListWidget extends StatelessWidget {
                           context,
                           channelsListSkinBloc
                               .getChannelItemIconColor(isChannelActive),
-                          networkState.connected && channelState.connected);
+                          networkState.connected && channelConnected);
                     }),
                 buildChannelUnreadCountBadge(context, isChannelActive),
                 buildChannelPopupMenuButton(

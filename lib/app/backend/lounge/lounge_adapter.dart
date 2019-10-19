@@ -57,7 +57,6 @@ ChatConfig toChatConfig(
         fileUploadMaxSizeInBytes: loungeConfig.fileUploadMaxFileSize,
         commands: commands);
 
-
 ChatMessage toChatMessage(
     NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) {
   var regularMessageType = detectRegularMessageType(msgLoungeResponseBody.type);
@@ -70,9 +69,9 @@ ChatMessage toChatMessage(
         specialType: SpecialMessageType.WHO_IS,
         date: DateTime.now());
   } else {
-    var text = regularMessageType == RegularMessageType.CTCP_REQUEST ?
-    msgLoungeResponseBody.ctcpMessage :
-    msgLoungeResponseBody.text;
+    var text = regularMessageType == RegularMessageType.CTCP_REQUEST
+        ? msgLoungeResponseBody.ctcpMessage
+        : msgLoungeResponseBody.text;
     return RegularMessage.name(
       channel.remoteId,
       command: msgLoungeResponseBody.command,
@@ -84,8 +83,8 @@ ChatMessage toChatMessage(
       params: msgLoungeResponseBody.params,
       previews: msgLoungeResponseBody.previews != null
           ? msgLoungeResponseBody.previews
-          .map((loungePreview) => toMessagePreview(loungePreview))
-          .toList()
+              .map((loungePreview) => toMessagePreview(loungePreview))
+              .toList()
           : null,
       date: DateTime.parse(msgLoungeResponseBody.time),
       fromNick: msgLoungeResponseBody.from != null
@@ -217,7 +216,8 @@ NetworkChannelState toNetworkChannelState(
                 type == NetworkChannelType.SPECIAL
             ? true
             : loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED,
-        highlighted: loungeChannel.highlight != null);
+        highlighted: loungeChannel.highlight != null,
+        moreHistoryAvailable: loungeChannel.moreHistoryAvailable);
 
 NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
         String nick, String name) =>
@@ -455,7 +455,6 @@ NetworkWithState toNetworkWithState(NetworkLoungeResponseBody loungeNetwork) {
   var loungeNetworkStatus = loungeNetwork.status;
 
   var networkState = toNetworkState(loungeNetworkStatus, nick, network.name);
-
 
   // TODO: open ticket for lounge
   // Strange field, it should be inside networkStatus.

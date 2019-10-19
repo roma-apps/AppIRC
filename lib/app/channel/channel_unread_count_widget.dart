@@ -26,13 +26,12 @@ buildChannelUnreadCountBadge(BuildContext context, bool isChannelActive) {
 
   var channelBloc = NetworkChannelBloc.of(context);
 
-  return StreamBuilder<NetworkChannelState>(
-    stream: channelBloc.networkChannelStateStream,
-    initialData: channelBloc.networkChannelState,
-    builder: (BuildContext context, AsyncSnapshot<NetworkChannelState> snapshot) {
-      var state = snapshot.data;
+  return StreamBuilder<int>(
+    stream: channelBloc.networkChannelUnreadCountStream,
+    initialData: channelBloc.networkChannelUnreadCount,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      var unreadCount = snapshot.data;
 
-      var unreadCount = state.unreadCount;
       if (unreadCount != null && unreadCount > 0) {
         return _buildChannelUnreadBadgeCount(context, isChannelActive, unreadCount);
       } else {

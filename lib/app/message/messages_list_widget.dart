@@ -83,14 +83,14 @@ class _NetworkChannelMessagesListWidgetState extends State<NetworkChannelMessage
           }
 
           if (messagesWrappers == null || messagesWrappers.length == 0) {
-            return StreamBuilder<NetworkChannelState>(
-              stream: channelBloc.networkChannelStateStream,
-              initialData: channelBloc.networkChannelState,
+            return StreamBuilder<bool>(
+              stream: channelBloc.networkChannelConnectedStream,
+              initialData: channelBloc.networkChannelConnected,
               builder: (BuildContext context,
-                  AsyncSnapshot<NetworkChannelState> snapshot) {
-                var currentChannelState = snapshot.data;
+                  AsyncSnapshot<bool> snapshot) {
+                var connected = snapshot.data;
 
-                if (currentChannelState.connected) {
+                if (connected) {
                   return Center(
                       child: Text(
                           AppLocalizations.of(context).tr("chat.empty_channel"),

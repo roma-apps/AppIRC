@@ -85,11 +85,32 @@ class NetworkChannelBloc extends DisposableOwner {
         waitForResult: false);
   }
 
-  NetworkChannelState get networkChannelState =>
+  NetworkChannelState get _networkChannelState =>
       channelsStatesBloc.getNetworkChannelState(network, channel);
 
-  Stream<NetworkChannelState> get networkChannelStateStream =>
+  Stream<NetworkChannelState> get _networkChannelStateStream =>
       channelsStatesBloc.getNetworkChannelStateStream(network, channel);
+
+  bool get networkChannelConnected => _networkChannelState.connected;
+
+  Stream<bool> get networkChannelConnectedStream =>
+      _networkChannelStateStream.map((state) => state?.connected).distinct();
+
+  bool get networkChannelMoreHistoryAvailable => _networkChannelState.moreHistoryAvailable;
+
+  Stream<bool> get networkChannelMoreHistoryAvailableStream =>
+      _networkChannelStateStream.map((state) => state?.moreHistoryAvailable).distinct();
+
+  int get networkChannelUnreadCount => _networkChannelState
+      .unreadCount;
+
+  Stream<int> get networkChannelUnreadCountStream =>
+      _networkChannelStateStream.map((state) => state?.unreadCount).distinct();
+
+  String get networkChannelTopic => _networkChannelState.topic;
+
+  Stream<String> get networkChannelTopicStream =>
+      _networkChannelStateStream.map((state) => state?.topic).distinct();
 
   Future<RequestResult<bool>> leaveNetworkChannel(
           {bool waitForResult: false}) async =>
