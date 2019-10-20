@@ -106,12 +106,19 @@ class ChatPage extends StatelessWidget {
           );
           if (unreadCount > 0) {
             // badge hide part of button clickable area
+            double rightMargin = 15.0;
+
+            if(isMaterial) {
+              rightMargin = 15;
+            } else if(isCupertino) {
+              rightMargin = 5;
+            }
             return GestureDetector(
               onTap: onPressed,
               child: Stack(children: <Widget>[
                 platformIconButton,
                 new Positioned(
-                  right: 15,
+                  right: rightMargin,
                   top: 10,
                   child: new Container(
                     padding: EdgeInsets.all(2),
