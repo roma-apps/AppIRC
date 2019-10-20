@@ -465,6 +465,15 @@ class LoungeBackendService extends Providable
       }
     }));
 
+    disposable.add(listenForLoadMore(network, channel,
+        (loadMoreResponse) {
+
+          loadMoreResponse.messages.forEach((message) {
+            listener(message);
+          });
+
+        }));
+
     return disposable;
   }
 
@@ -558,6 +567,16 @@ class LoungeBackendService extends Providable
           channelState.unreadCount = data.unread;
           listener(channelState);
         }
+      }
+    }));
+    disposable.add(
+        createEventListenerDisposable(LoungeResponseEventNames.more, (raw) {
+      var parsed = MoreLoungeResponseBody.fromJson(_preProcessRawData(raw));
+
+      if (channel.remoteId == parsed.chan) {
+          var channelState = currentStateExtractor();
+          channelState.moreHistoryAvailable = parsed.moreHistoryAvailable;
+          listener(channelState);
       }
     }));
 
@@ -988,8 +1007,8 @@ class LoungeBackendService extends Providable
   Disposable listenForSignOut(VoidCallback callback) {
     var disposable = CompositeDisposable([]);
 
-    disposable.add(
-        StreamSubscriptionDisposable(_signOutController.stream.listen((manualSignOut) {
+    disposable.add(StreamSubscriptionDisposable(
+        _signOutController.stream.listen((manualSignOut) {
       if (manualSignOut == true) {
         callback();
       }

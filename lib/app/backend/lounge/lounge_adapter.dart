@@ -229,10 +229,12 @@ NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
         name: name);
 
 ChatLoadMore toChatLoadMore(NetworkChannel channel, MoreLoungeResponseBody
-moreLoungeResponseBody) =>
-ChatLoadMore.name(messages: moreLoungeResponseBody.messages.map(
-    (loungeMessage) => toChatMessage(channel, loungeMessage)),
+moreLoungeResponseBody) {
+  var messages = moreLoungeResponseBody.messages.map(
+    (loungeMessage) => toChatMessage(channel, loungeMessage)).toList();
+  return ChatLoadMore.name(messages: messages,
     moreHistoryAvailable: moreLoungeResponseBody.moreHistoryAvailable);
+}
 
 RegularMessageType detectRegularMessageType(String stringType) {
   var type;

@@ -75,13 +75,14 @@ class _NetworkChannelMessagesListWidgetState
         builder: (BuildContext context,
             AsyncSnapshot<ChatMessagesWrapperState> snapshot) {
           var chatMessagesWrapperState = snapshot.data;
-          var messagesWrappers = chatMessagesWrapperState.messages;
-          if (messagesWrappers != null) {
-            messagesWrappers = messagesWrappers.where((messageWrapper) =>
+          var originalMessagesWrappers = chatMessagesWrapperState.messages;
+          var filteredMessagesWrappers;
+          if (originalMessagesWrappers != null) {
+            filteredMessagesWrappers = originalMessagesWrappers.where((messageWrapper) =>
                 _isNeedPrint(messageWrapper)).toList();
           }
 
-          if (messagesWrappers == null || messagesWrappers.isEmpty) {
+          if (filteredMessagesWrappers == null || filteredMessagesWrappers.isEmpty) {
             return StreamBuilder<bool>(
               stream: channelBloc.networkChannelConnectedStream,
               initialData: channelBloc.networkChannelConnected,
@@ -116,7 +117,7 @@ class _NetworkChannelMessagesListWidgetState
                 builder: (context, snapshot) {
                   var moreHistoryAvailable = snapshot.data;
 
-                  var itemCount = messagesWrappers.length;
+                  var itemCount = filteredMessagesWrappers.length;
 
                   if (moreHistoryAvailable) {
                     itemCount += 1;
@@ -129,7 +130,7 @@ class _NetworkChannelMessagesListWidgetState
                         if (moreHistoryAvailable && index == 0) {
                           // return the header
                           return _buildLoadMoreButton(
-                              context, channelBloc, messagesWrappers);
+                              context, channelBloc, originalMessagesWrappers);
                         }
                         index -= 1;
 
@@ -140,7 +141,7 @@ class _NetworkChannelMessagesListWidgetState
                           return SizedBox.shrink();
                         }
 //                        _logger.d(() => "$index");
-                        var messageWrapper = messagesWrappers[index];
+                        var messageWrapper = filteredMessagesWrappers[index];
                         var message = messageWrapper.message;
 
                         var chatMessageType = message.chatMessageType;

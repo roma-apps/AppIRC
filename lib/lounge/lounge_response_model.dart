@@ -524,7 +524,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
         'text: $text, hostmask: $hostmask, self: $self, '
         'highlight: $highlight, showInActive: $showInActive, '
         'users: $users, previews: $previews, params: $params, '
-        'ctcpMessage: $ctcpMessage'
+        'ctcpMessage: $ctcpMessage '
         'id: $id, whois: $whois}';
   }
 

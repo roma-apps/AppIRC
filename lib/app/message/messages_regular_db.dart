@@ -21,8 +21,19 @@ abstract class RegularMessageDao {
   Future<List<RegularMessageDB>> getChannelMessages(int channelRemoteId);
 
   @Query(
+      'SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
+          ':channelRemoteId ORDER BY dateMicrosecondsSinceEpoch ASC')
+  Future<List<RegularMessageDB>> getChannelMessagesOrderByDate(int
+  channelRemoteId);
+
+  @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
   Stream<List<RegularMessageDB>> getChannelMessagesStream(int channelRemoteId);
+
+  @Query(
+      'SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
+          ':channelRemoteId ORDER BY dateMicrosecondsSinceEpoch ASC')
+  Stream<List<RegularMessageDB>> getChannelMessagesOrderByDateStream(int channelRemoteId);
 
   @insert
   Future<int> insertRegularMessage(RegularMessageDB regularMessage);
