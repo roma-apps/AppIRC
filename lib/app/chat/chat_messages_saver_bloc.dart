@@ -1,3 +1,4 @@
+import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_list_listener_bloc.dart';
@@ -58,6 +59,43 @@ class NetworkChannelMessagesSaverBloc
       newMessageDB.localId = oldMessageDB.localId;
       db.regularMessagesDao.updateRegularMessage(newMessageDB);
     }));
+
+    channelDisposable.add(backendService
+        .listenForMessagePreviews(network, channel, (previewForMessage) async {
+      var oldMessageDB = await db.regularMessagesDao
+          .findMessageWithRemoteId(previewForMessage.remoteMessageId);
+
+      var oldMessage = regularMessageDBToChatMessage(oldMessageDB);
+
+      updatePreview(oldMessage, previewForMessage);
+
+      var newMessageDB = toRegularMessageDB(oldMessage);
+      newMessageDB.localId = oldMessageDB.localId;
+      db.regularMessagesDao.updateRegularMessage(newMessageDB);
+    }));
+
+    channelDisposable.add(backendService.listenForMessagePreviewToggle(
+        network, channel, (MessageTogglePreview togglePreview) async {
+      var previewForMessage = PreviewForMessage(togglePreview.message
+          .messageRemoteId, togglePreview.preview);
+
+      var oldMessageDB = await db.regularMessagesDao
+          .findMessageWithRemoteId(previewForMessage.remoteMessageId);
+
+      var oldMessage = regularMessageDBToChatMessage(oldMessageDB);
+
+      var foundOldMessage = oldMessage.previews.firstWhere((preview) {
+        return preview.link == previewForMessage.messagePreview.link;
+      }, orElse: () => null);
+
+      foundOldMessage.shown = togglePreview.newShownValue;
+
+      var newMessageDB = toRegularMessageDB(oldMessage);
+      newMessageDB.localId = oldMessageDB.localId;
+      db.regularMessagesDao.updateRegularMessage(newMessageDB);
+    }));
+
+
 
     _channelsListeners[channel.remoteId] = channelDisposable;
 

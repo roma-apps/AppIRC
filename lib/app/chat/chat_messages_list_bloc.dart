@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_loader_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
@@ -36,6 +37,7 @@ class ChatMessageListVisibleArea {
 }
 
 class ChatMessagesListBloc extends Providable {
+  ChatInputOutputBackendService backendService;
   ChannelMessagesListBloc _channelMessagesListBloc;
   NetworkChannelMessagesLoaderBloc _messagesLoaderBloc;
 
@@ -83,6 +85,8 @@ class ChatMessagesListBloc extends Providable {
         .listen((newSearchTerm) {
       _research(true);
     }));
+
+
 
     addDisposable(subject: _allMessagesStateController);
     addDisposable(subject: _foundMessagesController);

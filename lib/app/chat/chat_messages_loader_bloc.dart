@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_saver_bloc.dart';
@@ -14,11 +15,11 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger =
-    MyLogger(logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
+var _logger = MyLogger(
+    logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
 
 class NetworkChannelMessagesLoaderBloc extends Providable {
-  final ChatOutputBackendService backendService;
+  final ChatInputOutputBackendService backendService;
   final NetworkChannelMessagesSaverBloc messagesSaverBloc;
   final ChatDatabase db;
   final Network network;
@@ -27,8 +28,8 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
   List<ChatMessage> currentMessages = [];
 
   // ignore: close_sinks
-  var _messagesController =
-      new BehaviorSubject<List<ChatMessage>>(seedValue: []);
+  var _messagesController = new BehaviorSubject<List<ChatMessage>>(
+      seedValue: []);
 
   Stream<List<ChatMessage>> get messagesStream => _messagesController.stream;
 
@@ -39,20 +40,18 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
     Timer.run(() async {
       // history
       var regularMessages = (await db.regularMessagesDao
-              .getChannelMessagesOrderByDate(networkChannel.remoteId))
-          .map(regularMessageDBToChatMessage);
-      var specialMessages = (await db.specialMessagesDao
-              .getChannelMessages(networkChannel.remoteId))
-          .map(specialMessageDBToChatMessage);
+          .getChannelMessagesOrderByDate(networkChannel.remoteId)).map(
+          regularMessageDBToChatMessage);
+      var specialMessages = (await db.specialMessagesDao.getChannelMessages(
+          networkChannel.remoteId)).map(specialMessageDBToChatMessage);
 
       currentMessages.addAll(regularMessages);
       currentMessages.addAll(specialMessages);
       _resortMessagesByDate();
       _onMessagesChanged();
       // socket listener
-      addDisposable(
-          disposable: messagesSaverBloc
-              .listenForMessages(network, networkChannel, (newMessage) {
+      addDisposable(disposable: messagesSaverBloc.listenForMessages(
+          network, networkChannel, (newMessage) {
         if (currentMessages.isNotEmpty) {
           if (currentMessages.last.date.isBefore(newMessage.date)) {
             // if new message
@@ -75,9 +74,8 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
         _onMessagesChanged();
       }));
 
-      addDisposable(
-          disposable: backendService.listenForMessagePreviews(
-              network, networkChannel, (previewForMessage) {
+      addDisposable(disposable: backendService.listenForMessagePreviews(
+          network, networkChannel, (previewForMessage) {
         var oldMessage = currentMessages.firstWhere((message) {
           if (message is RegularMessage) {
             var regularMessage = message;
@@ -96,6 +94,28 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
         updatePreview(oldMessage, previewForMessage);
 
         _onMessagesChanged();
+      }));
+
+
+      addDisposable(disposable: backendService.listenForMessagePreviewToggle(
+          network, networkChannel, (MessageTogglePreview togglePreview) async {
+        _onMessagesChanged();
+      }));
+
+      addDisposable(disposable: backendService.listenForChannelPreviewToggle(
+          network, networkChannel, (channelToggle) async {
+        currentMessages.forEach((message) {
+          if (message is RegularMessage) {
+            if (message.previews != null) {
+              message.previews.forEach((preview) {
+                if (preview.shown != channelToggle.allPreviewsShown) {
+                  backendService.togglePreview(network, networkChannel, message,
+                      preview);
+                }
+              });
+            }
+          }
+        });
       }));
     });
   }

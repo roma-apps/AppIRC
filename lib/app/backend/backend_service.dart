@@ -73,6 +73,14 @@ abstract class ChatOutputBackendService implements ChatBackendService {
 
   Disposable listenForMessagePreviews(Network network, NetworkChannel channel,
       NetworkChannelMessagePreviewListener listener);
+
+  Disposable listenForMessagePreviewToggle(Network network, NetworkChannel channel,
+      Function(MessageTogglePreview) callback);
+
+  Disposable listenForChannelPreviewToggle(Network network, NetworkChannel
+  channel,
+      Function(ChannelTogglePreview) callback);
+
 }
 
 abstract class ChatInputBackendService implements ChatBackendService {
@@ -141,6 +149,9 @@ abstract class ChatInputBackendService implements ChatBackendService {
   Future<RequestResult<RegularMessage>> sendNetworkChannelRawMessage(
       Network network, NetworkChannel channel, String rawMessage,
       {bool waitForResult: false});
+
+  Future<RequestResult<MessageTogglePreview>> togglePreview(Network network,
+      NetworkChannel channel, RegularMessage message, MessagePreview preview);
 
   Future<RequestResult<ChatLoadMore>> loadMoreHistory(
       Network network, NetworkChannel channel, int lastMessageId);

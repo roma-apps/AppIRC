@@ -7,6 +7,7 @@ import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -158,5 +159,10 @@ class NetworkChannelBloc extends DisposableOwner {
   Future<RequestResult<ChatLoadMore>> loadMoreHistory(
       RegularMessage oldestMessage) async {
     return backendService.loadMoreHistory(network, channel, oldestMessage.messageRemoteId);
+  }
+
+  Future<RequestResult<MessageTogglePreview>> togglePreview(RegularMessage message,
+      MessagePreview preview) {
+    return backendService.togglePreview(network, channel, message, preview);
   }
 }

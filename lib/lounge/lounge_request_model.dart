@@ -14,7 +14,6 @@ class LoungeRequestEventNames {
   static const String auth = "auth";
   static const String uploadAuth = "upload:auth";
 
-
   static const String more = "more";
   static const String msgPreviewToggle = "msg:preview:toggle";
   static const String signOut = "sign-out";
@@ -22,8 +21,6 @@ class LoungeRequestEventNames {
   static const String pushFCMToken = "push:fcmToken";
   static const String pushRegister = "push:register";
   static const String pushUnregister = "push:unegister";
-
-
 }
 
 abstract class LoungeRequest extends SocketIOCommand {
@@ -94,11 +91,11 @@ class InputLoungeRequestBody extends LoungeRequestBody {
     return 'InputLoungeRequestBody{target: $target, content: $content}';
   }
 }
+
 @JsonSerializable()
 class MoreLoungeRequestBody extends LoungeRequestBody {
   final int target;
   final int lastId;
-
 
   MoreLoungeRequestBody(this.target, this.lastId);
 
@@ -109,10 +106,7 @@ class MoreLoungeRequestBody extends LoungeRequestBody {
   String toString() {
     return 'MoreLoungeRequestBody{target: $target, lastId: $lastId}';
   }
-
-
 }
-
 
 @JsonSerializable()
 class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
@@ -121,10 +115,14 @@ class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
   final String link;
   final bool shown;
 
+  MsgPreviewToggleLoungeRequestBody(
+      this.target, this.msgId, this.link, this.shown);
 
-  MsgPreviewToggleLoungeRequestBody(this.target, this.msgId, this.link,
-      this.shown);
-
+  MsgPreviewToggleLoungeRequestBody.name(
+      {@required this.target,
+      @required this.msgId,
+      @required this.link,
+      @required this.shown});
 
   @override
   String toString() {
@@ -133,10 +131,9 @@ class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
   }
 
   @override
-  Map<String, dynamic> toJson() => _$MsgPreviewToggleLoungeRequestBodyToJson(this);
-
+  Map<String, dynamic> toJson() =>
+      _$MsgPreviewToggleLoungeRequestBodyToJson(this);
 }
-
 
 @JsonSerializable()
 class PushTokenLoungeRequestBody extends LoungeRequestBody {
@@ -151,8 +148,6 @@ class PushTokenLoungeRequestBody extends LoungeRequestBody {
   String toString() {
     return 'PushTokenLoungeRequestBody{token: $token}';
   }
-
-
 }
 
 @JsonSerializable()
@@ -176,7 +171,6 @@ class NamesLoungeRequestBody extends LoungeRequestBody {
 class AuthLoungeRequestBody extends LoungeRequestBody {
   final String user;
   final String password;
-
 
   @override
   String toString() {
@@ -233,7 +227,6 @@ class NetworkNewLoungeRequestBody extends LoungeRequestBody {
   Map<String, dynamic> toJson() => _$NetworkNewLoungeRequestBodyToJson(this);
 }
 
-
 @JsonSerializable()
 class NetworkEditLoungeRequestBody extends LoungeRequestBody {
   final String uuid;
@@ -264,17 +257,16 @@ class NetworkEditLoungeRequestBody extends LoungeRequestBody {
 
   NetworkEditLoungeRequestBody(
       {@required this.host,
-        @required this.commands,
-        @required this.uuid,
-        @required this.name,
-        @required this.nick,
-        @required this.port,
-        @required this.realname,
-        @required this.rejectUnauthorized,
-        @required this.tls,
-        @required this.username,
-        @required this.password});
+      @required this.commands,
+      @required this.uuid,
+      @required this.name,
+      @required this.nick,
+      @required this.port,
+      @required this.realname,
+      @required this.rejectUnauthorized,
+      @required this.tls,
+      @required this.username,
+      @required this.password});
 
   Map<String, dynamic> toJson() => _$NetworkEditLoungeRequestBodyToJson(this);
 }
-

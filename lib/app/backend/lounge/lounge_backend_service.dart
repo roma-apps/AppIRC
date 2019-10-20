@@ -73,6 +73,7 @@ class LoungeBackendService extends Providable
     addDisposable(subject: _signOutController);
     addDisposable(subject: _connectionStateController);
     addDisposable(subject: _editNetworkRequests);
+    addDisposable(subject: _messageTogglePreviewSubject);
   }
 
   Future init() async {
@@ -465,14 +466,11 @@ class LoungeBackendService extends Providable
       }
     }));
 
-    disposable.add(listenForLoadMore(network, channel,
-        (loadMoreResponse) {
-
-          loadMoreResponse.messages.forEach((message) {
-            listener(message);
-          });
-
-        }));
+    disposable.add(listenForLoadMore(network, channel, (loadMoreResponse) {
+      loadMoreResponse.messages.forEach((message) {
+        listener(message);
+      });
+    }));
 
     return disposable;
   }
@@ -574,9 +572,9 @@ class LoungeBackendService extends Providable
       var parsed = MoreLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == parsed.chan) {
-          var channelState = currentStateExtractor();
-          channelState.moreHistoryAvailable = parsed.moreHistoryAvailable;
-          listener(channelState);
+        var channelState = currentStateExtractor();
+        channelState.moreHistoryAvailable = parsed.moreHistoryAvailable;
+        listener(channelState);
       }
     }));
 
@@ -951,12 +949,24 @@ class LoungeBackendService extends Providable
 
   void _sendInputRequest(
       Network network, NetworkChannel channel, String message) {
+
+
+    if(message.startsWith("/collapse")) {
+      _channelTogglePreviewSubject.add(ChannelTogglePreview(network, channel,
+          false));
+    } else if(message.startsWith("/expand")) {
+      _channelTogglePreviewSubject.add(ChannelTogglePreview(network, channel,
+          true));
+    } else {
+
+
     _sendRequest(
         LoungeJsonRequest(
             name: LoungeRequestEventNames.input,
             body: InputLoungeRequestBody(
                 target: channel.remoteId, content: message)),
         isNeedAddRequestToPending: false);
+    }
   }
 
   @override
@@ -1022,6 +1032,7 @@ class LoungeBackendService extends Providable
     return disposable;
   }
 
+
   @override
   Future<RequestResult<ChatLoadMore>> loadMoreHistory(
       Network network, NetworkChannel channel, int lastMessageId) async {
@@ -1045,6 +1056,68 @@ class LoungeBackendService extends Providable
     disposable.dispose();
 
     return RequestResult.name(isSentSuccessfully: true, result: chatLoadMore);
+  }
+
+  // ignore: close_sinks
+  BehaviorSubject<MessageTogglePreview> _messageTogglePreviewSubject = BehaviorSubject();
+
+  Disposable listenForMessagePreviewToggle(Network network, NetworkChannel channel,
+      Function(MessageTogglePreview) callback) {
+
+    return StreamSubscriptionDisposable(
+        _messageTogglePreviewSubject.stream.listen((MessageTogglePreview toggle)  {
+            if(toggle.networkChannel == channel) {
+              callback(toggle);
+            }
+        }));
+  }
+
+
+  // ignore: close_sinks
+  BehaviorSubject<ChannelTogglePreview> _channelTogglePreviewSubject =
+  BehaviorSubject();
+
+  Disposable listenForChannelPreviewToggle(Network network, NetworkChannel
+  channel,
+      Function(ChannelTogglePreview) callback) {
+    return StreamSubscriptionDisposable(
+        _channelTogglePreviewSubject.stream.listen((ChannelTogglePreview toggle)  {
+          if(toggle.networkChannel == channel) {
+            callback(toggle);
+          }
+        }));
+  }
+
+
+  @override
+  Future<RequestResult<MessageTogglePreview>> togglePreview(Network network,
+      NetworkChannel channel, RegularMessage message, MessagePreview preview,
+      {bool waitForResult = false}) async {
+    if (waitForResult) {
+      throw NotImplementedYetException();
+    }
+
+    var shownInverted = !preview.shown;
+    preview.shown = shownInverted;
+    _sendRequest(
+        LoungeJsonRequest(
+            name: LoungeRequestEventNames.msgPreviewToggle,
+            body: MsgPreviewToggleLoungeRequestBody.name(
+                target: channel.remoteId,
+                msgId: message.messageRemoteId,
+                link: preview.link,
+                shown: shownInverted)),
+        isNeedAddRequestToPending: false);
+
+
+
+    var chatTogglePreview = MessageTogglePreview.name(
+            network, channel, message, preview, shownInverted);
+
+    _messageTogglePreviewSubject.add(chatTogglePreview);
+    return RequestResult(
+        true,
+        chatTogglePreview);
   }
 
   void signOut() {

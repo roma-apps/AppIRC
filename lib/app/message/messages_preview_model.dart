@@ -23,7 +23,7 @@ class MessagePreview {
   final String head;
   final String body;
   final bool canDisplay;
-  final bool shown;
+  bool shown;
   final String link;
   final String thumb;
   final String media;

@@ -13,6 +13,7 @@ import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:video_player/video_player.dart';
 
@@ -108,8 +109,8 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message) {
   }
 
   if (message.previews != null) {
-    message.previews
-        .forEach((preview) => rows.add(buildPreview(context, preview)));
+    message.previews.forEach(
+        (preview) => rows.add(buildPreview(context, message, preview)));
   }
 
   return Column(
@@ -274,26 +275,51 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
   }
 }
 
-Widget buildPreview(BuildContext context, MessagePreview preview) {
+Widget buildPreview(
+    BuildContext context, RegularMessage message, MessagePreview preview) {
   _logger.d((() => " build preview for $preview"));
 
+  var previewBody;
   switch (preview.type) {
     case MessagePreviewType.LINK:
-      return buildMessageLinkPreview(context, preview);
+      previewBody = buildMessageLinkPreview(context, preview);
 
       break;
     case MessagePreviewType.IMAGE:
-      return buildMessageImagePreview(context, preview);
+      previewBody = buildMessageImagePreview(context, preview);
       break;
     case MessagePreviewType.LOADING:
-      return Text("Loading");
+      previewBody = Text("Loading");
       break;
     case MessagePreviewType.AUDIO:
-      return buildMessageAudioPreview(context, preview);
+      previewBody = buildMessageAudioPreview(context, preview);
       break;
     case MessagePreviewType.VIDEO:
-      return buildMessageVideoPreview(context, preview);
+      previewBody = buildMessageVideoPreview(context, preview);
       break;
+  }
+
+  if (previewBody != null) {
+    return Stack(children: <Widget>[
+      preview.shown ? previewBody : SizedBox.shrink(),
+      PlatformIconButton(
+          icon: Icon(preview.shown ? Icons.expand_less : Icons.expand_more),
+          onPressed: () {
+            NetworkChannelBloc channelBloc = NetworkChannelBloc.of(context);
+            channelBloc.togglePreview(message, preview);
+          })
+    ]);
+
+//    return Row(children: <Widget>[
+//      previewBody,  PlatformIconButton(
+//        icon: Icon(preview.shown ? Icons.expand_less : Icons.expand_more),
+//        onPressed: () {
+//
+//        },
+//      )
+//    ],);
+  } else {
+    return SizedBox.shrink();
   }
 }
 
@@ -499,8 +525,7 @@ class MessageVideoPreviewWidgetState extends State<MessageVideoPreviewWidget> {
     super.initState();
     _videoPlayerController1 = VideoPlayerController.network(_videoURL);
     _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController1,
-      allowFullScreen: false,
+      videoPlayerController: _videoPlayerController1, allowFullScreen: false,
 
       // Try playing around with some of these other options:
 

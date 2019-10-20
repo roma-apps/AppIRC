@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
+import 'package:flutter_appirc/app/message/messages_preview_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_model.dart';
+import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -31,6 +35,49 @@ class ChatLoadMore {
 
 
 }
+
+
+class ChannelTogglePreview {
+  Network network;
+  NetworkChannel networkChannel;
+  bool allPreviewsShown;
+  ChannelTogglePreview(this.network, this.networkChannel,
+      this.allPreviewsShown);
+
+  ChannelTogglePreview.name(this.network, this.networkChannel,
+      this.allPreviewsShown);
+
+  @override
+  String toString() {
+    return 'ChannelTogglePreview{network: $network,'
+        ' networkChannel: $networkChannel, allPreviewsShown: $allPreviewsShown}';
+  }
+
+
+}
+
+class MessageTogglePreview {
+  Network network;
+  NetworkChannel networkChannel;
+  RegularMessage message;
+  MessagePreview preview;
+  bool newShownValue;
+  MessageTogglePreview(this.network, this.networkChannel, this.message,
+      this.preview, this.newShownValue);
+
+  MessageTogglePreview.name(this.network, this.networkChannel, this.message,
+      this.preview, this.newShownValue);
+
+  @override
+  String toString() {
+    return 'ChatTogglePreview{network: $network, '
+        'networkChannel: $networkChannel, message: $message,'
+        ' preview: $preview, newShownValue: $newShownValue}';
+  }
+
+
+}
+
 
 @JsonSerializable()
 class ChatPushMessageNotification {
