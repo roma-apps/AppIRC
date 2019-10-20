@@ -18,8 +18,8 @@ import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
-var _logger = MyLogger(
-    logTag: "NetworkChannelMessagesListWidget", enabled: true);
+var _logger =
+    MyLogger(logTag: "NetworkChannelMessagesListWidget", enabled: true);
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
   final VisibleAreaCallback visibleAreaCallback;
@@ -34,8 +34,8 @@ class _NetworkChannelMessagesListWidgetState
     extends State<NetworkChannelMessagesListWidget> {
   final VisibleAreaCallback visibleAreaCallback;
 
-  final ItemPositionsListener positionsListener = ItemPositionsListener
-      .create();
+  final ItemPositionsListener positionsListener =
+      ItemPositionsListener.create();
 
   final ItemScrollController scrollController = ItemScrollController();
 
@@ -78,11 +78,13 @@ class _NetworkChannelMessagesListWidgetState
           var originalMessagesWrappers = chatMessagesWrapperState.messages;
           var filteredMessagesWrappers;
           if (originalMessagesWrappers != null) {
-            filteredMessagesWrappers = originalMessagesWrappers.where((messageWrapper) =>
-                _isNeedPrint(messageWrapper)).toList();
+            filteredMessagesWrappers = originalMessagesWrappers
+                .where((messageWrapper) => _isNeedPrint(messageWrapper))
+                .toList();
           }
 
-          if (filteredMessagesWrappers == null || filteredMessagesWrappers.isEmpty) {
+          if (filteredMessagesWrappers == null ||
+              filteredMessagesWrappers.isEmpty) {
             return StreamBuilder<bool>(
               stream: channelBloc.networkChannelConnectedStream,
               initialData: channelBloc.networkChannelConnected,
@@ -90,93 +92,106 @@ class _NetworkChannelMessagesListWidgetState
                 var connected = snapshot.data;
 
                 if (connected) {
-                  return Center(child: Text(
-                      AppLocalizations.of(context).tr("chat.empty_channel"),
-                      style: TextStyle(color: AppSkinBloc
-                          .of(context)
-                          .appSkinTheme
-                          .textColor)));
+                  return Center(
+                      child: Text(
+                          AppLocalizations.of(context).tr("chat.empty_channel"),
+                          style: TextStyle(
+                              color: AppSkinBloc.of(context)
+                                  .appSkinTheme
+                                  .textColor)));
                 } else {
-                  return Center(child: Text(AppLocalizations.of(context).tr(
-                      "chat.not_connected_channel"),
-                      style: TextStyle(color: AppSkinBloc
-                          .of(context)
-                          .appSkinTheme
-                          .textColor)));
+                  return Center(
+                      child: Text(
+                          AppLocalizations.of(context)
+                              .tr("chat.not_connected_channel"),
+                          style: TextStyle(
+                              color: AppSkinBloc.of(context)
+                                  .appSkinTheme
+                                  .textColor)));
                 }
-              },);
+              },
+            );
           } else {
             var result = Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0), child:
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child:
 
 //              ListView.builder(
 
-            StreamBuilder<bool>(
-                stream: channelBloc.networkChannelMoreHistoryAvailableStream,
-                initialData: channelBloc.networkChannelMoreHistoryAvailable,
-                builder: (context, snapshot) {
-                  var moreHistoryAvailable = snapshot.data;
+                  StreamBuilder<bool>(
+                      stream:
+                          channelBloc.networkChannelMoreHistoryAvailableStream,
+                      initialData:
+                          channelBloc.networkChannelMoreHistoryAvailable,
+                      builder: (context, snapshot) {
+                        var moreHistoryAvailable = snapshot.data;
 
-                  var itemCount = filteredMessagesWrappers.length;
+                        var itemCount = filteredMessagesWrappers.length;
 
-                  if (moreHistoryAvailable) {
-                    itemCount += 1;
-                  }
-
-                  return ScrollablePositionedList.builder(itemCount: itemCount,
-                      itemScrollController: scrollController,
-                      itemPositionsListener: positionsListener,
-                      itemBuilder: (BuildContext context, int index) {
-                        if (moreHistoryAvailable && index == 0) {
-                          // return the header
-                          return _buildLoadMoreButton(
-                              context, channelBloc, originalMessagesWrappers);
+                        if (moreHistoryAvailable) {
+                          itemCount += 1;
                         }
-                        index -= 1;
 
-                        if (index >= itemCount || index < 0) {
-                          // hack for ScrollablePositionedList
-                          // sometimes it is ask for widgets outside
-                          // original bounds
-                          return SizedBox.shrink();
-                        }
+                        return ScrollablePositionedList.builder(
+                            itemCount: itemCount,
+                            itemScrollController: scrollController,
+                            itemPositionsListener: positionsListener,
+                            itemBuilder: (BuildContext context, int index) {
+                              if (moreHistoryAvailable && index == 0) {
+                                // return the header
+                                return _buildLoadMoreButton(context,
+                                    channelBloc, originalMessagesWrappers);
+                              }
+                              index -= 1;
+
+                              if (index >= filteredMessagesWrappers.length ||
+                                  index < 0) {
+                                // hack for ScrollablePositionedList
+                                // sometimes it is ask for widgets outside
+                                // original bounds
+                                return SizedBox.shrink();
+                              }
 //                        _logger.d(() => "$index");
-                        var messageWrapper = filteredMessagesWrappers[index];
-                        var message = messageWrapper.message;
+                              var messageWrapper =
+                                  filteredMessagesWrappers[index];
+                              var message = messageWrapper.message;
 
-                        var chatMessageType = message.chatMessageType;
+                              var chatMessageType = message.chatMessageType;
 
-                        Widget messageBody;
-                        switch (chatMessageType) {
-                          case ChatMessageType.SPECIAL:
-                            var specialMessage = message as SpecialMessage;
-                            messageBody = buildSpecialMessageWidget(
-                                context, specialMessage);
-                            break;
-                          case ChatMessageType.REGULAR:
-                            messageBody = buildRegularMessage(context, message);
-                            break;
-                        }
+                              Widget messageBody;
+                              switch (chatMessageType) {
+                                case ChatMessageType.SPECIAL:
+                                  var specialMessage =
+                                      message as SpecialMessage;
+                                  messageBody = buildSpecialMessageWidget(
+                                      context, specialMessage);
+                                  break;
+                                case ChatMessageType.REGULAR:
+                                  messageBody =
+                                      buildRegularMessage(context, message);
+                                  break;
+                              }
 
-                        if (messageBody == null) {
-                          throw Exception(
-                              "Invalid message type = $chatMessageType");
-                        }
+                              if (messageBody == null) {
+                                throw Exception(
+                                    "Invalid message type = $chatMessageType");
+                              }
 
-                        Border border;
-                        if (messageWrapper.includedInSearchResult) {
-                          border = Border.all(color: Colors.red);
-                        } else {
-                          border = Border.all(color: Colors.transparent);
-                        }
-                        return Container(
-                            decoration: BoxDecoration(border: border),
-                            child: messageBody);
-                      });
-                }),);
+                              Border border;
+                              if (messageWrapper.includedInSearchResult) {
+                                border = Border.all(color: Colors.red);
+                              } else {
+                                border = Border.all(color: Colors.transparent);
+                              }
+                              return Container(
+                                  decoration: BoxDecoration(border: border),
+                                  child: messageBody);
+                            });
+                      }),
+            );
 
-            var forcedMessagesListIndex = chatMessagesWrapperState
-                .newScrollIndex;
+            var forcedMessagesListIndex =
+                chatMessagesWrapperState.newScrollIndex;
             if (forcedMessagesListIndex != null) {
 //            scrollController.scrollTo(
 //                index: forcedMessagesListIndex,
@@ -213,19 +228,23 @@ class _NetworkChannelMessagesListWidgetState
         });
   }
 
-  Widget _buildLoadMoreButton(BuildContext context,
-      NetworkChannelBloc channelBloc,
-      List<ChatMessageWrapper> messageWrappers) =>
+  Widget _buildLoadMoreButton(
+          BuildContext context,
+          NetworkChannelBloc channelBloc,
+          List<ChatMessageWrapper> messageWrappers) =>
       createSkinnedPlatformButton(context, onPressed: () {
         doAsyncOperationWithDialog(context, () async {
-          var oldestRegularMessage = messageWrappers.firstWhere((
-              messageWrapper) => messageWrapper.message.chatMessageType ==
-              ChatMessageType.REGULAR).message as RegularMessage;
+          var oldestRegularMessage = messageWrappers
+              .firstWhere((messageWrapper) =>
+                  messageWrapper.message.chatMessageType ==
+                  ChatMessageType.REGULAR)
+              .message as RegularMessage;
 
           return await channelBloc.loadMoreHistory(oldestRegularMessage);
         });
-      }, child: Text(AppLocalizations.of(context).tr("chat.messages"
-          ".load_more")));
+      },
+          child: Text(AppLocalizations.of(context).tr("chat.messages"
+              ".load_more")));
 }
 
 _isNeedPrint(ChatMessageWrapper messageWrapper) {
