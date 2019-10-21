@@ -72,5 +72,10 @@
 	<string>Used to pick photo from camera or library for upload</string>
 <key>NSAppleMusicUsageDescription</key>
 <string>Used to pick audio from library for upload</string>
+<key>ITSAppUsesNonExemptEncryption</key><false/>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Your location is required for picking image from camera</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Your location is required for picking image from camera</string>
 </dict>
 </plist>
