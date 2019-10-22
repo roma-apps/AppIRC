@@ -211,6 +211,7 @@ NetworkChannelState toNetworkChannelState(
         ChannelLoungeResponseBody loungeChannel, NetworkChannelType type) =>
     NetworkChannelState.name(
         topic: loungeChannel.topic,
+        firstUnreadRemoteMessageId: loungeChannel.firstUnread,
         editTopicPossible: loungeChannel.editTopic,
         unreadCount: loungeChannel.unread,
         connected: type == NetworkChannelType.QUERY ||

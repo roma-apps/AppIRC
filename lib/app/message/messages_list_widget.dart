@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -23,6 +21,7 @@ var _logger =
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
   final VisibleAreaCallback visibleAreaCallback;
+
   NetworkChannelMessagesListWidget(this.visibleAreaCallback);
 
   @override
@@ -39,11 +38,14 @@ class _NetworkChannelMessagesListWidgetState
 
   final ItemScrollController scrollController = ItemScrollController();
 
+
   @override
   void dispose() {
     super.dispose();
     positionsListener.itemPositions.removeListener(onVisiblePositionsChanged);
   }
+  final scrollDirection = Axis.vertical;
+
 
   @override
   void initState() {
@@ -112,96 +114,101 @@ class _NetworkChannelMessagesListWidgetState
               },
             );
           } else {
-            var result = Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child:
+            var moreHistoryAvailable =
+                chatMessagesWrapperState.moreHistoryAvailable;
+            var itemCount = filteredMessagesWrappers.length;
 
-//              ListView.builder(
-
-                  StreamBuilder<bool>(
-                      stream:
-                          channelBloc.networkChannelMoreHistoryAvailableStream,
-                      initialData:
-                          channelBloc.networkChannelMoreHistoryAvailable,
-                      builder: (context, snapshot) {
-                        var moreHistoryAvailable = snapshot.data;
-
-                        var itemCount = filteredMessagesWrappers.length;
-
-                        if (moreHistoryAvailable) {
-                          itemCount += 1;
-                        }
-
-                        return ScrollablePositionedList.builder(
-                            itemCount: itemCount,
-                            itemScrollController: scrollController,
-                            itemPositionsListener: positionsListener,
-                            itemBuilder: (BuildContext context, int index) {
-                              if (moreHistoryAvailable && index == 0) {
-                                // return the header
-                                return _buildLoadMoreButton(context,
-                                    channelBloc, originalMessagesWrappers);
-                              }
-                              index -= 1;
-
-                              if (index >= filteredMessagesWrappers.length ||
-                                  index < 0) {
-                                // hack for ScrollablePositionedList
-                                // sometimes it is ask for widgets outside
-                                // original bounds
-                                return SizedBox.shrink();
-                              }
-//                        _logger.d(() => "$index");
-                              var messageWrapper =
-                                  filteredMessagesWrappers[index];
-                              var message = messageWrapper.message;
-
-                              var chatMessageType = message.chatMessageType;
-
-                              Widget messageBody;
-                              switch (chatMessageType) {
-                                case ChatMessageType.SPECIAL:
-                                  var specialMessage =
-                                      message as SpecialMessage;
-                                  messageBody = buildSpecialMessageWidget(
-                                      context, specialMessage);
-                                  break;
-                                case ChatMessageType.REGULAR:
-                                  messageBody =
-                                      buildRegularMessage(context, message);
-                                  break;
-                              }
-
-                              if (messageBody == null) {
-                                throw Exception(
-                                    "Invalid message type = $chatMessageType");
-                              }
-
-                              Border border;
-                              if (messageWrapper.includedInSearchResult) {
-                                border = Border.all(color: Colors.red);
-                              } else {
-                                border = Border.all(color: Colors.transparent);
-                              }
-                              return Container(
-                                  decoration: BoxDecoration(border: border),
-                                  child: messageBody);
-                            });
-                      }),
-            );
-
-            var forcedMessagesListIndex =
-                chatMessagesWrapperState.newScrollIndex;
-            if (forcedMessagesListIndex != null) {
-//            scrollController.scrollTo(
-//                index: forcedMessagesListIndex,
-//                duration: Duration(seconds: 1),
-//                curve: Curves.easeInOutCubic);
-
-              Timer.run(() {
-                scrollController.jumpTo(index: forcedMessagesListIndex);
-              });
+            if (moreHistoryAvailable) {
+              itemCount += 1;
             }
+
+            _logger.d(() => "rebuild ScrollablePositionedList");
+//            return ListView.builder(
+            return ScrollablePositionedList.builder(
+                itemCount: itemCount,
+
+                itemScrollController: scrollController,
+
+                itemBuilder: (BuildContext context, int index) {
+
+
+
+
+
+                  if (moreHistoryAvailable && index == 0) {
+                    // return the header
+                    return _buildLoadMoreButton(context,
+                        channelBloc, originalMessagesWrappers);
+                  }
+                  index -= 1;
+
+//                  if (index >= filteredMessagesWrappers.length ||
+//                      index < 0) {
+//                    // hack for ScrollablePositionedList
+//                    // sometimes it is ask for widgets outside
+//                    // original bounds
+//                    return SizedBox.shrink();
+//                  }
+
+                  _logger.d(() => "$index");
+
+                  var messageWrapper = filteredMessagesWrappers[index];
+                  var message = messageWrapper.message;
+
+                  var chatMessageType = message.chatMessageType;
+
+                  Widget messageBody;
+                  switch (chatMessageType) {
+                    case ChatMessageType.SPECIAL:
+                      var specialMessage = message as SpecialMessage;
+                      messageBody =
+                          buildSpecialMessageWidget(context, specialMessage);
+                      break;
+                    case ChatMessageType.REGULAR:
+                      messageBody = buildRegularMessage(context, message);
+                      break;
+                  }
+
+                  if (messageBody == null) {
+                    throw Exception("Invalid message type = $chatMessageType");
+                  }
+
+                  Border border;
+                  if (messageWrapper.includedInSearchResult) {
+                    border = Border.all(color: Colors.red);
+                  } else {
+                    border = Border.all(color: Colors.transparent);
+                  }
+                  return Container(
+                      decoration: BoxDecoration(border: border),
+                      child: messageBody);
+
+                });
+
+//            var result = Padding(
+//              padding: const EdgeInsets.symmetric(vertical: 10.0),
+//              child:
+//
+//
+//
+//                  StreamBuilder<bool>(
+//                      stream:
+//                          channelBloc.networkChannelMoreHistoryAvailableStream,
+//                      initialData:
+//                          channelBloc.networkChannelMoreHistoryAvailable,
+//                      builder: (context, snapshot) {
+//
+//
+//                      }),
+//            );
+
+//            var forcedMessagesListIndex =
+//                chatMessagesWrapperState.newScrollIndex;
+//            if (forcedMessagesListIndex != null) {
+//              Timer.run(() {
+//                scrollController.jumpTo(index: forcedMessagesListIndex);
+//              });
+//            }
 
 //            var itemScrollPosition = messagesBloc.itemScrollPosition;
 //            if (itemScrollPosition != null && itemScrollPosition > 0 &&
@@ -210,20 +217,7 @@ class _NetworkChannelMessagesListWidgetState
 //                  index: itemScrollPosition, alignment: 1.0);
 //            }
 
-//         Timer.run( () {
-//              var bottomOffset = _scrollController.position.maxScrollExtent * 3;
-//              // TODO: Remove magic 3 number
-//              // Looks like bug in ListView _scrollController.position
-//              // .maxScrollExtent should be always bottom value
-//              // However it is not true when list view contains Text
-//              // with new lines characters
-//              _scrollController.animateTo(bottomOffset,
-//                  duration: const Duration(milliseconds: 200),
-//                  curve: Curves.easeOut);
-////              _scrollController.jumpTo(
-////                  _scrollController.position.maxScrollExtent);
-//            });
-            return result;
+//            return result;
           }
         });
   }

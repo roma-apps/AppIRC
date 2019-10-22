@@ -65,9 +65,16 @@ class NetworkChannelState {
   bool connected;
   bool highlighted;
   bool moreHistoryAvailable;
+  int firstUnreadRemoteMessageId;
 
-  NetworkChannelState(this.topic, this.editTopicPossible, this.unreadCount,
-      this.connected, this.highlighted, this.moreHistoryAvailable);
+  NetworkChannelState(
+      this.topic,
+      this.editTopicPossible,
+      this.unreadCount,
+      this.connected,
+      this.highlighted,
+      this.moreHistoryAvailable,
+      this.firstUnreadRemoteMessageId);
 
   NetworkChannelState.name(
       {@required this.topic,
@@ -75,7 +82,8 @@ class NetworkChannelState {
       @required this.unreadCount,
       @required this.connected,
       @required this.highlighted,
-      @required this.moreHistoryAvailable});
+      @required this.moreHistoryAvailable,
+      @required this.firstUnreadRemoteMessageId});
 
   static final NetworkChannelState empty = NetworkChannelState.name(
       topic: null,
@@ -83,13 +91,17 @@ class NetworkChannelState {
       unreadCount: 0,
       connected: false,
       highlighted: false,
-      moreHistoryAvailable: false);
+      moreHistoryAvailable: false,
+      firstUnreadRemoteMessageId: null);
 
   @override
   String toString() {
     return 'NetworkChannelState{topic: $topic, '
-        'editTopicPossible: $editTopicPossible, '
-        'unreadCount: $unreadCount,'
-        ' connected: $connected, highlighted: $highlighted}';
+        'editTopicPossible: $editTopicPossible, unreadCount: $unreadCount, '
+        'connected: $connected, highlighted: $highlighted, '
+        'moreHistoryAvailable: $moreHistoryAvailable, '
+        'firstUnread: $firstUnreadRemoteMessageId}';
   }
+
+
 }

@@ -15,24 +15,29 @@ var _logger = MyLogger(logTag: "ChatMessagesListBloc", enabled: true);
 class ChatMessageWrapper {
   bool includedInSearchResult;
   ChatMessage message;
+
   ChatMessageWrapper(this.includedInSearchResult, this.message);
 }
 
 class ChatMessagesWrapperState {
   List<ChatMessageWrapper> messages;
   int newScrollIndex;
-  ChatMessagesWrapperState(this.messages, this.newScrollIndex);
+  bool moreHistoryAvailable;
+
+  ChatMessagesWrapperState(this.messages, this.newScrollIndex, this.moreHistoryAvailable);
 }
 
 class MessagesSearchState {
   List<ChatMessage> messages;
   int currentIndex;
+
   MessagesSearchState(this.messages, this.currentIndex);
 }
 
 class ChatMessageListVisibleArea {
   ChatMessage minVisibleMessage;
   ChatMessage maxVisibleMessage;
+
   ChatMessageListVisibleArea(this.minVisibleMessage, this.maxVisibleMessage);
 }
 
@@ -59,6 +64,7 @@ class ChatMessagesListBloc extends Providable {
 
   Stream<bool> get searchNextEnabledStream =>
       foundMessagesStream.map(mapSearchNextEnabled);
+
   bool get searchNextEnabled =>
       mapSearchNextEnabled(_foundMessagesController.value);
 
@@ -70,6 +76,7 @@ class ChatMessagesListBloc extends Providable {
 
   String get _currentSearchTerm =>
       _channelMessagesListBloc.searchFieldBloc.value;
+
   List<ChatMessage> get _currentLoadedMessages =>
       _messagesLoaderBloc.currentMessages;
 
@@ -77,6 +84,7 @@ class ChatMessagesListBloc extends Providable {
       this._channelMessagesListBloc, this._messagesLoaderBloc) {
     addDisposable(streamSubscription:
         _messagesLoaderBloc.messagesStream.listen((newMessages) {
+          _logger.d(() => "newMessages = ${newMessages.length}");
       _research(false);
     }));
 
@@ -86,8 +94,6 @@ class ChatMessagesListBloc extends Providable {
       _research(true);
     }));
 
-
-
     addDisposable(subject: _allMessagesStateController);
     addDisposable(subject: _foundMessagesController);
 //    addDisposable(subject: _forcedMessagesListIndexController);
@@ -95,6 +101,9 @@ class ChatMessagesListBloc extends Providable {
   }
 
   void _research(bool isSearchTermChanged) {
+
+    _logger.d(()=> "_research $isSearchTermChanged");
+
     List<ChatMessage> filteredMessages;
     bool Function(ChatMessage chatMessage) isFoundFunction;
     var searchTermIsNotEmpty =
@@ -129,7 +138,7 @@ class ChatMessagesListBloc extends Providable {
     }
 
     _allMessagesStateController
-        .add(ChatMessagesWrapperState(messageWrappersList, newIndex));
+        .add(ChatMessagesWrapperState(messageWrappersList, newIndex, true));
 
     if (searchTermIsNotEmpty) {
       _foundMessagesController.add(MessagesSearchState(filteredMessages, 0));
@@ -158,16 +167,20 @@ class ChatMessagesListBloc extends Providable {
   }
 
   BehaviorSubject<ChatMessagesWrapperState> _allMessagesStateController =
-      BehaviorSubject(seedValue: ChatMessagesWrapperState([], null));
+      BehaviorSubject(seedValue: ChatMessagesWrapperState([], null, false));
+
   Stream<ChatMessagesWrapperState> get allMessagesStateStream =>
       _allMessagesStateController.stream;
+
   ChatMessagesWrapperState get allMessagesState =>
       _allMessagesStateController.value;
 
   BehaviorSubject<MessagesSearchState> _foundMessagesController =
       BehaviorSubject();
+
   Stream<MessagesSearchState> get foundMessagesStream =>
       _foundMessagesController.stream;
+
   MessagesSearchState get foundMessages => _foundMessagesController.value;
 
 //  BehaviorSubject<int> _selectedFoundMessageIndexController = BehaviorSubject();
@@ -196,9 +209,11 @@ class ChatMessagesListBloc extends Providable {
 //            "isNotEmpty = $isNotEmpty" +
 //        "isInit = $isInit");
     if (isNotEmpty && !isInit) {
-      _channelMessagesListBloc.visibleArea = ChatMessageListVisibleArea(
-          _currentLoadedMessages[minVisibleIndex],
-          _currentLoadedMessages[maxVisibleIndex]);
+//      _channelMessagesListBloc.visibleArea = ChatMessageListVisibleArea(
+//          _currentLoadedMessages[minVisibleIndex],
+//          maxVisibleIndex != null
+//              ? _currentLoadedMessages[maxVisibleIndex]
+//              : null);
     }
   }
 
@@ -215,6 +230,9 @@ class ChatMessagesListBloc extends Providable {
   }
 
   void onNeedChangeScrollIndex() {
+
+    _logger.d(() => "onNeedChangeScrollIndex");
+
     var selectedMessage = foundMessages.messages[foundMessages.currentIndex];
 
     var index = _currentLoadedMessages.indexOf(selectedMessage);
