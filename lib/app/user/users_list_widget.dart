@@ -97,7 +97,7 @@ Widget _buildUserListItem(BuildContext context, NetworkChannelUser user,
 
   var child = Text("${user.mode}$nick", style: TextStyle(color: color));
 
-  NetworkChannelBloc channelBloc = Provider.of(context);
+  NetworkChannelBloc channelBloc = NetworkChannelBloc.of(context);
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: buildUserNickWithPopupMenu(context, child, nick, channelBloc,
