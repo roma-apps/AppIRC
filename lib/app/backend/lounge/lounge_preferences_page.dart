@@ -189,12 +189,6 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
             "per credential. "),
         Text("So notifications will not work if you or someone else use "
             "credentials after your connection to lounge"),
-        createSkinnedPlatformButton(context,
-            onPressed: null, child: Text("Fill for lounge demo server")),
-        createSkinnedPlatformButton(context,
-            onPressed: null,
-            child: Text("Fill for test server with push "
-                "notifications"))
       ],
     );
   }
