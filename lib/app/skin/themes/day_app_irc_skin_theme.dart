@@ -120,7 +120,13 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   Color get onNotActiveListItemColor => onAppBackgroundColor;
 
   @override
-  Color get highlightBackgroundColor => _androidDayThemeData.primaryColorLight;
+  Color get highlightSearchBackgroundColor => _androidDayThemeData
+      .primaryColorLight;
+
+
+  @override
+  Color get highlightServerBackgroundColor => _androidDayThemeData
+      .primaryColorDark;
 
   @override
   Color get searchBackgroundColor => _androidDayThemeData.primaryColorDark;

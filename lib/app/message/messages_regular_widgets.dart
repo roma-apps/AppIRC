@@ -28,18 +28,16 @@ var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
 //  NetworkChannelMessageWidget(this.message);
 //
 
-Widget buildRegularMessage(BuildContext context, RegularMessage message) {
-  var needHighlight = isNeedHighlight(message);
-
+Widget buildRegularMessage(BuildContext context, RegularMessage message,
+    bool isHighlightedBySearch, String searchTerm) {
   var channelBloc = NetworkChannelBloc.of(context);
 
-  var body = _buildMessageBody(context, message);
+  var body =
+      _buildMessageBody(context, message, isHighlightedBySearch, searchTerm);
 
 //  Widget  body= SizedBox.shrink();
 
   var title = _buildMessageTitle(context, channelBloc, message);
-
-
 
   var subMessage = _buildTitleSubMessage(context, message);
 
@@ -56,10 +54,11 @@ Widget buildRegularMessage(BuildContext context, RegularMessage message) {
   var color =
       messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
 
-  return buildRegularMessageWidget(context, title, body, needHighlight, color);
+  return buildRegularMessageWidget(context, title, body, color);
 }
 
-Widget _buildMessageBody(BuildContext context, RegularMessage message) {
+Widget _buildMessageBody(BuildContext context, RegularMessage message,
+    bool isHighlightedBySearch, String searchTerm) {
   var regularMessageType = message.regularMessageType;
 
   if (regularMessageType == RegularMessageType.AWAY ||
@@ -95,9 +94,8 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message) {
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 //      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
 
-    rows.add(
-        buildRegularMessageBody(context, text, nicknames: message.nicknames));
-
+    rows.add(buildRegularMessageBody(context, text, message.nicknames,
+        message.linksInText, isHighlightedBySearch, searchTerm));
 
 //
 //    rows.add(Linkify(
@@ -429,31 +427,22 @@ IconData _findTitleIconDataForMessage(RegularMessage message) {
   return icon;
 }
 
-Widget buildRegularMessageWidget(BuildContext context, Widget title,
-    Widget body, bool needHighlight, Color color) {
-  var decoration;
-  if (needHighlight) {
-    var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
-    decoration = BoxDecoration(color: messagesSkin.highlightBackgroundColor);
-  }
-
-  return Container(
-    decoration: decoration,
-    child: Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: title,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2.0),
-            child: body,
-          ),
-        ],
-      ),
+Widget buildRegularMessageWidget(
+    BuildContext context, Widget title, Widget body, Color color) {
+  return Padding(
+    padding: const EdgeInsets.all(4.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: title,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+          child: body,
+        ),
+      ],
     ),
   );
 }

@@ -162,11 +162,14 @@ class ChatMessagesListBloc extends Providable {
     } else {}
   }
 
+
+
   List<ChatMessage> filterMessages(
       List<ChatMessage> messages, String searchTerm) {
     return messages.where((message) {
       if (message is RegularMessage) {
-        return message.text.contains(searchTerm);
+
+        return message.text.toLowerCase().contains(searchTerm.toLowerCase());
       } else if (message is SpecialMessage) {
         return message.data.isContainsText(searchTerm);
       } else {

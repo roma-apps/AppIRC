@@ -8,6 +8,7 @@ import 'package:flutter_appirc/app/chat/chat_channel_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_widgets.dart';
@@ -57,8 +58,8 @@ class _NetworkChannelMessagesListWidgetState
 
     Timer.run(() {
       ChatMessagesListBloc chatListMessagesBloc = Provider.of(context);
-      positionSubscription = chatListMessagesBloc.allMessagesPositionStream
-          .listen((newPosition) {
+      positionSubscription =
+          chatListMessagesBloc.allMessagesPositionStream.listen((newPosition) {
         if (newPosition != null) {
           scrollController?.jumpTo(
               index: newPosition + lastBuildMessagesStartIndex);
@@ -230,6 +231,12 @@ class _NetworkChannelMessagesListWidgetState
                   }
                   index -= 1;
 
+                  if (index >= filteredMessagesWrappers.length) {
+                    return SizedBox.shrink();
+                  }
+
+                  _logger.d(() => "build index $index");
+
                   var messageWrapper = filteredMessagesWrappers[index];
                   var message = messageWrapper.message;
 
@@ -240,11 +247,15 @@ class _NetworkChannelMessagesListWidgetState
                     case ChatMessageType.SPECIAL:
                       var specialMessage = message as SpecialMessage;
                       messageBody =
-                          buildSpecialMessageWidget(context, specialMessage);
+                          buildSpecialMessageWidget(context, specialMessage,
+                              messageWrapper.includedInSearchResult,
+                              chatMessagesWrapperState.searchTerm);
                       messageBody = Text("index $index");
                       break;
                     case ChatMessageType.REGULAR:
-                      messageBody = buildRegularMessage(context, message);
+                      messageBody = buildRegularMessage(context, message,
+                          messageWrapper.includedInSearchResult,
+                          chatMessagesWrapperState.searchTerm);
 //                      messageBody = Text("index $index");
                       break;
                   }
@@ -253,15 +264,31 @@ class _NetworkChannelMessagesListWidgetState
                     throw Exception("Invalid message type = $chatMessageType");
                   }
 
-                  Border border;
-                  if (messageWrapper.includedInSearchResult) {
-                    border = Border.all(color: Colors.red);
-                  } else {
-                    border = Border.all(color: Colors.transparent);
+                  var decoration;
+                  bool isHighlightBySearch =
+                      messageWrapper.includedInSearchResult;
+                  bool isHighlightByServer;
+
+
+                  if (message is RegularMessage) {
+                    isHighlightByServer = message.highlight;
                   }
-                  return Container(
-                      decoration: BoxDecoration(border: border),
-                      child: messageBody);
+
+                  if (isHighlightBySearch) {
+                    var messagesSkin =
+                        Provider.of<MessagesRegularSkinBloc>(context);
+                    decoration = BoxDecoration(
+                        color: messagesSkin.highlightSearchBackgroundColor);
+                  } else {
+                    if (isHighlightByServer ??= false) {
+                      var messagesSkin =
+                          Provider.of<MessagesRegularSkinBloc>(context);
+                      decoration = BoxDecoration(
+                          color: messagesSkin.highlightServerBackgroundColor);
+                    }
+                  }
+
+                  return Container(decoration: decoration, child: messageBody);
                 });
           }
         });
