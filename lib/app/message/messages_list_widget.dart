@@ -119,10 +119,10 @@ class _NetworkChannelMessagesListWidgetState
               "=${chatMessagesWrapperState.messages?.length}");
 
 //          // todo: remove hack
-//          if (chatMessagesWrapperState.channel != null &&
-//              chatMessagesWrapperState.channel != channelBloc.channel) {
-//            return SizedBox.shrink();
-//          }
+          if (chatMessagesWrapperState.channel != null &&
+              chatMessagesWrapperState.channel != channelBloc.channel) {
+            return SizedBox.shrink();
+          }
 
           var originalMessagesWrappers = chatMessagesWrapperState.messages;
           List<ChatMessageWrapper> filteredMessagesWrappers =
@@ -230,10 +230,10 @@ class _NetworkChannelMessagesListWidgetState
                         context, channelBloc, originalMessagesWrappers);
                   }
                   index -= 1;
-
-                  if (index >= filteredMessagesWrappers.length) {
-                    return SizedBox.shrink();
-                  }
+//
+//                  if (index >= filteredMessagesWrappers.length) {
+//                    return SizedBox.shrink();
+//                  }
 
                   _logger.d(() => "build index $index");
 

@@ -16,6 +16,7 @@ abstract class MessagesRegularSkinBloc extends SkinBloc {
   TextStyle createNickTextStyle(Color color);
   TextStyle createDateTextStyle(Color color);
   TextStyle createMessageSubTitleTextStyle(Color color);
+  TextStyle createMessageHighlightTextStyle();
 
   Color findTitleColorDataForMessage(RegularMessageType messageType);
 

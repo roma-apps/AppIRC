@@ -35,8 +35,6 @@ Widget buildRegularMessage(BuildContext context, RegularMessage message,
   var body =
       _buildMessageBody(context, message, isHighlightedBySearch, searchTerm);
 
-//  Widget  body= SizedBox.shrink();
-
   var title = _buildMessageTitle(context, channelBloc, message);
 
   var subMessage = _buildTitleSubMessage(context, message);
@@ -90,27 +88,8 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message,
 
   if (message.text != null) {
     var text = message.text;
-
-//      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
-//      rows.add(Text(text, softWrap: true, overflow: TextOverflow.clip));
-
     rows.add(buildRegularMessageBody(context, text, message.nicknames,
         message.linksInText, isHighlightedBySearch, searchTerm));
-
-//
-//    rows.add(Linkify(
-//      onOpen: (link) async {
-//        if (await canLaunch(link.url)) {
-//          await launch(link.url);
-//        } else {
-//          throw 'Could not launch $link';
-//        }
-//      },
-//      text: text,
-//      style: messagesSkin.regularMessageBodyTextStyle,
-//      linkStyle: messagesSkin
-//          .modifyToLinkTextStyle(messagesSkin.regularMessageBodyTextStyle),
-//    ));
   }
 
   if (message.previews != null) {

@@ -35,51 +35,50 @@ Widget buildRegularMessageBody(
   var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
   var regularMessageBodyTextStyle = messagesSkin.regularMessageBodyTextStyle;
-//
-//  if (links?.isNotEmpty == true) {
-//    var linkTextStyle =
-//        messagesSkin.modifyToLinkTextStyle(regularMessageBodyTextStyle);
-//
-//    spanBuilders.addAll(links.map((link) {
-//      return HighlightStringSpanBuilder(link, linkTextStyle,
-//          (word, screenPosition) {
-//        var isEmail = word.contains("@");
-//        if (isEmail) {
-//          // email
-//          var prefix = "mailto:";
-//          if (!word.contains(prefix)) {
-//            word = prefix + word;
-//          }
-//          return handleLinkClick(word);
-//        } else {
-//          // url
-//          return handleLinkClick(word);
-//        }
-//      });
-//    }));
-//  }
-//
-//  if (nicknames?.isNotEmpty == true) {
-//    var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
-//    spanBuilders.addAll(nicknames.map((nickname) {
-//      return HighlightStringSpanBuilder(
-//          nickname,
-//          regularMessageBodyTextStyle.copyWith(
-//              color: nickNamesBloc.getColorForNick(nickname)),
-//          (word, screenPosition) {
-//        var local = screenPosition.global;
-//        RelativeRect position =
-//            RelativeRect.fromLTRB(local.dx, local.dy, local.dx, local.dy);
-//        NetworkChannelBloc channelBloc = Provider.of(context);
-//        String nick = word;
-//        showPopupMenuForUser(context, position, nick, channelBloc);
-//      });
-//    }));
-//  }
+
+  if (links?.isNotEmpty == true) {
+    var linkTextStyle =
+        messagesSkin.modifyToLinkTextStyle(regularMessageBodyTextStyle);
+
+    spanBuilders.addAll(links.map((link) {
+      return HighlightStringSpanBuilder(link, linkTextStyle,
+          (word, screenPosition) {
+        var isEmail = word.contains("@");
+        if (isEmail) {
+          // email
+          var prefix = "mailto:";
+          if (!word.contains(prefix)) {
+            word = prefix + word;
+          }
+          return handleLinkClick(word);
+        } else {
+          // url
+          return handleLinkClick(word);
+        }
+      });
+    }));
+  }
+
+  if (nicknames?.isNotEmpty == true) {
+    var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
+    spanBuilders.addAll(nicknames.map((nickname) {
+      return HighlightStringSpanBuilder(
+          nickname,
+          regularMessageBodyTextStyle.copyWith(
+              color: nickNamesBloc.getColorForNick(nickname)),
+          (word, screenPosition) {
+        var local = screenPosition.global;
+        RelativeRect position =
+            RelativeRect.fromLTRB(local.dx, local.dy, local.dx, local.dy);
+        NetworkChannelBloc channelBloc = Provider.of(context);
+        String nick = word;
+        showPopupMenuForUser(context, position, nick, channelBloc);
+      });
+    }));
+  }
 
   if (includedInSearch) {
-    var searchHighlightStyle =
-        regularMessageBodyTextStyle.copyWith(color: Colors.red);
+    var searchHighlightStyle = messagesSkin.createMessageHighlightTextStyle();
 
     spanBuilders.add(
         HighlightStringSpanBuilder(searchTerm, searchHighlightStyle, null));
