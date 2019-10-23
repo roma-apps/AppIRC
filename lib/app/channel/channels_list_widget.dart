@@ -137,9 +137,12 @@ class NetworkChannelsListWidget extends StatelessWidget {
                         }
                         return activeChannelBloc.changeActiveChanel(channel);
                       },
-                      child: Text(channel.name,
-                          style: channelsListSkinBloc
-                              .getChannelItemTextStyle(isChannelActive)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(channel.name,
+                            style: channelsListSkinBloc
+                                .getChannelItemTextStyle(isChannelActive)),
+                      ),
                     ),
                   ),
                 ),
