@@ -25,44 +25,47 @@ dynamic handleLinkClick(String url) async {
 
 Widget buildRegularMessageBody(BuildContext context, String text,
     {List<String> nicknames}) {
+
+
   var messagesSkin = Provider.of<MessagesRegularSkinBloc>(context);
 
   var regularMessageBodyTextStyle = messagesSkin.regularMessageBodyTextStyle;
   var linkTextStyle =
       messagesSkin.modifyToLinkTextStyle(regularMessageBodyTextStyle);
   var spanBuilders = <WordSpanBuilder>[
-    LinkWordSpanBuilder(linkTextStyle, (word, _) async {
-      var isEmail = word.contains("@");
-      if (isEmail) {
-        // email
-        var prefix = "mailto:";
-        if (!word.contains(prefix)) {
-          word = prefix + word;
-        }
-        return handleLinkClick(word);
-      } else {
-        // url
-        return handleLinkClick(word);
-      }
-    }),
+    // TODO : rework
+//    LinkWordSpanBuilder(linkTextStyle, (word, _) async {
+//      var isEmail = word.contains("@");
+//      if (isEmail) {
+//        // email
+//        var prefix = "mailto:";
+//        if (!word.contains(prefix)) {
+//          word = prefix + word;
+//        }
+//        return handleLinkClick(word);
+//      } else {
+//        // url
+//        return handleLinkClick(word);
+//      }
+//    }),
   ];
 
   if (nicknames != null) {
     var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
-    spanBuilders.addAll(nicknames.map((nickname) {
-      return SimpleWordSpanBuilder(
-          nickname,
-          regularMessageBodyTextStyle.copyWith(
-              color: nickNamesBloc.getColorForNick(nickname)),
-          (word, screenPosition) {
-        var local = screenPosition.global;
-        RelativeRect position =
-            RelativeRect.fromLTRB(local.dx, local.dy, local.dx, local.dy);
-        NetworkChannelBloc channelBloc = Provider.of(context);
-        String nick = word;
-        showPopupMenuForUser(context, position, nick, channelBloc);
-      });
-    }));
+//    spanBuilders.addAll(nicknames.map((nickname) {
+//      return SimpleWordSpanBuilder(
+//          nickname,
+//          regularMessageBodyTextStyle.copyWith(
+//              color: nickNamesBloc.getColorForNick(nickname)),
+//          (word, screenPosition) {
+//        var local = screenPosition.global;
+//        RelativeRect position =
+//            RelativeRect.fromLTRB(local.dx, local.dy, local.dx, local.dy);
+//        NetworkChannelBloc channelBloc = Provider.of(context);
+//        String nick = word;
+//        showPopupMenuForUser(context, position, nick, channelBloc);
+//      });
+//    }));
   }
 
   return buildWordSpannedRichText(
@@ -70,7 +73,7 @@ Widget buildRegularMessageBody(BuildContext context, String text,
 }
 
 Widget buildWordSpannedRichText(BuildContext context, String text,
-    TextStyle textStyle, List<WordSpanBuilder> wordSpanBuilders) {
+    TextStyle textStyle, List<HighlightStringSpanBuilder> wordSpanBuilders) {
   var builderToRegExpMatches = Map<WordSpanBuilder, Iterable<RegExpMatch>>();
   var totalMatch = 0;
   wordSpanBuilders.forEach((spanBuilder) {
@@ -139,6 +142,7 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
       );
     }
   } else {
+//      return Text(text, style: textStyle);
     if (isMaterial) {
       return SelectableText(text, style: textStyle);
     } else {
@@ -189,10 +193,10 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
 
 abstract class WordSpanBuilder {
   final RegExp findRegExp;
-  final TextStyle textStyle;
+  final TextStyle highlightTextStyle;
   final WordSpanTapCallback tapCallback;
 
-  WordSpanBuilder(this.findRegExp, this.textStyle, {this.tapCallback});
+  WordSpanBuilder(this.findRegExp, this.highlightTextStyle, {this.tapCallback});
 
   TextSpan createTextSpan(String word) {
     TapGestureRecognizer gestureRecognizer;
@@ -203,27 +207,50 @@ abstract class WordSpanBuilder {
         };
     }
     var textSpan =
-        TextSpan(text: word, style: textStyle, recognizer: gestureRecognizer);
+        TextSpan(text: word, style: highlightTextStyle, recognizer: gestureRecognizer);
 
     return textSpan;
   }
 }
+//
+//class LinkWordSpanBuilder extends WordSpanBuilder {
+//
+//
+//  LinkWordSpanBuilder(TextStyle textStyle, WordSpanTapCallback tapCallback)
+//      : super(_regex, textStyle, tapCallback: tapCallback);
+//}
 
-class LinkWordSpanBuilder extends WordSpanBuilder {
-  static final _regex = RegExp(
-    r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z0-9]{2,6}\b"
-    r"([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
-    caseSensitive: false,
-  );
+//class SimpleWordSpanBuilder extends WordSpanBuilder {
+//  final String word;
+//
+//  SimpleWordSpanBuilder(
+//      this.word, TextStyle textStyle, WordSpanTapCallback tapCallback)
+//      : super(RegExp("\\b($word)\\b"), textStyle, tapCallback: tapCallback);
+//}
 
-  LinkWordSpanBuilder(TextStyle textStyle, WordSpanTapCallback tapCallback)
-      : super(_regex, textStyle, tapCallback: tapCallback);
-}
 
-class SimpleWordSpanBuilder extends WordSpanBuilder {
-  final String word;
 
-  SimpleWordSpanBuilder(
-      this.word, TextStyle textStyle, WordSpanTapCallback tapCallback)
-      : super(RegExp("\\b($word)\\b"), textStyle, tapCallback: tapCallback);
+class HighlightStringSpanBuilder {
+  final String highlightString;
+  final TextStyle highlightTextStyle;
+  final WordSpanTapCallback tapCallback;
+
+  HighlightStringSpanBuilder(this.highlightString, this.highlightTextStyle,
+      this.tapCallback);
+
+  TextSpan createTextSpan(String word) {
+    TapGestureRecognizer gestureRecognizer;
+    if (tapCallback != null) {
+      gestureRecognizer = TapGestureRecognizer()
+        ..onTap = () {
+          tapCallback(word, gestureRecognizer.initialPosition);
+        };
+    }
+    var textSpan =
+    TextSpan(text: word, style: highlightTextStyle, recognizer: gestureRecognizer);
+
+    return textSpan;
+  }
+
+
 }

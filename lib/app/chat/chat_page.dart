@@ -29,6 +29,7 @@ import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
@@ -37,6 +38,8 @@ import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'chat_messages_list_bloc.dart';
+
+var _logger = MyLogger(logTag: "ChatPage", enabled: true);
 
 class ChatPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -285,16 +288,23 @@ class ChatPage extends StatelessWidget {
                       channelBloc.channel);
 
                   var chatListMessagesBloc = ChatMessagesListBloc(
-                      channelBloc.messagesBloc, messagesLoaderBloc);
+                      channelBloc.messagesBloc, messagesLoaderBloc,
+                      channelBloc.channel);
+
+                  _logger.d(() => "build for activeChannel ${channelBloc
+                      .channel.name}");
 
                   return Provider(
                       providable: NetworkChannelBlocProvider(channelBloc),
                       child: Provider(
-                        providable: chatListMessagesBloc,
-                        child: NetworkChannelWidget((minIndex, maxIndex) {
-                          chatListMessagesBloc.onMessagesScrolled(
-                              minIndex, maxIndex);
-                        }),
+                        providable: messagesLoaderBloc,
+                        child: Provider(
+                          providable: chatListMessagesBloc,
+                          child: NetworkChannelWidget((minIndex, maxIndex) {
+                            chatListMessagesBloc.onMessagesScrolled(
+                                minIndex, maxIndex);
+                          }),
+                        ),
                       ));
                 }
               }

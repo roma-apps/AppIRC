@@ -1,18 +1,14 @@
-import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 
-
 class RegularMessage extends ChatMessage {
-
   final int messageRemoteId;
   final String command;
 
   final String hostMask;
 
   final String text;
-
 
   final List<String> params;
 
@@ -30,7 +26,7 @@ class RegularMessage extends ChatMessage {
 
   final String newNick;
 
-   List<MessagePreview> previews;
+  List<MessagePreview> previews;
 
   List<String> nicknames;
 
@@ -46,15 +42,15 @@ class RegularMessage extends ChatMessage {
       this.highlight,
       this.previews,
       DateTime date,
+      List<String> linksInText,
       this.newNick,
       this.nicknames,
       this.fromRemoteId,
       this.fromNick,
       this.fromMode)
-      : super(ChatMessageType.REGULAR, channelRemoteId, date);
+      : super(ChatMessageType.REGULAR, channelRemoteId, date, linksInText);
 
-  RegularMessage.name(
- int channelRemoteId,
+  RegularMessage.name(int channelRemoteId,
       {@required this.command,
       @required this.hostMask,
       @required this.messageRemoteId,
@@ -65,17 +61,17 @@ class RegularMessage extends ChatMessage {
       @required this.highlight,
       @required this.previews,
       @required DateTime date,
+      @required List<String> linksInText,
       @required this.fromRemoteId,
       @required this.fromNick,
       @required this.newNick,
       @required this.nicknames,
-       int messageLocalId,
+      int messageLocalId,
       @required this.fromMode})
-      : super(ChatMessageType.REGULAR, channelRemoteId, date, messageLocalId: messageLocalId);
+      : super(ChatMessageType.REGULAR, channelRemoteId, date, linksInText,
+            messageLocalId: messageLocalId);
 
   bool get isHaveFromNick => fromNick != null;
-
-
 
   @override
   String toString() {
@@ -87,10 +83,9 @@ class RegularMessage extends ChatMessage {
         ' fromRemoteId: $fromRemoteId,'
         ' fromNick: $fromNick,'
         ' nicknames: $nicknames,'
+        ' linksInText: $linksInText,'
         ' fromMode: $fromMode, newNick: $newNick}';
   }
-
-
 }
 
 enum RegularMessageType {
@@ -113,5 +108,4 @@ enum RegularMessageType {
   PART,
   NICK,
   CTCP_REQUEST,
-
 }

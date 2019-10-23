@@ -10,16 +10,23 @@ class SpecialMessage extends ChatMessage {
   final SpecialMessageType specialType;
 
   SpecialMessage(int channelLocalId, int channelRemoteId, this.specialType,
-      this.data, DateTime date)
-      : super(ChatMessageType.SPECIAL, channelRemoteId, date);
+      this.data, DateTime date, List<String> linksInText)
+      : super(ChatMessageType.SPECIAL, channelRemoteId, date, linksInText);
 
   SpecialMessage.name(
       {@required int channelRemoteId,
       @required this.data,
       @required this.specialType,
-        int messageLocalId,
-      @required DateTime date})
-      : super(ChatMessageType.SPECIAL, channelRemoteId, date, messageLocalId: messageLocalId);
+      int messageLocalId,
+      @required DateTime date,
+      @required List<String> linksInText})
+      : super(
+          ChatMessageType.SPECIAL,
+          channelRemoteId,
+          date,
+          linksInText,
+          messageLocalId: messageLocalId,
+        );
 }
 
 enum SpecialMessageType { WHO_IS, CHANNELS_LIST_ITEM, TEXT }
@@ -140,11 +147,11 @@ class NetworkChannelInfoSpecialMessageBody extends SpecialMessageBody {
 class TextSpecialMessageBody extends SpecialMessageBody {
   final String message;
 
-
   @override
   bool isContainsText(String searchTerm) {
     return message.contains(searchTerm);
   }
+
   TextSpecialMessageBody(this.message);
 
   @override

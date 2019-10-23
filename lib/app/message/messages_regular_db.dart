@@ -90,6 +90,7 @@ class RegularMessageDB implements ChatMessageDB {
       message.highlight != null ? message.highlight != 0 : null;
 
   final String previewsJsonEncoded;
+  final String linksJsonEncoded;
 
   static List<MessagePreview> previews(RegularMessageDB message) =>
       json.decode(message.previewsJsonEncoded);
@@ -121,6 +122,7 @@ class RegularMessageDB implements ChatMessageDB {
       this.self,
       this.highlight,
       this.previewsJsonEncoded,
+      this.linksJsonEncoded,
       this.dateMicrosecondsSinceEpoch,
       this.fromRemoteId,
       this.fromNick,
@@ -142,6 +144,8 @@ class RegularMessageDB implements ChatMessageDB {
       this.self,
       this.highlight,
       this.previewsJsonEncoded,
+      this.linksJsonEncoded,
+
       this.dateMicrosecondsSinceEpoch,
       this.fromRemoteId,
       this.fromNick,
@@ -313,6 +317,9 @@ RegularMessageDB toRegularMessageDB(
                 .map((preview) => preview.toJson())
                 .toList())
             : null,
+        linksJsonEncoded: regularMessage.linksInText != null
+            ? json.encode(regularMessage.linksInText)
+            : null,
         dateMicrosecondsSinceEpoch: regularMessage.date.microsecondsSinceEpoch,
         fromNick: regularMessage.fromNick,
         fromRemoteId: regularMessage.fromRemoteId,
@@ -342,6 +349,8 @@ RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
         previews: messageDB.previewsJsonEncoded != null
             ? _convertPreviews(messageDB)
             : null,
+        linksInText: messageDB.linksJsonEncoded != null
+        ? convertLinks(messageDB) : null,
         date: DateTime.fromMicrosecondsSinceEpoch(
             messageDB.dateMicrosecondsSinceEpoch),
         fromRemoteId: messageDB.fromRemoteId,
@@ -382,3 +391,4 @@ List<MessagePreview> _convertPreviews(RegularMessageDB messageDB) {
 
   return list.map((listItem) => MessagePreview.fromJson(listItem)).toList();
 }
+

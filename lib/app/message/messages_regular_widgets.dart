@@ -34,7 +34,12 @@ Widget buildRegularMessage(BuildContext context, RegularMessage message) {
   var channelBloc = NetworkChannelBloc.of(context);
 
   var body = _buildMessageBody(context, message);
+
+//  Widget  body= SizedBox.shrink();
+
   var title = _buildMessageTitle(context, channelBloc, message);
+
+
 
   var subMessage = _buildTitleSubMessage(context, message);
 
@@ -63,11 +68,11 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message) {
       regularMessageType == RegularMessageType.MOTD ||
       regularMessageType == RegularMessageType.MODE_CHANNEL ||
       regularMessageType == RegularMessageType.BACK) {
-    return Container();
+    return SizedBox.shrink();
   }
   if (regularMessageType == RegularMessageType.MODE) {
     if (!isHaveLongText(message)) {
-      return Container();
+      return SizedBox.shrink();
     }
   }
 
@@ -92,6 +97,8 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message) {
 
     rows.add(
         buildRegularMessageBody(context, text, nicknames: message.nicknames));
+
+
 //
 //    rows.add(Linkify(
 //      onOpen: (link) async {

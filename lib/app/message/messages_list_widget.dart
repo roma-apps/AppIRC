@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -38,27 +40,59 @@ class _NetworkChannelMessagesListWidgetState
 
   final ItemScrollController scrollController = ItemScrollController();
 
+  StreamSubscription<int> positionSubscription;
 
   @override
   void dispose() {
     super.dispose();
     positionsListener.itemPositions.removeListener(onVisiblePositionsChanged);
+    positionSubscription?.cancel();
   }
-  final scrollDirection = Axis.vertical;
-
 
   @override
   void initState() {
     super.initState();
 
     positionsListener.itemPositions.addListener(onVisiblePositionsChanged);
+
+    Timer.run(() {
+      ChatMessagesListBloc chatListMessagesBloc = Provider.of(context);
+      positionSubscription = chatListMessagesBloc.allMessagesPositionStream
+          .listen((newPosition) {
+        if (newPosition != null) {
+          scrollController?.jumpTo(
+              index: newPosition + lastBuildMessagesStartIndex);
+        }
+      });
+    });
   }
+
+  var lastBuildMessagesStartIndex = 0;
 
   void onVisiblePositionsChanged() {
     var visiblePositions = positionsListener.itemPositions.value;
+    _logger.d(() => "visiblePositions $visiblePositions");
+
     if (visiblePositions.isNotEmpty) {
-      visibleAreaCallback(
-          visiblePositions.first.index, visiblePositions.last.index);
+      var minIndex = visiblePositions.first.index;
+      var maxIndex = visiblePositions.first.index;
+
+      visiblePositions.forEach((position) {
+        if (minIndex > position.index) {
+          minIndex = position.index;
+        }
+
+        if (maxIndex < position.index) {
+          maxIndex = position.index;
+        }
+      });
+      minIndex -= lastBuildMessagesStartIndex;
+      maxIndex -= lastBuildMessagesStartIndex;
+
+      if (minIndex < 0) {
+        minIndex = 0;
+      }
+      visibleAreaCallback(minIndex, maxIndex);
     }
   }
 
@@ -70,6 +104,8 @@ class _NetworkChannelMessagesListWidgetState
   Widget build(BuildContext context) {
     var channelBloc = NetworkChannelBloc.of(context);
     ChatMessagesListBloc chatListMessagesBloc = Provider.of(context);
+    _logger.d(() => "_NetworkChannelMessagesListWidgetState build"
+        "${channelBloc.channel.name}");
 
     return StreamBuilder<ChatMessagesWrapperState>(
         stream: chatListMessagesBloc.allMessagesStateStream,
@@ -77,13 +113,19 @@ class _NetworkChannelMessagesListWidgetState
         builder: (BuildContext context,
             AsyncSnapshot<ChatMessagesWrapperState> snapshot) {
           var chatMessagesWrapperState = snapshot.data;
+          _logger.d(() => "chatMessagesWrapperState build for "
+              "${channelBloc.channel.name} "
+              "=${chatMessagesWrapperState.messages?.length}");
+
+//          // todo: remove hack
+//          if (chatMessagesWrapperState.channel != null &&
+//              chatMessagesWrapperState.channel != channelBloc.channel) {
+//            return SizedBox.shrink();
+//          }
+
           var originalMessagesWrappers = chatMessagesWrapperState.messages;
-          var filteredMessagesWrappers;
-          if (originalMessagesWrappers != null) {
-            filteredMessagesWrappers = originalMessagesWrappers
-                .where((messageWrapper) => _isNeedPrint(messageWrapper))
-                .toList();
-          }
+          List<ChatMessageWrapper> filteredMessagesWrappers =
+              originalMessagesWrappers;
 
           if (filteredMessagesWrappers == null ||
               filteredMessagesWrappers.isEmpty) {
@@ -122,35 +164,71 @@ class _NetworkChannelMessagesListWidgetState
               itemCount += 1;
             }
 
-            _logger.d(() => "rebuild ScrollablePositionedList");
+            _logger.d(() => "rebuild ScrollablePositionedList $itemCount"
+                "for ${channelBloc.channel.name} ");
 //            return ListView.builder(
+            var lastIndex = itemCount - 1;
+            int initialScrollIndex;
+
+            _logger.d(() => "rebuild chatMessagesWrapperState.newScrollIndex "
+                "${chatMessagesWrapperState.newScrollIndex}");
+
+            if (chatMessagesWrapperState.newScrollIndex != null) {
+              initialScrollIndex = chatMessagesWrapperState.newScrollIndex;
+            } else {
+              var firstUnreadRemoteMessageId =
+                  Provider.of<NetworkChannelBlocProvider>(context)
+                      .networkChannelBloc
+                      .networkChannelState
+                      .firstUnreadRemoteMessageId;
+
+              _logger.d(() => "rebuild firstUnreadRemoteMessageId "
+                  "$firstUnreadRemoteMessageId");
+              if (firstUnreadRemoteMessageId != null) {
+                var foundIndex = filteredMessagesWrappers.indexWhere((wrapper) {
+                  var message = wrapper.message;
+                  if (message is RegularMessage) {
+                    return message.messageRemoteId ==
+                        firstUnreadRemoteMessageId;
+                  } else {
+                    return false;
+                  }
+                });
+
+                _logger.d(() => "rebuild firstUnreadRemoteMessageId "
+                    "foundIndex $foundIndex");
+                if (foundIndex != null && foundIndex > 0) {
+                  initialScrollIndex = foundIndex;
+                } else {
+                  initialScrollIndex = lastIndex;
+                }
+              } else {
+                initialScrollIndex = lastIndex;
+              }
+            }
+
+            if (moreHistoryAvailable) {
+              initialScrollIndex -= 1;
+              lastBuildMessagesStartIndex = 1;
+            } else {
+              lastBuildMessagesStartIndex = 0;
+            }
+            var initialAlignment = 0.0;
+
             return ScrollablePositionedList.builder(
-                itemCount: itemCount,
-
+                initialScrollIndex: initialScrollIndex,
+                initialAlignment: initialAlignment,
                 itemScrollController: scrollController,
-
+                itemPositionsListener: positionsListener,
+//            return ListView.builder(
+                itemCount: itemCount,
                 itemBuilder: (BuildContext context, int index) {
-
-
-
-
-
                   if (moreHistoryAvailable && index == 0) {
                     // return the header
-                    return _buildLoadMoreButton(context,
-                        channelBloc, originalMessagesWrappers);
+                    return _buildLoadMoreButton(
+                        context, channelBloc, originalMessagesWrappers);
                   }
                   index -= 1;
-
-//                  if (index >= filteredMessagesWrappers.length ||
-//                      index < 0) {
-//                    // hack for ScrollablePositionedList
-//                    // sometimes it is ask for widgets outside
-//                    // original bounds
-//                    return SizedBox.shrink();
-//                  }
-
-                  _logger.d(() => "$index");
 
                   var messageWrapper = filteredMessagesWrappers[index];
                   var message = messageWrapper.message;
@@ -163,9 +241,11 @@ class _NetworkChannelMessagesListWidgetState
                       var specialMessage = message as SpecialMessage;
                       messageBody =
                           buildSpecialMessageWidget(context, specialMessage);
+                      messageBody = Text("index $index");
                       break;
                     case ChatMessageType.REGULAR:
                       messageBody = buildRegularMessage(context, message);
+//                      messageBody = Text("index $index");
                       break;
                   }
 
@@ -182,42 +262,7 @@ class _NetworkChannelMessagesListWidgetState
                   return Container(
                       decoration: BoxDecoration(border: border),
                       child: messageBody);
-
                 });
-
-//            var result = Padding(
-//              padding: const EdgeInsets.symmetric(vertical: 10.0),
-//              child:
-//
-//
-//
-//                  StreamBuilder<bool>(
-//                      stream:
-//                          channelBloc.networkChannelMoreHistoryAvailableStream,
-//                      initialData:
-//                          channelBloc.networkChannelMoreHistoryAvailable,
-//                      builder: (context, snapshot) {
-//
-//
-//                      }),
-//            );
-
-//            var forcedMessagesListIndex =
-//                chatMessagesWrapperState.newScrollIndex;
-//            if (forcedMessagesListIndex != null) {
-//              Timer.run(() {
-//                scrollController.jumpTo(index: forcedMessagesListIndex);
-//              });
-//            }
-
-//            var itemScrollPosition = messagesBloc.itemScrollPosition;
-//            if (itemScrollPosition != null && itemScrollPosition > 0 &&
-//                itemScrollPosition < messages.length) {
-//              itemScrollController.jumpTo(
-//                  index: itemScrollPosition, alignment: 1.0);
-//            }
-
-//            return result;
           }
         });
   }
@@ -239,14 +284,4 @@ class _NetworkChannelMessagesListWidgetState
       },
           child: Text(AppLocalizations.of(context).tr("chat.messages"
               ".load_more")));
-}
-
-_isNeedPrint(ChatMessageWrapper messageWrapper) {
-  var message = messageWrapper.message;
-  if (message is RegularMessage) {
-    var regularMessageType = message.regularMessageType;
-    return regularMessageType != RegularMessageType.RAW;
-  } else {
-    return true;
-  }
 }
