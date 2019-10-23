@@ -38,8 +38,6 @@ class NetworkChannelsListWidget extends StatelessWidget {
         builder: (context, snapshot) {
           var channels = snapshot.data;
 
-          _logger.d(() => "channels = $channels");
-
           channels = channels.where((channel) => !channel.isLobby).toList();
 
           return ListView.builder(
@@ -115,8 +113,6 @@ class NetworkChannelsListWidget extends StatelessWidget {
             stream: channelBloc.networkChannelConnectedStream,
             builder: (context, snapshot) {
               bool channelConnected = snapshot.data;
-
-              _logger.d(() => "new state for channelItem $channelConnected");
 
               var channelsListSkinBloc =
                   Provider.of<ChannelsListSkinBloc>(context);

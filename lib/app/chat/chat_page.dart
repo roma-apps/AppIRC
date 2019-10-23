@@ -287,25 +287,40 @@ class ChatPage extends StatelessWidget {
                       channelBloc.network,
                       channelBloc.channel);
 
-                  var chatListMessagesBloc = ChatMessagesListBloc(
-                      channelBloc.messagesBloc, messagesLoaderBloc,
-                      channelBloc.channel);
-
-                  _logger.d(() => "build for activeChannel ${channelBloc
-                      .channel.name}");
 
                   return Provider(
-                      providable: NetworkChannelBlocProvider(channelBloc),
-                      child: Provider(
-                        providable: messagesLoaderBloc,
-                        child: Provider(
-                          providable: chatListMessagesBloc,
-                          child: NetworkChannelWidget((minIndex, maxIndex) {
-                            chatListMessagesBloc.onMessagesScrolled(
-                                minIndex, maxIndex);
-                          }),
-                        ),
-                      ));
+                    providable: messagesLoaderBloc,
+                    child: StreamBuilder(
+                      stream: messagesLoaderBloc.isInitFinishedStream,
+                      initialData: false,
+                      builder: (context, snapshot) {
+
+                        var initFinished = snapshot.data;
+                          var length = messagesLoaderBloc.messages?.length;
+                        _logger.d(() => "initFinished $initFinished"
+                        "messages $length");
+                        if(initFinished && length != null) {
+
+                          var chatListMessagesBloc = ChatMessagesListBloc(
+                              channelBloc.messagesBloc, messagesLoaderBloc, channelBloc);
+
+                          _logger.d(() => "build for activeChannel ${channelBloc
+                              .channel.name}");
+
+                          return Provider(
+                              providable: NetworkChannelBlocProvider(channelBloc),
+                              child: Provider(
+                                providable: chatListMessagesBloc,
+                                child: NetworkChannelWidget(),
+                              ));
+                        } else {
+                          return Text("Load messages");
+                        }
+
+                      }
+                    ),
+                  );
+
                 }
               }
             }));

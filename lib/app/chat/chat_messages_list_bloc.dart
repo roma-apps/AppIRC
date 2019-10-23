@@ -1,274 +1,201 @@
 import 'dart:async';
 
-import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_messages_list_bloc.dart';
-import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_loader_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
-import 'package:flutter_appirc/app/message/messages_regular_model.dart';
-import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "ChatMessagesListBloc", enabled: true);
 
-class ChatMessageWrapper {
-  bool includedInSearchResult;
-  ChatMessage message;
+abstract class MoreHistoryOwner {
+  bool get networkChannelMoreHistoryAvailable;
 
-  ChatMessageWrapper(this.includedInSearchResult, this.message);
-}
-
-class ChatMessagesWrapperState {
-  NetworkChannel channel;
-  List<ChatMessageWrapper> messages;
-  int newScrollIndex;
-  bool moreHistoryAvailable;
-  String searchTerm;
-
-  ChatMessagesWrapperState(this.channel, this.messages, this.newScrollIndex,
-      this.moreHistoryAvailable, this.searchTerm);
-}
-
-class MessagesSearchState {
-  List<ChatMessage> messages;
-  int currentIndex;
-
-  MessagesSearchState(this.messages, this.currentIndex);
-}
-
-class ChatMessageListVisibleArea {
-  ChatMessage minVisibleMessage;
-  ChatMessage maxVisibleMessage;
-
-  ChatMessageListVisibleArea(this.minVisibleMessage, this.maxVisibleMessage);
+  Stream<bool> get networkChannelMoreHistoryAvailableStream;
 }
 
 class ChatMessagesListBloc extends Providable {
-  ChatInputOutputBackendService backendService;
   ChannelMessagesListBloc channelMessagesListBloc;
   NetworkChannelMessagesLoaderBloc messagesLoaderBloc;
+  MoreHistoryOwner moreHistoryOwner;
 
-  bool mapSearchNextEnabled(MessagesSearchState foundState) {
-    if (foundState != null) {
-      return foundState.currentIndex < foundState.messages.length - 1;
-    } else {
-      return false;
-    }
-  }
+  ChatMessagesListBloc(this.channelMessagesListBloc, this.messagesLoaderBloc,
+      this.moreHistoryOwner) {
+    init();
 
-  bool mapSearchPreviousEnabled(MessagesSearchState foundState) {
-    if (foundState != null) {
-      return foundState.currentIndex > 0;
-    } else {
-      return false;
-    }
-  }
-
-  Stream<bool> get searchNextEnabledStream =>
-      foundMessagesStream.map(mapSearchNextEnabled);
-
-  bool get searchNextEnabled =>
-      mapSearchNextEnabled(_foundMessagesController.value);
-
-  Stream<bool> get searchPreviousEnabledStream =>
-      foundMessagesStream.map(mapSearchPreviousEnabled);
-
-  bool get searchPreviousEnabled =>
-      mapSearchPreviousEnabled(_foundMessagesController.value);
-
-  String get _currentSearchTerm =>
-      channelMessagesListBloc.searchFieldBloc.value;
-
-  List<ChatMessage> get _currentLoadedMessages =>
-      messagesLoaderBloc.currentMessages;
-
-  NetworkChannel channel;
-
-  ChatMessagesListBloc(
-      this.channelMessagesListBloc, this.messagesLoaderBloc, this.channel) {
-    _logger.d(() => "create ChatMessagesListBloc for ${channel.name}");
     addDisposable(streamSubscription:
         messagesLoaderBloc.messagesStream.listen((newMessages) {
-      _logger.d(() => "newMessages = ${newMessages.length}");
-      _research(false);
+      _onMessagesChanged(
+          newMessages, moreHistoryOwner.networkChannelMoreHistoryAvailable);
     }));
 
-    addDisposable(streamSubscription: channelMessagesListBloc
-        .searchFieldBloc.valueStream
-        .listen((newSearchTerm) {
-      _research(true);
+    addDisposable(streamSubscription: moreHistoryOwner
+        .networkChannelMoreHistoryAvailableStream
+        .listen((moreHistoryAvailable) {
+      _onMessagesChanged(messagesLoaderBloc.messages,
+          moreHistoryOwner.networkChannelMoreHistoryAvailable);
     }));
 
-    addDisposable(subject: _allMessagesStateController);
-    addDisposable(subject: _foundMessagesController);
-//    addDisposable(subject: _forcedMessagesListIndexController);
-//    addDisposable(subject: _selectedFoundMessageIndexController);
+    addDisposable(streamSubscription:
+        channelMessagesListBloc.isNeedSearchStream.listen((isNeedSearch) {
+      if (isNeedSearch) {
+        _search(messagesLoaderBloc.messages,
+            channelMessagesListBloc.searchFieldBloc.value, true);
+      } else {
+        _searchStateSubject.add(ChatMessagesListSearchState.empty);
+        updateMessagesList();
+      }
+    }));
+
+    addDisposable(subject: _listStateSubject);
+    addDisposable(subject: _searchStateSubject);
   }
 
-  void _research(bool isSearchTermChanged) {
-    _logger.d(() => "_research $isSearchTermChanged");
+  void init() {
+    var messages = messagesLoaderBloc.messages;
 
-    List<ChatMessage> filteredMessages;
-    bool Function(ChatMessage chatMessage) isFoundFunction;
-    var searchTermIsNotEmpty =
-        _currentSearchTerm != null && _currentSearchTerm.isNotEmpty;
-    var filteredForPrint = _currentLoadedMessages
-        .where((message) => _isNeedPrint(message))
-        .toList();
-    if (searchTermIsNotEmpty) {
-      filteredMessages = filterMessages(filteredForPrint, _currentSearchTerm);
+    _logger.d(() => "init messages ${messages.length}");
+    ChatMessagesListState initListState = ChatMessagesListState.name(
+        messages: messages,
+        moreHistoryAvailable:
+            moreHistoryOwner.networkChannelMoreHistoryAvailable);
+    ChatMessagesListSearchState initSearchState;
 
-      isFoundFunction =
-          (ChatMessage chatMessage) => filteredMessages.contains(chatMessage);
+    if (channelMessagesListBloc.isNeedSearch) {
+      var searchTerm = channelMessagesListBloc.searchFieldBloc.value;
+      var filteredMessages = filterMessages(messages, searchTerm);
+
+      initSearchState = ChatMessagesListSearchState.name(
+          foundMessages: filteredMessages,
+          searchTerm: searchTerm,
+          selectedFoundMessage:
+              filteredMessages.isNotEmpty ? filteredMessages[0] : null);
     } else {
-      filteredMessages = [];
-
-      isFoundFunction = (_) => false;
+      initSearchState = ChatMessagesListSearchState.empty;
     }
 
-    var messageWrappersList = filteredForPrint.map((chatMessage) {
-      return ChatMessageWrapper(isFoundFunction(chatMessage), chatMessage);
-    }).toList();
+    _listStateSubject = BehaviorSubject(seedValue: initListState);
+    _searchStateSubject = BehaviorSubject(seedValue: initSearchState);
+  }
 
-    int newIndex;
-//    if (allMessagesState?.newScrollIndex == null) {
-    var visibleArea = channelMessagesListBloc.visibleArea;
-    if (visibleArea != null) {
-      var indexOf = filteredForPrint.indexWhere((message) {
-        return visibleArea.minVisibleMessage == message;
-      });
-      if (indexOf > 0) {
-        newIndex = indexOf;
-      }
+  void _onMessagesChanged(
+      List<ChatMessage> newMessages, bool moreHistoryAvailable) {
+    _logger.d(() => "newMessages = ${newMessages.length} "
+        "moreHistoryAvailable = $moreHistoryAvailable");
+    _listStateSubject.add(ChatMessagesListState.name(
+        messages: newMessages, moreHistoryAvailable: moreHistoryAvailable));
+    if (channelMessagesListBloc.isNeedSearch) {
+      _search(
+          newMessages, channelMessagesListBloc.searchFieldBloc.value, false);
     }
+  }
+
+  void _search(
+      List<ChatMessage> messages, String searchTerm, bool isSearchTermChanged) {
+    var filteredMessages = filterMessages(messages, searchTerm);
+
+    _logger.d(() => "_search $searchTerm "
+        "isNeedChangeSelectedFoundMessage $isSearchTermChanged"
+        "messages ${messages.length}"
+        "filteredMessages ${filteredMessages.length}");
+
+    _searchStateSubject.add(ChatMessagesListSearchState.name(
+        foundMessages: filteredMessages,
+        searchTerm: searchTerm,
+        selectedFoundMessage:
+            filteredMessages.isNotEmpty ? filteredMessages.first : null));
+
+    if (isSearchTermChanged) {
+      // redraw search highlighted words
+      updateMessagesList();
+    }
+  }
+
+  void updateMessagesList() {
+    _onMessagesChanged(listState.messages, listState.moreHistoryAvailable);
+  }
+
+  Stream<bool> get searchNextEnabledStream => searchStateStream
+      .map((state) => state?.isCanMoveNext ?? false)
+      .distinct();
+
+  bool get searchNextEnabled => searchState?.isCanMoveNext ?? false;
+
+  Stream<bool> get searchPreviousEnabledStream => searchStateStream
+      .map((state) => state?.isCanMovePrevious ?? false)
+      .distinct();
+
+  bool get searchPreviousEnabled => searchState?.isCanMovePrevious ?? false;
+
+  BehaviorSubject<ChatMessagesListState> _listStateSubject;
+
+  Stream<ChatMessagesListState> get listStateStream => _listStateSubject.stream;
+
+  ChatMessagesListState get listState => _listStateSubject.value;
+
+  BehaviorSubject<ChatMessagesListSearchState> _searchStateSubject;
+
+  Stream<ChatMessagesListSearchState> get searchStateStream =>
+      _searchStateSubject.stream;
+
+  ChatMessagesListSearchState get searchState => _searchStateSubject.value;
+
+//
+//  void _research(bool isSearchTermChanged) {
+//    _logger.d(() => "_research $isSearchTermChanged");
+//
+//    List<ChatMessage> filteredMessages;
+//    var searchTermIsNotEmpty = _currentSearchTerm != null &&
+//        _currentSearchTerm.isNotEmpty;
+//    var filteredForPrint = _currentLoadedMessages;
+//    if (searchTermIsNotEmpty) {
+//      filteredMessages = filterMessages(filteredForPrint, _currentSearchTerm);
 //    }
-
-    _allMessagesStateController.add(
-        ChatMessagesWrapperState(channel, messageWrappersList, newIndex,
-          true, _currentSearchTerm));
-
-    if (searchTermIsNotEmpty) {
-      _foundMessagesController.add(MessagesSearchState(filteredMessages, 0));
-    } else {
-      _foundMessagesController.add(null);
-    }
-
-    if (searchTermIsNotEmpty) {
-      if (isSearchTermChanged && filteredMessages.isNotEmpty) {
-        goToFirstFoundMessage();
-      }
-    } else {}
-  }
-
-
+//
+//    _listStateSubject.add(ChatMessagesListState.name(
+//        messages: _currentLoadedMessages, moreHistoryAvailable:));
+//
+//    if (searchTermIsNotEmpty) {
+//      _searchStateSubject.add(ChatMessagesListSearchState(filteredMessages, 0));
+//    } else {
+//      _searchStateSubject.add(null);
+//    }
+//
+//    if (searchTermIsNotEmpty) {
+//      if (isSearchTermChanged && filteredMessages.isNotEmpty) {
+//        goToFirstFoundMessage();
+//      }
+//    } else {}
+//  }
 
   List<ChatMessage> filterMessages(
       List<ChatMessage> messages, String searchTerm) {
-    return messages.where((message) {
-      if (message is RegularMessage) {
-
-        return message.text.toLowerCase().contains(searchTerm.toLowerCase());
-      } else if (message is SpecialMessage) {
-        return message.data.isContainsText(searchTerm);
-      } else {
-        throw "Not supported $message";
-      }
-    }).toList();
-  }
-
-  BehaviorSubject<ChatMessagesWrapperState> _allMessagesStateController =
-      BehaviorSubject(
-          seedValue: ChatMessagesWrapperState(null, [], null, false, null));
-
-  Stream<ChatMessagesWrapperState> get allMessagesStateStream =>
-      _allMessagesStateController.stream;
-
-  Observable<int> get allMessagesPositionStream =>
-      _allMessagesStateController.stream
-          .map((state) => state?.newScrollIndex)
-          .distinct();
-
-  ChatMessagesWrapperState get allMessagesState =>
-      _allMessagesStateController.value;
-
-  BehaviorSubject<MessagesSearchState> _foundMessagesController =
-      BehaviorSubject();
-
-  Stream<MessagesSearchState> get foundMessagesStream =>
-      _foundMessagesController.stream;
-
-  MessagesSearchState get foundMessages => _foundMessagesController.value;
-
-//  BehaviorSubject<int> _selectedFoundMessageIndexController = BehaviorSubject();
-//  Stream<int> get selectedFoundMessageIndexStream =>
-//      _selectedFoundMessageIndexController.stream;
-//  int get selectedFoundMessageIndex =>
-//      _selectedFoundMessageIndexController.value;
-
-//  Stream<int> get selectedFoundMessagePositionStream =>
-//      selectedFoundMessageIndexStream
-//          .map((index) => index != null ? index + 1 : null);
-//
-//  int get selectedFoundMessagePosition =>
-//      selectedFoundMessageIndex != null ? selectedFoundMessageIndex + 1 : null;
-//
-//  BehaviorSubject<int> _forcedMessagesListIndexController = BehaviorSubject();
-//  Stream<int> get forcedMessagesListIndexStream =>
-//      _forcedMessagesListIndexController.stream;
-//  int get forcedMessagesListIndex => _forcedMessagesListIndexController.value;
-
-  void onMessagesScrolled(int minVisibleIndex, int maxVisibleIndex) {
-    var isNotEmpty = _currentLoadedMessages.isNotEmpty;
-    var isInit = (minVisibleIndex == 0 && maxVisibleIndex == 0);
-    _logger.d(() =>
-        "onMessagesScrolled [$minVisibleIndex, $maxVisibleIndex] "
-            "isNotEmpty = $isNotEmpty" +
-        "isInit = $isInit");
-    if (isNotEmpty && !isInit) {
-      channelMessagesListBloc.visibleArea = ChatMessageListVisibleArea(
-          _currentLoadedMessages[minVisibleIndex],
-          _currentLoadedMessages[maxVisibleIndex]);
-    }
-  }
-
-  void goToNextFoundMessage() {
-    changeSelectedMessage(foundMessages.currentIndex + 1);
-  }
-
-  void goToPreviousFoundMessage() {
-    changeSelectedMessage(foundMessages.currentIndex - 1);
-  }
-
-  void goToFirstFoundMessage() {
-    changeSelectedMessage(0);
-  }
-
-  void onNeedChangeScrollIndex() {
-    _logger.d(() => "onNeedChangeScrollIndex");
-
-    var selectedMessage = foundMessages.messages[foundMessages.currentIndex];
-
-    var index = _currentLoadedMessages.indexOf(selectedMessage);
-
-    allMessagesState.newScrollIndex = index;
-
-    _allMessagesStateController.add(allMessagesState);
+    return messages
+        .where(
+            (message) => message.isContainsText(searchTerm, ignoreCase: true))
+        .toList();
   }
 
   void changeSelectedMessage(int newSelectedFoundMessageIndex) {
-    foundMessages.currentIndex = (newSelectedFoundMessageIndex);
-    _foundMessagesController.add(foundMessages);
-    onNeedChangeScrollIndex();
-  }
-}
+    var state = searchState;
+    var foundMessage = state.foundMessages[newSelectedFoundMessageIndex];
 
-_isNeedPrint(ChatMessage message) {
-  if (message is RegularMessage) {
-    var regularMessageType = message.regularMessageType;
-    return regularMessageType != RegularMessageType.RAW;
-  } else {
-    return true;
+    _logger.d(() => "changeSelectedMessage "
+        "index $newSelectedFoundMessageIndex"
+        "foundMessage $foundMessage");
+    _searchStateSubject.add(ChatMessagesListSearchState.name(
+        foundMessages: state.foundMessages,
+        searchTerm: state.searchTerm,
+        selectedFoundMessage: foundMessage));
+  }
+
+  void goToNextFoundMessage() {
+    changeSelectedMessage(searchState.selectedFoundMessageIndex + 1);
+  }
+
+  void goToPreviousFoundMessage() {
+    changeSelectedMessage(searchState.selectedFoundMessageIndex - 1);
   }
 }

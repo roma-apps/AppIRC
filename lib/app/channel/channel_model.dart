@@ -102,6 +102,18 @@ class NetworkChannelState {
         'moreHistoryAvailable: $moreHistoryAvailable, '
         'firstUnread: $firstUnreadRemoteMessageId}';
   }
+}
+
+class VisibleMessagesBounds {
+  ChatMessage min;
+  ChatMessage max;
+
+  VisibleMessagesBounds({@required this.min, @required this.max});
+
+  @override
+  String toString() {
+    return 'VisibleMessagesBounds{min: $min, max: $max}';
+  }
 
 
 }

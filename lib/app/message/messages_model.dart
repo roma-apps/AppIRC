@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 abstract class ChatMessage {
   int messageLocalId;
 
@@ -33,6 +35,19 @@ abstract class ChatMessage {
 
   @override
   int get hashCode => messageLocalId.hashCode;
+
+  bool isContainsText(String searchTerm, {@required bool ignoreCase});
+}
+
+bool isContainsSearchTerm(String text, String searchTerm, {bool ignoreCase}) {
+  if(text == null) {
+    return false;
+  }
+  if(ignoreCase == true) {
+    return text.toLowerCase().contains(searchTerm.toLowerCase());
+  } else {
+    return text.contains(searchTerm);
+  }
 }
 
 enum ChatMessageType { SPECIAL, REGULAR }

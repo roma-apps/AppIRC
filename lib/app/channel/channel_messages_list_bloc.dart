@@ -1,28 +1,36 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_messages_list_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:rxdart/rxdart.dart';
+
+var _logger = MyLogger(logTag: "ChannelMessagesListBloc", enabled: true);
 
 class ChannelMessagesListBloc extends Providable {
   // ignore: close_sinks
   BehaviorSubject<bool> _searchEnabledController =
       BehaviorSubject(seedValue: false);
-  
+
   Stream<bool> get searchEnabledStream =>
       _searchEnabledController.stream.distinct();
   bool get searchEnabled => _searchEnabledController.value;
 
+  VisibleMessagesBounds visibleMessagesBounds;
 
-  FormValueFieldBloc<String> searchFieldBloc;
+  bool get isNeedSearch =>
+      _mapIsNeedSearchTerm(searchEnabled, searchFieldBloc.value);
+
+  Stream<bool> get isNeedSearchStream => Observable.combineLatest2(
+          searchEnabledStream, searchFieldBloc.valueStream,
+          (searchEnabled, searchTerm) {
+        return _mapIsNeedSearchTerm(searchEnabled, searchTerm);
+      });
+
+  FormValueFieldBloc<String> searchFieldBloc = FormValueFieldBloc("");
   ChannelMessagesListBloc() {
-    searchFieldBloc = FormValueFieldBloc("");
-
-    addDisposable(streamSubscription: _searchEnabledController.stream.listen((enabled) {
-
-      if(!enabled) {
+    addDisposable(
+        streamSubscription: _searchEnabledController.stream.listen((enabled) {
+      if (!enabled) {
         searchFieldBloc.onNewValue("");
       }
     }));
@@ -31,8 +39,13 @@ class ChannelMessagesListBloc extends Providable {
     addDisposable(disposable: searchFieldBloc);
   }
 
-  ChatMessageListVisibleArea visibleArea;
+  bool _mapIsNeedSearchTerm(searchEnabled, searchTerm) =>
+      searchEnabled && searchTerm?.isNotEmpty == true;
 
+  void onVisibleMessagesBounds(VisibleMessagesBounds visibleMessagesBounds) {
+    this.visibleMessagesBounds = visibleMessagesBounds;
+    _logger.d(() => "visibleMessagesBounds $visibleMessagesBounds");
+  }
 
   void onNeedShowSearch() {
     _searchEnabledController.add(true);
@@ -45,9 +58,4 @@ class ChannelMessagesListBloc extends Providable {
   void onNeedToggleSearch() {
     _searchEnabledController.add(!_searchEnabledController.value);
   }
-
-
-
-
-
 }

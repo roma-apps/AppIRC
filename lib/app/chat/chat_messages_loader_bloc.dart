@@ -15,8 +15,8 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(
-    logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
+var _logger =
+    MyLogger(logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
 
 class NetworkChannelMessagesLoaderBloc extends Providable {
   final ChatInputOutputBackendService backendService;
@@ -25,47 +25,48 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
   final Network network;
   final NetworkChannel networkChannel;
 
-  List<ChatMessage> currentMessages = [];
-
   // ignore: close_sinks
-  var _messagesController = new BehaviorSubject<List<ChatMessage>>(
-      seedValue: []);
+  BehaviorSubject<bool> _isInitFinishedSubject =
+      BehaviorSubject(seedValue: false);
+  Stream<bool> get isInitFinishedStream => _isInitFinishedSubject.stream;
+  bool get isInitFinished => _isInitFinishedSubject.value;
+
+  BehaviorSubject<List<ChatMessage>> _messagesController;
 
   Stream<List<ChatMessage>> get messagesStream => _messagesController.stream;
+  List<ChatMessage> get messages => _messagesController?.value;
 
   NetworkChannelMessagesLoaderBloc(this.backendService, this.db,
       this.messagesSaverBloc, this.network, this.networkChannel) {
     addDisposable(subject: _messagesController);
+    addDisposable(subject: _isInitFinishedSubject);
 
     Timer.run(() async {
-      // history
-      var regularMessages = (await db.regularMessagesDao
-          .getChannelMessagesOrderByDate(networkChannel.remoteId)).map(
-          regularMessageDBToChatMessage);
-      var specialMessages = (await db.specialMessagesDao.getChannelMessages(
-          networkChannel.remoteId)).map(specialMessageDBToChatMessage);
+      _logger.d(() => "init start $disposed");
 
-      currentMessages.addAll(regularMessages);
-      currentMessages.addAll(specialMessages);
-      _resortMessagesByDate();
-      _onMessagesChanged();
+      _messagesController = new BehaviorSubject<List<ChatMessage>>(
+          seedValue: await loadInitMessages());
+      _logger.d(() => "init finish");
+      _isInitFinishedSubject.add(true);
+
       // socket listener
-      addDisposable(disposable: messagesSaverBloc.listenForMessages(
-          network, networkChannel, (newMessage) {
-        if (currentMessages.isNotEmpty) {
-          if (currentMessages.last.date.isBefore(newMessage.date)) {
+      addDisposable(
+          disposable: messagesSaverBloc
+              .listenForMessages(network, networkChannel, (newMessage) {
+        if (messages.isNotEmpty) {
+          if (messages.last.date.isBefore(newMessage.date)) {
             // if new message
-            currentMessages.add(newMessage);
-          } else if (currentMessages.first.date.isAfter(newMessage.date)) {
+            messages.add(newMessage);
+          } else if (messages.first.date.isAfter(newMessage.date)) {
             // if message from history
-            currentMessages.insert(0, newMessage);
+            messages.insert(0, newMessage);
           } else {
             // strange case, new message somewhere inside existing messages
-            currentMessages.add(newMessage);
-            _resortMessagesByDate();
+            messages.add(newMessage);
+            _resort(messages);
           }
         } else {
-          currentMessages.add(newMessage);
+          messages.add(newMessage);
         }
 
         if (newMessage.chatMessageType == ChatMessageType.SPECIAL) {
@@ -74,9 +75,10 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
         _onMessagesChanged();
       }));
 
-      addDisposable(disposable: backendService.listenForMessagePreviews(
-          network, networkChannel, (previewForMessage) {
-        var oldMessage = currentMessages.firstWhere((message) {
+      addDisposable(
+          disposable: backendService.listenForMessagePreviews(
+              network, networkChannel, (previewForMessage) {
+        var oldMessage = messages.firstWhere((message) {
           if (message is RegularMessage) {
             var regularMessage = message;
 
@@ -96,42 +98,67 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
         _onMessagesChanged();
       }));
 
-
-      addDisposable(disposable: backendService.listenForMessagePreviewToggle(
-          network, networkChannel, (MessageTogglePreview togglePreview) async {
+      addDisposable(
+          disposable: backendService
+              .listenForMessagePreviewToggle(network, networkChannel,
+                  (MessageTogglePreview togglePreview) async {
         _onMessagesChanged();
       }));
 
-      addDisposable(disposable: backendService.listenForChannelPreviewToggle(
-          network, networkChannel, (channelToggle) async {
-        currentMessages.forEach((message) {
+      addDisposable(
+          disposable: backendService.listenForChannelPreviewToggle(
+              network, networkChannel, (channelToggle) async {
+        messages.forEach((message) {
           if (message is RegularMessage) {
             if (message.previews != null) {
               message.previews.forEach((preview) {
                 if (preview.shown != channelToggle.allPreviewsShown) {
-                  backendService.togglePreview(network, networkChannel, message,
-                      preview);
+                  backendService.togglePreview(
+                      network, networkChannel, message, preview);
                 }
               });
             }
           }
         });
       }));
+
+
     });
   }
 
-  void _resortMessagesByDate() {
-    currentMessages.sort((a, b) {
+  Future<List<ChatMessage>> loadInitMessages() async {
+    List<ChatMessage> messages = <ChatMessage>[];
+
+    // history
+    var regularMessages = (await db.regularMessagesDao
+            .getChannelMessagesOrderByDate(networkChannel.remoteId))
+        .map(regularMessageDBToChatMessage);
+    var specialMessages = (await db.specialMessagesDao
+            .getChannelMessages(networkChannel.remoteId))
+        .map(specialMessageDBToChatMessage);
+
+    messages.addAll(regularMessages);
+    messages.addAll(specialMessages);
+    _resort(messages);
+
+    return messages;
+  }
+
+  void _resort(List<ChatMessage> messages) {
+    messages.sort((a, b) {
       return a.date.compareTo(b.date);
     });
   }
 
   void _onMessagesChanged() {
-    _messagesController.add(currentMessages);
+    _logger.d(() => "_onMessagesChanged ${messages.length}"
+        "closed ${_messagesController.isClosed}");
+
+    _messagesController.add(messages);
   }
 
   void _onSpecialMessagesChanged() {
-    SpecialMessage latestTextMessage = currentMessages.lastWhere((message) {
+    SpecialMessage latestTextMessage = messages.lastWhere((message) {
       if (message.isSpecial) {
         var specialMessage = message as SpecialMessage;
         if (specialMessage.specialType == SpecialMessageType.TEXT) {
@@ -145,7 +172,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
     }, orElse: () => null);
 
     if (latestTextMessage != null) {
-      currentMessages.removeWhere((message) {
+      messages.removeWhere((message) {
         if (message.isSpecial) {
           var specialMessage = message as SpecialMessage;
           if (specialMessage.specialType == SpecialMessageType.TEXT) {

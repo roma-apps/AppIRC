@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
@@ -21,7 +22,7 @@ class NetworkChannelBlocProvider extends Providable {
   NetworkChannelBlocProvider(this.networkChannelBloc);
 }
 
-class NetworkChannelBloc extends DisposableOwner {
+class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
   final ChatInputOutputBackendService backendService;
   final Network network;
   NetworkChannel channel;
@@ -165,4 +166,7 @@ class NetworkChannelBloc extends DisposableOwner {
       MessagePreview preview) {
     return backendService.togglePreview(network, channel, message, preview);
   }
+
+
 }
+

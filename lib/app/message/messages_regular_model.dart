@@ -86,6 +86,20 @@ class RegularMessage extends ChatMessage {
         ' linksInText: $linksInText,'
         ' fromMode: $fromMode, newNick: $newNick}';
   }
+
+  @override
+  bool isContainsText(String searchTerm, {@required bool ignoreCase}) {
+    var contains = false;
+
+    contains |=
+        isContainsSearchTerm(fromNick, searchTerm, ignoreCase: ignoreCase);
+    if (!contains) {
+      contains |=
+          isContainsSearchTerm(text, searchTerm, ignoreCase: ignoreCase);
+    }
+
+    return contains;
+  }
 }
 
 enum RegularMessageType {
