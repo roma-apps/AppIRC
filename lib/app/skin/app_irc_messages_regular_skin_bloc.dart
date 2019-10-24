@@ -1,6 +1,6 @@
 import 'package:flutter/painting.dart';
-import 'package:flutter_appirc/app/message/messages_regular_model.dart';
-import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/regular/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 
 class AppIRCMessagesRegularSkinBloc extends MessagesRegularSkinBloc {

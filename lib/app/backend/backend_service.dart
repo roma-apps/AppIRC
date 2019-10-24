@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/chat/chat_connection_model.dart';
-import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
+import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
+import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
-import 'package:flutter_appirc/app/message/messages_preview_model.dart';
-import 'package:flutter_appirc/app/message/messages_regular_model.dart';
-import 'package:flutter_appirc/app/message/messages_special_model.dart';
+import 'package:flutter_appirc/app/message/preview/messages_preview_model.dart';
+import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/special/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -74,13 +74,11 @@ abstract class ChatOutputBackendService implements ChatBackendService {
   Disposable listenForMessagePreviews(Network network, NetworkChannel channel,
       NetworkChannelMessagePreviewListener listener);
 
-  Disposable listenForMessagePreviewToggle(Network network, NetworkChannel channel,
-      Function(MessageTogglePreview) callback);
+  Disposable listenForMessagePreviewToggle(Network network,
+      NetworkChannel channel, Function(MessageTogglePreview) callback);
 
-  Disposable listenForChannelPreviewToggle(Network network, NetworkChannel
-  channel,
-      Function(ChannelTogglePreview) callback);
-
+  Disposable listenForChannelPreviewToggle(Network network,
+      NetworkChannel channel, Function(ChannelTogglePreview) callback);
 }
 
 abstract class ChatInputBackendService implements ChatBackendService {

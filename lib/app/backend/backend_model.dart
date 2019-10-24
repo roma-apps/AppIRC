@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/chat/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
+import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
-import 'package:flutter_appirc/app/message/messages_preview_model.dart';
-import 'package:flutter_appirc/app/message/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/preview/messages_preview_model.dart';
+import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:json_annotation/json_annotation.dart';

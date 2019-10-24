@@ -5,33 +5,32 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_page.dart';
-import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_active_channel_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_app_bar_skin_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_connection_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_deep_link_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_init_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_input_message_skin_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_messages_saver_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_networks_blocs_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_networks_states_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_page.dart';
+import 'package:flutter_appirc/app/channel/list/channels_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_skin_bloc.dart';
+import 'package:flutter_appirc/app/chat/channels/chat_network_channels_blocs_bloc.dart';
+import 'package:flutter_appirc/app/chat/channels/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_page.dart';
-import 'package:flutter_appirc/app/chat/chat_preferences_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_preferences_model.dart';
-import 'package:flutter_appirc/app/chat/chat_preferences_saver_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_pushes_service.dart';
-import 'package:flutter_appirc/app/chat/chat_unread_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_upload_bloc.dart';
+import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
+import 'package:flutter_appirc/app/chat/input_message/chat_input_message_skin_bloc.dart';
+import 'package:flutter_appirc/app/chat/messages/chat_messages_saver_bloc.dart';
+import 'package:flutter_appirc/app/chat/networks/chat_networks_blocs_bloc.dart';
+import 'package:flutter_appirc/app/chat/networks/chat_networks_list_bloc.dart';
+import 'package:flutter_appirc/app/chat/networks/chat_networks_states_bloc.dart';
+import 'package:flutter_appirc/app/chat/preferences/chat_preferences_bloc.dart';
+import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart';
+import 'package:flutter_appirc/app/chat/preferences/chat_preferences_saver_bloc.dart';
+import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
+import 'package:flutter_appirc/app/chat/state/chat_unread_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
+import 'package:flutter_appirc/app/deep_link/chat_deep_link_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
-import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
-import 'package:flutter_appirc/app/message/messages_special_skin_bloc.dart';
-import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/message/regular/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/app/message/special/messages_special_skin_bloc.dart';
+import 'package:flutter_appirc/app/network/list/networks_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/push_notifications/chat_pushes_service.dart';
 import 'package:flutter_appirc/app/skin/app_irc_app_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_button_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_chat_app_bar_skin_bloc.dart';
@@ -42,7 +41,8 @@ import 'package:flutter_appirc/app/skin/app_irc_networks_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
-import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/app/upload/chat_upload_bloc.dart';
+import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/form/form_skin_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -119,8 +119,6 @@ class AppIRCState extends State<AppIRC> {
           await pushesService.askPermissions();
           await pushesService.configure();
 
-
-
           loungePreferencesBloc
               .valueStream(defaultValue: LoungePreferences.empty)
               .listen((newPreferences) {
@@ -159,27 +157,20 @@ class AppIRCState extends State<AppIRC> {
       var loungeBackendService = LoungeBackendService(
           socketManagerProvider.manager, loungePreferences);
 
-
       await loungeBackendService.init();
 
-
       loungeBackendService.listenForSignOut(() {
-
         loungeBackendService.dispose();
         this.loungeBackendService = null;
         this.loungePreferences.authPreferences = null;
 
         var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
         loungePreferencesBloc.setValue(LoungePreferences.empty);
-        setState(() {
-
-        });
+        setState(() {});
       });
 
-
       var chatPushesService =
-      ChatPushesService(pushesService, loungeBackendService);
-
+          ChatPushesService(pushesService, loungeBackendService);
 
       this.loungeBackendService = loungeBackendService;
 
@@ -189,15 +180,15 @@ class AppIRCState extends State<AppIRC> {
         loungeBackendService,
         nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
         nextChannelIdGenerator:
-        chatPreferencesBloc.getNextNetworkChannelLocalId,
+            chatPreferencesBloc.getNextNetworkChannelLocalId,
       );
 
       var connectionBloc = ChatConnectionBloc(loungeBackendService);
       var networkStatesBloc =
-      ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+          ChatNetworksStateBloc(loungeBackendService, networksListBloc);
 
       var _startPreferences =
-      chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+          chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
 
       var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
           networksListBloc, _startPreferences);
@@ -221,12 +212,8 @@ class AppIRCState extends State<AppIRC> {
           channelsStatesBloc,
           activeChannelBloc);
 
-      var chatDeepLinkBloc = ChatDeepLinkBloc(
-          loungeBackendService,
-          chatInitBloc,
-          networksListBloc,
-          networksBlocsBloc,
-          activeChannelBloc);
+      var chatDeepLinkBloc = ChatDeepLinkBloc(loungeBackendService,
+          chatInitBloc, networksListBloc, networksBlocsBloc, activeChannelBloc);
 
       var chatUploadBloc = ChatUploadBloc(loungeBackendService);
 
@@ -271,18 +258,18 @@ class AppIRCState extends State<AppIRC> {
                                             providable: chatUploadBloc,
                                             child: Provider(
                                               providable:
-                                              NetworkChannelMessagesSaverBloc(
-                                                  loungeBackendService,
-                                                  networksListBloc,
-                                                  database),
+                                                  NetworkChannelMessagesSaverBloc(
+                                                      loungeBackendService,
+                                                      networksListBloc,
+                                                      database),
                                               child: Provider(
                                                 providable:
-                                                ChatPreferencesSaverBloc(
-                                                    loungeBackendService,
-                                                    networkStatesBloc,
-                                                    networksListBloc,
-                                                    chatPreferencesBloc,
-                                                    chatInitBloc),
+                                                    ChatPreferencesSaverBloc(
+                                                        loungeBackendService,
+                                                        networkStatesBloc,
+                                                        networksListBloc,
+                                                        chatPreferencesBloc,
+                                                        chatInitBloc),
                                                 child: _buildApp(ChatPage()),
                                               ),
                                             ),

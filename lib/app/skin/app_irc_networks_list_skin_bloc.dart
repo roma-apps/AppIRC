@@ -1,5 +1,5 @@
 import 'package:flutter/painting.dart';
-import 'package:flutter_appirc/app/network/networks_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/network/list/networks_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 
 import 'app_irc_channels_list_skin_bloc.dart';

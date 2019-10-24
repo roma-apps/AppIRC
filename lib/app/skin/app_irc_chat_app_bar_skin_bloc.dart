@@ -1,5 +1,5 @@
 import 'package:flutter/painting.dart';
-import 'package:flutter_appirc/app/chat/chat_app_bar_skin_bloc.dart';
+import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 
 class AppIRCChatAppBarSkinBloc extends ChatAppBarSkinBloc {

@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/app/user/users_list_bloc.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_text_field.dart';

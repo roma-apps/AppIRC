@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
+import 'package:flutter_appirc/app/chat/channels/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/user/users_list_bloc.dart';
 import 'package:flutter_appirc/app/user/users_list_widget.dart';

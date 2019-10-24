@@ -1,5 +1,5 @@
 import 'package:flutter/painting.dart';
-import 'package:flutter_appirc/app/channel/channels_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/channel/list/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 
 class AppIRCChannelsListSkinBloc extends ChannelsListSkinBloc {
