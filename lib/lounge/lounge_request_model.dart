@@ -102,6 +102,9 @@ class MoreLoungeRequestBody extends LoungeRequestBody {
   @override
   Map<String, dynamic> toJson() => _$MoreLoungeRequestBodyToJson(this);
 
+  factory MoreLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$MoreLoungeRequestBodyFromJson(json);
+
   @override
   String toString() {
     return 'MoreLoungeRequestBody{target: $target, lastId: $lastId}';
@@ -133,6 +136,9 @@ class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
   @override
   Map<String, dynamic> toJson() =>
       _$MsgPreviewToggleLoungeRequestBodyToJson(this);
+
+  factory MsgPreviewToggleLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$MsgPreviewToggleLoungeRequestBodyFromJson(json);
 }
 
 @JsonSerializable()
@@ -143,6 +149,9 @@ class PushTokenLoungeRequestBody extends LoungeRequestBody {
 
   @override
   Map<String, dynamic> toJson() => _$PushTokenLoungeRequestBodyToJson(this);
+
+  factory PushTokenLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$PushTokenLoungeRequestBodyFromJson(json);
 
   @override
   String toString() {
@@ -165,6 +174,9 @@ class NamesLoungeRequestBody extends LoungeRequestBody {
 
   @override
   Map<String, dynamic> toJson() => _$NamesLoungeRequestBodyToJson(this);
+
+  factory NamesLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$NamesLoungeRequestBodyFromJson(json);
 }
 
 @JsonSerializable()
@@ -183,6 +195,9 @@ class AuthLoungeRequestBody extends LoungeRequestBody {
 
   @override
   Map<String, dynamic> toJson() => _$AuthLoungeRequestBodyToJson(this);
+
+  factory AuthLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$AuthLoungeRequestBodyFromJson(json);
 }
 
 @JsonSerializable()
@@ -225,6 +240,9 @@ class NetworkNewLoungeRequestBody extends LoungeRequestBody {
       @required this.password});
 
   Map<String, dynamic> toJson() => _$NetworkNewLoungeRequestBodyToJson(this);
+
+  factory NetworkNewLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$NetworkNewLoungeRequestBodyFromJson(json);
 }
 
 @JsonSerializable()
@@ -269,4 +287,7 @@ class NetworkEditLoungeRequestBody extends LoungeRequestBody {
       @required this.password});
 
   Map<String, dynamic> toJson() => _$NetworkEditLoungeRequestBodyToJson(this);
+
+  factory NetworkEditLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$NetworkEditLoungeRequestBodyFromJson(json);
 }

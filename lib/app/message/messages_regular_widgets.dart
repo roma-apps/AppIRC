@@ -495,7 +495,7 @@ Icon buildMessageIcon(IconData iconData, Color color) {
 }
 
 class MessageVideoPreviewWidget extends StatefulWidget {
-  String _videoURL;
+  final String _videoURL;
 
   MessageVideoPreviewWidget(this._videoURL);
 
@@ -553,7 +553,7 @@ class MessageVideoPreviewWidgetState extends State<MessageVideoPreviewWidget> {
 }
 
 class MessageAudioPreviewWidget extends StatefulWidget {
-  String _audioURL;
+  final String _audioURL;
 
   MessageAudioPreviewWidget(this._audioURL);
 

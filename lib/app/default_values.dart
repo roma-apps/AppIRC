@@ -1,8 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 
 LoungePreferences createDefaultLoungePreferences(
         BuildContext context) =>

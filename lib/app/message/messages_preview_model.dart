@@ -57,7 +57,6 @@ class MessagePreview {
   factory MessagePreview.fromJson(Map<String, dynamic> json) =>
       _$MessagePreviewFromJson(json);
 
-  @override
   Map<String, dynamic> toJson() => _$MessagePreviewToJson(this);
 }
 

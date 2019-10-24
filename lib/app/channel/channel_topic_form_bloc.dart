@@ -1,7 +1,4 @@
-import 'package:flutter_appirc/app/backend/backend_model.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/form/form_blocs.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ChannelTopicFormBloc extends FormBloc {

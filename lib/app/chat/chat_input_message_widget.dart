@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart' show Colors, Icons;
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_upload_helper.dart';

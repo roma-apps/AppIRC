@@ -19,6 +19,7 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
 
   @override
   void initState() {
+    super.initState();
     filterController = TextEditingController();
   }
 

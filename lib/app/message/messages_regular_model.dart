@@ -1,4 +1,3 @@
-import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_preview_model.dart';

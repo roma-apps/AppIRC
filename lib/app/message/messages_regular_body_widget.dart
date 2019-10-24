@@ -5,13 +5,9 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-final MyLogger _logger =
-    MyLogger(logTag: "messages_regular_body_widget", enabled: true);
 
 typedef dynamic WordSpanTapCallback(String word, OffsetPair position);
 

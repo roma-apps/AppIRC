@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_list_bloc.dart';
 import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ChannelMessagesListBloc extends Providable {

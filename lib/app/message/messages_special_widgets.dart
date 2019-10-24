@@ -13,7 +13,6 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Widget buildSpecialMessageWidget(
     BuildContext context, SpecialMessage specialMessage) {

@@ -1,7 +1,7 @@
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
-import 'package:json_annotation/json_annotation.dart';
+
 
 abstract class LoungeException implements Exception {}
 

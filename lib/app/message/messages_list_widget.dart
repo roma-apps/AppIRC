@@ -12,14 +12,10 @@ import 'package:flutter_appirc/app/message/messages_regular_widgets.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_widgets.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
-
-var _logger =
-    MyLogger(logTag: "NetworkChannelMessagesListWidget", enabled: true);
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
   final VisibleAreaCallback visibleAreaCallback;

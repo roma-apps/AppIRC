@@ -90,6 +90,8 @@ class ChatPushMessageNotification {
     return 'ChatPushMessageNotification{title: $title, body: $body}';
   }
 
+  Map<String, dynamic> toJson() => _$ChatPushMessageNotificationToJson(this);
+
   factory ChatPushMessageNotification.fromJson(Map<dynamic, dynamic> json) =>
       _$ChatPushMessageNotificationFromJson(json);
 }
@@ -109,9 +111,10 @@ class ChatPushMessageData {
     return 'ChatPushMessageData{chanId: $chanId, body: $body,'
         ' type: $type, timestamp: $timestamp, title: $title}';
   }
-
   factory ChatPushMessageData.fromJson(Map<dynamic, dynamic> json) =>
       _$ChatPushMessageDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChatPushMessageDataToJson(this);
 }
 
 class RequestResult<T> {

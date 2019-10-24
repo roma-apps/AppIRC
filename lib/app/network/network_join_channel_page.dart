@@ -53,7 +53,7 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
 
                   var pressed = dataValid
                       ? () async {
-                          var asyncResult = await doAsyncOperationWithDialog(context, () async {
+                          await doAsyncOperationWithDialog(context, () async {
                             var chatNetworkChannelPreferences = ChatNetworkChannelPreferences.name(
                                     name: networkChannelJoinFormBloc
                                         .extractChannel(),

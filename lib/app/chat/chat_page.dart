@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart' show CupertinoNavigationBar;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
-    show AppBar, Colors, Drawer, Icons, Scaffold, ScaffoldState;
+    show AppBar, Colors, Drawer, Icons, ScaffoldState;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';

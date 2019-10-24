@@ -6,33 +6,34 @@ import 'package:flutter_appirc/app/chat/chat_messages_loader_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
-
-var _logger = MyLogger(logTag: "ChatMessagesListBloc", enabled: true);
 
 class ChatMessageWrapper {
   bool includedInSearchResult;
   ChatMessage message;
+
   ChatMessageWrapper(this.includedInSearchResult, this.message);
 }
 
 class ChatMessagesWrapperState {
   List<ChatMessageWrapper> messages;
   int newScrollIndex;
+
   ChatMessagesWrapperState(this.messages, this.newScrollIndex);
 }
 
 class MessagesSearchState {
   List<ChatMessage> messages;
   int currentIndex;
+
   MessagesSearchState(this.messages, this.currentIndex);
 }
 
 class ChatMessageListVisibleArea {
   ChatMessage minVisibleMessage;
   ChatMessage maxVisibleMessage;
+
   ChatMessageListVisibleArea(this.minVisibleMessage, this.maxVisibleMessage);
 }
 
@@ -59,6 +60,7 @@ class ChatMessagesListBloc extends Providable {
 
   Stream<bool> get searchNextEnabledStream =>
       foundMessagesStream.map(mapSearchNextEnabled);
+
   bool get searchNextEnabled =>
       mapSearchNextEnabled(_foundMessagesController.value);
 
@@ -70,6 +72,7 @@ class ChatMessagesListBloc extends Providable {
 
   String get _currentSearchTerm =>
       _channelMessagesListBloc.searchFieldBloc.value;
+
   List<ChatMessage> get _currentLoadedMessages =>
       _messagesLoaderBloc.currentMessages;
 
@@ -85,8 +88,6 @@ class ChatMessagesListBloc extends Providable {
         .listen((newSearchTerm) {
       _research(true);
     }));
-
-
 
     addDisposable(subject: _allMessagesStateController);
     addDisposable(subject: _foundMessagesController);
@@ -159,15 +160,19 @@ class ChatMessagesListBloc extends Providable {
 
   BehaviorSubject<ChatMessagesWrapperState> _allMessagesStateController =
       BehaviorSubject(seedValue: ChatMessagesWrapperState([], null));
+
   Stream<ChatMessagesWrapperState> get allMessagesStateStream =>
       _allMessagesStateController.stream;
+
   ChatMessagesWrapperState get allMessagesState =>
       _allMessagesStateController.value;
 
   BehaviorSubject<MessagesSearchState> _foundMessagesController =
       BehaviorSubject();
+
   Stream<MessagesSearchState> get foundMessagesStream =>
       _foundMessagesController.stream;
+
   MessagesSearchState get foundMessages => _foundMessagesController.value;
 
 //  BehaviorSubject<int> _selectedFoundMessageIndexController = BehaviorSubject();

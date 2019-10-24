@@ -11,12 +11,9 @@ import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_db.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(
-    logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
 
 class NetworkChannelMessagesLoaderBloc extends Providable {
   final ChatInputOutputBackendService backendService;

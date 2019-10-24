@@ -3,13 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_widget.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-var _logger = MyLogger(logTag: "LoungePreferencesPage", enabled: true);
 
 typedef PreferencesActionCallback = void Function(
     BuildContext context, LoungePreferences preferences);

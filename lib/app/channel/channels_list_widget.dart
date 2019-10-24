@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart'
-    show Colors, Icons, PopupMenuButton, PopupMenuEntry, PopupMenuItem;
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_connection_status_widget.dart';
@@ -14,7 +13,6 @@ import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
 
 var _logger = MyLogger(logTag: "NetworkChannelsListWidget", enabled: true);
 

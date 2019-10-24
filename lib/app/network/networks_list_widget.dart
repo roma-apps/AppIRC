@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization_delegate.dart';
-import 'package:flutter/material.dart'
-    show Divider, Icons, PopupMenuButton, PopupMenuEntry;
+import 'package:flutter/material.dart' show Divider, Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_connection_status_widget.dart';

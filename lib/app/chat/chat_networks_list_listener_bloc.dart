@@ -1,15 +1,9 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/async/disposable.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-
-var _logger = MyLogger(logTag: "ChatNetworksListListenerBloc", enabled: true);
 
 abstract class ChatNetworksListListenerBloc extends Providable {
   final ChatNetworksListBloc networksListBloc;
