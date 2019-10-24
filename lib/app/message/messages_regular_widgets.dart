@@ -40,7 +40,6 @@ Widget buildRegularMessage(BuildContext context, RegularMessage message,
   var subMessage = _buildTitleSubMessage(context, message);
 
   if (subMessage != null) {
-    // todo: rework
     body = Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +335,7 @@ Widget _buildPreviewThumb(BuildContext context, String thumb) {
 isNeedHighlight(RegularMessage message) =>
     message.highlight == true ||
     message.regularMessageType ==
-        RegularMessageType.UNKNOWN; // TODO: remove debug UNKNOWN
+        RegularMessageType.UNKNOWN;
 
 bool isHaveLongText(RegularMessage message) =>
     message.text != null ? message.text.length > 10 : false;
