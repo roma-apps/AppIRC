@@ -111,9 +111,9 @@ class ChatPage extends StatelessWidget {
             // badge hide part of button clickable area
             double rightMargin = 15.0;
 
-            if(isMaterial) {
+            if (isMaterial) {
               rightMargin = 15;
-            } else if(isCupertino) {
+            } else if (isCupertino) {
               rightMargin = 5;
             }
             return GestureDetector(
@@ -217,15 +217,15 @@ class ChatPage extends StatelessWidget {
                 switch (connectionState) {
                   case ChatConnectionState.CONNECTED:
                     content = AppLocalizations.of(context)
-                        .tr('chat.connection.connected');
+                        .tr('chat.state.connection.status.connected');
                     break;
                   case ChatConnectionState.CONNECTING:
                     content = AppLocalizations.of(context)
-                        .tr('chat.connection.connecting');
+                        .tr('chat.state.connection.status.connecting');
                     break;
                   case ChatConnectionState.DISCONNECTED:
                     content = AppLocalizations.of(context)
-                        .tr('chat.connection.disconnected');
+                        .tr('chat.state.connection.status.disconnected');
                     break;
                 }
 
@@ -287,44 +287,46 @@ class ChatPage extends StatelessWidget {
                       channelBloc.network,
                       channelBloc.channel);
 
-
                   return Provider(
                     providable: messagesLoaderBloc,
                     child: StreamBuilder(
-                      stream: messagesLoaderBloc.isInitFinishedStream,
-                      initialData: false,
-                      builder: (context, snapshot) {
-
-                        var initFinished = snapshot.data;
+                        stream: messagesLoaderBloc.isInitFinishedStream,
+                        initialData: false,
+                        builder: (context, snapshot) {
+                          var initFinished = snapshot.data;
                           var length = messagesLoaderBloc.messages?.length;
-                        _logger.d(() => "initFinished $initFinished"
-                        "messages $length");
-                        if(initFinished && length != null) {
+                          _logger.d(() => "initFinished $initFinished"
+                              "messages $length");
+                          if (initFinished && length != null) {
+                            var chatListMessagesBloc = ChatMessagesListBloc(
+                                channelBloc.messagesBloc,
+                                messagesLoaderBloc,
+                                channelBloc);
 
-                          var chatListMessagesBloc = ChatMessagesListBloc(
-                              channelBloc.messagesBloc, messagesLoaderBloc, channelBloc);
+                            _logger.d(() =>
+                                "build for activeChannel ${channelBloc.channel.name}");
 
-                          _logger.d(() => "build for activeChannel ${channelBloc
-                              .channel.name}");
-
-                          return Provider(
-                              providable: NetworkChannelBlocProvider(channelBloc),
-                              child: Provider(
-                                providable: chatListMessagesBloc,
-                                child: NetworkChannelWidget(),
-                              ));
-                        } else {
-                          return Text("Load messages");
-                        }
-
-                      }
-                    ),
+                            return Provider(
+                                providable:
+                                    NetworkChannelBlocProvider(channelBloc),
+                                child: Provider(
+                                  providable: chatListMessagesBloc,
+                                  child: NetworkChannelWidget(),
+                                ));
+                          } else {
+                            return Center(
+                                child:
+                                    _buildLoadingMessagesWidget(context));
+                          }
+                        }),
                   );
-
                 }
               }
             }));
   }
+
+  Text _buildLoadingMessagesWidget(BuildContext context) =>
+      Text(AppLocalizations.of(context).tr("chat.messages_list.loading"));
 
   Widget _buildConnectToNetworkWidget(BuildContext context) {
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
@@ -363,7 +365,7 @@ class ChatPage extends StatelessWidget {
                           await networksBloc.joinNetwork(preferences);
                         },
                             AppLocalizations.of(context)
-                                .tr('irc_connection.connect')),
+                                .tr('irc.connection.new.action.connect')),
                       );
                     } else {
                       return Center(child: PlatformCircularProgressIndicator());
@@ -373,7 +375,10 @@ class ChatPage extends StatelessWidget {
               break;
             case ChatConnectionState.CONNECTING:
               return Center(
-                  child: Text(appLocalizations.tr("chat.connection.connecting"),
+                  child: Text(
+                      appLocalizations.tr("chat.state.connection"
+                          ".status"
+                          ".connecting"),
                       style: TextStyle(
                           color:
                               AppSkinBloc.of(context).appSkinTheme.textColor)));
@@ -384,14 +389,16 @@ class ChatPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(appLocalizations.tr("chat.connection.disconnected"),
+                    Text(
+                        appLocalizations.tr("chat.state.connection"
+                            ".status.disconnected"),
                         style: TextStyle(
                             color: AppSkinBloc.of(context)
                                 .appSkinTheme
                                 .textColor)),
                     createSkinnedPlatformButton(context,
-                        child: Text(
-                            appLocalizations.tr("chat.connection.reconnect")),
+                        child: Text(appLocalizations
+                            .tr("chat.state.connection.action.reconnect")),
                         onPressed: () {
                       connectionBloc.reconnect();
                     })
@@ -406,7 +413,9 @@ class ChatPage extends StatelessWidget {
 
   Center _buildNoActiveChannelMessage(BuildContext context) {
     return Center(
-      child: Text(AppLocalizations.of(context).tr('chat.no_active_channel'),
+      child: Text(
+          AppLocalizations.of(context).tr('chat'
+              '.state.active_channel_not_selected'),
           style:
               TextStyle(color: AppSkinBloc.of(context).appSkinTheme.textColor)),
     );

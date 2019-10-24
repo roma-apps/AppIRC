@@ -40,17 +40,18 @@ abstract class ValidationError {
 
 class IsEmptyValidationError extends ValidationError {
   String getDescription(BuildContext context) =>
-      AppLocalizations.of(context).tr("form.empty_field_not_valid");
+      AppLocalizations.of(context)
+          .tr("form.field.text.error.empty_field");
 }
 
 class NoWhitespacesValidationError extends ValidationError {
   String getDescription(BuildContext context) =>
-      AppLocalizations.of(context).tr("form.no_whitespace");
+      AppLocalizations.of(context).tr("form.field.text.error.no_whitespace");
 }
 
 class NotUniqueValidationError extends ValidationError {
   String getDescription(BuildContext context) =>
-      AppLocalizations.of(context).tr("form.not_unique");
+      AppLocalizations.of(context).tr("form.field.text.error.not_unique");
 }
 
 abstract class FormFieldBloc<T> extends Providable {

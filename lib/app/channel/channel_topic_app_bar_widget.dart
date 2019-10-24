@@ -40,11 +40,11 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
                   break;
                 case ChatConnectionState.CONNECTING:
                   subTitleText = AppLocalizations.of(context)
-                      .tr("chat.connection.connecting");
+                      .tr("chat.state.connection.status.connecting");
                   break;
                 case ChatConnectionState.DISCONNECTED:
                   subTitleText = AppLocalizations.of(context)
-                      .tr("chat.connection.disconnected");
+                      .tr("chat.state.connection.status.disconnected");
                   break;
               }
 

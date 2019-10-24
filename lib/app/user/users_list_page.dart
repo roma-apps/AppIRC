@@ -36,7 +36,7 @@ class NetworkChannelUsersPageState extends State<NetworkChannelUsersPage> {
 
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        title: Text(AppLocalizations.of(context).tr('chat.users.title')),
+        title: Text(AppLocalizations.of(context).tr('chat.users_list.title')),
       ),
       body: SafeArea(
         child: Padding(

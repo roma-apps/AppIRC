@@ -49,8 +49,11 @@ class LoungeAuthPreferencesFormWidgetState
           formBloc.usernameFieldBloc,
           _usernameController,
           Icons.account_box,
-          appLocalizations.tr('lounge.preferences.auth.username.label'),
-          appLocalizations.tr('lounge.preferences.auth.username.hint'),
+          appLocalizations
+              .tr('lounge.preferences.auth.field.username.label'),
+          appLocalizations
+              .tr('lounge.preferences.auth.field.username'
+                  '.hint'),
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.none,
           nextBloc: formBloc.passwordFieldBloc,
@@ -60,8 +63,10 @@ class LoungeAuthPreferencesFormWidgetState
           formBloc.passwordFieldBloc,
           _passwordController,
           Icons.lock,
-          appLocalizations.tr('lounge.preferences.auth.password.label'),
-          appLocalizations.tr('lounge.preferences.auth.password.hint'),
+          appLocalizations
+              .tr('lounge.preferences.auth.field.password.label'),
+          appLocalizations
+              .tr('lounge.preferences.auth.field.password.hint'),
           obscureText: true,
           textCapitalization: TextCapitalization.none,
           textInputAction: TextInputAction.done,

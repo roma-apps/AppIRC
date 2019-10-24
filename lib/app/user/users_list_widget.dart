@@ -51,7 +51,8 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
               body = Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
-                    child: Text(appLocalizations.tr("chat.users.not_found"),
+                    child: Text(appLocalizations.tr("chat.users_list.search"
+                        ".users_not_found"),
                         style: TextStyle(
                             color:
                                 AppSkinBloc.of(context).appSkinTheme.textColor))),
@@ -72,9 +73,11 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
                   context,
                   channelUsersListBloc.filterFieldBloc,
                   filterController,
-                  AppLocalizations.of(context).tr("chat.users_list.filter"
-                      ".name"),
-                  AppLocalizations.of(context).tr("chat.users_list.filter"
+                  AppLocalizations.of(context).tr("chat.users_list.search"
+                      ".field.filter"
+                      ".label"),
+                  AppLocalizations.of(context).tr("chat.users_list.search"
+                      ".field.filter"
                       ".hint"),
                 ),
                 body,
@@ -82,7 +85,7 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
             );
           } else {
             return Center(
-                child: Text(appLocalizations.tr("chat.users.loading"),
+                child: Text(appLocalizations.tr("chat.users_list.loading"),
                     style: TextStyle(
                         color:
                             AppSkinBloc.of(context).appSkinTheme.textColor)));

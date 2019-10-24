@@ -11,7 +11,6 @@ import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/async/async_dialog_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware_alert_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
@@ -187,11 +186,12 @@ class LoungePreferencesFormWidgetState
     if (error != null) {
       content = appLocalizations.tr(
           'lounge.preferences.connection.dialog.connection_error'
-          '.content_with_error',
+          '.content.with_exception',
           args: [error]);
     } else {
       content = appLocalizations
-          .tr('lounge.preferences.connection.dialog.connection_error.content');
+          .tr('lounge.preferences.connection.dialog.connection_error.content'
+          '.no_exception');
     }
 
     return PlatformAlertDialog(
@@ -245,4 +245,12 @@ class LoungePreferencesFormWidgetState
         content: Text(content),
         actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
+}
+
+PlatformDialogAction createOkPlatformDialogAction(BuildContext context) {
+  return PlatformDialogAction(
+    child: Text(AppLocalizations.of(context).tr("lounge.preferences"
+        ".connection.dialog.action.ok")),
+    onPressed: () => Navigator.pop(context),
+  );
 }

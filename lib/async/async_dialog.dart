@@ -83,7 +83,8 @@ class AsyncProgressDialog {
           if (cancelableOperation != null) {
             actions.add(PlatformDialogAction(
                 child: cancelAction ??
-                    Text(AppLocalizations.of(context).tr("button.cancel")),
+                    Text(AppLocalizations.of(context).tr("async_dialog"
+                        ".action.cancel")),
                 onPressed: () {
                   cancelableOperation.cancel();
                   hide(context);

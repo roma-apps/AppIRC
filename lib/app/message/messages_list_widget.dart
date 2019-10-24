@@ -20,9 +20,8 @@ import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
-
-
-var _logger = MyLogger(logTag: "NetworkChannelMessagesListWidget", enabled: true);
+var _logger =
+    MyLogger(logTag: "NetworkChannelMessagesListWidget", enabled: true);
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
   NetworkChannelMessagesListWidget();
@@ -34,9 +33,9 @@ class NetworkChannelMessagesListWidget extends StatefulWidget {
 
 class _NetworkChannelMessagesListWidgetState
     extends State<NetworkChannelMessagesListWidget> {
-   ItemPositionsListener positionsListener;
+  ItemPositionsListener positionsListener;
 
-   ItemScrollController scrollController;
+  ItemScrollController scrollController;
 
   StreamSubscription<ChatMessagesListSearchState> positionSubscription;
 
@@ -57,8 +56,7 @@ class _NetworkChannelMessagesListWidgetState
   void initState() {
     super.initState();
     scrollController = ItemScrollController();
-    positionsListener =
-        ItemPositionsListener.create();
+    positionsListener = ItemPositionsListener.create();
 
     positionsListener.itemPositions.addListener(onVisiblePositionsChanged);
 
@@ -177,8 +175,6 @@ class _NetworkChannelMessagesListWidgetState
           "messageForInitScrollPosition $messageForInitScrollPosition "
           "firstUnreadRemoteMessageId ${NetworkChannelBloc.of(context).networkChannelState.firstUnreadRemoteMessageId}");
 
-
-
       return _buildListWidget(
           context,
           originalMessages,
@@ -196,7 +192,6 @@ class _NetworkChannelMessagesListWidgetState
       bool moreHistoryAvailable,
       ChatMessagesListSearchState searchState,
       ChatMessage messageForInitScrollPosition) {
-
     _lastBuildFilteredMessages = filteredMessages;
     var itemCount = filteredMessages.length;
 
@@ -211,12 +206,11 @@ class _NetworkChannelMessagesListWidgetState
       _lastBuildMessagesStartIndex = 0;
     }
 
-    if(initialScrollIndex == 1 && moreHistoryAvailable) {
+    if (initialScrollIndex == 1 && moreHistoryAvailable) {
       // hack to display load more button
       // when list want to display first message
       initialScrollIndex = 0;
     }
-
 
     _logger.d(() => "_buildListWidget "
         "itemCount $itemCount "
@@ -225,14 +219,13 @@ class _NetworkChannelMessagesListWidgetState
 
     double initialAlignment = 0.0;
 
-    var lastIndex = itemCount -1;
-    if(initialScrollIndex == lastIndex) {
+    var lastIndex = itemCount - 1;
+    if (initialScrollIndex == lastIndex && initialScrollIndex != 0) {
       // hack to display last message at the bottom
       // when list want to display last message
       initialScrollIndex += 1;
       initialAlignment = 1.0;
     }
-
 
     return ScrollablePositionedList.builder(
         initialScrollIndex: initialScrollIndex,
@@ -256,7 +249,7 @@ class _NetworkChannelMessagesListWidgetState
             }
           }
 
-          if(index >=filteredMessages.length) {
+          if (index >= filteredMessages.length) {
             return null;
           }
 
@@ -335,13 +328,16 @@ class _NetworkChannelMessagesListWidgetState
 
         if (connected) {
           return Center(
-              child: Text(AppLocalizations.of(context).tr("chat.empty_channel"),
+              child: Text(
+                  AppLocalizations.of(context).tr("chat.messages_list"
+                      ".empty.connected"),
                   style: TextStyle(
                       color: AppSkinBloc.of(context).appSkinTheme.textColor)));
         } else {
           return Center(
               child: Text(
-                  AppLocalizations.of(context).tr("chat.not_connected_channel"),
+                  AppLocalizations.of(context).tr("chat.messages_list.empty"
+                      ".not_connected"),
                   style: TextStyle(
                       color: AppSkinBloc.of(context).appSkinTheme.textColor)));
         }
@@ -352,7 +348,7 @@ class _NetworkChannelMessagesListWidgetState
 
 Widget _buildLoadMoreButton(BuildContext context, List<ChatMessage> messages) =>
     createSkinnedPlatformButton(context, onPressed: () {
-      doAsyncOperationWithDialog(context, asyncCode:() async {
+      doAsyncOperationWithDialog(context, asyncCode: () async {
         var oldestRegularMessage = messages.firstWhere(
                 (message) => message.chatMessageType == ChatMessageType.REGULAR)
             as RegularMessage;
@@ -361,7 +357,7 @@ Widget _buildLoadMoreButton(BuildContext context, List<ChatMessage> messages) =>
         return await channelBloc.loadMoreHistory(oldestRegularMessage);
       }, cancellationValue: null, isDismissible: true);
     },
-        child: Text(AppLocalizations.of(context).tr("chat.messages"
+        child: Text(AppLocalizations.of(context).tr("chat.messages_list.action"
             ".load_more")));
 
 _isNeedPrintChatMessage(ChatMessage message) {

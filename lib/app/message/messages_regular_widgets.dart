@@ -184,69 +184,69 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
   String str;
   switch (regularMessageType) {
     case RegularMessageType.TOPIC_SET_BY:
-      str = appLocalizations.tr("chat.sub_message.topic_set_by");
+      str = appLocalizations.tr("chat.message.regular.sub_message.topic_set_by");
       break;
     case RegularMessageType.TOPIC:
-      str = appLocalizations.tr("chat.sub_message.topic");
+      str = appLocalizations.tr("chat.message.regular.sub_message.topic");
       break;
     case RegularMessageType.WHO_IS:
-      str = appLocalizations.tr("chat.sub_message.who_is");
+      str = appLocalizations.tr("chat.message.regular.sub_message.who_is");
       break;
     case RegularMessageType.UNHANDLED:
       str = null;
       break;
     case RegularMessageType.UNKNOWN:
-      str = appLocalizations.tr("chat.sub_message.unknown");
+      str = appLocalizations.tr("chat.message.regular.sub_message.unknown");
       break;
     case RegularMessageType.MESSAGE:
       str = null;
       break;
     case RegularMessageType.JOIN:
-      str = appLocalizations.tr("chat.sub_message.join");
+      str = appLocalizations.tr("chat.message.regular.sub_message.join");
       break;
     case RegularMessageType.MODE:
       if (isHaveLongText(message)) {
-        str = appLocalizations.tr("chat.sub_message.mode_long");
+        str = appLocalizations.tr("chat.message.regular.sub_message.mode_long");
       } else {
         str = appLocalizations
-            .tr("chat.sub_message.mode_short", args: [message.text]);
+            .tr("chat.message.regular.sub_message.mode_short", args: [message.text]);
       }
 
       break;
     case RegularMessageType.MOTD:
-      str = appLocalizations.tr("chat.sub_message.motd", args: [message.text]);
+      str = appLocalizations.tr("chat.message.regular.sub_message.motd", args: [message.text]);
       break;
     case RegularMessageType.NOTICE:
-      str = appLocalizations.tr("chat.sub_message.notice");
+      str = appLocalizations.tr("chat.message.regular.sub_message.notice");
       break;
     case RegularMessageType.ERROR:
-      str = appLocalizations.tr("chat.sub_message.error");
+      str = appLocalizations.tr("chat.message.regular.sub_message.error");
       break;
     case RegularMessageType.AWAY:
-      str = appLocalizations.tr("chat.sub_message.away");
+      str = appLocalizations.tr("chat.message.regular.sub_message.away");
       break;
     case RegularMessageType.BACK:
-      str = appLocalizations.tr("chat.sub_message.back");
+      str = appLocalizations.tr("chat.message.regular.sub_message.back");
       break;
     case RegularMessageType.MODE_CHANNEL:
       str = appLocalizations
-          .tr("chat.sub_message.channel_mode", args: [message.text]);
+          .tr("chat.message.regular.sub_message.channel_mode", args: [message.text]);
       break;
     case RegularMessageType.QUIT:
-      str = appLocalizations.tr("chat.sub_message.quit");
+      str = appLocalizations.tr("chat.message.regular.sub_message.quit");
       break;
     case RegularMessageType.RAW:
       str = null;
       break;
     case RegularMessageType.PART:
-      str = appLocalizations.tr("chat.sub_message.part");
+      str = appLocalizations.tr("chat.message.regular.sub_message.part");
       break;
     case RegularMessageType.NICK:
       str =
-          appLocalizations.tr("chat.sub_message.nick", args: [message.newNick]);
+          appLocalizations.tr("chat.message.regular.sub_message.nick", args: [message.newNick]);
       break;
     case RegularMessageType.CTCP_REQUEST:
-      str = appLocalizations.tr("chat.sub_message.ctcp_request");
+      str = appLocalizations.tr("chat.message.regular.sub_message.ctcp_request");
       break;
   }
 

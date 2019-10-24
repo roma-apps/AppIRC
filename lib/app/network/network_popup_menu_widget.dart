@@ -33,7 +33,7 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
 
   var items = <PlatformAwarePopupMenuAction>[
     PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("settings.network_dropdown_menu.edit"),
+        text: appLocalizations.tr("chat.network.action.edit"),
         iconData: Icons.edit,
         actionCallback: (action) {
           Navigator.push(
@@ -53,7 +53,7 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
         }),
     PlatformAwarePopupMenuAction(
         text:
-            appLocalizations.tr("settings.network_dropdown_menu.join_channel"),
+            appLocalizations.tr("chat.network.action.join_channel"),
         iconData: Icons.add,
         actionCallback: (action) {
           Navigator.push(
@@ -63,14 +63,14 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
         }),
     PlatformAwarePopupMenuAction(
         text: appLocalizations
-            .tr("settings.network_dropdown_menu.list_all_channels"),
+            .tr("chat.network.action.list_all_channels"),
         iconData: Icons.list,
         actionCallback: (action) {
           networkBloc.printNetworkAvailableChannels();
         }),
     PlatformAwarePopupMenuAction(
         text: appLocalizations
-            .tr("settings.network_dropdown_menu.list_ignored_users"),
+            .tr("chat.network.action.list_ignored_users"),
         iconData: Icons.list,
         actionCallback: (action) {
           networkBloc.printNetworkIgnoredUsers();
@@ -79,21 +79,21 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
 
   if (connected) {
     items.add(PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("settings.network_dropdown_menu.disconnect"),
+        text: appLocalizations.tr("chat.network.action.disconnect"),
         iconData: Icons.cloud_off,
         actionCallback: (action) {
           networkBloc.disableNetwork();
         }));
   } else {
     items.add(PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("settings.network_dropdown_menu.connect"),
+        text: appLocalizations.tr("chat.network.action.connect"),
         iconData: Icons.cloud,
         actionCallback: (action) {
           networkBloc.enableNetwork();
         }));
   }
   items.add(PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("settings.network_dropdown_menu.exit"),
+      text: appLocalizations.tr("chat.network.action.exit"),
       iconData: Icons.clear,
       actionCallback: (action) {
         networkBloc.leaveNetwork();

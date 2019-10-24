@@ -21,7 +21,7 @@ class NewChatNetworkPage extends ChatNetworkPage {
       bool serverPreferencesEnabled,
       bool serverPreferencesVisible,
       this.successCallback)
-      : super(AppLocalizations.of(context).tr('irc_connection.title'),
+      : super(AppLocalizations.of(context).tr('irc.connection.new.title'),
             startValues, (context, preferences) async {
           final ChatNetworksListBloc chatBloc =
               Provider.of<ChatNetworksListBloc>(context);
@@ -39,13 +39,14 @@ class NewChatNetworkPage extends ChatNetworkPage {
             successCallback();
           }
         }, true, false, serverPreferencesEnabled, serverPreferencesVisible,
-            AppLocalizations.of(context).tr('irc_connection.connect'));
+            AppLocalizations.of(context).tr('irc.connection.new.action'
+                '.connect'));
 }
 
 class EditChatNetworkPage extends ChatNetworkPage {
   EditChatNetworkPage(BuildContext context, ChatNetworkPreferences startValues,
       bool serverPreferencesEnabled, bool serverPreferencesVisible)
-      : super(AppLocalizations.of(context).tr('irc_connection.title_edit'),
+      : super(AppLocalizations.of(context).tr('irc.connection.edit.title'),
             startValues, (context, preferences) async {
           final NetworkBloc networkBloc = NetworkBloc.of(context);
 
@@ -60,7 +61,7 @@ class EditChatNetworkPage extends ChatNetworkPage {
 
           return result;
         }, false, true, serverPreferencesEnabled, serverPreferencesVisible,
-            AppLocalizations.of(context).tr('irc_connection.save'));
+            AppLocalizations.of(context).tr('irc.connection.edit.action.save'));
 }
 
 class ChatNetworkPage extends StatefulWidget {

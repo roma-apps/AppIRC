@@ -1,215 +1,342 @@
 {
   "app_name": "AppIRC",
   "form": {
-    "empty_field_not_valid": "Field should be not empty",
-    "no_whitespace": "Field should not have whitespaces",
-    "not_unique": "Should be unique"
+    "field": {
+      "text": {
+        "error": {
+          "empty_field": "Field should be not empty",
+          "no_whitespace": "Field should not have whitespaces",
+          "not_unique": "Should be unique"
+        }
+      }
+    }
   },
   "async_dialog": {
-    "title": "Operation in progress"
-  },
-  "button": {
-    "ok": "OK",
-    "cancel": "Cancel"
-  },
-  "splash": {
-    "loading": "Loading"
-  },
-  "settings": {
-    "title": "Settings",
-    "channel_dropdown_menu": {
-      "leave": "Leave",
-      "users": "Users",
-      "list_banned": "List banned users",
-      "topic": "Topic",
-      "user_information": "User information"
-    },
-    "network_dropdown_menu": {
-      "join_channel": "Join channel",
-      "edit": "Edit",
-      "list_all_channels": "List all channels",
-      "list_ignored_users": "List ignored users",
-      "disconnect": "Disconnect",
-      "connect": "Connect",
-      "exit": "Exit"
+    "title": "Operation in progress",
+    "action": {
+      "cancel": "Cancel"
     }
   },
   "lounge": {
     "preferences": {
       "title": "Lounge preferences",
-      "connect": "Connect",
       "connection": {
         "title": "Connection",
-        "host": {
-          "label": "Host",
-          "hint": "https://demo.thelounge.chat"
+        "field": {
+          "host": {
+            "label": "Host",
+            "hint": "https://demo.thelounge.chat"
+          }
         },
         "dialog": {
           "connection_error": {
             "title": "Connection error",
-            "content": "Can't connect to host",
-            "content_with_error": "Can't connect to host. Error {}"
+            "content": {
+              "no_exception": "Can't connect to host",
+              "with_exception": "Can't connect to host. Error: {}"
+            }
           },
           "invalid_response_error": {
             "title": "Invalid server response",
             "content": "Connected to host but correct response not received. Maybe remote server have unsupported Lounge version."
           },
           "auth_fail": {
-            "title": "Auth fail",
+            "title": "Auth failed",
             "content": "Invalid username or password"
           },
           "timeout": {
             "title": "Response timeout",
             "content": "Check your network connection"
+          },
+          "action": {
+            "ok": "OK"
           }
         }
       },
       "auth": {
         "title": "Authentication",
-        "username": {
-          "label": "Username",
-          "hint": "username"
-        },
-        "password": {
-          "label": "Password",
-          "hint": "(required)"
+        "field": {
+          "username": {
+            "label": "Username",
+            "hint": "username"
+          },
+          "password": {
+            "label": "Password",
+            "hint": "(required)"
+          }
         }
       },
       "new": {
-        "title": "New lounge connection"
+        "title": "New Lounge connection",
+        "action": {
+          "connect": "Connect"
+        }
       },
       "edit": {
-        "title": "Change lounge connection",
-        "change": "Change",
+        "title": "Edit lounge connection",
+        "action": {
+          "change": "Save"
+        },
         "dialog": {
           "confirm": {
             "title": "Are you sure?",
             "content": "You will be disconnected from current Lounge server and all local history will be cleared",
-            "save_reload": "Save & Reload",
-            "cancel": "Cancel"
+            "action": {
+              "save_reload": "Save & Reload",
+              "cancel": "Cancel"
+            }
           }
         }
       }
     }
   },
-  "irc_connection": {
-    "title": "New Server connection",
-    "title_edit": "Edit Server connection",
-    "no_networks": "No networks",
-    "network_prefs": {
-      "title": "Network preferences",
-      "name_label": "Name",
-      "name_hint": "Freenode",
-      "server_host_label": "Host",
-      "server_host_hint": "chat.freenode.net",
-      "server_port_label": "Port",
-      "server_port_hint": "6697",
-      "use_tls": "Use TLS",
-      "trusted_only": "Only allow trusted certificates"
-    },
-    "user_prefs": {
-      "title": "User preferences",
-      "nick_label": "Nickname",
-      "nick_hint": "Superhero",
-      "password_label": "Password",
-      "password_hint": "(optional)",
-      "real_name_label": "Real name",
-      "real_name_hint": "https://demo.thelounge.chat/",
-      "user_name_hint": "User name",
-      "user_name_label": "User name",
-      "commands_hint": "One raw command per line, each command will be executed on new connection",
-      "commands_label": "Commands"
-    },
-    "not_unique_name_dialog": {
-      "title": "Name already in use",
-      "content": "Please choose different name"
-    },
-    "channels_title": "Channels",
-    "channels_hint": "#thelounge, #thelounge-spam",
-    "connect": "Connect",
-    "save": "Save"
-  },
-  "join_channel": {
-    "title": "Join channel",
-    "channel_label": "Channel",
-    "channel_hint": "#thelounge",
-    "password_label": "Password",
-    "password_hint": "(optional)",
-    "join": "Join"
-  },
-  "chat": {
-    "title": "Chat",
-    "no_active_channel": "Active channel not selected",
-    "empty_channel": "This channel doesn't have any messages yet",
-    "not_connected_channel": "Loading messages...",
-    "enter_message": {
-      "hint": "Enter message..."
-    },
-    "users_list": {
-      "filter": {
-        "name": "Search",
-        "hint": "Nickname"
-      }
-    },
-    "messages": {
-      "search": {
-        "label_empty": "Nothing found",
-        "label_not_empty": "Found {}/{}",
-        "hint": "Text, nickname, or status..."
-      },
-      "load_more": "Load more..."
-    },
+  "irc": {
     "connection": {
-      "connected": "Connected to server",
-      "connecting": "Connecting to server",
-      "disconnected": "Not connected to server",
-      "reconnect": "Reconnect"
-    },
-    "who_is": {
-      "hostmask": "Hostmask:",
-      "actual_hostname": "Actual hostname:",
-      "real_name": "Real Name:",
-      "channels": "Channels:",
-      "secure_connection": "Secure connection:",
-      "account": "Account:",
-      "connected_at": "Connected at:",
-      "connected_to": "Connected to:",
-      "idle_since": "Idle since:"
-    },
-    "sub_message": {
-      "mode_short": "mode {}",
-      "mode_long": "mode",
-      "notice": "notice",
-      "join": "joined",
-      "motd": "motd: {}",
-      "who_is": "(who is)",
-      "away": "away",
-      "back": "back",
-      "error": "error",
-      "topic_set_by": "set topic",
-      "topic": "Topic",
-      "unknown": "unknown",
-      "quit": "quit",
-      "part": "part",
-      "nick": "change nick to {}",
-      "channel_mode": "Channel mode: {}",
-      "ctcp_request": "CTCP request"
-    },
-    "users": {
-      "title": "Channel users",
-      "loading": "Loading",
-      "not_found": "Users not found"
-    },
-    "channel": {
-      "topic": {
-        "title": "{}:",
-        "label": "Topic",
-        "hint": "Lorem ipsum...",
-        "change": "Change"
+      "new": {
+        "title": "New IRC network connection",
+        "action": {
+          "connect": "Connect"
+        }
+      },
+      "edit": {
+        "title": "Edit IRC network connection",
+        "action": {
+          "save": "Save"
+        }
+      },
+      "preferences": {
+        "server": {
+          "title": "Network preferences",
+          "field": {
+            "name": {
+              "label": "Name",
+              "hint": "Freenode",
+              "error": {
+                "not_unique_name": "Name already in use"
+              }
+            },
+            "host": {
+              "label": "Host",
+              "hint": "chat.freenode.net"
+            },
+            "port": {
+              "label": "Port",
+              "hint": "6697"
+            },
+            "use_tls": {
+              "label": "Use TLS"
+            },
+            "trusted_only": {
+              "label": "Only allow trusted certificates"
+            }
+          }
+        },
+        "user": {
+          "title": "User preferences",
+          "field": {
+            "nick": {
+              "label": "Nickname",
+              "hint": "AwesomeNick"
+            },
+            "password": {
+              "label": "Password",
+              "hint": "(optional)"
+            },
+            "real_name": {
+              "label": "Real name",
+              "hint": "https://irc.pleroma.social/"
+            },
+            "user_name": {
+              "label": "User name",
+              "hint": "John Smith"
+            },
+            "commands": {
+              "label": "Commands",
+              "hint": "One raw command per line, each command will be executed on new login"
+            }
+          }
+        },
+        "field": {
+          "channels": {
+            "label": "Channels",
+            "hint": "#pleroma, #thelounge"
+          }
+        }
       }
     }
   },
-  "channels_list": {
-    "users": "{} users"
+  "chat": {
+    "title": "Chat",
+    "state": {
+      "connection": {
+        "status": {
+          "connected": "Connected to server",
+          "connecting": "Connecting to server",
+          "disconnected": "Not connected to server"
+        },
+        "action": {
+          "reconnect": "Reconnect"
+        }
+      },
+      "active_channel_not_selected": "Active channel not selected"
+    },
+    "network": {
+      "join_channel": {
+        "title": "Join channel",
+        "field": {
+          "channel": {
+            "label": "Channel",
+            "hint": "#pleroma"
+          },
+          "password": {
+            "label": "Password",
+            "hint": "(optional)"
+          }
+        },
+        "action": {
+          "join": "Join"
+        }
+      },
+      "action": {
+        "join_channel": "Join channel",
+        "edit": "Edit",
+        "list_all_channels": "List all channels",
+        "list_ignored_users": "List ignored users",
+        "disconnect": "Disconnect",
+        "connect": "Connect",
+        "exit": "Exit"
+      }
+    },
+    "networks_list": {
+      "empty": "No networks found"
+    },
+    "settings": {
+      "title": "Settings"
+    },
+    "channel": {
+      "topic": {
+        "dialog": {
+          "title": "{}:",
+          "field": {
+            "edit": {
+              "label": "Topic",
+              "hint": "Hey there!"
+            }
+          }
+        },
+        "action": {
+          "change": "Change",
+          "cancel": "Cancel"
+        }
+      },
+      "action": {
+        "leave": "Leave",
+        "users": "Users",
+        "list_banned": "List banned users",
+        "topic": "Topic",
+        "user_information": "User information"
+      }
+    },
+    "messages_list": {
+      "search": {
+        "field": {
+          "filter": {
+            "label": {
+              "nothing_found": "Nothing found",
+              "found": "Found {}/{}"
+            },
+            "hint": "Text, nickname, or status..."
+          }
+        }
+      },
+      "action": {
+        "load_more": "Load more..."
+      },
+      "empty": {
+        "connected": "This channel doesn't have any messages yet",
+        "not_connected": "Not connected to the server"
+      },
+      "loading": "Loading messages..."
+    },
+    "message": {
+      "special": {
+        "channels_list": {
+          "users": "{} users"
+        },
+        "who_is": {
+          "hostmask": "Hostmask:",
+          "actual_hostname": "Actual hostname:",
+          "real_name": "Real Name:",
+          "channels": "Channels:",
+          "secure_connection": "Secure connection:",
+          "account": "Account:",
+          "connected_at": "Connected at:",
+          "connected_to": "Connected to:",
+          "idle_since": "Idle since:"
+        }
+      },
+      "regular": {
+        "sub_message": {
+          "mode_short": "mode {}",
+          "mode_long": "mode",
+          "notice": "notice",
+          "join": "joined",
+          "motd": "motd: {}",
+          "who_is": "(who is)",
+          "away": "away",
+          "back": "back",
+          "error": "error",
+          "topic_set_by": "set topic",
+          "topic": "Topic",
+          "unknown": "unknown",
+          "quit": "quit",
+          "part": "part",
+          "nick": "change nick to {}",
+          "channel_mode": "Channel mode: {}",
+          "ctcp_request": "CTCP request"
+        }
+      }
+    },
+    "new_message": {
+      "field": {
+        "enter_message": {
+          "hint": "Enter message..."
+        }
+      },
+      "attach": {
+        "action": {
+          "file": "File",
+          "audio": "Audio",
+          "video": "Video",
+          "image": "Image",
+          "photo": "Photo"
+        },
+        "error": {
+          "cant_access_file": "Can't access file",
+          "server_auth": "Server don't accept new files",
+          "file_size": "File exceeds maximum size",
+          "transport_error": "Error during uploading"
+        }
+      }
+    },
+    "users_list": {
+      "title": "Users",
+      "loading": "Loading...",
+      "search": {
+        "field": {
+          "filter": {
+            "label": "Search",
+            "hint": "Nickname"
+          }
+        },
+        "users_not_found": "Users not found"
+      }
+    },
+    "user": {
+      "action": {
+        "information": "User information",
+        "direct_messages": "Direct Messages"
+      }
+    }
   }
 }

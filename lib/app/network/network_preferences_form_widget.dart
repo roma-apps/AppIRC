@@ -73,8 +73,11 @@ class ChatNetworkPreferencesFormWidgetState
                   formBloc.channelsFieldBloc,
                   _channelsController,
                   Icons.list,
-                  appLocalizations.tr('irc_connection.channels_title'),
-                  appLocalizations.tr('irc_connection.channels_hint'),
+                  appLocalizations.tr('irc.connection.preferences.field'
+                      '.channels'
+                      '.label'),
+                  appLocalizations.tr('irc.connection.preferences.field'
+                      '.channels.hint'),
                   textInputAction: TextInputAction.done,
                 )
               ],

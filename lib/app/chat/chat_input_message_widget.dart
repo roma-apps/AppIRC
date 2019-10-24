@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' show Icons;
@@ -20,8 +21,6 @@ import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 
-
-
 class NetworkChannelNewMessageWidget extends StatefulWidget {
   NetworkChannelNewMessageWidget();
 
@@ -33,7 +32,9 @@ class NetworkChannelNewMessageState
     extends State<NetworkChannelNewMessageWidget> {
   @override
   Widget build(BuildContext context) {
-    var hintStr = AppLocalizations.of(context).tr("chat.enter_message.hint");
+    var hintStr = AppLocalizations.of(context).tr("chat.new_message.field"
+        ".enter_message"
+        ".hint");
 
     var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
 
@@ -152,9 +153,10 @@ class NetworkChannelNewMessageState
 
   _buildAttachMenuItems(BuildContext context, ChatUploadBloc chatUploadBloc,
       ChatInputMessageBloc inputMessageBloc) {
+    var appLocalizations = AppLocalizations.of(context);
     return <PlatformAwarePopupMenuAction>[
       PlatformAwarePopupMenuAction(
-        text: "File",
+        text: appLocalizations.tr("chat.new_message.attach.action.file"),
         iconData: Icons.insert_drive_file,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
@@ -162,7 +164,7 @@ class NetworkChannelNewMessageState
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: "Audio",
+        text: appLocalizations.tr("chat.new_message.attach.action.audio"),
         iconData: Icons.audiotrack,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
@@ -170,7 +172,7 @@ class NetworkChannelNewMessageState
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: "Image from library",
+        text: appLocalizations.tr("chat.new_message.attach.action.image"),
         iconData: Icons.image,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
@@ -178,18 +180,18 @@ class NetworkChannelNewMessageState
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: "Photo from camera",
+        text: appLocalizations.tr("chat.new_message.attach.action.camera"),
         iconData: Icons.camera_alt,
         actionCallback: (PlatformAwarePopupMenuAction action) async {
-          var pickedPhoto = await ImagePicker.pickImage(source: ImageSource
-              .camera);
-          if(pickedPhoto != null) {
+          var pickedPhoto =
+              await ImagePicker.pickImage(source: ImageSource.camera);
+          if (pickedPhoto != null) {
             _uploadFile(context, chatUploadBloc, pickedPhoto, inputMessageBloc);
           }
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: "Video",
+        text: appLocalizations.tr("chat.new_message.attach.action.video"),
         iconData: Icons.video_library,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
@@ -211,24 +213,24 @@ class NetworkChannelNewMessageState
         showPlatformDialog(
             context: context,
             builder: (_) => PlatformAlertDialog(
-                title: Text("Can't access "
-                    "file")));
+                title: Text(
+                    AppLocalizations.of(context).tr("chat.new_message.attach"
+                        ".error.cant_access_file"))));
       }
     });
   }
 
-  Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc, File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
+  Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc,
+      File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
     try {
-      var asyncDialogResult = await doAsyncOperationWithDialog(context,
-          asyncCode: ()
-      async {
-        var uploadRequestResult =
-            await chatUploadBloc.uploadFile(pickedFile);
-       
+      var asyncDialogResult =
+          await doAsyncOperationWithDialog(context, asyncCode: () async {
+        var uploadRequestResult = await chatUploadBloc.uploadFile(pickedFile);
+
         return uploadRequestResult;
       }, cancellationValue: null, isDismissible: true);
-      
-      if(asyncDialogResult.isNotCanceled) {
+
+      if (asyncDialogResult.isNotCanceled) {
         var uploadRequestResult = asyncDialogResult.result;
         var remoteURL = uploadRequestResult.result;
 
@@ -239,17 +241,20 @@ class NetworkChannelNewMessageState
     } on ServerAuthUploadException {
       showPlatformDialog(
           context: context,
-          builder: (_) =>
-              PlatformAlertDialog(title: Text("Server auth error")));
+          builder: (_) => PlatformAlertDialog(
+              title:
+                  Text(AppLocalizations.of(context)
+                      .tr("chat.new_message.attach.error.server_auth"))));
     } on FileSizeUploadException {
       showPlatformDialog(
           context: context,
-          builder: (_) =>
-              PlatformAlertDialog(title: Text("File size error")));
+          builder: (_) => PlatformAlertDialog(title: Text(AppLocalizations.of(context)
+              .tr("chat.new_message.attach.error.file_size"))));
     } on HttpUploadException {
       showPlatformDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(title: Text("Http error")));
+          builder: (_) => PlatformAlertDialog(title: Text(AppLocalizations.of(context)
+              .tr("chat.new_message.attach.error.transport_error"))));
     }
   }
 }

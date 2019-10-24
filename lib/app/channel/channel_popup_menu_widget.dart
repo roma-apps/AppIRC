@@ -86,7 +86,7 @@ PlatformAwarePopupMenuAction _buildCloseMenuItem(
     BuildContext context, NetworkChannelBloc channelBloc) {
   var appLocalizations = AppLocalizations.of(context);
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("settings.channel_dropdown_menu.leave"),
+      text: appLocalizations.tr("chat.channel.action.leave"),
       iconData: Icons.clear,
       actionCallback: (action) {
         channelBloc.leaveNetworkChannel();
@@ -97,7 +97,7 @@ PlatformAwarePopupMenuAction _buildMembersMenuItem(
     BuildContext context, NetworkChannelBloc channelBloc) {
   var appLocalizations = AppLocalizations.of(context);
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("settings.channel_dropdown_menu.users"),
+      text: appLocalizations.tr("chat.channel.action.users"),
       iconData: Icons.group,
       actionCallback: (action) {
         Navigator.push(
@@ -113,7 +113,7 @@ PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
   var appLocalizations = AppLocalizations.of(context);
   return PlatformAwarePopupMenuAction(
       text: appLocalizations
-          .tr("settings.channel_dropdown_menu.user_information"),
+          .tr("chat.channel.action.user_information"),
       iconData: Icons.account_box,
       actionCallback: (action) {
         channelBloc.printUserInfo(channelBloc.channel.name);
@@ -124,7 +124,7 @@ PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
     BuildContext context, NetworkChannelBloc channelBloc) {
   var appLocalizations = AppLocalizations.of(context);
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("settings.channel_dropdown_menu.list_banned"),
+      text: appLocalizations.tr("chat.channel.action.list_banned"),
       iconData: Icons.list,
       actionCallback: (action) {
         channelBloc.printNetworkChannelBannedUsers();
@@ -135,7 +135,7 @@ PlatformAwarePopupMenuAction _buildEditTopicMenuItem(
     BuildContext context, NetworkChannelBloc channelBloc) {
   var appLocalizations = AppLocalizations.of(context);
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("settings.channel_dropdown_menu.topic"),
+      text: appLocalizations.tr("chat.channel.action.topic"),
       iconData: Icons.edit,
       actionCallback: (action) {
         showTopicDialog(context, channelBloc);

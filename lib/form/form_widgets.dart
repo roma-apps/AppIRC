@@ -60,6 +60,7 @@ buildFormTextRow(
     };
   }
 
+  // TODO: don't move cursor to the start on keyboard shown
   if (bloc.visible) {
     PlatformTextField platformTextField = buildPlatformTextField(
         context, bloc, controller, labelText, hint,

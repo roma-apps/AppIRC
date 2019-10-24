@@ -38,10 +38,12 @@ class NetworkChannelTopicWidgetState extends State<NetworkChannelTopicWidget> {
         context,
         formBloc.topicFieldBloc,
         _topicController,
-        AppLocalizations.of(context).tr("chat.channel.topic.label"),
-        AppLocalizations.of(context).tr("chat.channel.topic.hint"),
-        minLines: 1, textInputAction: TextInputAction.done);
-
+        AppLocalizations.of(context)
+            .tr("chat.channel.topic.dialog.field.edit.label"),
+        AppLocalizations.of(context)
+            .tr("chat.channel.topic.dialog.field.edit.hint"),
+        minLines: 1,
+        textInputAction: TextInputAction.done);
   }
 
   @override
@@ -60,12 +62,11 @@ void showTopicDialog(BuildContext context, NetworkChannelBloc channelBloc) {
 
         return PlatformAlertDialog(
           title: Text(AppLocalizations.of(context).tr(
-              "chat.channel.topic.title",
+              "chat.channel.topic.dialog.title",
               args: [channelBloc.channel.name])),
           content: Provider(
             providable: topicFormBloc,
-            child: NetworkChannelTopicWidget(
-                topicString),
+            child: NetworkChannelTopicWidget(topicString),
           ),
           actions: <Widget>[
             StreamBuilder<bool>(
@@ -83,14 +84,16 @@ void showTopicDialog(BuildContext context, NetworkChannelBloc channelBloc) {
                     };
                   }
                   return PlatformDialogAction(
-                    child: Text(AppLocalizations.of(context).tr("chat.channel"
-                        ".topic.change")),
+                    child: Text(AppLocalizations.of(context)
+                        .tr("chat.channel.topic.dialog.action.change")),
                     onPressed: onPressed,
                   );
                 }),
             PlatformDialogAction(
-              child: Text(AppLocalizations.of(context).tr("button.cancel")),
+              child: Text(AppLocalizations.of(context)
+                  .tr("chat.channel.topic.dialog.action.cancel")),
               onPressed: () {
+                // TODO: check
                 topicFormBloc.dispose();
                 Navigator.pop(context);
               },

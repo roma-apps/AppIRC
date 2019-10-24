@@ -79,11 +79,14 @@ class _NetworkChannelWidgetState extends State<NetworkChannelWidget> {
                             if (searchState.searchTerm?.isNotEmpty == true) {
                               if (searchState.foundMessages.isEmpty) {
                                 labelText = AppLocalizations.of(context)
-                                    .tr("chat.messages.search.label_empty");
+                                    .tr("chat.messages_list.search.field.filter"
+                                    ".label.nothing_found");
                               } else {
 
-                                labelText = AppLocalizations.of(context).tr(
-                                    "chat.messages.search.label_not_empty",
+                                labelText = AppLocalizations.of(context)
+                                    .tr("chat.messages_list.search.field.filter"
+                                    ".label"
+                                    ".found",
                                     args: [
                                       searchState
                                           .selectedFoundMessagePosition.toString(),
@@ -103,7 +106,9 @@ class _NetworkChannelWidgetState extends State<NetworkChannelWidget> {
                                   searchController,
                                   labelText,
                                   AppLocalizations.of(context)
-                                      .tr("chat.messages.search.hint")),
+                                      .tr("chat.messages_list.search.field"
+                                      ".filter"
+                                      ".hint")),
                             );
                           }),
                       StreamBuilder<bool>(

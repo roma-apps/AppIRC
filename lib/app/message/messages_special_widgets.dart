@@ -72,23 +72,23 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
 
   var body = Column(
     children: <Widget>[
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.hostmask"),
+      _buildWhoIsRow(appLocalizations.tr("chat.message.special.who_is.hostmask"),
           "${whoIsBody.ident}@${whoIsBody.hostname}"),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.actual_hostname"),
+      _buildWhoIsRow(appLocalizations.tr("chat.message.special.who_is.actual_hostname"),
           actualHostNameValue),
       _buildWhoIsRow(
-          appLocalizations.tr("chat.who_is.real_name"), whoIsBody.realName),
+          appLocalizations.tr("chat.message.special.who_is.real_name"), whoIsBody.realName),
       _buildWhoIsRow(
-          appLocalizations.tr("chat.who_is.channels"), whoIsBody.channels),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.secure_connection"),
+          appLocalizations.tr("chat.message.special.who_is.channels"), whoIsBody.channels),
+      _buildWhoIsRow(appLocalizations.tr("chat.message.special.who_is.secure_connection"),
           whoIsBody.secure.toString()),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.connected_to"),
+      _buildWhoIsRow(appLocalizations.tr("chat.message.special.who_is.connected_to"),
           "${whoIsBody.server} (${whoIsBody.serverInfo})"),
       _buildWhoIsRow(
-          appLocalizations.tr("chat.who_is.account"), whoIsBody.account),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.connected_at"),
+          appLocalizations.tr("chat.message.special.who_is.account"), whoIsBody.account),
+      _buildWhoIsRow(appLocalizations.tr("chat.message.special.who_is.connected_at"),
           regularDateFormatter.format(whoIsBody.logonTime)),
-      _buildWhoIsRow(appLocalizations.tr("chat.who_is.idle_since"),
+      _buildWhoIsRow(appLocalizations.tr("chat.message.special.who_is.idle_since"),
           regularDateFormatter.format(whoIsBody.idleTime)),
 //      _buildWhoIsRow("Logon", whoIsBody.logon),
     ],
@@ -137,7 +137,8 @@ Widget _buildWhoIsRow(String label, String value) {
 
 Widget _buildUsersCount(BuildContext context,
     NetworkChannelInfoSpecialMessageBody channelInfoItem) {
-  return Text(AppLocalizations.of(context).tr("channels_list.users",
+  return Text(AppLocalizations.of(context).tr("chat"
+      ".message_special.channels_list.users",
       args: [channelInfoItem.usersCount.toString()]));
 }
 

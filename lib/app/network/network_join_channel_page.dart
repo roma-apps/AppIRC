@@ -12,8 +12,6 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-
-
 var _logger = MyLogger(logTag: "NetworkChannelJoinPage", enabled: true);
 
 class NetworkChannelJoinPage extends StatefulWidget {
@@ -39,7 +37,7 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
     var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        title: Text(appLocalizations.tr('join_channel.title')),
+        title: Text(appLocalizations.tr('chat.network.join_channel.title')),
       ),
       body: SafeArea(
           child: Provider(
@@ -55,32 +53,35 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
 
                   var pressed = dataValid
                       ? () async {
-                          var dialogResult = await doAsyncOperationWithDialog
-                            (context, asyncCode:()
-                          async {
-                            var chatNetworkChannelPreferences = ChatNetworkChannelPreferences.name(
+                          var dialogResult = await doAsyncOperationWithDialog(
+                              context, asyncCode: () async {
+                            var chatNetworkChannelPreferences =
+                                ChatNetworkChannelPreferences.name(
                                     name: networkChannelJoinFormBloc
                                         .extractChannel(),
                                     password: networkChannelJoinFormBloc
                                         .extractPassword());
-                            _logger.d(() => "startJoinChannel $chatNetworkChannelPreferences");
-                            var joinResult = await networkBloc.joinNetworkChannel(
-                                chatNetworkChannelPreferences, waitForResult: true);
-                            _logger.d(() => "startJoinChannel result $joinResult");
+                            _logger.d(() =>
+                                "startJoinChannel $chatNetworkChannelPreferences");
+                            var joinResult =
+                                await networkBloc.joinNetworkChannel(
+                                    chatNetworkChannelPreferences,
+                                    waitForResult: true);
+                            _logger
+                                .d(() => "startJoinChannel result $joinResult");
                           }, cancellationValue: null, isDismissible: true);
 
-                          if(dialogResult.isNotCanceled){
+                          if (dialogResult.isNotCanceled) {
                             Navigator.pop(context);
                             Navigator.pop(context);
                           }
-
-
                         }
                       : null;
                   return createSkinnedPlatformButton(
                     context,
                     child: Text(
-                      appLocalizations.tr('join_channel.join'),
+                      appLocalizations.tr('chat.network.join_channel.action.'
+                          '.join'),
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: pressed,

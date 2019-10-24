@@ -43,7 +43,8 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
               actions: <Widget>[
                 PlatformDialogAction(
                   child: Text(appLocalizations.tr(
-                      "lounge.preferences.edit.dialog.confirm.save_reload")),
+                      "lounge.preferences.edit.dialog.confirm.action"
+                          ".save_reload")),
                   onPressed: () async {
                     // exit dialog
                     Navigator.pop(context);
@@ -54,7 +55,7 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
                 ),
                 PlatformDialogAction(
                   child: Text(appLocalizations
-                      .tr("lounge.preferences.edit.dialog.confirm.cancel")),
+                      .tr("lounge.preferences.edit.dialog.confirm.action.cancel")),
                   onPressed: () async {
                     Navigator.pop(context);
                   },
@@ -115,7 +116,8 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
                       startPreferencesValues,
                       actionCallback,
                       AppLocalizations.of(context)
-                          .tr('lounge.preferences.connect')),
+                          .tr('lounge.preferences.new.action'
+                          '.connect')),
                 ),
                 _buildTestButtons(context)
               ],

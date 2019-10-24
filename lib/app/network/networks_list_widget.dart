@@ -53,7 +53,7 @@ class NetworksListWidget extends StatelessWidget {
           } else {
             return Center(
               child: Text(
-                  AppLocalizations.of(context).tr("irc_connection.no_networks"),
+                  AppLocalizations.of(context).tr("chat.networks_list.empty"),
                   style: TextStyle(
                       color: AppSkinBloc.of(context).appSkinTheme.textColor)),
             );

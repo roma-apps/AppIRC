@@ -45,27 +45,31 @@ class ChatNetworkServerPreferencesFormWidgetState
 
     return Column(
       children: <Widget>[
-        buildFormTitle(
-            context, appLocalizations.tr('irc_connection.network_prefs.title')),
+        buildFormTitle(context,
+            appLocalizations.tr('irc.connection.preferences.server.title')),
         buildFormTextRow(
           context,
           formBloc.nameFieldBloc,
           _nameController,
           Icons.account_circle,
-          appLocalizations.tr('irc_connection.network_prefs.name_label'),
-          appLocalizations.tr('irc_connection.network_prefs.name_hint'),
+          appLocalizations.tr('irc.connection.preferences.server'
+              '.field.name.label'),
+          appLocalizations
+              .tr('irc.connection.preferences.server.field.name.hint'),
           textInputAction: TextInputAction.next,
-          nextBloc:   formBloc.hostFieldBloc,
+          nextBloc: formBloc.hostFieldBloc,
         ),
         buildFormTextRow(
           context,
           formBloc.hostFieldBloc,
           _hostController,
           Icons.cloud,
-          appLocalizations.tr('irc_connection.network_prefs.server_host_label'),
-          appLocalizations.tr('irc_connection.network_prefs.server_host_hint'),
+          appLocalizations
+              .tr('irc.connection.preferences.server.field.host.label'),
+          appLocalizations
+              .tr('irc.connection.preferences.server.field.host.hint'),
           textInputAction: TextInputAction.next,
-          nextBloc:   formBloc.portFieldBloc,
+          nextBloc: formBloc.portFieldBloc,
         ),
         buildFormTextRow(
             context,
@@ -73,18 +77,20 @@ class ChatNetworkServerPreferencesFormWidgetState
             _portController,
             Icons.cloud,
             appLocalizations
-                .tr('irc_connection.network_prefs.server_port_label'),
+                .tr('irc.connection.preferences.server.field.port.label'),
             appLocalizations
-                .tr('irc_connection.network_prefs.server_port_hint'),
+                .tr('irc.connection.preferences.server.field.port.hint'),
             textInputAction: TextInputAction.done,
             keyboardType: TextInputType.number),
         buildFormBooleanRow(
             context,
-            appLocalizations.tr('irc_connection.network_prefs.use_tls'),
+            appLocalizations
+                .tr('irc.connection.preferences.server.field.use_tls.label'),
             formBloc.tlsFieldBloc),
         buildFormBooleanRow(
             context,
-            appLocalizations.tr('irc_connection.network_prefs.trusted_only'),
+            appLocalizations
+                .tr('irc.connection.preferences.server.field.trusted_only.label'),
             formBloc.trustedFieldBloc)
       ],
     );

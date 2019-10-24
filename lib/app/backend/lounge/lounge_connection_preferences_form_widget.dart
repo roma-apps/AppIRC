@@ -47,8 +47,8 @@ class LoungeConnectionPreferencesFormWidgetState
           loungePreferencesFormBloc.hostFieldBloc,
           _hostController,
           Icons.cloud,
-          appLocalizations.tr('lounge.preferences.connection.host.label'),
-          appLocalizations.tr('lounge.preferences.connection.host.hint'),
+          appLocalizations.tr('lounge.preferences.connection.field.host.label'),
+          appLocalizations.tr('lounge.preferences.connection.field.host.hint'),
           textInputAction: TextInputAction.done,
         )
       ],
