@@ -195,8 +195,8 @@ class LoungeBackendService extends Providable
 
     // todo: open ticket for lounge
     // if you change nickname to registered nickname on Freenode
-    // then you should write additional query to identify
-
+    // then you should write additional query to identify user with passsword
+    // Lounge API should send this request once new settings arrived
     var userPreferences =
         networkPreferences.networkConnectionPreferences.userPreferences;
     var serverPreferences =
@@ -295,6 +295,10 @@ class LoungeBackendService extends Providable
           // it is bug in the lounge.
           // We should wait some time after join network to start send requests to network
           // Lounge don't respond with error, it is just don't execute requests
+          // It looks like bug exist only in public mode
+          // Lounge doesn't execute request if network not created/connected
+          // Lounge should send event when network is ready to receive commands
+          // Also lougne should return error if something wrong
           // todo: open request for lounge server to fix this issue
           await Future.delayed(Duration(seconds: 5));
 
@@ -650,7 +654,10 @@ class LoungeBackendService extends Providable
       _logger.d(() => "listenForNetworkJoin parsed = $parsed");
 
       for (var loungeNetwork in parsed.networks) {
-        // todo: check existed networks
+        // Why lounge sent array of networks?
+        // It is possible to join only one network Lounge API per request
+        // Lounge should send only one network in this response
+        // todo: open ticket for lounge
 
         JoinNetworkLoungeRequest request =
             _pendingRequests.firstWhere((request) {
@@ -888,6 +895,7 @@ class LoungeBackendService extends Providable
   _sendRequest(LoungeRequest request,
       {@required bool isNeedAddRequestToPending}) async {
     if (isNeedAddRequestToPending) {
+      // todo: rework
       _pendingRequests.add(request);
     }
 
@@ -1060,8 +1068,15 @@ class LoungeBackendService extends Providable
             body: MoreLoungeRequestBody(channel.remoteId, lastMessageId)),
         isNeedAddRequestToPending: false);
 
-    // todo: rework to timeout
-    await Future.delayed(Duration(seconds: 1));
+    var isTimeout = false;
+    Future.delayed(_timeoutForRequestsWithResponse, () {
+      if (chatLoadMore == null) {
+        isTimeout = true;
+      }
+    });
+    while (chatLoadMore == null && !isTimeout) {
+      Future.delayed(_timeBetweenCheckResultForRequestsWithResponse);
+    }
 
     disposable.dispose();
 
