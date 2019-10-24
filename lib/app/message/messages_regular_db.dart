@@ -84,10 +84,12 @@ class RegularMessageDB implements ChatMessageDB {
   static bool isSelf(RegularMessageDB message) =>
       message.self != null ? message.self != 0 : null;
 
+  // TODO: Replace with bool when SQFLite Floor ORM will support null for bool types
   final int highlight;
 
   static bool isHighlight(RegularMessageDB message) =>
       message.highlight != null ? message.highlight != 0 : null;
+
 
   final String previewsJsonEncoded;
   final String linksJsonEncoded;
