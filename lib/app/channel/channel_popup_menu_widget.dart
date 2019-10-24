@@ -13,7 +13,6 @@ import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-
 Widget buildChannelPopupMenuButton(BuildContext context,
     NetworkBloc networkBloc, NetworkChannelBloc channelBloc, Color iconColor) {
   var channel = channelBloc.channel;
@@ -28,13 +27,13 @@ Widget buildChannelPopupMenuButton(BuildContext context,
       actions: _buildMenuItems(context, network, channel));
 }
 
-List<PlatformAwarePopupMenuAction> _buildMenuItems(BuildContext context,
-    Network network, NetworkChannel channel) {
+List<PlatformAwarePopupMenuAction> _buildMenuItems(
+    BuildContext context, Network network, NetworkChannel channel) {
   List<PlatformAwarePopupMenuAction> menuItems;
 
   NetworkChannelBloc channelBloc =
-  Provider.of<ChatNetworkChannelsBlocsBloc>(context)
-      .getNetworkChannelBloc(channel);
+      Provider.of<ChatNetworkChannelsBlocsBloc>(context)
+          .getNetworkChannelBloc(channel);
 
   switch (channel.type) {
     case NetworkChannelType.LOBBY:
@@ -67,9 +66,10 @@ List<PlatformAwarePopupMenuAction> _buildChannelMenuItems(
 
   // TODO: report bug to lounge. Lounge have field "editTopic" in channel state
   //  but it is  false even if user can access to change topic for current channel
-//  if (channelBloc.networkChannelState.editTopicPossible == true) {
+  //  if (channelBloc.networkChannelState.editTopicPossible == true) {
+  //    items.insert(0, _buildEditTopicMenuItem(context, channelBloc));
+  //  }
   items.insert(0, _buildEditTopicMenuItem(context, channelBloc));
-//  }
 
   return items;
 }

@@ -512,7 +512,7 @@ async {
 
   // TODO: open ticket for lounge
   // Strange field, it should be inside networkStatus.
-  // Sometimes network status connected == false but actually connected
+  // Sometimes network status connected == false but network actually connected
   networkState.connected = !loungeNetwork.userDisconnected;
 
   var networkWithState =
