@@ -22,8 +22,6 @@ dependencies:
 
   # ios icons
   cupertino_icons: ^0.1.2
-  # additional material icons
-  mdi: ^0.2.1
 
   # socket io protocol implementation for lounge
   adhara_socket_io: ^0.3.5
@@ -49,7 +47,6 @@ dependencies:
   # non-official widgets from google
   # Use ScrollablePositionedList for message list page
   flutter_widgets: ^0.1.6
-  rect_getter: ^0.0.1
 
   # open links in messages
   url_launcher: ^5.1.2
@@ -81,6 +78,7 @@ dependencies:
   # video/audio player for preview render
   chewie: ^0.9.8+1
   chewie_audio: ^1.0.0+1
+  # requried by chewie
   video_player: ^0.10.2+3
 
 dev_dependencies:
