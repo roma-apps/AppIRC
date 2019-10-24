@@ -22,6 +22,8 @@ class NetworkChannelBlocProvider extends Providable {
   NetworkChannelBlocProvider(this.networkChannelBloc);
 }
 
+final Duration usersListOutDateDuration = Duration(seconds: 15);
+
 class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
   final ChatInputOutputBackendService backendService;
   final Network network;
@@ -70,9 +72,8 @@ class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
     } else {
       var now = DateTime.now();
 
-      var difference = now.difference(_lastUsersRefreshDate);
-      // todo: change constant
-      if (difference.inSeconds > 15) {
+      var differenceDuration = now.difference(_lastUsersRefreshDate);
+      if (differenceDuration > usersListOutDateDuration) {
         refreshUsers();
       }
     }
