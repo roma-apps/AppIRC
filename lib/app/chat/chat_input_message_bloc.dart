@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
@@ -101,6 +102,8 @@ class CommandsAutoCompleteProvider extends AutoCompleteProvider {
 }
 
 class NamesAutoCompleteProvider extends AutoCompleteProvider {
+  static final int minimumCharsCountForAutoComplete = 2;
+
   NetworkChannelBloc channelBloc;
 
   NamesAutoCompleteProvider(this.channelBloc);
@@ -109,19 +112,35 @@ class NamesAutoCompleteProvider extends AutoCompleteProvider {
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern) async {
     String lastWord = _findLastWord(pattern);
 
-    // TODO: rework filter
-    if (lastWord != null && lastWord.length > 2) {
+    if (lastWord != null &&
+        lastWord.length > minimumCharsCountForAutoComplete) {
       var users = await channelBloc.getUsers();
-      var lastWordLowerCase = lastWord.toLowerCase();
-      return users.map((user) => user.nick).where((nick) {
-        var nickLowerCase = nick.toLowerCase();
-        return nickLowerCase.startsWith(lastWordLowerCase) &&
-            lastWordLowerCase != nickLowerCase;
-      }).toList();
+      return compute(
+          _calculateSuggestions,
+          NamesAutoCompleteRequest(
+              lastWord, users.map((user) => user.nick).toList()));
     } else {
       return [];
     }
   }
+
+  Future<List<String>> _calculateSuggestions(
+      NamesAutoCompleteRequest request) async {
+    var lastWordLowerCase = request.word.toLowerCase();
+    return request.usersNames.where((nick) {
+      var nickLowerCase = nick.toLowerCase();
+      return nickLowerCase.startsWith(lastWordLowerCase) &&
+          lastWordLowerCase != nickLowerCase; // don't show autocomplete
+      // when nick fully entered
+    }).toList();
+  }
+}
+
+class NamesAutoCompleteRequest {
+  String word;
+  List<String> usersNames;
+
+  NamesAutoCompleteRequest(this.word, this.usersNames);
 }
 
 String _findLastWord(String pattern) {
