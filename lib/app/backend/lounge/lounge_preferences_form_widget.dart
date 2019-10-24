@@ -8,6 +8,7 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_connection_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
+import 'package:flutter_appirc/async/async_dialog_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_alert_dialog.dart';
@@ -37,20 +38,19 @@ class LoungePreferencesFormWidgetState
   final LoungePreferencesActionCallback successCallback;
   final String buttonText;
 
-
-  LoungePreferencesFormWidgetState(this.startValues, this.successCallback,
-      this.buttonText);
+  LoungePreferencesFormWidgetState(
+      this.startValues, this.successCallback, this.buttonText);
 
   @override
   Widget build(BuildContext context) {
     LoungePreferencesFormBloc formBloc =
-    Provider.of<LoungePreferencesFormBloc>(context);
+        Provider.of<LoungePreferencesFormBloc>(context);
 
     var connectionFormBloc = formBloc.connectionFormBloc;
 
     var authFormBloc = formBloc.authPreferencesFormBloc;
     var loungeAuthPreferencesFormWidget =
-    LoungeAuthPreferencesFormWidget(authFormBloc.authPreferences);
+        LoungeAuthPreferencesFormWidget(authFormBloc.authPreferences);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -94,39 +94,45 @@ class LoungePreferencesFormWidgetState
                     try {
                       var currentLoungePreferences = formBloc.extractData();
 
-                      ConnectResult connectResult =
-                      await doAsyncOperationWithDialog(
-                          context,
-                              () async =>
-                          await tryConnect(
-                              context, currentLoungePreferences));
+                      AsyncDialogResult<ConnectResult> dialogResult;
 
-                      if (connectResult.config != null) {
-                        successCallback(context, currentLoungePreferences);
-                      } else {
-                        if (connectResult.isPrivateModeResponseReceived &&
-                            !formBloc.isAuthFormEnabled) {
-                          formBloc.isAuthFormEnabled = true;
+                      dialogResult = await doAsyncOperationWithDialog(
+                          context,
+                          asyncCode: () async => await tryConnect(
+                              context, currentLoungePreferences),
+                          cancellationValue: null, isDismissible: true);
+
+                      if (dialogResult.isNotCanceled) {
+                        ConnectResult connectResult = dialogResult.result;
+
+                        if (connectResult.config != null) {
+                          successCallback(context, currentLoungePreferences);
                         } else {
-                          PlatformAlertDialog dialog;
-                          if (connectResult.isSocketConnected) {
-                            if (connectResult.isFailAuthResponseReceived) {
-                              dialog = buildLoungeAuthFailAlertDialog(context);
-                            } else if (connectResult.isTimeout) {
-                              dialog = buildLoungeTimeoutAlertDialog(context);
+                          if (connectResult.isPrivateModeResponseReceived &&
+                              !formBloc.isAuthFormEnabled) {
+                            formBloc.isAuthFormEnabled = true;
+                          } else {
+                            PlatformAlertDialog dialog;
+                            if (connectResult.isSocketConnected) {
+                              if (connectResult.isFailAuthResponseReceived) {
+                                dialog =
+                                    buildLoungeAuthFailAlertDialog(context);
+                              } else if (connectResult.isTimeout) {
+                                dialog = buildLoungeTimeoutAlertDialog(context);
+                              } else {
+                                dialog = buildLoungeConnectionErrorAlertDialog(
+                                    context, connectResult.error);
+                              }
                             } else {
                               dialog = buildLoungeConnectionErrorAlertDialog(
                                   context, connectResult.error);
                             }
-                          } else {
-                            dialog = buildLoungeConnectionErrorAlertDialog(
-                                context, connectResult.error);
-                          }
 
-                          showPlatformDialog(
-                              androidBarrierDismissible: true,
-                              context: context,
-                              builder: (_) => dialog);
+                            showPlatformDialog(
+                                androidBarrierDismissible: true,
+                                context: context,
+                                builder: (_) => dialog);
+                          }
                         }
                       }
                     } on InvalidConnectionResponseException catch (e) {
@@ -153,16 +159,16 @@ class LoungePreferencesFormWidgetState
     );
   }
 
-  Future<ConnectResult> tryConnect(BuildContext context,
-      LoungePreferences preferences) async {
+  Future<ConnectResult> tryConnect(
+      BuildContext context, LoungePreferences preferences) async {
     var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
     var lounge =
-    LoungeBackendService(socketManagerProvider.manager, preferences);
+        LoungeBackendService(socketManagerProvider.manager, preferences);
 
     ConnectResult connectResult;
 
     var requestResult =
-    await lounge.tryConnectWithDifferentPreferences(preferences);
+        await lounge.tryConnectWithDifferentPreferences(preferences);
     connectResult = requestResult.result;
 
     _logger.e(() => "tryConnect = $connectResult preferences = $preferences");
@@ -181,7 +187,7 @@ class LoungePreferencesFormWidgetState
     if (error != null) {
       content = appLocalizations.tr(
           'lounge.preferences.connection.dialog.connection_error'
-              '.content_with_error',
+          '.content_with_error',
           args: [error]);
     } else {
       content = appLocalizations
@@ -239,5 +245,4 @@ class LoungePreferencesFormWidgetState
         content: Text(content),
         actions: <Widget>[createOkPlatformDialogAction(context)]);
   }
-
 }

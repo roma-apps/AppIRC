@@ -1,5 +1,5 @@
 import 'package:adhara_socket_io/adhara_socket_io.dart';
-import 'package:flutter_appirc/async/disposable.dart';
+import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';

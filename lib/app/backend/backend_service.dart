@@ -11,7 +11,7 @@ import 'package:flutter_appirc/app/message/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/async/disposable.dart';
+import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 typedef NetworkListener(NetworkWithState network);

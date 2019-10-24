@@ -20,6 +20,8 @@ import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
+
+
 var _logger = MyLogger(logTag: "NetworkChannelMessagesListWidget", enabled: true);
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
@@ -350,14 +352,14 @@ class _NetworkChannelMessagesListWidgetState
 
 Widget _buildLoadMoreButton(BuildContext context, List<ChatMessage> messages) =>
     createSkinnedPlatformButton(context, onPressed: () {
-      doAsyncOperationWithDialog(context, () async {
+      doAsyncOperationWithDialog(context, asyncCode:() async {
         var oldestRegularMessage = messages.firstWhere(
                 (message) => message.chatMessageType == ChatMessageType.REGULAR)
             as RegularMessage;
 
         var channelBloc = NetworkChannelBloc.of(context);
         return await channelBloc.loadMoreHistory(oldestRegularMessage);
-      });
+      }, cancellationValue: null, isDismissible: true);
     },
         child: Text(AppLocalizations.of(context).tr("chat.messages"
             ".load_more")));

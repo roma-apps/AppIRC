@@ -10,7 +10,8 @@ import 'package:flutter_appirc/app/message/messages_regular_db.dart';
 import 'package:flutter_appirc/app/message/messages_regular_model.dart';
 import 'package:flutter_appirc/app/message/messages_special_db.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/async/disposable.dart';
+import 'package:flutter_appirc/disposable/async_disposable.dart';
+import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 

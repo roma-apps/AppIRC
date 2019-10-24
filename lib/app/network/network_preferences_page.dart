@@ -11,6 +11,7 @@ import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+
 class NewChatNetworkPage extends ChatNetworkPage {
   final VoidCallback successCallback;
 
@@ -25,13 +26,18 @@ class NewChatNetworkPage extends ChatNetworkPage {
           final ChatNetworksListBloc chatBloc =
               Provider.of<ChatNetworksListBloc>(context);
 
-          await doAsyncOperationWithDialog(context, () async {
+          var dialogResult = await doAsyncOperationWithDialog(context,
+              asyncCode:() async {
             var result = await chatBloc.joinNetwork(preferences);
 
-            successCallback();
+
 
             return result;
-          });
+          }, cancellationValue: null, isDismissible: true);
+
+          if(dialogResult.isNotCanceled) {
+            successCallback();
+          }
         }, true, false, serverPreferencesEnabled, serverPreferencesVisible,
             AppLocalizations.of(context).tr('irc_connection.connect'));
 }
@@ -43,11 +49,14 @@ class EditChatNetworkPage extends ChatNetworkPage {
             startValues, (context, preferences) async {
           final NetworkBloc networkBloc = NetworkBloc.of(context);
 
-          var result = await doAsyncOperationWithDialog(context, () async {
+          var result = await doAsyncOperationWithDialog(context, asyncCode: ()
+          async {
             return await networkBloc.editNetworkSettings(preferences);
-          });
+          }, cancellationValue: null, isDismissible: true);
 
-          Navigator.pop(context);
+          if(result.isNotCanceled) {
+            Navigator.pop(context);
+          }
 
           return result;
         }, false, true, serverPreferencesEnabled, serverPreferencesVisible,

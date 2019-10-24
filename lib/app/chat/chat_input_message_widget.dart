@@ -20,6 +20,8 @@ import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 
+
+
 class NetworkChannelNewMessageWidget extends StatefulWidget {
   NetworkChannelNewMessageWidget();
 
@@ -217,15 +219,23 @@ class NetworkChannelNewMessageState
 
   Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc, File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
     try {
-      await doAsyncOperationWithDialog(context, () async {
+      var asyncDialogResult = await doAsyncOperationWithDialog(context,
+          asyncCode: ()
+      async {
         var uploadRequestResult =
             await chatUploadBloc.uploadFile(pickedFile);
+       
+        return uploadRequestResult;
+      }, cancellationValue: null, isDismissible: true);
+      
+      if(asyncDialogResult.isNotCanceled) {
+        var uploadRequestResult = asyncDialogResult.result;
         var remoteURL = uploadRequestResult.result;
 
         if (remoteURL != null) {
           inputMessageBloc.appendText(remoteURL);
         }
-      });
+      }
     } on ServerAuthUploadException {
       showPlatformDialog(
           context: context,

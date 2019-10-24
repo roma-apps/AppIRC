@@ -12,6 +12,8 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+
+
 var _logger = MyLogger(logTag: "NetworkChannelJoinPage", enabled: true);
 
 class NetworkChannelJoinPage extends StatefulWidget {
@@ -53,7 +55,9 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
 
                   var pressed = dataValid
                       ? () async {
-                          await doAsyncOperationWithDialog(context, () async {
+                          var dialogResult = await doAsyncOperationWithDialog
+                            (context, asyncCode:()
+                          async {
                             var chatNetworkChannelPreferences = ChatNetworkChannelPreferences.name(
                                     name: networkChannelJoinFormBloc
                                         .extractChannel(),
@@ -63,10 +67,13 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
                             var joinResult = await networkBloc.joinNetworkChannel(
                                 chatNetworkChannelPreferences, waitForResult: true);
                             _logger.d(() => "startJoinChannel result $joinResult");
-                          });
+                          }, cancellationValue: null, isDismissible: true);
 
-                          Navigator.pop(context);
-                          Navigator.pop(context);
+                          if(dialogResult.isNotCanceled){
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          }
+
 
                         }
                       : null;

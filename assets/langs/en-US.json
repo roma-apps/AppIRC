@@ -5,6 +5,9 @@
     "no_whitespace": "Field should not have whitespaces",
     "not_unique": "Should be unique"
   },
+  "async_dialog": {
+    "title": "Operation in progress"
+  },
   "button": {
     "ok": "OK",
     "cancel": "Cancel"
@@ -36,7 +39,7 @@
       "title": "Lounge preferences",
       "connect": "Connect",
       "connection": {
-      "title": "Connection",
+        "title": "Connection",
         "host": {
           "label": "Host",
           "hint": "https://demo.thelounge.chat"
@@ -153,9 +156,8 @@
         "label_empty": "Nothing found",
         "label_not_empty": "Found {}/{}",
         "hint": "Text, nickname, or status..."
-
       },
-      "load_more" : "Load more..."
+      "load_more": "Load more..."
     },
     "connection": {
       "connected": "Connected to server",

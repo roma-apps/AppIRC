@@ -6,7 +6,7 @@ import 'package:flutter_appirc/app/chat/chat_network_channels_list_listener_bloc
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/async/disposable.dart';
+import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class ChatNetworkChannelsBlocsBloc extends ChatNetworkChannelsListListenerBloc {
