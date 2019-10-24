@@ -27,10 +27,6 @@ Future<AsyncDialogResult<T>> doAsyncOperationWithDialog<T>(
   try {
     result = await cancelableOperation.valueOrCancellation(cancellationValue);
   } finally {
-//    // bug in progress dialog library.
-//    // Sometimes dialog not dismissed without additional wait
-//    // todo: fix with own widget
-//    await Future.delayed(Duration(milliseconds: 100));
     var hide = progressDialog.hide(context);
     _logger.d(() => "progress dialog hide = $hide");
   }
