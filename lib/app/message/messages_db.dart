@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_appirc/app/message/messages_model.dart';
 
 const int chatMessageTypeRegularId = 1;
@@ -12,6 +14,8 @@ abstract class ChatMessageDB {
       chatMessageTypeIdToType(message.chatMessageTypeId);
 
   int get channelRemoteId;
+
+  String get linksJsonEncoded;
 }
 
 
@@ -39,4 +43,11 @@ int chatMessageTypeTypeToId(ChatMessageType type) {
       break;
   }
   throw Exception("Invalid ChatMessageType = $type");
+}
+
+List<String> convertLinks(ChatMessageDB messageDB) {
+  var decoded = json.decode(messageDB.linksJsonEncoded);
+  var list = decoded as List<dynamic>;
+
+  return list.map((listItem) => listItem.toString()).toList();
 }

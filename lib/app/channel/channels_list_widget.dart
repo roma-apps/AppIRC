@@ -11,10 +11,7 @@ import 'package:flutter_appirc/app/chat/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-
-var _logger = MyLogger(logTag: "NetworkChannelsListWidget", enabled: true);
 
 class NetworkChannelsListWidget extends StatelessWidget {
   final Network network;
@@ -22,7 +19,6 @@ class NetworkChannelsListWidget extends StatelessWidget {
   final VoidCallback onActionCallback;
 
   NetworkChannelsListWidget(this.network, this.onActionCallback);
-
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +31,6 @@ class NetworkChannelsListWidget extends StatelessWidget {
         initialData: channelsListBloc.networkChannels,
         builder: (context, snapshot) {
           var channels = snapshot.data;
-
-          _logger.d(() => "channels = $channels");
 
           channels = channels.where((channel) => !channel.isLobby).toList();
 
@@ -114,8 +108,6 @@ class NetworkChannelsListWidget extends StatelessWidget {
             builder: (context, snapshot) {
               bool channelConnected = snapshot.data;
 
-              _logger.d(() => "new state for channelItem $channelConnected");
-
               var channelsListSkinBloc =
                   Provider.of<ChannelsListSkinBloc>(context);
               return Row(children: <Widget>[
@@ -135,17 +127,20 @@ class NetworkChannelsListWidget extends StatelessWidget {
                         }
                         return activeChannelBloc.changeActiveChanel(channel);
                       },
-                      child: Text(channel.name,
-                          style: channelsListSkinBloc
-                              .getChannelItemTextStyle(isChannelActive)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(channel.name,
+                            style: channelsListSkinBloc
+                                .getChannelItemTextStyle(isChannelActive)),
+                      ),
                     ),
                   ),
                 ),
                 StreamBuilder<bool>(
                     stream: networkBloc.networkConnectedStream,
                     initialData: networkBloc.networkConnected,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<bool> snapshot) {
+                    builder:
+                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
                       var networkConnected = snapshot.data;
 
                       return buildConnectionIcon(
@@ -154,8 +149,8 @@ class NetworkChannelsListWidget extends StatelessWidget {
                               .getChannelItemIconColor(isChannelActive),
                           networkConnected && channelConnected);
                     }),
-                buildChannelUnreadCountBadge(context, channelBloc,
-                    isChannelActive),
+                buildChannelUnreadCountBadge(
+                    context, channelBloc, isChannelActive),
                 buildChannelPopupMenuButton(
                     context,
                     networkBloc,

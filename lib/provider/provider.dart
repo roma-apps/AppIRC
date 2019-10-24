@@ -5,6 +5,8 @@ import 'package:flutter_appirc/async/disposable.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DisposableOwner extends Disposable {
+
+  bool disposed = false;
   final CompositeDisposable _compositeDisposable = CompositeDisposable([]);
 
 
@@ -40,6 +42,7 @@ class DisposableOwner extends Disposable {
 
   @mustCallSuper
   void dispose() {
+    disposed = true;
     _compositeDisposable.dispose();
   }
 }

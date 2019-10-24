@@ -4,39 +4,29 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_widget.dart';
 import 'package:flutter_appirc/app/chat/chat_messages_list_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_messages_model.dart';
 import 'package:flutter_appirc/app/message/messages_list_widget.dart';
 import 'package:flutter_appirc/app/message/messages_regular_skin_bloc.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_text_field.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-typedef VisibleAreaCallback(int minVisibleIndex, int maxVisibleIndex);
+var _logger = MyLogger(logTag: "NetworkChannelWidget", enabled: true);
 
 class NetworkChannelWidget extends StatefulWidget {
-  final VisibleAreaCallback visibleAreaCallback;
 
-  NetworkChannelWidget(this.visibleAreaCallback);
+  NetworkChannelWidget();
 
   @override
   _NetworkChannelWidgetState createState() =>
-      _NetworkChannelWidgetState(visibleAreaCallback);
+      _NetworkChannelWidgetState();
 }
 
 class _NetworkChannelWidgetState extends State<NetworkChannelWidget> {
-  final VisibleAreaCallback visibleAreaCallback;
-
   TextEditingController searchController;
 
-  _NetworkChannelWidgetState(this.visibleAreaCallback) {
-//    streamSubscription = chatMessagesListBloc.forcedMessagesListIndexStream
-//        .listen((newForcedIndex) {
-//      if (newForcedIndex != null &&
-//          newForcedIndex > 0) {
-//        scrollController.jumpTo(
-//            index: newForcedIndex);
-//      }
-//    });
-  }
+  _NetworkChannelWidgetState();
 
   @override
   void dispose() {
@@ -55,6 +45,10 @@ class _NetworkChannelWidgetState extends State<NetworkChannelWidget> {
 
     ChatMessagesListBloc chatListMessagesBloc = Provider.of(context);
     var channelBloc = NetworkChannelBloc.of(context);
+
+    _logger.d(() => "build for ${channelBloc.channel.name} "
+    "messages ${chatListMessagesBloc.messagesLoaderBloc.messages
+        .length}");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,28 +69,31 @@ class _NetworkChannelWidgetState extends State<NetworkChannelWidget> {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: <Widget>[
-                      StreamBuilder<MessagesSearchState>(
-                          stream: chatListMessagesBloc.foundMessagesStream,
-                          initialData: chatListMessagesBloc.foundMessages,
+                      StreamBuilder<ChatMessagesListSearchState>(
+                          stream: chatListMessagesBloc.searchStateStream,
+                          initialData: chatListMessagesBloc.searchState,
                           builder: (context, snapshot) {
-                            var messagesSearchState = snapshot.data;
+                            var searchState = snapshot.data;
 
                             String labelText;
-                            if (messagesSearchState != null) {
-                              if (messagesSearchState.messages.isEmpty) {
+                            if (searchState.searchTerm?.isNotEmpty == true) {
+                              if (searchState.foundMessages.isEmpty) {
                                 labelText = AppLocalizations.of(context)
                                     .tr("chat.messages.search.label_empty");
                               } else {
-                                var currentPosition = messagesSearchState.currentIndex + 1;
-                                var maxPosition = messagesSearchState
-                                    .messages.length;
+
                                 labelText = AppLocalizations.of(context).tr(
                                     "chat.messages.search.label_not_empty",
                                     args: [
-                                      currentPosition.toString(),
-                                      maxPosition.toString()
+                                      searchState
+                                          .selectedFoundMessagePosition.toString(),
+                                      searchState
+                                          .maxPossibleSelectedFoundPosition
+                                          .toString()
                                     ]);
                               }
+                            } else {
+                              // empty label if search not started
                             }
 
                             return Flexible(
@@ -169,13 +166,9 @@ class _NetworkChannelWidgetState extends State<NetworkChannelWidget> {
             }
           },
         ),
-        Expanded(child: buildListWidget(context)),
+        Expanded(child: NetworkChannelMessagesListWidget()),
         NetworkChannelNewMessageWidget()
       ],
     );
-  }
-
-  NetworkChannelMessagesListWidget buildListWidget(BuildContext context) {
-    return NetworkChannelMessagesListWidget(visibleAreaCallback);
   }
 }

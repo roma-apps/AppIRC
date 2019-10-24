@@ -10,16 +10,27 @@ class SpecialMessage extends ChatMessage {
   final SpecialMessageType specialType;
 
   SpecialMessage(int channelLocalId, int channelRemoteId, this.specialType,
-      this.data, DateTime date)
-      : super(ChatMessageType.SPECIAL, channelRemoteId, date);
+      this.data, DateTime date, List<String> linksInText)
+      : super(ChatMessageType.SPECIAL, channelRemoteId, date, linksInText);
 
   SpecialMessage.name(
       {@required int channelRemoteId,
       @required this.data,
       @required this.specialType,
-        int messageLocalId,
-      @required DateTime date})
-      : super(ChatMessageType.SPECIAL, channelRemoteId, date, messageLocalId: messageLocalId);
+      int messageLocalId,
+      @required DateTime date,
+      @required List<String> linksInText})
+      : super(
+          ChatMessageType.SPECIAL,
+          channelRemoteId,
+          date,
+          linksInText,
+          messageLocalId: messageLocalId,
+        );
+
+  @override
+  bool isContainsText(String searchTerm, {@required bool ignoreCase}) =>
+      data.isContainsText(searchTerm, ignoreCase: ignoreCase);
 }
 
 enum SpecialMessageType { WHO_IS, CHANNELS_LIST_ITEM, TEXT }
@@ -27,7 +38,7 @@ enum SpecialMessageType { WHO_IS, CHANNELS_LIST_ITEM, TEXT }
 abstract class SpecialMessageBody {
   Map<String, dynamic> toJson();
 
-  bool isContainsText(String searchTerm);
+  bool isContainsText(String searchTerm, {@required bool ignoreCase});
 }
 
 @JsonSerializable()
@@ -100,9 +111,8 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
   Map<String, dynamic> toJson() => _$WhoIsSpecialMessageBodyToJson(this);
 
   @override
-  bool isContainsText(String searchTerm) {
-    return nick.contains(searchTerm);
-  }
+  bool isContainsText(String searchTerm, {@required bool ignoreCase}) =>
+      isContainsSearchTerm(nick, searchTerm, ignoreCase: ignoreCase);
 }
 
 @JsonSerializable()
@@ -112,8 +122,16 @@ class NetworkChannelInfoSpecialMessageBody extends SpecialMessageBody {
   final int usersCount;
 
   @override
-  bool isContainsText(String searchTerm) {
-    return topic.contains(searchTerm) || name.contains(searchTerm);
+  bool isContainsText(String searchTerm, {@required bool ignoreCase}) {
+    var contains = false;
+
+    contains |= isContainsSearchTerm(name, searchTerm, ignoreCase: ignoreCase);
+    if (!contains) {
+      contains |=
+          isContainsSearchTerm(topic, searchTerm, ignoreCase: ignoreCase);
+    }
+
+    return contains;
   }
 
   @override
@@ -140,11 +158,10 @@ class NetworkChannelInfoSpecialMessageBody extends SpecialMessageBody {
 class TextSpecialMessageBody extends SpecialMessageBody {
   final String message;
 
-
   @override
-  bool isContainsText(String searchTerm) {
-    return message.contains(searchTerm);
-  }
+  bool isContainsText(String searchTerm, {@required bool ignoreCase}) =>
+      isContainsSearchTerm(message, searchTerm, ignoreCase: ignoreCase);
+
   TextSpecialMessageBody(this.message);
 
   @override

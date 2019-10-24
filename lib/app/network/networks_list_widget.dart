@@ -150,9 +150,12 @@ class NetworksListWidget extends StatelessWidget {
                       var title = snapshot.data;
 
                       var networkTitle = "${title.name} (${title.nick})";
-                      return Text(networkTitle,
-                          style: networkListSkinBloc
-                              .getNetworkItemTextStyle(isChannelActive));
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(networkTitle,
+                            style: networkListSkinBloc
+                                .getNetworkItemTextStyle(isChannelActive)),
+                      );
                     }),
               ),
             ),

@@ -45,6 +45,7 @@ class SpecialMessageDB implements ChatMessageDB {
   int specialTypeId;
 
   final int dateMicrosecondsSinceEpoch;
+  final String linksJsonEncoded;
 
   static DateTime date(SpecialMessageDB message) =>
       DateTime.fromMicrosecondsSinceEpoch(message.dateMicrosecondsSinceEpoch);
@@ -56,7 +57,9 @@ class SpecialMessageDB implements ChatMessageDB {
       this.channelRemoteId,
       this.dataJsonEncoded,
       this.specialTypeId,
-      this.dateMicrosecondsSinceEpoch);
+      this.dateMicrosecondsSinceEpoch,
+      this.linksJsonEncoded
+      );
 
   SpecialMessageDB.name(
       {this.localId,
@@ -65,7 +68,9 @@ class SpecialMessageDB implements ChatMessageDB {
       @required this.channelRemoteId,
       @required this.dataJsonEncoded,
       @required this.specialTypeId,
-      @required this.dateMicrosecondsSinceEpoch});
+      @required this.dateMicrosecondsSinceEpoch,
+      @required this.linksJsonEncoded
+      });
 }
 
 SpecialMessageType specialMessageTypeIdToType(int id) {
@@ -104,6 +109,9 @@ SpecialMessageDB toSpecialMessageDB(SpecialMessage specialMessage) =>
         channelRemoteId: specialMessage.channelRemoteId,
         dataJsonEncoded: json.encode(specialMessage.data),
         specialTypeId: specialMessageTypeTypeToId(specialMessage.specialType),
+        linksJsonEncoded: specialMessage.linksInText != null
+            ? json.encode(specialMessage.linksInText)
+            : null,
         dateMicrosecondsSinceEpoch: specialMessage.date.microsecondsSinceEpoch);
 
 
@@ -129,6 +137,8 @@ SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
       channelRemoteId: messageDB.channelRemoteId,
       data: body,
       specialType: type,
+      linksInText: messageDB.linksJsonEncoded != null
+          ? convertLinks(messageDB) : null,
       date: DateTime.fromMicrosecondsSinceEpoch(
           messageDB.dateMicrosecondsSinceEpoch));
 }

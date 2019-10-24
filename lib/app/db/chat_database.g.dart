@@ -82,9 +82,9 @@ class _$ChatDatabase extends ChatDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `RegularMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `command` TEXT, `hostMask` TEXT, `text` TEXT, `paramsJsonEncoded` TEXT, `nicknamesJsonEncoded` TEXT, `regularMessageTypeId` INTEGER, `self` INTEGER, `highlight` INTEGER, `previewsJsonEncoded` TEXT, `dateMicrosecondsSinceEpoch` INTEGER, `fromRemoteId` INTEGER, `fromNick` TEXT, `fromMode` TEXT, `newNick` TEXT, `messageRemoteId` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `RegularMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `command` TEXT, `hostMask` TEXT, `text` TEXT, `paramsJsonEncoded` TEXT, `nicknamesJsonEncoded` TEXT, `regularMessageTypeId` INTEGER, `self` INTEGER, `highlight` INTEGER, `previewsJsonEncoded` TEXT, `linksJsonEncoded` TEXT, `dateMicrosecondsSinceEpoch` INTEGER, `fromRemoteId` INTEGER, `fromNick` TEXT, `fromMode` TEXT, `newNick` TEXT, `messageRemoteId` INTEGER)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `SpecialMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `dataJsonEncoded` TEXT, `specialTypeId` INTEGER, `dateMicrosecondsSinceEpoch` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `SpecialMessageDB` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT, `channelLocalId` INTEGER, `chatMessageTypeId` INTEGER, `channelRemoteId` INTEGER, `dataJsonEncoded` TEXT, `specialTypeId` INTEGER, `dateMicrosecondsSinceEpoch` INTEGER, `linksJsonEncoded` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -124,6 +124,7 @@ class _$RegularMessageDao extends RegularMessageDao {
                   'self': item.self,
                   'highlight': item.highlight,
                   'previewsJsonEncoded': item.previewsJsonEncoded,
+                  'linksJsonEncoded': item.linksJsonEncoded,
                   'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch,
                   'fromRemoteId': item.fromRemoteId,
                   'fromNick': item.fromNick,
@@ -150,6 +151,7 @@ class _$RegularMessageDao extends RegularMessageDao {
                   'self': item.self,
                   'highlight': item.highlight,
                   'previewsJsonEncoded': item.previewsJsonEncoded,
+                  'linksJsonEncoded': item.linksJsonEncoded,
                   'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch,
                   'fromRemoteId': item.fromRemoteId,
                   'fromNick': item.fromNick,
@@ -180,6 +182,7 @@ class _$RegularMessageDao extends RegularMessageDao {
           row['self'] as int,
           row['highlight'] as int,
           row['previewsJsonEncoded'] as String,
+          row['linksJsonEncoded'] as String,
           row['dateMicrosecondsSinceEpoch'] as int,
           row['fromRemoteId'] as int,
           row['fromNick'] as String,
@@ -279,7 +282,8 @@ class _$SpecialMessageDao extends SpecialMessageDao {
                   'channelRemoteId': item.channelRemoteId,
                   'dataJsonEncoded': item.dataJsonEncoded,
                   'specialTypeId': item.specialTypeId,
-                  'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch
+                  'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch,
+                  'linksJsonEncoded': item.linksJsonEncoded
                 },
             changeListener);
 
@@ -297,7 +301,8 @@ class _$SpecialMessageDao extends SpecialMessageDao {
           row['channelRemoteId'] as int,
           row['dataJsonEncoded'] as String,
           row['specialTypeId'] as int,
-          row['dateMicrosecondsSinceEpoch'] as int);
+          row['dateMicrosecondsSinceEpoch'] as int,
+          row['linksJsonEncoded'] as String);
 
   final InsertionAdapter<SpecialMessageDB> _specialMessageDBInsertionAdapter;
 

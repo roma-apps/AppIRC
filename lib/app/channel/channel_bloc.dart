@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_input_message_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
@@ -21,7 +22,7 @@ class NetworkChannelBlocProvider extends Providable {
   NetworkChannelBlocProvider(this.networkChannelBloc);
 }
 
-class NetworkChannelBloc extends DisposableOwner {
+class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
   final ChatInputOutputBackendService backendService;
   final Network network;
   NetworkChannel channel;
@@ -85,30 +86,30 @@ class NetworkChannelBloc extends DisposableOwner {
         network, channel, waitForResult: false);
   }
 
-  NetworkChannelState get _networkChannelState =>
+  NetworkChannelState get networkChannelState =>
       channelsStatesBloc.getNetworkChannelState(network, channel);
 
   Stream<NetworkChannelState> get _networkChannelStateStream =>
       channelsStatesBloc.getNetworkChannelStateStream(network, channel);
 
-  bool get networkChannelConnected => _networkChannelState.connected;
+  bool get networkChannelConnected => networkChannelState.connected;
 
   Stream<bool> get networkChannelConnectedStream =>
       _networkChannelStateStream.map((state) => state?.connected).distinct();
 
   bool get networkChannelMoreHistoryAvailable =>
-      _networkChannelState.moreHistoryAvailable;
+      networkChannelState.moreHistoryAvailable;
 
   Stream<bool> get networkChannelMoreHistoryAvailableStream =>
       _networkChannelStateStream.map((state) => state?.moreHistoryAvailable)
           .distinct();
 
-  int get networkChannelUnreadCount => _networkChannelState.unreadCount;
+  int get networkChannelUnreadCount => networkChannelState.unreadCount;
 
   Stream<int> get networkChannelUnreadCountStream =>
       _networkChannelStateStream.map((state) => state?.unreadCount).distinct();
 
-  String get networkChannelTopic => _networkChannelState.topic;
+  String get networkChannelTopic => networkChannelState.topic;
 
   Stream<String> get networkChannelTopicStream =>
       _networkChannelStateStream.map((state) => state?.topic).distinct();
@@ -165,4 +166,7 @@ class NetworkChannelBloc extends DisposableOwner {
       MessagePreview preview) {
     return backendService.togglePreview(network, channel, message, preview);
   }
+
+
 }
+

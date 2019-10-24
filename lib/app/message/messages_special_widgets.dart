@@ -14,8 +14,8 @@ import 'package:flutter_appirc/app/user/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-Widget buildSpecialMessageWidget(
-    BuildContext context, SpecialMessage specialMessage) {
+Widget buildSpecialMessageWidget(BuildContext context,
+    SpecialMessage specialMessage, bool includedInSearch, String searchTerm) {
   switch (specialMessage.specialType) {
     case SpecialMessageType.WHO_IS:
       return _buildWhoIsMessage(context, specialMessage);
@@ -34,7 +34,8 @@ Widget buildSpecialMessageWidget(
                 _buildUsersCount(context, channelInfoItem),
               ],
             ),
-            _buildTopic(context, channelInfoItem.topic),
+            _buildTopic(context, channelInfoItem.topic,
+                specialMessage.linksInText, includedInSearch, searchTerm),
           ],
         ),
       );
@@ -112,7 +113,7 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
           buildMessageIcon(Icons.account_box, color)
         ],
       ));
-  return buildRegularMessageWidget(context, title, body, false, null);
+  return buildRegularMessageWidget(context, title, body, null);
 }
 
 Widget _buildWhoIsRow(String label, String value) {
@@ -159,10 +160,12 @@ Widget _buildChannelName(BuildContext context,
       ));
 }
 
-Widget _buildTopic(BuildContext context, String topic) {
+Widget _buildTopic(BuildContext context, String topic, List<String> linksInText,
+    bool includedInSearch, String searchTerm) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
-child: buildRegularMessageBody(context, topic),
+    child: buildRegularMessageBody(context, topic, null, linksInText,
+      includedInSearch, searchTerm),
 //    child: Linkify(
 //        onOpen: (link) async {
 //          if (await canLaunch(link.url)) {

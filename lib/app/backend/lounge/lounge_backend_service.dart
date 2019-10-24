@@ -29,6 +29,7 @@ import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:flutter_appirc/socketio/socketio_service.dart';
+import 'package:flutter_appirc/url/url_finder.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "LoungeService", enabled: true);
@@ -436,19 +437,30 @@ class LoungeBackendService extends Providable
       var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
-        var message = toChatMessage(channel, data.msg);
-        _logger.d(() => "onNewMessage for {$data.chan}  $data");
-        var type = detectRegularMessageType(data.msg.type);
-        if (type == RegularMessageType.WHO_IS) {
-          var whoIsSpecialBody = toSpecialMessageWhoIs(data.msg.whois);
-          listener(SpecialMessage.name(
-              channelRemoteId: data.chan,
-              data: whoIsSpecialBody,
-              specialType: SpecialMessageType.WHO_IS,
-              date: DateTime.now()));
-        } else {
-          listener(message);
-        }
+        toChatMessage(channel, data.msg).then((message) {
+          _logger.d(() => "onNewMessage for {$data.chan}  $data");
+          var type = detectRegularMessageType(data.msg.type);
+          if (type == RegularMessageType.WHO_IS) {
+            var whoIsSpecialBody = toSpecialMessageWhoIs(data.msg.whois);
+
+            findUrls([
+              whoIsSpecialBody.actualHostname,
+              whoIsSpecialBody.realName,
+              whoIsSpecialBody.account,
+              whoIsSpecialBody.server,
+              whoIsSpecialBody.serverInfo
+            ]).then((urls) {
+              listener(SpecialMessage.name(
+                  channelRemoteId: data.chan,
+                  data: whoIsSpecialBody,
+                  specialType: SpecialMessageType.WHO_IS,
+                  date: DateTime.now(),
+                  linksInText: urls));
+            });
+          } else {
+            listener(message);
+          }
+        });
       }
     }));
 
@@ -458,10 +470,10 @@ class LoungeBackendService extends Providable
           MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
-        var specialMessages = toSpecialMessages(channel, data);
-
-        specialMessages.forEach((specialMessage) {
-          listener(specialMessage);
+        toSpecialMessages(channel, data).then((specialMessages) {
+          specialMessages.forEach((specialMessage) {
+            listener(specialMessage);
+          });
         });
       }
     }));
@@ -521,11 +533,11 @@ class LoungeBackendService extends Providable
 
         var loungeChannel = parsed.chan;
 
-        var channelWithState = toNetworkChannelWithState(loungeChannel);
+        toNetworkChannelWithState(loungeChannel).then((channelWithState) {
+          channelWithState.channel.channelPreferences = preferences;
 
-        channelWithState.channel.channelPreferences = preferences;
-
-        listener(channelWithState);
+          listener(channelWithState);
+        });
       }
     }));
 
@@ -660,24 +672,25 @@ class LoungeBackendService extends Providable
         var nick = loungeNetwork.nick;
         connectionPreferences.userPreferences.nickname = nick;
 
-        NetworkWithState networkWithState = toNetworkWithState(loungeNetwork);
+        toNetworkWithState(loungeNetwork).then((networkWithState) {
+          networkWithState.network.localId = request.networkPreferences.localId;
 
-        networkWithState.network.localId = request.networkPreferences.localId;
+          networkWithState.network.channels.forEach((channel) {
+            var networkChannelPreferences = request.networkPreferences.channels
+                .firstWhere((channelPreferences) {
+              return channel.name == channelPreferences.name;
+            }, orElse: () => null);
 
-        networkWithState.network.channels.forEach((channel) {
-          var networkChannelPreferences = request.networkPreferences.channels
-              .firstWhere((channelPreferences) {
-            return channel.name == channelPreferences.name;
-          }, orElse: () => null);
+            if (networkChannelPreferences != null) {
+              channel.localId = networkChannelPreferences.localId;
+            }
+          });
 
-          if (networkChannelPreferences != null) {
-            channel.localId = networkChannelPreferences.localId;
-          }
+          networkWithState.network.connectionPreferences =
+              connectionPreferences;
+
+          listener(networkWithState);
         });
-
-        networkWithState.network.connectionPreferences = connectionPreferences;
-
-        listener(networkWithState);
       }
     }));
 
@@ -949,23 +962,19 @@ class LoungeBackendService extends Providable
 
   void _sendInputRequest(
       Network network, NetworkChannel channel, String message) {
-
-
-    if(message.startsWith("/collapse")) {
-      _channelTogglePreviewSubject.add(ChannelTogglePreview(network, channel,
-          false));
-    } else if(message.startsWith("/expand")) {
-      _channelTogglePreviewSubject.add(ChannelTogglePreview(network, channel,
-          true));
+    if (message.startsWith("/collapse")) {
+      _channelTogglePreviewSubject
+          .add(ChannelTogglePreview(network, channel, false));
+    } else if (message.startsWith("/expand")) {
+      _channelTogglePreviewSubject
+          .add(ChannelTogglePreview(network, channel, true));
     } else {
-
-
-    _sendRequest(
-        LoungeJsonRequest(
-            name: LoungeRequestEventNames.input,
-            body: InputLoungeRequestBody(
-                target: channel.remoteId, content: message)),
-        isNeedAddRequestToPending: false);
+      _sendRequest(
+          LoungeJsonRequest(
+              name: LoungeRequestEventNames.input,
+              body: InputLoungeRequestBody(
+                  target: channel.remoteId, content: message)),
+          isNeedAddRequestToPending: false);
     }
   }
 
@@ -1007,8 +1016,9 @@ class LoungeBackendService extends Providable
 
       _logger.d(() => "loadMoreHistory $parsed for $channel");
 
-      var chatLoadMore = toChatLoadMore(channel, parsed);
-      callback(chatLoadMore);
+      toChatLoadMore(channel, parsed).then((chatLoadMore) {
+        callback(chatLoadMore);
+      });
     }));
 
     return disposable;
@@ -1031,7 +1041,6 @@ class LoungeBackendService extends Providable
 
     return disposable;
   }
-
 
   @override
   Future<RequestResult<ChatLoadMore>> loadMoreHistory(
@@ -1059,35 +1068,32 @@ class LoungeBackendService extends Providable
   }
 
   // ignore: close_sinks
-  BehaviorSubject<MessageTogglePreview> _messageTogglePreviewSubject = BehaviorSubject();
+  BehaviorSubject<MessageTogglePreview> _messageTogglePreviewSubject =
+      BehaviorSubject();
 
-  Disposable listenForMessagePreviewToggle(Network network, NetworkChannel channel,
-      Function(MessageTogglePreview) callback) {
-
-    return StreamSubscriptionDisposable(
-        _messageTogglePreviewSubject.stream.listen((MessageTogglePreview toggle)  {
-            if(toggle.networkChannel == channel) {
-              callback(toggle);
-            }
-        }));
+  Disposable listenForMessagePreviewToggle(Network network,
+      NetworkChannel channel, Function(MessageTogglePreview) callback) {
+    return StreamSubscriptionDisposable(_messageTogglePreviewSubject.stream
+        .listen((MessageTogglePreview toggle) {
+      if (toggle.networkChannel == channel) {
+        callback(toggle);
+      }
+    }));
   }
-
 
   // ignore: close_sinks
   BehaviorSubject<ChannelTogglePreview> _channelTogglePreviewSubject =
-  BehaviorSubject();
+      BehaviorSubject();
 
-  Disposable listenForChannelPreviewToggle(Network network, NetworkChannel
-  channel,
-      Function(ChannelTogglePreview) callback) {
-    return StreamSubscriptionDisposable(
-        _channelTogglePreviewSubject.stream.listen((ChannelTogglePreview toggle)  {
-          if(toggle.networkChannel == channel) {
-            callback(toggle);
-          }
-        }));
+  Disposable listenForChannelPreviewToggle(Network network,
+      NetworkChannel channel, Function(ChannelTogglePreview) callback) {
+    return StreamSubscriptionDisposable(_channelTogglePreviewSubject.stream
+        .listen((ChannelTogglePreview toggle) {
+      if (toggle.networkChannel == channel) {
+        callback(toggle);
+      }
+    }));
   }
-
 
   @override
   Future<RequestResult<MessageTogglePreview>> togglePreview(Network network,
@@ -1109,15 +1115,11 @@ class LoungeBackendService extends Providable
                 shown: shownInverted)),
         isNeedAddRequestToPending: false);
 
-
-
     var chatTogglePreview = MessageTogglePreview.name(
-            network, channel, message, preview, shownInverted);
+        network, channel, message, preview, shownInverted);
 
     _messageTogglePreviewSubject.add(chatTogglePreview);
-    return RequestResult(
-        true,
-        chatTogglePreview);
+    return RequestResult(true, chatTogglePreview);
   }
 
   void signOut() {
@@ -1209,7 +1211,9 @@ Disposable _listenForInit(SocketIOService _socketIOService,
     _logger.d(() => "_listenForInit = $raw}");
     var parsed = InitLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-    listener(toChatInit(parsed));
+    toChatInit(parsed).then((chatInit) {
+      listener(chatInit);
+    });
   }));
 
   return disposable;
