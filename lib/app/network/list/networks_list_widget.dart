@@ -187,7 +187,7 @@ class NetworksListWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             rowContainer,
-            NetworkChannelsListWidget(network, onActionCallback)
+            NetworkChannelsListWidget(network, onActionCallback, true)
           ]);
     } else {
       return rowContainer;
