@@ -5,8 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/form/form_skin_bloc.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+MyLogger _logger = MyLogger(logTag: "platform_aware_text_field.dart",
+    enabled: true);
 
 PlatformTextField buildPlatformTextField(
     BuildContext context,
@@ -20,7 +24,7 @@ PlatformTextField buildPlatformTextField(
       int minLines,
       int maxLines,
       bool obscureText = false,
-      bool autocorrect = false,
+      bool autoCorrect = false,
       TextAlign textAlign: TextAlign.start,
       TextCapitalization textCapitalization = TextCapitalization.sentences,
       TextInputAction textInputAction = TextInputAction.next,
@@ -85,7 +89,7 @@ PlatformTextField buildPlatformTextField(
       minLines: minLines,
       maxLines: maxLines,
       obscureText: obscureText,
-      autocorrect: autocorrect,
+      autocorrect: autoCorrect,
       textAlign: textAlign,
       textCapitalization: textCapitalization,
       textInputAction: textInputAction,
@@ -96,6 +100,7 @@ PlatformTextField buildPlatformTextField(
       ios: iosBuilder,
       controller: controller,
       onChanged: (newValue) {
+        _logger.d(() => "onChanged $newValue");
         bloc.onNewValue(newValue);
       });
   return platformTextField;

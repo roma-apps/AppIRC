@@ -3,12 +3,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_form_widget.dart';
-
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+MyLogger _logger =
+    MyLogger(logTag: "lounge_preferences_page.dart", enabled: true);
 
 typedef PreferencesActionCallback = void Function(
     BuildContext context, LoungePreferences preferences);
@@ -32,6 +34,8 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
     var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
 
     var appLocalizations = AppLocalizations.of(context);
+
+    _logger.d(() => "build");
     showPlatformDialog(
         androidBarrierDismissible: true,
         context: context,
@@ -42,8 +46,8 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
                   .tr("lounge.preferences.edit.dialog.confirm.content")),
               actions: <Widget>[
                 PlatformDialogAction(
-                  child: Text(appLocalizations.tr(
-                      "lounge.preferences.edit.dialog.confirm.action"
+                  child: Text(appLocalizations
+                      .tr("lounge.preferences.edit.dialog.confirm.action"
                           ".save_reload")),
                   onPressed: () async {
                     // exit dialog
@@ -54,8 +58,8 @@ class EditLoungePreferencesPage extends LoungePreferencesPage {
                   },
                 ),
                 PlatformDialogAction(
-                  child: Text(appLocalizations
-                      .tr("lounge.preferences.edit.dialog.confirm.action.cancel")),
+                  child: Text(appLocalizations.tr(
+                      "lounge.preferences.edit.dialog.confirm.action.cancel")),
                   onPressed: () async {
                     Navigator.pop(context);
                   },
@@ -117,7 +121,7 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
                       actionCallback,
                       AppLocalizations.of(context)
                           .tr('lounge.preferences.new.action'
-                          '.connect')),
+                              '.connect')),
                 ),
                 _buildTestButtons(context)
               ],
@@ -153,7 +157,6 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
                       PlatformDialogAction(
                         child: Text("OK"),
                         onPressed: () {
-
                           Navigator.pop(context);
                         },
                       )
@@ -161,8 +164,7 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
                   ),
               androidBarrierDismissible: true);
 
-          connectionPreferences.host =
-          "http://167.71.55.184:9000/";
+          connectionPreferences.host = "http://167.71.55.184:9000/";
           hostBloc.onNewValue("http://167.71.55.184:9000/");
           setState(() {});
         },

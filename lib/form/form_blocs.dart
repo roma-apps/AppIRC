@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
+
+MyLogger _logger = MyLogger(logTag: "form_blocs.dart", enabled: true);
 
 typedef ValidatorFunction<T> = Future<ValidationError> Function(T newValue);
 
@@ -40,8 +43,7 @@ abstract class ValidationError {
 
 class IsEmptyValidationError extends ValidationError {
   String getDescription(BuildContext context) =>
-      AppLocalizations.of(context)
-          .tr("form.field.text.error.empty_field");
+      AppLocalizations.of(context).tr("form.field.text.error.empty_field");
 }
 
 class NoWhitespacesValidationError extends ValidationError {
@@ -105,7 +107,7 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
     listeners.forEach((listener) {
       listener.cancel();
     });
-     children.forEach((child) {
+    children.forEach((child) {
       listeners.add(child.errorStream.listen((_) => onDataChanged()));
     });
 
@@ -166,7 +168,10 @@ class FormValueFieldBloc<T> extends FormFieldBloc<T> {
   }
 
   void onNewValue(T newValue) {
-    if (value != newValue) {
+    var isNew = value != newValue;
+
+    _logger.d(() => "onNewValue = $isNew.");
+    if (isNew) {
       _valueController.add(newValue);
     }
   }

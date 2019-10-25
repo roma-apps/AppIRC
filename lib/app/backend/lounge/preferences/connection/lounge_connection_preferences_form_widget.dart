@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/connection/lounge_connection_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+
+MyLogger _logger = MyLogger(
+    logTag:
+    "lounge_connection_preferences_form_widget.dart",
+    enabled: true);
 
 class LoungeConnectionPreferencesFormWidget extends StatefulWidget {
   final LoungeConnectionPreferences startValues;
@@ -22,6 +28,7 @@ class LoungeConnectionPreferencesFormWidgetState
   TextEditingController _hostController;
 
   LoungeConnectionPreferencesFormWidgetState(this.startValues) {
+    _logger.d(() => "create");
     _hostController = TextEditingController(text: startValues.host);
   }
 
@@ -36,7 +43,8 @@ class LoungeConnectionPreferencesFormWidgetState
     var loungePreferencesFormBloc =
         Provider.of<LoungeConnectionPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
-    _hostController.text = loungePreferencesFormBloc.hostFieldBloc.value;
+
+    _logger.d(() => "build");
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[

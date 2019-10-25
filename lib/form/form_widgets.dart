@@ -44,7 +44,7 @@ buildFormTextRow(
     int minLines,
     int maxLines,
     bool obscureText = false,
-    bool autocorrect = false,
+    bool autoCorrect = false,
     TextAlign textAlign: TextAlign.start,
     TextCapitalization textCapitalization = TextCapitalization.sentences,
     TextInputAction textInputAction = TextInputAction.next,
@@ -60,7 +60,6 @@ buildFormTextRow(
     };
   }
 
-  // TODO: don't move cursor to the start on keyboard shown
   if (bloc.visible) {
     PlatformTextField platformTextField = buildPlatformTextField(
         context, bloc, controller, labelText, hint,
@@ -70,7 +69,7 @@ buildFormTextRow(
         minLines: minLines,
         maxLines: maxLines,
         obscureText: obscureText,
-        autocorrect: autocorrect,
+        autoCorrect: autoCorrect,
         textAlign: textAlign,
         textCapitalization: textCapitalization,
         textInputAction: textInputAction,
