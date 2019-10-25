@@ -13,6 +13,7 @@ class ChatConnectionBloc extends Providable {
 
 
   bool get isConnected => backendService.isConnected;
+  Stream<bool> get isConnectedStream => backendService.isConnectedStream;
 
   ChatConnectionState get connectionState => backendService.connectionState;
 

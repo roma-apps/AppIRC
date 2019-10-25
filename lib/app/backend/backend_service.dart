@@ -27,6 +27,7 @@ abstract class ChatBackendService implements Providable {
   Stream<ChatConnectionState> get connectionStateStream;
 
   bool get isConnected;
+  Stream<bool> get isConnectedStream;
 
   ChatConnectionState get connectionState;
 

@@ -8,17 +8,16 @@ import 'package:adhara_socket_io/manager.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_model_adapter.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
-import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
-import 'package:flutter_appirc/app/message/special/messages_special_model.dart';
-import 'package:flutter_appirc/lounge/lounge_upload_file_helper.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_model_adapter.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
+import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
+import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/preview/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/special/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
@@ -27,6 +26,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
+import 'package:flutter_appirc/lounge/lounge_upload_file_helper.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:flutter_appirc/socketio/socketio_service.dart';
@@ -53,9 +53,12 @@ class LoungeBackendService extends Providable
 
   bool get isConnected => connectionState == ChatConnectionState.CONNECTED;
 
+  Stream<bool> get isConnectedStream => connectionStateStream
+      .map((state) => state == ChatConnectionState.CONNECTED).distinct();
+
   // ignore: close_sinks
   BehaviorSubject<ChatConnectionState> _connectionStateController =
-  BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
+      BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
 
   Stream<ChatConnectionState> get connectionStateStream =>
       _connectionStateController.stream;
@@ -105,18 +108,15 @@ class LoungeBackendService extends Providable
 
     await _socketIOService.init();
 
-
-    addDisposable(streamSubscription: _socketIOService.connectionStateStream.listen(
-        (socketState) {
-          var newBackendState = mapState(socketState);
-          _logger.d(() => "newState socketState $socketState "
-              " newBackendState $newBackendState");
-          _connectionStateController.add(newBackendState);
-
-        }));
+    addDisposable(streamSubscription:
+        _socketIOService.connectionStateStream.listen((socketState) {
+      var newBackendState = mapState(socketState);
+      _logger.d(() => "newState socketState $socketState "
+          " newBackendState $newBackendState");
+      _connectionStateController.add(newBackendState);
+    }));
     _logger.d(() => "init finished");
   }
-
 
   Future<RequestResult<ConnectResult>> tryConnectWithDifferentPreferences(
       LoungePreferences preferences) async {
@@ -142,7 +142,6 @@ class LoungeBackendService extends Providable
   @override
   Future<RequestResult<ConnectResult>> connectChat() async {
     assert(_loungePreferences != LoungeConnectionPreferences.empty);
-
 
     ConnectResult connectResult =
         await _connect(_loungePreferences, _socketIOService);

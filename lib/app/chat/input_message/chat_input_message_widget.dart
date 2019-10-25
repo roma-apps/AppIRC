@@ -8,8 +8,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_skin_bloc.dart';
+import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
+import 'package:flutter_appirc/lounge/lounge_upload_file_helper.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/platform_widgets/platform_aware_type_ahead_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -18,7 +20,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_appirc/lounge/lounge_upload_file_helper.dart';
 
 class NetworkChannelNewMessageWidget extends StatefulWidget {
   NetworkChannelNewMessageWidget();
@@ -31,10 +32,41 @@ class NetworkChannelNewMessageState
     extends State<NetworkChannelNewMessageWidget> {
   @override
   Widget build(BuildContext context) {
-    var hintStr = AppLocalizations.of(context).tr("chat.new_message.field"
-        ".enter_message"
-        ".hint");
+    var children = <Widget>[
+      Flexible(
+          child: Container(
+        //              decoration: BoxDecoration(border: Border.all(color: inputMessageSkinBloc.inputMessageCursorColor)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: _buildInputMessageField(context),
+        ),
+      )),
+      _buildSendButton(context),
+    ];
 
+    ChatUploadBloc chatUploadBloc = Provider.of<ChatUploadBloc>(context);
+    if (chatUploadBloc.isUploadSupported) {
+      children.insert(0, _buildUploadButton(context, chatUploadBloc));
+    }
+
+    return _buildContainer(context, children);
+  }
+
+  Container _buildContainer(BuildContext context, List<Widget> children) {
+    var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
+    return Container(
+      decoration: BoxDecoration(
+          color: inputMessageSkinBloc.inputMessageBackgroundColor),
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          children: children,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputMessageField(BuildContext context) {
     var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
 
     var channelBloc = NetworkChannelBloc.of(context);
@@ -42,13 +74,31 @@ class NetworkChannelNewMessageState
     var appSkinTheme = AppSkinBloc.of(context).appSkinTheme;
     var popupBackgroundColor = appSkinTheme.backgroundColor;
 
-    var children = <Widget>[
-      Flexible(
-          child: Container(
-        //              decoration: BoxDecoration(border: Border.all(color: inputMessageSkinBloc.inputMessageCursorColor)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-          child: createPlatformTypeAhead(
+    var hintText = AppLocalizations.of(context).tr("chat.new_message.field"
+        ".enter_message"
+        ".hint");
+
+    ChatConnectionBloc chatConnectionBloc = Provider.of(context);
+
+    return StreamBuilder<bool>(
+        stream: chatConnectionBloc.isConnectedStream,
+        initialData: chatConnectionBloc.isConnected,
+        builder: (context, snapshot) {
+          var connected = snapshot.data;
+
+          TextInputAction inputAction;
+          if (connected) {
+            inputAction = TextInputAction.send;
+          } else {
+            inputAction = TextInputAction.done;
+          }
+          var submitted;
+          if (connected) {
+            submitted = (_) {
+              inputMessageBloc.sendMessage();
+            };
+          }
+          return createPlatformTypeAhead(
             context,
             keepSuggestionsOnSuggestionSelected: true,
             direction: AxisDirection.up,
@@ -74,16 +124,14 @@ class NetworkChannelNewMessageState
               return AndroidTypeAheadData(
                   textFieldConfiguration: TextFieldConfiguration(
                       autofocus: false,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) {
-                        inputMessageBloc.sendMessage();
-                      },
+                      textInputAction: inputAction,
+                      onSubmitted: submitted,
                       controller: inputMessageBloc.messageController,
                       style: DefaultTextStyle.of(context)
                           .style
                           .copyWith(fontStyle: FontStyle.italic),
                       decoration: InputDecoration(
-                          hintText: hintStr,
+                          hintText: hintText,
                           hintStyle:
                               inputMessageSkinBloc.inputMessageHintTextStyle)));
             },
@@ -92,62 +140,54 @@ class NetworkChannelNewMessageState
                   textFieldConfiguration: CupertinoTextFieldConfiguration(
                       autofocus: false,
                       controller: inputMessageBloc.messageController,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) {
-                        inputMessageBloc.sendMessage();
-                      },
+                      textInputAction: inputAction,
+                      onSubmitted: submitted,
                       style: DefaultTextStyle.of(context).style.copyWith(
                           fontStyle: FontStyle.italic,
                           color: appSkinTheme.textColor),
-                      placeholder: hintStr));
+                      placeholder: hintText));
             },
-          ),
-        ),
-      )),
-//            Flexible(
-//                child: PlatformTextField(
-//              android: (_) {
-//                return MaterialTextFieldData(
-//                    decoration: InputDecoration(
-//                        hintText: hintStr,
-//                        hintStyle:
-//                            inputMessageSkinBloc.inputMessageHintTextStyle));
-//              },
-//              ios: (_) => CupertinoTextFieldData(placeholder: hintStr),
-//              cursorColor: inputMessageSkinBloc.inputMessageCursorColor,
-//              style: inputMessageSkinBloc.inputMessageTextStyle,
-//              controller: inputMessageBloc.messageController,
-//              onSubmitted: (term) {
-//                inputMessageBloc.sendMessage();
-//              },
-//            )),
-      PlatformIconButton(
-          icon: Icon(Icons.message),
-          onPressed: () {
-            inputMessageBloc.sendMessage();
-          }),
-    ];
+          );
+        });
+  }
 
-    ChatUploadBloc chatUploadBloc = Provider.of<ChatUploadBloc>(context);
-    if (chatUploadBloc.isUploadSupported) {
-      children.insert(
-          0,
-          createPlatformPopupMenuButton(context,
+  Widget _buildUploadButton(
+      BuildContext context, ChatUploadBloc chatUploadBloc) {
+    ChatConnectionBloc chatConnectionBloc = Provider.of(context);
+    var channelBloc = NetworkChannelBloc.of(context);
+
+    return StreamBuilder<bool>(
+        stream: chatConnectionBloc.isConnectedStream,
+        initialData: chatConnectionBloc.isConnected,
+        builder: (context, snapshot) {
+          var connected = snapshot.data;
+
+          return createPlatformPopupMenuButton(context,
               child: Icon(Icons.attach_file),
               actions: _buildAttachMenuItems(
-                  context, chatUploadBloc, inputMessageBloc)));
-    }
+                  context, chatUploadBloc, channelBloc.inputMessageBloc),
+              enabled: connected);
+        });
+  }
 
-    return Container(
-      decoration: BoxDecoration(
-          color: inputMessageSkinBloc.inputMessageBackgroundColor),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Row(
-          children: children,
-        ),
-      ),
-    );
+  Widget _buildSendButton(BuildContext context) {
+    ChatConnectionBloc chatConnectionBloc = Provider.of(context);
+
+    return StreamBuilder<bool>(
+        stream: chatConnectionBloc.isConnectedStream,
+        initialData: chatConnectionBloc.isConnected,
+        builder: (context, snapshot) {
+          var connected = snapshot.data;
+          var pressed;
+          if (connected) {
+            pressed = () {
+              ChatInputMessageBloc inputMessageBloc = Provider.of(context);
+              inputMessageBloc.sendMessage();
+            };
+          }
+          return PlatformIconButton(
+              icon: Icon(Icons.message), onPressed: pressed);
+        });
   }
 
   _buildAttachMenuItems(BuildContext context, ChatUploadBloc chatUploadBloc,
@@ -241,19 +281,20 @@ class NetworkChannelNewMessageState
       showPlatformDialog(
           context: context,
           builder: (_) => PlatformAlertDialog(
-              title:
-                  Text(AppLocalizations.of(context)
-                      .tr("chat.new_message.attach.error.server_auth"))));
+              title: Text(AppLocalizations.of(context)
+                  .tr("chat.new_message.attach.error.server_auth"))));
     } on FileSizeUploadException {
       showPlatformDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(title: Text(AppLocalizations.of(context)
-              .tr("chat.new_message.attach.error.file_size"))));
+          builder: (_) => PlatformAlertDialog(
+              title: Text(AppLocalizations.of(context)
+                  .tr("chat.new_message.attach.error.file_size"))));
     } on HttpUploadException {
       showPlatformDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(title: Text(AppLocalizations.of(context)
-              .tr("chat.new_message.attach.error.transport_error"))));
+          builder: (_) => PlatformAlertDialog(
+              title: Text(AppLocalizations.of(context)
+                  .tr("chat.new_message.attach.error.transport_error"))));
     }
   }
 }
