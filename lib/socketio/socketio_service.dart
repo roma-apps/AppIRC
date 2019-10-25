@@ -110,7 +110,10 @@ class SocketIOService extends Providable {
 
     addDisposable(
         disposable: _listenConnectionState(
-            (state) => _connectionStateController.add(state)));
+            (state) {
+              _logger.d(() => "onNewState => $state");
+              _connectionStateController.add(state);
+            }));
   }
 
   Disposable _listenConnectionState(
@@ -166,7 +169,6 @@ class SocketIOService extends Providable {
       await _socketIO.emit(command.getName(), command.getBody());
 
   disconnect() async {
-    _connectionStateController.add(SocketConnectionState.DISCONNECTED);
     return await _manager.clearInstance(_socketIO);
   }
 

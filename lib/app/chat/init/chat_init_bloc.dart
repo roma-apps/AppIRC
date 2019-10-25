@@ -4,7 +4,6 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/networks/chat_networks_list_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -41,12 +40,12 @@ class ChatInitBloc extends Providable {
       _sendStartRequests();
     } else {
       // ignore: cancel_subscriptions
-      StreamSubscription<ChatConnectionState> subscription;
+      StreamSubscription<bool> subscription;
       subscription =
-          _connectionBloc.connectionStateStream.listen((connectionState) {
-            _logger.d(() => "send ${_connectionBloc
-                .isConnected} connectionState $connectionState");
-            if (_connectionBloc.isConnected) {
+          _backendService.chatConfigExistStream.listen((configExist) {
+//            _logger.d(() => "send ${_connectionBloc
+//                .isConnected} connectionState $connectionState");
+            if (configExist) {
               _sendStartRequests();
               subscription.cancel();
             }

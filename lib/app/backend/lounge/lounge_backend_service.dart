@@ -48,8 +48,26 @@ class LoungeBackendService extends Providable
   final SocketIOManager socketIOManager;
   SocketIOService _socketIOService;
 
+  Stream<bool> get chatConfigExistStream =>
+      chatConfigStream.map((chatConfig) => chatConfig != null);
+
+  bool get isConnected => connectionState == ChatConnectionState.CONNECTED;
+
+  // ignore: close_sinks
+  BehaviorSubject<ChatConnectionState> _connectionStateController =
+  BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
+
+  Stream<ChatConnectionState> get connectionStateStream =>
+      _connectionStateController.stream;
+
+  ChatConnectionState get connectionState => _connectionStateController.value;
+
+  // ignore: close_sinks
+  BehaviorSubject<ChatConfig> _chatConfigSubject = BehaviorSubject();
+  Stream<ChatConfig> get chatConfigStream => _chatConfigSubject.stream;
+
   @override
-  ChatConfig chatConfig;
+  ChatConfig get chatConfig => _chatConfigSubject.value;
 
   @override
   ChatInitInformation chatInit;
@@ -76,6 +94,7 @@ class LoungeBackendService extends Providable
     addDisposable(subject: _connectionStateController);
     addDisposable(subject: _editNetworkRequests);
     addDisposable(subject: _messageTogglePreviewSubject);
+    addDisposable(subject: _chatConfigSubject);
   }
 
   Future init() async {
@@ -86,26 +105,18 @@ class LoungeBackendService extends Providable
 
     await _socketIOService.init();
 
-    addDisposable(
-        disposable: _createEventListenerDisposable(
-            _socketIOService, SocketIO.DISCONNECT, (_) {
-      _logger.d(() => "on Disconnect");
-      _connectionStateController.add(ChatConnectionState.DISCONNECTED);
-    }));
 
+    addDisposable(streamSubscription: _socketIOService.connectionStateStream.listen(
+        (socketState) {
+          var newBackendState = mapState(socketState);
+          _logger.d(() => "newState socketState $socketState "
+              " newBackendState $newBackendState");
+          _connectionStateController.add(newBackendState);
+
+        }));
     _logger.d(() => "init finished");
   }
 
-  bool get isConnected => connectionState == ChatConnectionState.CONNECTED;
-
-  // ignore: close_sinks
-  BehaviorSubject<ChatConnectionState> _connectionStateController =
-      BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
-
-  Stream<ChatConnectionState> get connectionStateStream =>
-      _connectionStateController.stream;
-
-  ChatConnectionState get connectionState => _connectionStateController.value;
 
   Future<RequestResult<ConnectResult>> tryConnectWithDifferentPreferences(
       LoungePreferences preferences) async {
@@ -132,17 +143,14 @@ class LoungeBackendService extends Providable
   Future<RequestResult<ConnectResult>> connectChat() async {
     assert(_loungePreferences != LoungeConnectionPreferences.empty);
 
-    _connectionStateController.add(ChatConnectionState.CONNECTING);
 
     ConnectResult connectResult =
         await _connect(_loungePreferences, _socketIOService);
 
+    // todo: rework
     if (connectResult.config != null) {
-      this.chatConfig = connectResult.config;
+      this._chatConfigSubject.add(connectResult.config);
       this.chatInit = connectResult.chatInit;
-      _connectionStateController.add(ChatConnectionState.CONNECTED);
-    } else {
-      _connectionStateController.add(ChatConnectionState.DISCONNECTED);
     }
 
     _logger.d(() => "connectChat = $connectResult chatConfig = $chatConfig");

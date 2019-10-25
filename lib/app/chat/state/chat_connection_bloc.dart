@@ -11,16 +11,6 @@ var _reconnectDuration = Duration(seconds: 5);
 class ChatConnectionBloc extends Providable {
   final ChatInputOutputBackendService backendService;
 
-  ChatConnectionBloc(this.backendService) {
-    addDisposable(
-        timer: Timer.periodic(_reconnectDuration, (_) => _reconnectIfNeeded()));
-    Future.delayed(Duration(milliseconds: 100), () {
-      _reconnectIfNeeded();
-    });
-
-
-
-  }
 
   bool get isConnected => backendService.isConnected;
 
@@ -28,6 +18,19 @@ class ChatConnectionBloc extends Providable {
 
   Stream<ChatConnectionState> get connectionStateStream =>
       backendService.connectionStateStream;
+
+
+  ChatConnectionBloc(this.backendService) {
+    addDisposable(
+        timer: Timer.periodic(_reconnectDuration, (_) => _reconnectIfNeeded()));
+    // TODO: extract constant
+    Future.delayed(Duration(milliseconds: 100), () {
+      _reconnectIfNeeded();
+    });
+
+
+
+  }
 
 
   reconnect() => _reconnectIfNeeded();
