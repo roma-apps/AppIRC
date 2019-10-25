@@ -9,24 +9,24 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
 import 'package:flutter_appirc/app/channel/topic/channel_topic_app_bar_widget.dart';
-import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
-import 'package:flutter_appirc/app/chat/messages/chat_messages_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/networks/chat_networks_blocs_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_widget.dart';
+import 'package:flutter_appirc/app/chat/channels/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_channel_widget.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
-import 'package:flutter_appirc/app/drawer/chat_drawer_page.dart';
-import 'package:flutter_appirc/app/drawer/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
+import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
+import 'package:flutter_appirc/app/chat/messages/chat_messages_list_bloc.dart';
 import 'package:flutter_appirc/app/chat/messages/chat_messages_loader_bloc.dart';
 import 'package:flutter_appirc/app/chat/messages/chat_messages_saver_bloc.dart';
-import 'package:flutter_appirc/app/chat/channels/chat_network_channels_blocs_bloc.dart';
+import 'package:flutter_appirc/app/chat/networks/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/networks/chat_networks_list_bloc.dart';
+import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
+import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/state/chat_unread_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
+import 'package:flutter_appirc/app/drawer/chat_drawer_page.dart';
+import 'package:flutter_appirc/app/drawer/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
@@ -37,7 +37,6 @@ import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
 import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 
 var _logger = MyLogger(logTag: "ChatPage", enabled: true);
 
@@ -315,8 +314,7 @@ class ChatPage extends StatelessWidget {
                                 ));
                           } else {
                             return Center(
-                                child:
-                                    _buildLoadingMessagesWidget(context));
+                                child: _buildLoadingMessagesWidget(context));
                           }
                         }),
                   );
@@ -330,85 +328,99 @@ class ChatPage extends StatelessWidget {
 
   Widget _buildConnectToNetworkWidget(BuildContext context) {
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
-    ChatBackendService backendService = Provider.of(context);
+
     return StreamBuilder<ChatConnectionState>(
         stream: connectionBloc.connectionStateStream,
         initialData: connectionBloc.connectionState,
         builder: (BuildContext context,
             AsyncSnapshot<ChatConnectionState> snapshot) {
           var connectionState = snapshot.data;
-          var appLocalizations = AppLocalizations.of(context);
           switch (connectionState) {
             case ChatConnectionState.CONNECTED:
-              var initBloc = Provider.of<ChatInitBloc>(context);
-
-              return StreamBuilder<ChatInitState>(
-                  stream: initBloc.stateStream,
-                  initialData: initBloc.state,
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    var currentInitState = snapshot.data;
-
-                    if (currentInitState == ChatInitState.FINISHED) {
-                      var startValues =
-                          createDefaultNetworkPreferences(context);
-                      return Provider(
-                        providable: ChatNetworkPreferencesFormBloc(
-                            startValues,
-                            true,
-                            false,
-                            !backendService.chatConfig.lockNetwork,
-                            backendService.chatConfig.displayNetwork),
-                        child: ChatNetworkPreferencesFormWidget(startValues,
-                            (context, preferences) async {
-                          var networksBloc =
-                              Provider.of<ChatNetworksListBloc>(context);
-                          await networksBloc.joinNetwork(preferences);
-                        },
-                            AppLocalizations.of(context)
-                                .tr('irc.connection.new.action.connect')),
-                      );
-                    } else {
-                      return Center(child: PlatformCircularProgressIndicator());
-                    }
-                  });
+              return _buildConnectedWidget(context);
 
               break;
             case ChatConnectionState.CONNECTING:
-              return Center(
-                  child: Text(
-                      appLocalizations.tr("chat.state.connection"
-                          ".status"
-                          ".connecting"),
-                      style: TextStyle(
-                          color:
-                              AppSkinBloc.of(context).appSkinTheme.textColor)));
+              return _buildConnectingWidget(context);
               break;
             case ChatConnectionState.DISCONNECTED:
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                        appLocalizations.tr("chat.state.connection"
-                            ".status.disconnected"),
-                        style: TextStyle(
-                            color: AppSkinBloc.of(context)
-                                .appSkinTheme
-                                .textColor)),
-                    createSkinnedPlatformButton(context,
-                        child: Text(appLocalizations
-                            .tr("chat.state.connection.action.reconnect")),
-                        onPressed: () {
-                      connectionBloc.reconnect();
-                    })
-                  ],
-                ),
-              );
+              return _buildDisconnectedWidget(context);
               break;
           }
           throw Exception("Invalid Chat connection state $connectionState");
         });
+  }
+
+  Widget _buildDisconnectedWidget(BuildContext context) {
+    var appLocalizations = AppLocalizations.of(context);
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(
+              appLocalizations.tr("chat.state.connection"
+                  ".status.disconnected"),
+              style: TextStyle(
+                  color: AppSkinBloc.of(context).appSkinTheme.textColor)),
+          createSkinnedPlatformButton(context,
+              child: Text(appLocalizations.tr(
+                  "chat.state.connection.action.reconnect")), onPressed: () {
+            var connectionBloc = Provider.of<ChatConnectionBloc>(context);
+            connectionBloc.reconnect();
+          })
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConnectingWidget(BuildContext context) => Center(
+      child: Text(
+          AppLocalizations.of(context).tr("chat.state.connection"
+              ".status"
+              ".connecting"),
+          style: TextStyle(
+              color: AppSkinBloc.of(context).appSkinTheme.textColor)));
+
+  Widget _buildConnectedWidget(BuildContext context) {
+    var initBloc = Provider.of<ChatInitBloc>(context);
+
+    _logger.d(() => "_buildConnectedWidget");
+
+    return StreamBuilder<ChatInitState>(
+        stream: initBloc.stateStream,
+        initialData: initBloc.state,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          var currentInitState = snapshot.data;
+          _logger.d(() => "currentInitState $currentInitState");
+          if (currentInitState == ChatInitState.FINISHED) {
+            return _buildConnectedAlreadyInitWidget(context);
+          } else {
+            return _buildConnectedNoInitWidget();
+          }
+        });
+  }
+
+  Widget _buildConnectedNoInitWidget() =>
+      Center(child: PlatformCircularProgressIndicator());
+
+  Widget _buildConnectedAlreadyInitWidget(BuildContext context) {
+    var startValues = createDefaultNetworkPreferences(context);
+
+    ChatBackendService backendService = Provider.of(context);
+    return Provider(
+      providable: ChatNetworkPreferencesFormBloc(
+          startValues,
+          true,
+          false,
+          !backendService.chatConfig.lockNetwork,
+          backendService.chatConfig.displayNetwork),
+      child: ChatNetworkPreferencesFormWidget(startValues,
+          (context, preferences) async {
+        var networksBloc = Provider.of<ChatNetworksListBloc>(context);
+        await networksBloc.joinNetwork(preferences);
+      }, AppLocalizations.of(context).tr('irc.connection.new.action.connect')),
+    );
   }
 
   Center _buildNoActiveChannelMessage(BuildContext context) {

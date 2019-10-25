@@ -33,26 +33,33 @@ class ChatInitBloc extends Providable {
 
   ChatInitBloc(this._backendService, this._connectionBloc,
       this._networksListBloc, this._startPreferences) {
-    _logger.d(() => "init $_startPreferences");
     addDisposable(subject: _stateController);
 
-    if (_connectionBloc.isConnected) {
+    var isConnected = _connectionBloc.isConnected;
+    _logger.d(() => "init $_startPreferences"
+    "isConnected $isConnected");
+    if (isConnected) {
       _sendStartRequests();
     } else {
       // ignore: cancel_subscriptions
-      StreamSubscription<bool> subscription;
-      subscription =
-          _backendService.chatConfigExistStream.listen((configExist) {
-//            _logger.d(() => "send ${_connectionBloc
-//                .isConnected} connectionState $connectionState");
-            if (configExist) {
-              _sendStartRequests();
-              subscription.cancel();
-            }
-          });
-
-      addDisposable(streamSubscription: subscription);
+      _subscribeForConnectEvent();
     }
+  }
+
+  void _subscribeForConnectEvent() {
+    _logger.d(() => "_subscribeForConnectEvent");
+       // ignore: cancel_subscriptions
+    StreamSubscription<bool> subscription;
+    subscription =
+        _backendService.chatConfigExistStream.listen((configExist) {
+          _logger.d(() => "_subscribeForConnectEvent configExist $configExist");
+          if (configExist) {
+            _sendStartRequests();
+            subscription.cancel();
+          }
+        });
+
+    addDisposable(streamSubscription: subscription);
   }
 
   void _sendStartRequests() async {

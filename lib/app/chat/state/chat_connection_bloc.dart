@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 var _reconnectDuration = Duration(seconds: 5);
 
+MyLogger _logger = MyLogger(logTag: "chat_connection_bloc.dart", enabled: true);
 
 class ChatConnectionBloc extends Providable {
   final ChatInputOutputBackendService backendService;
@@ -24,21 +26,13 @@ class ChatConnectionBloc extends Providable {
   ChatConnectionBloc(this.backendService) {
     addDisposable(
         timer: Timer.periodic(_reconnectDuration, (_) => _reconnectIfNeeded()));
-    // TODO: extract constant
-    Future.delayed(Duration(milliseconds: 100), () {
-      _reconnectIfNeeded();
-    });
-
-
-
   }
-
 
   reconnect() => _reconnectIfNeeded();
 
   void _reconnectIfNeeded() async {
-//    _logger.d(() => "_reconnectIfNeeded = $connectionState "
-//        "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
+    _logger.d(() => "_reconnectIfNeeded = $connectionState "
+        "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
     if (connectionState == ChatConnectionState.DISCONNECTED) {
       var connectivityResult = await (Connectivity().checkConnectivity());
 

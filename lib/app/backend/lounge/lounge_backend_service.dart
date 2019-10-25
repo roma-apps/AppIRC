@@ -142,6 +142,7 @@ class LoungeBackendService extends Providable
   @override
   Future<RequestResult<ConnectResult>> connectChat() async {
     assert(_loungePreferences != LoungeConnectionPreferences.empty);
+    _logger.d(() => "connectChat _loungePreferences $_loungePreferences");
 
     ConnectResult connectResult =
         await _connect(_loungePreferences, _socketIOService);
