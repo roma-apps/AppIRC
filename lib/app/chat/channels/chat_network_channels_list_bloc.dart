@@ -57,13 +57,24 @@ class ChatNetworkChannelsListBloc extends Providable {
 
     listenForNetworkChannelLeave =
         backendService.listenForNetworkChannelLeave(network, channel, () async {
+
+
+      var tempListeners = <VoidCallback>[];
+      // additional list required
+      // because we want modify original list during iteration
+      var originalListeners = leaveListeners[channel];
+      tempListeners.addAll(originalListeners);
+      tempListeners.forEach((listener) {
+        listener();
+      });
+
+      // all listeners should dispose itself on leave
+      assert(originalListeners.isEmpty);
+
       network.channels.remove(channel);
 
       _onChannelsChanged(network.channels);
 
-      leaveListeners[channel]?.forEach((listener) => listener());
-
-      _onChannelsChanged(networkChannels);
       listenForNetworkChannelLeave.dispose();
     });
     addDisposable(disposable: listenForNetworkChannelLeave);

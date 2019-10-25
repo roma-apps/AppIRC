@@ -28,7 +28,8 @@ class ChatMessagesListBloc extends Providable {
     addDisposable(streamSubscription:
         messagesLoaderBloc.messagesStream.listen((newMessages) {
       _onMessagesChanged(
-          newMessages, moreHistoryOwner.networkChannelMoreHistoryAvailable);
+          newMessages, moreHistoryOwner.networkChannelMoreHistoryAvailable ??
+          false);
     }));
 
     addDisposable(streamSubscription: moreHistoryOwner

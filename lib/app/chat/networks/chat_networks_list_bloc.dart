@@ -64,7 +64,16 @@ class ChatNetworksListBloc extends Providable {
 
       _networks.remove(network);
 
-      leaveListeners[network].forEach((listener) => listener());
+      // additional list required
+      // because we want modify original list during iteration
+      var tempListeners = <VoidCallback>[];
+      var originalListeners = leaveListeners[network];
+      tempListeners.addAll(originalListeners);
+      tempListeners.forEach((listener) => listener());
+
+
+      // all listeners should dispose itself on leave
+      assert(originalListeners.isEmpty);
 
       _onNetworksChanged(_networks);
       listenForNetworkExit.dispose();

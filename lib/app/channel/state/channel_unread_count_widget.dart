@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/list/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-
-import '../list/channels_list_skin_bloc.dart';
 
 Widget _buildChannelUnreadBadgeCount(
     BuildContext context, bool isChannelActive, int unreadCount) {

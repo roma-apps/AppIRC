@@ -1,6 +1,9 @@
 import 'package:flutter_appirc/app/chat/channels/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
+
+MyLogger _logger = MyLogger(logTag: "chat_unread_bloc.dart", enabled: true);
 
 class ChatUnreadBloc extends Providable {
   // ignore: close_sinks
@@ -12,7 +15,7 @@ class ChatUnreadBloc extends Providable {
       _channelsWithUnreadMessagesCountController.value;
 
   final ChatNetworkChannelsStateBloc channelsStateBloc;
-  ChatUnreadBloc(this.channelsStateBloc) {
+  ChatUnreadBloc(this.channelsStateBloc) : super() {
     addDisposable(subject: _channelsWithUnreadMessagesCountController);
 
     addDisposable(
@@ -24,12 +27,13 @@ class ChatUnreadBloc extends Providable {
 
   void _update() {
     var unreadCount = 0;
-    for(var state in channelsStateBloc.states) {
-      var  haveUnread = state.unreadCount > 0;
-      if(haveUnread) {
+    for (var state in channelsStateBloc.states) {
+      var haveUnread = state.unreadCount > 0;
+      if (haveUnread) {
         unreadCount++;
       }
     }
+    _logger.d(() => "_update $unreadCount");
     _channelsWithUnreadMessagesCountController.add(unreadCount);
   }
 }

@@ -107,13 +107,25 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
     NetworkChannel newActiveChannel =
         await findChannelWithRemoteID(chatInitActiveChannelRemoteID);
 
+    if (newActiveChannel == null) {
+      _logger.w(() => "fail to _restoreByRemoteID "
+          "$chatInitActiveChannelRemoteID");
+      // sometimes required channel already leaved
+      // usually when we try to restore active channel by remote config
+      var allChannels = await _networksListBloc.allNetworksChannels;
+      if (allChannels?.isNotEmpty == true) {
+        newActiveChannel = allChannels.first;
+      }
+    }
+
     changeActiveChanel(newActiveChannel);
   }
 
   Future<NetworkChannel> findChannelWithRemoteID(int remoteId) async {
     var allChannels = await _networksListBloc.allNetworksChannels;
-    var newActiveChannel =
-        allChannels.firstWhere((channel) => channel.remoteId == remoteId);
+    var newActiveChannel = allChannels.firstWhere(
+        (channel) => channel.remoteId == remoteId,
+        orElse: () => null);
     return newActiveChannel;
   }
 

@@ -13,32 +13,51 @@ abstract class ChatNetworkChannelsListListenerBloc
 
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {
-
     var network = networkWithState.network;
-
-    networkWithState.channelsWithState.forEach(
-        (channelWithState) => onChannelJoined(network, channelWithState));
-
     ChatNetworkChannelsListBloc chatNetworkChannelsListBloc =
         getChatNetworkChannelsListBloc(network);
+
+    networkWithState.channelsWithState.forEach((channelWithState) {
+      onChannelJoined(network, channelWithState);
+      var channel = channelWithState.channel;
+      addDisposable(
+          disposable: _subscribeForChannelLeave(
+              chatNetworkChannelsListBloc, network, channel));
+    });
 
     var channelJoinListener = chatNetworkChannelsListBloc
         .listenForNetworkChannelJoin(((channelWithState) {
       var channel = channelWithState.channel;
-      Disposable leaveListener;
-      leaveListener =
-          chatNetworkChannelsListBloc.listenForNetworkChannelLeave(channel, () {
-        onChannelLeaved(network, channel);
-        leaveListener.dispose();
-      });
+
+      addDisposable(
+          disposable: _subscribeForChannelLeave(
+              chatNetworkChannelsListBloc, network, channel));
 
       onChannelJoined(network, channelWithState);
-
-      addDisposable(disposable: leaveListener);
     }));
 
     addDisposable(disposable: channelJoinListener);
   }
+
+  @override
+  void onNetworkLeaved(Network network) {
+    network.channels.forEach((channel) => onChannelLeaved(network, channel));
+  }
+
+  Disposable _subscribeForChannelLeave(
+      ChatNetworkChannelsListBloc chatNetworkChannelsListBloc,
+      Network network,
+      NetworkChannel channel) {
+    Disposable leaveListener;
+    leaveListener =
+        chatNetworkChannelsListBloc.listenForNetworkChannelLeave(channel, () {
+      onChannelLeaved(network, channel);
+      leaveListener.dispose();
+    });
+    return leaveListener;
+  }
+
+
 
   @mustCallSuper
   @protected
@@ -48,9 +67,4 @@ abstract class ChatNetworkChannelsListListenerBloc
   @protected
   void onChannelJoined(
       Network network, NetworkChannelWithState channelWithState);
-
-  @override
-  void onNetworkLeaved(Network network) {
-    network.channels.forEach((channel) => onChannelLeaved(network, channel));
-  }
 }

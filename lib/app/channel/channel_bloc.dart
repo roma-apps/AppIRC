@@ -99,7 +99,7 @@ class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
       _networkChannelStateStream.map((state) => state?.connected).distinct();
 
   bool get networkChannelMoreHistoryAvailable =>
-      networkChannelState.moreHistoryAvailable;
+      networkChannelState?.moreHistoryAvailable;
 
   Stream<bool> get networkChannelMoreHistoryAvailableStream =>
       _networkChannelStateStream.map((state) => state?.moreHistoryAvailable)
