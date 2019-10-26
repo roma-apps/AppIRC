@@ -5,7 +5,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(logTag: "ChatNetworksStateBloc", enabled: true);
+var _logger = MyLogger(logTag: "chat_networks_states_bloc.dart", enabled: true);
 
 class ChatNetworksStateBloc extends ChatNetworksListListenerBloc {
   final ChatBackendService _backendService;

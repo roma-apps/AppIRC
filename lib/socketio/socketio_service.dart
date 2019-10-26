@@ -5,7 +5,7 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(logTag: "SocketIOService", enabled: true);
+var _logger = MyLogger(logTag: "socketio_service.dart", enabled: true);
 
 var _connectTimeout = Duration(seconds: 5);
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);

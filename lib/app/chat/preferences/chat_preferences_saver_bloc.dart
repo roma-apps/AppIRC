@@ -9,7 +9,7 @@ import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart'
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 
-var _logger = MyLogger(logTag: "ChatPreferencesSaverBloc", enabled: true);
+var _logger = MyLogger(logTag: "chat_preferences_saver_bloc.dart", enabled: true);
 
 class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
   final ChatBackendService _backendService;

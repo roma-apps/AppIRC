@@ -9,7 +9,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
 
-var _logger = MyLogger(logTag: "ChatDeepLinkBloc", enabled: true);
+var _logger = MyLogger(logTag: "chat_deep_link_bloc.dart", enabled: true);
 
 class ChatDeepLinkBloc extends Providable {
   final ChatBackendService backendService;

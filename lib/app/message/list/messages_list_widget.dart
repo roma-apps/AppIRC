@@ -21,7 +21,7 @@ import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
 var _logger =
-    MyLogger(logTag: "NetworkChannelMessagesListWidget", enabled: true);
+    MyLogger(logTag: "messages_list_widget.dart", enabled: true);
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
   NetworkChannelMessagesListWidget();

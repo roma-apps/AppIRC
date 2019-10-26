@@ -16,7 +16,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _logger =
-    MyLogger(logTag: "NetworkChannelMessagesSaverBloc", enabled: true);
+    MyLogger(logTag: "chat_messages_saver_bloc.dart", enabled: true);
 
 class NetworkChannelMessagesSaverBloc
     extends ChatNetworkChannelsListListenerBloc {

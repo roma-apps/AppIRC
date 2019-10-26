@@ -16,7 +16,7 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _logger =
-    MyLogger(logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
+    MyLogger(logTag: "chat_messages_loader_bloc.dart", enabled: true);
 
 class NetworkChannelMessagesLoaderBloc extends Providable {
   final ChatBackendService backendService;

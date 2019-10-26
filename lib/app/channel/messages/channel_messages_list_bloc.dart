@@ -4,7 +4,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(logTag: "ChannelMessagesListBloc", enabled: true);
+var _logger = MyLogger(logTag: "channel_messages_list_bloc.dart", enabled: true);
 
 class ChannelMessagesListBloc extends Providable {
   // ignore: close_sinks

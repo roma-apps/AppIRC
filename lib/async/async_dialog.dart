@@ -5,7 +5,7 @@ import 'package:flutter_appirc/async/async_dialog_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-var _logger = MyLogger(logTag: "doAsyncOperationWithDialog", enabled: true);
+var _logger = MyLogger(logTag: "async_dialog.dart", enabled: true);
 
 Future<AsyncDialogResult<T>> doAsyncOperationWithDialog<T>(
   BuildContext context, {

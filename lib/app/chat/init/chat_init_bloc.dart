@@ -9,7 +9,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(logTag: "ChatInitBloc", enabled: true);
+var _logger = MyLogger(logTag: "chat_init_bloc.dart", enabled: true);
 
 class ChatInitBloc extends Providable {
   final ChatBackendService _backendService;

@@ -9,7 +9,7 @@ import 'package:flutter_appirc/provider/provider.dart';
 
 var _splitSeparator = " ";
 
-var _logger = MyLogger(logTag: "ChatInputMessageBloc", enabled: true);
+var _logger = MyLogger(logTag: "chat_input_message_bloc.dart", enabled: true);
 
 class ChatInputMessageBloc extends Providable {
   final ChatConfig chatConfig;

@@ -12,7 +12,7 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-var _logger = MyLogger(logTag: "NetworkChannelJoinPage", enabled: true);
+var _logger = MyLogger(logTag: "network_join_channel_page.dart", enabled: true);
 
 class NetworkChannelJoinPage extends StatefulWidget {
   final Network network;

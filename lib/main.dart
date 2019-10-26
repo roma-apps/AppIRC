@@ -60,7 +60,7 @@ import 'app/skin/app_irc_channels_list_skin_bloc.dart';
 import 'app/skin/app_irc_chat_input_message_skin_bloc.dart';
 import 'app/skin/themes/day_app_irc_skin_theme.dart';
 
-var _logger = MyLogger(logTag: "Main", enabled: true);
+var _logger = MyLogger(logTag: "main.dart", enabled: true);
 
 Future main() async {
 //  changeToCupertinoPlatformAware();

@@ -7,7 +7,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/pushes/push_service.dart';
 
-var _logger = MyLogger(logTag: "ChatPushesService", enabled: true);
+var _logger = MyLogger(logTag: "chat_pushes_service.dart", enabled: true);
 
 class ChatPushesService extends Providable {
   final PushesService _pushesService;

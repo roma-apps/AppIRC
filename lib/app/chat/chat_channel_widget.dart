@@ -12,7 +12,7 @@ import 'package:flutter_appirc/platform_aware/platform_aware_text_field.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-var _logger = MyLogger(logTag: "NetworkChannelWidget", enabled: true);
+var _logger = MyLogger(logTag: "channel_messages_list_bloc.dart", enabled: true);
 
 class NetworkChannelWidget extends StatefulWidget {
 

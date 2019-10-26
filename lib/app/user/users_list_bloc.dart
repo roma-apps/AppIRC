@@ -5,7 +5,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(logTag: "ChannelUsersListBloc", enabled: true);
+var _logger = MyLogger(logTag: "users_list_bloc.dart", enabled: true);
 
 class ChannelUsersListBloc extends Providable {
   NetworkChannelBloc channelBloc;

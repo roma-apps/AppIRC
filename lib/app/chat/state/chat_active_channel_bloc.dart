@@ -15,7 +15,7 @@ import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _preferenceKey = "chat.activeChannel";
-var _logger = MyLogger(logTag: "ChatActiveChannelBloc", enabled: true);
+var _logger = MyLogger(logTag: "chat_active_channel_bloc.dart", enabled: true);
 
 class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
   final ChatBackendService _backendService;

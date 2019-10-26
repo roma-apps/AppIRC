@@ -38,7 +38,7 @@ import 'package:flutter_appirc/skin/skin_model.dart';
 import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-var _logger = MyLogger(logTag: "ChatPage", enabled: true);
+var _logger = MyLogger(logTag: "chat_page.dart", enabled: true);
 
 class ChatPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
