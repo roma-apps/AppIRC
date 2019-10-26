@@ -8,28 +8,25 @@ import 'package:flutter_appirc/disposable/ui_disposable.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DisposableOwner extends Disposable {
-
   bool disposed = false;
   final CompositeDisposable _compositeDisposable = CompositeDisposable([]);
 
-
   void addDisposable(
       {Disposable disposable,
-        StreamSubscription streamSubscription,
-        TextEditingController textEditingController, Subject subject, Timer timer}) {
+      StreamSubscription streamSubscription,
+      TextEditingController textEditingController,
+      Subject subject,
+      Timer timer}) {
     if (disposable != null) {
       _compositeDisposable.children.add(disposable);
     }
 
-    if(subject != null) {
-      _compositeDisposable.children
-          .add(SubjectDisposable(subject));
+    if (subject != null) {
+      _compositeDisposable.children.add(SubjectDisposable(subject));
     }
 
-
-    if(timer != null) {
-      _compositeDisposable.children
-          .add(TimerDisposable(timer));
+    if (timer != null) {
+      _compositeDisposable.children.add(TimerDisposable(timer));
     }
 
     if (streamSubscription != null) {
@@ -50,10 +47,7 @@ class DisposableOwner extends Disposable {
   }
 }
 
-abstract class Providable extends DisposableOwner {
-
-}
-
+abstract class Providable extends DisposableOwner {}
 
 class Provider<T extends Providable> extends StatefulWidget {
   Provider({
