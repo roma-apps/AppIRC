@@ -7,10 +7,6 @@ class PushMessage {
   String toString() {
     return 'PushMessage{type: $type, data: $data}';
   }
-
-
 }
 
-enum PushMessageType {
-  DEFAULT, LAUNCH, RESUME
-}
+enum PushMessageType { DEFAULT, LAUNCH, RESUME }
