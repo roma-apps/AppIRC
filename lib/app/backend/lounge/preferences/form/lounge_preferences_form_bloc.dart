@@ -4,47 +4,51 @@ import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:rxdart/rxdart.dart';
 
-class LoungePreferencesFormBloc extends FormBloc {
-  LoungeConnectionPreferencesFormBloc connectionFormBloc;
-  LoungeAuthPreferencesFormBloc authPreferencesFormBloc;
+final bool _authBlockEnabledFromStart = false;
 
-  final LoungePreferences preferences;
+class LoungePreferencesFormBloc extends FormBloc {
+  LoungeConnectionPreferencesFormBloc _connectionFormBloc;
+  LoungeAuthPreferencesFormBloc _authPreferencesFormBloc;
+
+  LoungeConnectionPreferencesFormBloc get connectionFormBloc =>
+      _connectionFormBloc;
+
+  LoungeAuthPreferencesFormBloc get authPreferencesFormBloc =>
+      _authPreferencesFormBloc;
+
+  final LoungePreferences _startPreferences;
 
   BehaviorSubject<bool> _isAuthFormEnabledController;
 
-  LoungePreferencesFormBloc(this.preferences) {
-    connectionFormBloc =
-        LoungeConnectionPreferencesFormBloc(preferences.connectionPreferences);
-    authPreferencesFormBloc =
-        LoungeAuthPreferencesFormBloc(preferences.authPreferences);
+  LoungePreferencesFormBloc(this._startPreferences) {
+    _connectionFormBloc = LoungeConnectionPreferencesFormBloc(
+        _startPreferences.connectionPreferences);
+    _authPreferencesFormBloc =
+        LoungeAuthPreferencesFormBloc(_startPreferences.authPreferences);
 
-//    var authBlockEnabledFromStart = preferences
-//        .authPreferences != null && preferences.authPreferences !=
-//        LoungeAuthPreferences.empty;
-    var authBlockEnabledFromStart = false;
     _isAuthFormEnabledController =
-        BehaviorSubject(seedValue: authBlockEnabledFromStart);
+        BehaviorSubject(seedValue: _authBlockEnabledFromStart);
 
     addDisposable(subject: _isAuthFormEnabledController);
   }
 
   @override
   List<FormFieldBloc> get children {
-    if (isAuthFormEnabled == true) {
+    if (isAuthFormEnabled) {
       return [connectionFormBloc, authPreferencesFormBloc];
     } else {
       return [connectionFormBloc];
     }
   }
 
-  bool get isAuthFormEnabled => _isAuthFormEnabledController?.value;
+  bool get isAuthFormEnabled => _isAuthFormEnabledController?.value ?? false;
+
+  get isAuthFormEnabledStream => _isAuthFormEnabledController.stream.distinct();
 
   set isAuthFormEnabled(newValue) {
     _isAuthFormEnabledController.add(newValue);
     resubscribeInternalFormsErrors();
   }
-
-  get isAuthFormEnabledStream => _isAuthFormEnabledController.stream.distinct();
 
   LoungePreferences extractData() =>
       LoungePreferences(connectionFormBloc.extractData(),

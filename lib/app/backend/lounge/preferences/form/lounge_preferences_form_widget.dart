@@ -6,7 +6,7 @@ import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_p
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/connection/lounge_connection_preferences_form_widget.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_form_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/form/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/async/async_dialog_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -33,23 +33,21 @@ class LoungePreferencesFormWidget extends StatefulWidget {
 
 class LoungePreferencesFormWidgetState
     extends State<LoungePreferencesFormWidget> {
-  final LoungePreferences startValues;
+  final LoungePreferences startPreferences;
   final LoungePreferencesActionCallback successCallback;
   final String buttonText;
 
   LoungePreferencesFormWidgetState(
-      this.startValues, this.successCallback, this.buttonText);
+      this.startPreferences, this.successCallback, this.buttonText);
 
   @override
   Widget build(BuildContext context) {
     LoungePreferencesFormBloc formBloc =
         Provider.of<LoungePreferencesFormBloc>(context);
 
-    var connectionFormBloc = formBloc.connectionFormBloc;
 
-    var authFormBloc = formBloc.authPreferencesFormBloc;
     var loungeAuthPreferencesFormWidget =
-        LoungeAuthPreferencesFormWidget(authFormBloc.authPreferences);
+        LoungeAuthPreferencesFormWidget(startPreferences.authPreferences);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -59,9 +57,9 @@ class LoungePreferencesFormWidgetState
             child: ListView(
               children: <Widget>[
                 Provider(
-                  providable: connectionFormBloc,
+                  providable: formBloc.connectionFormBloc,
                   child: LoungeConnectionPreferencesFormWidget(
-                      startValues.connectionPreferences),
+                      startPreferences.connectionPreferences),
                 ),
                 StreamBuilder<bool>(
                     stream: formBloc.isAuthFormEnabledStream,
@@ -70,7 +68,7 @@ class LoungePreferencesFormWidgetState
                       var enabled = snapshot.data;
                       if (enabled) {
                         return Provider(
-                          providable: authFormBloc,
+                          providable: formBloc.authPreferencesFormBloc,
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                             child: loungeAuthPreferencesFormWidget,

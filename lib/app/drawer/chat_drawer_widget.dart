@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_page.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/page/lounge_edit_preferences_page.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/list/networks_list_widget.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_page.dart';

@@ -1,101 +1,45 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_form_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_form_widget.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/form/lounge_preferences_form_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/form/lounge_preferences_form_widget.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "lounge_preferences_page.dart", enabled: true);
-
-typedef PreferencesActionCallback = void Function(
+typedef LoungePreferencesActionCallback = void Function(
     BuildContext context, LoungePreferences preferences);
 
-class NewLoungePreferencesPage extends LoungePreferencesPage {
-  NewLoungePreferencesPage(LoungePreferences startPreferences)
-      : super(startPreferences);
-
-  @override
-  successCallback(BuildContext context, LoungePreferences preferences) async {
-    Provider.of<LoungePreferencesBloc>(context).setValue(preferences);
-  }
-}
-
-class EditLoungePreferencesPage extends LoungePreferencesPage {
-  EditLoungePreferencesPage(LoungePreferences startPreferences)
-      : super(startPreferences);
-
-  @override
-  successCallback(BuildContext context, LoungePreferences preferences) async {
-    var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
-
-    var appLocalizations = AppLocalizations.of(context);
-
-    _logger.d(() => "build");
-    showPlatformDialog(
-        androidBarrierDismissible: true,
-        context: context,
-        builder: (_) => PlatformAlertDialog(
-              title: Text(appLocalizations
-                  .tr("lounge.preferences.edit.dialog.confirm.title")),
-              content: Text(appLocalizations
-                  .tr("lounge.preferences.edit.dialog.confirm.content")),
-              actions: <Widget>[
-                PlatformDialogAction(
-                  child: Text(appLocalizations
-                      .tr("lounge.preferences.edit.dialog.confirm.action"
-                          ".save_reload")),
-                  onPressed: () async {
-                    // exit dialog
-                    Navigator.pop(context);
-                    // exit edit page
-                    Navigator.pop(context);
-                    loungePreferencesBloc.setValue(preferences);
-                  },
-                ),
-                PlatformDialogAction(
-                  child: Text(appLocalizations.tr(
-                      "lounge.preferences.edit.dialog.confirm.action.cancel")),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                  },
-                )
-              ],
-            ));
-  }
-}
-
 abstract class LoungePreferencesPage extends StatefulWidget {
-  final LoungePreferences startPreferences;
+  final LoungePreferences _startPreferences;
 
-  successCallback(BuildContext context, LoungePreferences preferences);
+  @protected
+  onSuccessTestConnectionWithGivenPreferences(
+      BuildContext context, LoungePreferences preferences);
 
-  LoungePreferencesPage(this.startPreferences);
+  LoungePreferencesPage(this._startPreferences);
 
   @override
   State<StatefulWidget> createState() {
-    return LoungePreferencesPageState(startPreferences, successCallback);
+    return LoungePreferencesPageState(
+        _startPreferences, onSuccessTestConnectionWithGivenPreferences);
   }
 }
 
 class LoungePreferencesPageState extends State<LoungePreferencesPage> {
-  final PreferencesActionCallback actionCallback;
-  final LoungePreferences startPreferencesValues;
+  final LoungePreferencesActionCallback _actionCallback;
+  final LoungePreferences _startPreferences;
 
-  LoungePreferencesFormBloc preferencesFormBloc;
+  LoungePreferencesFormBloc _preferencesFormBloc;
 
-  LoungePreferencesPageState(this.startPreferencesValues, this.actionCallback) {
-    preferencesFormBloc = LoungePreferencesFormBloc(startPreferencesValues);
+  LoungePreferencesPageState(this._startPreferences, this._actionCallback) {
+    _preferencesFormBloc = LoungePreferencesFormBloc(_startPreferences);
   }
 
   @override
   void dispose() {
     super.dispose();
-    preferencesFormBloc?.dispose();
+    _preferencesFormBloc?.dispose();
   }
 
   @override
@@ -111,17 +55,16 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Provider<LoungePreferencesFormBloc>(
-            providable: preferencesFormBloc,
+            providable: _preferencesFormBloc,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Expanded(
                   child: LoungePreferencesFormWidget(
-                      startPreferencesValues,
-                      actionCallback,
+                      _startPreferences,
+                      _actionCallback,
                       AppLocalizations.of(context)
-                          .tr('lounge.preferences.new.action'
-                              '.connect')),
+                          .tr('lounge.preferences.new.action.connect')),
                 ),
                 _buildTestButtons(context)
               ],
@@ -133,8 +76,8 @@ class LoungePreferencesPageState extends State<LoungePreferencesPage> {
   }
 
   Widget _buildTestButtons(BuildContext context) {
-    var hostBloc = preferencesFormBloc.connectionFormBloc.hostFieldBloc;
-    var connectionPreferences = startPreferencesValues.connectionPreferences;
+    var hostBloc = _preferencesFormBloc.connectionFormBloc.hostFieldBloc;
+    var connectionPreferences = _startPreferences.connectionPreferences;
     return Column(
       children: <Widget>[
         createSkinnedPlatformButton(context, onPressed: () {

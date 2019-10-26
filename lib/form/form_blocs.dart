@@ -103,6 +103,7 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
     });
   }
 
+  @protected
   void resubscribeInternalFormsErrors() {
     listeners.forEach((listener) {
       listener.cancel();

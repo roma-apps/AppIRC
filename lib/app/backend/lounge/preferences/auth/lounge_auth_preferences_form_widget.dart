@@ -1,5 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_bloc.dart';
@@ -8,24 +8,24 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class LoungeAuthPreferencesFormWidget extends StatefulWidget {
-  final LoungeAuthPreferences startValues;
+  final LoungeAuthPreferences _startPreferences;
 
-  LoungeAuthPreferencesFormWidget(this.startValues);
+  LoungeAuthPreferencesFormWidget(this._startPreferences);
 
   @override
   State<StatefulWidget> createState() =>
-      LoungeAuthPreferencesFormWidgetState(startValues);
+      LoungeAuthPreferencesFormWidgetState(_startPreferences);
 }
 
 class LoungeAuthPreferencesFormWidgetState
     extends State<LoungeAuthPreferencesFormWidget> {
-  final LoungeAuthPreferences startValues;
+  final LoungeAuthPreferences _startPreferences;
   TextEditingController _usernameController;
   TextEditingController _passwordController;
 
-  LoungeAuthPreferencesFormWidgetState(this.startValues) {
-    _usernameController = TextEditingController(text: startValues?.username);
-    _passwordController = TextEditingController(text: startValues?.password);
+  LoungeAuthPreferencesFormWidgetState(this._startPreferences) {
+    _usernameController = TextEditingController(text: _startPreferences?.username);
+    _passwordController = TextEditingController(text: _startPreferences?.password);
   }
 
   @override

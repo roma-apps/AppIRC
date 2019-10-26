@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/connection/lounge_connection_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
@@ -13,23 +14,23 @@ MyLogger _logger = MyLogger(
     enabled: true);
 
 class LoungeConnectionPreferencesFormWidget extends StatefulWidget {
-  final LoungeConnectionPreferences startValues;
+  final LoungeConnectionPreferences _startPreferences;
 
-  LoungeConnectionPreferencesFormWidget(this.startValues);
+  LoungeConnectionPreferencesFormWidget(this._startPreferences);
 
   @override
   State<StatefulWidget> createState() =>
-      LoungeConnectionPreferencesFormWidgetState(startValues);
+      LoungeConnectionPreferencesFormWidgetState(_startPreferences);
 }
 
 class LoungeConnectionPreferencesFormWidgetState
     extends State<LoungeConnectionPreferencesFormWidget> {
-  final LoungeConnectionPreferences startValues;
+  final LoungeConnectionPreferences _startPreferences;
   TextEditingController _hostController;
 
-  LoungeConnectionPreferencesFormWidgetState(this.startValues) {
+  LoungeConnectionPreferencesFormWidgetState(this._startPreferences) {
     _logger.d(() => "create");
-    _hostController = TextEditingController(text: startValues.host);
+    _hostController = TextEditingController(text: _startPreferences.host);
   }
 
   @override
@@ -43,6 +44,12 @@ class LoungeConnectionPreferencesFormWidgetState
     var loungePreferencesFormBloc =
         Provider.of<LoungeConnectionPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
+
+
+    // temp hack to fill data by test buttons
+    // it also cause strange cursors bugs on Android
+    // TODO: remove hack
+    _hostController.text = _startPreferences.host;
 
     _logger.d(() => "build");
     return Column(

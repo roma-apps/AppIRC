@@ -4,8 +4,8 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 class LoungeConnectionPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<String> hostFieldBloc;
 
-  LoungeConnectionPreferencesFormBloc(LoungeConnectionPreferences loungePreferences) {
-    hostFieldBloc = FormValueFieldBloc<String>(loungePreferences.host,
+  LoungeConnectionPreferencesFormBloc(LoungeConnectionPreferences startPreferences) {
+    hostFieldBloc = FormValueFieldBloc<String>(startPreferences.host,
         validators: [NotEmptyTextValidator.instance, NoWhitespaceTextValidator.instance]);
   }
 

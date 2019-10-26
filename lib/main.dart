@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_page.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/page/lounge_new_preferences_page.dart';
 import 'package:flutter_appirc/app/channel/list/channels_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/channels/chat_network_channels_blocs_bloc.dart';
