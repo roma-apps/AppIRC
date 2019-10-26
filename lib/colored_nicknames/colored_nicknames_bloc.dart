@@ -13,15 +13,11 @@ class ColoredNicknamesBloc extends Providable {
   int _currentColorIndex = 0;
   Map<String, Color> _nickToColor = Map();
 
-
   Color getColorForNick(String nick) {
-
-    if(!_nickToColor.containsKey(nick)) {
+    if (!_nickToColor.containsKey(nick)) {
       _nickToColor[nick] = _colors[(_currentColorIndex++ % _colors.length)];
     }
 
     return _nickToColor[nick];
   }
-
-
 }

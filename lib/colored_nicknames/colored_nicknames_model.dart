@@ -4,6 +4,4 @@ class ColoredNicknamesData {
   final List<Color> colors;
 
   ColoredNicknamesData(this.colors);
-
-
 }
