@@ -11,7 +11,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
-import 'package:flutter_appirc/url/url_finder.dart';
+import 'package:flutter_appirc/url_finder/url_finder.dart';
 
 var _logger = MyLogger(logTag: "lounge_model_adapter.dart", enabled: true);
 

@@ -31,7 +31,7 @@ import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_helper.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_service.dart';
-import 'package:flutter_appirc/url/url_finder.dart';
+import 'package:flutter_appirc/url_finder/url_finder.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "lounge_backend_service.dart", enabled: true);
