@@ -18,7 +18,7 @@ var _preferenceKey = "chat.activeChannel";
 var _logger = MyLogger(logTag: "ChatActiveChannelBloc", enabled: true);
 
 class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
-  final ChatInputBackendService _backendService;
+  final ChatBackendService _backendService;
   final ChatNetworksListBloc _networksListBloc;
   final ChatInitBloc _chatInitBloc;
   final ChatPushesService pushesService;
@@ -170,7 +170,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
 
     Network network =
         _networksListBloc.findNetworkWithChannel(newActiveChannel);
-    _backendService.onOpenNetworkChannel(network, newActiveChannel);
+    _backendService.sendChannelOpenedEventToServer(network, newActiveChannel);
     _backendService.requestNetworkChannelUsers(network, newActiveChannel);
   }
 

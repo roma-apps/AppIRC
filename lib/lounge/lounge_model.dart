@@ -6,23 +6,33 @@ import 'package:json_annotation/json_annotation.dart';
 part 'lounge_model.g.dart';
 
 class LoungeConstants {
-  static const String on = "on";
-  static const String off = "off";
   static const String channelsNamesSeparator = " ";
-
-  static const int CHANNEL_STATE_CONNECTED = 1;
-  static const int CHANNEL_STATE_DISCONNECTED = 0;
 }
 
-class LoungeChannelTypeConstants {
+class ClientSideLoungeIRCCommandConstants {
+  static const String expand = "/expand";
+  static const String collapse = "/collapse";
+
+}
+
+class BooleanLoungeConstants {
+  static const String on = "on";
+  static const String off = "off";
+}
+
+class ChannelStateLoungeConstants {
+  static const int connected = 1;
+  static const int disconnected = 0;
+}
+
+class ChannelTypeLoungeConstants {
   static const lobby = "lobby";
   static const special = "special";
   static const query = "query";
   static const channel = "channel";
 }
 
-class LoungeMessageTypeConstants {
-
+class MessageTypeLoungeConstants {
   static const lobby = "lobby";
   static const unhandled = "unhandled";
   static const topicSetBy = "topic_set_by";
@@ -46,9 +56,10 @@ class LoungeMessageTypeConstants {
 
 @JsonSerializable()
 class LoungeConnectionPreferences extends JsonPreferences {
-   String host;
+  String host;
 
   LoungeConnectionPreferences(this.host);
+
   LoungeConnectionPreferences.name({@required this.host});
 
   static LoungeConnectionPreferences empty =
@@ -81,8 +92,10 @@ class LoungeAuthPreferences extends JsonPreferences {
   final String username;
   final String password;
 
-  LoungeAuthPreferences(this.username,this.password);
-  LoungeAuthPreferences.name({@required this.username, @required this.password});
+  LoungeAuthPreferences(this.username, this.password);
+
+  LoungeAuthPreferences.name(
+      {@required this.username, @required this.password});
 
   static LoungeAuthPreferences empty =
       LoungeAuthPreferences.name(username: null, password: null);
@@ -104,27 +117,24 @@ class LoungePreferences extends JsonPreferences {
   LoungeConnectionPreferences connectionPreferences;
   LoungeAuthPreferences authPreferences;
 
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is LoungePreferences &&
-              runtimeType == other.runtimeType &&
-              connectionPreferences == other.connectionPreferences &&
-              authPreferences == other.authPreferences;
+      other is LoungePreferences &&
+          runtimeType == other.runtimeType &&
+          connectionPreferences == other.connectionPreferences &&
+          authPreferences == other.authPreferences;
 
   @override
-  int get hashCode =>
-      connectionPreferences.hashCode ^
-      authPreferences.hashCode;
+  int get hashCode => connectionPreferences.hashCode ^ authPreferences.hashCode;
 
   LoungePreferences(this.connectionPreferences, {this.authPreferences});
 
   LoungePreferences.name(
       {@required this.connectionPreferences, @required this.authPreferences});
 
-  static LoungePreferences empty =
-      LoungePreferences.name(connectionPreferences: null, authPreferences: null);
+  static LoungePreferences empty = LoungePreferences.name(
+      connectionPreferences: null, authPreferences: null);
 
   @override
   Map<String, dynamic> toJson() => _$LoungePreferencesToJson(this);
@@ -137,9 +147,4 @@ class LoungePreferences extends JsonPreferences {
     return 'LoungePreferences{connectionPreferences: $connectionPreferences,'
         ' authPreferences: $authPreferences}';
   }
-
-
 }
-
-typedef LoungePreferencesActionCallback = void Function(
-    BuildContext context, LoungePreferences preferences);

@@ -11,7 +11,7 @@ var _logger = MyLogger(logTag: "ChatPushesService", enabled: true);
 
 class ChatPushesService extends Providable {
   final PushesService _pushesService;
-  final ChatInputBackendService _backendService;
+  final ChatBackendService _backendService;
 
   Stream<ChatPushMessage> get chatPushMessageStream =>
       _pushesService.messageStream.map((pushMessage) {
@@ -58,14 +58,14 @@ class ChatPushesService extends Providable {
         _backendService.connectionStateStream.listen((connectionState) {
       var token = _pushesService.token;
       if (token != null && connectionState == ChatConnectionState.CONNECTED) {
-        _backendService.onNewDevicePushToken(token);
+        _backendService.sendDevicePushFCMTokenToServer(token);
       }
     }));
     addDisposable(
         streamSubscription: _pushesService.tokenStream.listen((token) {
       if (token != null &&
           _backendService.connectionState == ChatConnectionState.CONNECTED) {
-        _backendService.onNewDevicePushToken(token);
+        _backendService.sendDevicePushFCMTokenToServer(token);
       }
     }));
 

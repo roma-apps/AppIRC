@@ -9,7 +9,7 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ChatNetworkChannelsListBloc extends Providable {
-  final ChatOutputBackendService backendService;
+  final ChatBackendService backendService;
   final Network network;
   final LocalIdGenerator nextChannelIdGenerator;
 

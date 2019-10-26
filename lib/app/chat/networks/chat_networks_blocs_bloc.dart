@@ -16,7 +16,7 @@ class ChatNetworksBlocsBloc extends ChatNetworksListListenerBloc {
   }
 
   Map<Network, NetworkBloc> _blocs = Map();
-  final ChatInputBackendService backendService;
+  final ChatBackendService backendService;
   final ChatNetworksStateBloc networkStatesBloc;
   final ChatNetworkChannelsStateBloc channelsStatesBloc;
   final ChatActiveChannelBloc activeChannelBloc;

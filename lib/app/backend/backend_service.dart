@@ -40,9 +40,81 @@ abstract class ChatBackendService implements Providable {
   ChatInitInformation get chatInit;
 
   bool get isReadyToConnect;
-}
 
-abstract class ChatOutputBackendService implements ChatBackendService {
+  Future<RequestResult<ConnectResult>> connectChat();
+
+  Future<RequestResult<bool>> disconnectChat({bool waitForResult: false});
+
+  Future<RequestResult<NetworkWithState>> joinNetwork(
+      ChatNetworkPreferences preferences,
+      {bool waitForResult: false});
+
+  Future<RequestResult<bool>> leaveNetwork(Network network,
+      {bool waitForResult: false});
+
+  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
+      Network network,
+      {bool waitForResult: false});
+
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(Network network,
+      {bool waitForResult: false});
+
+  Future<RequestResult<bool>> enableNetwork(Network network,
+      {bool waitForResult: false});
+
+  Future<RequestResult<bool>> disableNetwork(Network network,
+      {bool waitForResult: false});
+
+  Future<RequestResult<Network>> editNetworkSettings(
+      Network network, ChatNetworkPreferences preferences,
+      {bool waitForResult: false});
+
+  Future<RequestResult<NetworkChannelWithState>> joinNetworkChannel(
+      Network network, ChatNetworkChannelPreferences preferences,
+      {bool waitForResult: false});
+
+  Future<RequestResult<NetworkChannelWithState>> openDirectMessagesChannel(
+      Network network, NetworkChannel channel, String nick,
+      {bool waitForResult: false});
+
+  Future<RequestResult<bool>> leaveNetworkChannel(
+      Network network, NetworkChannel channel,
+      {bool waitForResult: false});
+
+  Future<RequestResult<NetworkChannelUser>> requestUserInfo(
+      Network network, NetworkChannel channel, String userNick,
+      {bool waitForResult: false});
+
+  Future<RequestResult<RegularMessage>> printNetworkChannelBannedUsers(
+      Network network, NetworkChannel channel,
+      {bool waitForResult: false});
+
+  Future<RequestResult<List<NetworkChannelUser>>> requestNetworkChannelUsers(
+      Network network, NetworkChannel channel,
+      {bool waitForResult: false});
+
+  Future<RequestResult<bool>> editNetworkChannelTopic(
+      Network network, NetworkChannel channel, String newTopic,
+      {bool waitForResult: false});
+
+  Future<RequestResult<bool>> sendChannelOpenedEventToServer(
+      Network network, NetworkChannel channel);
+
+  Future<RequestResult<bool>> sendDevicePushFCMTokenToServer(String newToken,
+      {bool waitForResult: false});
+
+  Future<RequestResult<RegularMessage>> sendNetworkChannelRawMessage(
+      Network network, NetworkChannel channel, String rawMessage,
+      {bool waitForResult: false});
+
+  Future<RequestResult<MessageTogglePreview>> togglePreview(Network network,
+      NetworkChannel channel, RegularMessage message, MessagePreview preview);
+
+  Future<RequestResult<ChatLoadMoreData>> loadMoreHistory(
+      Network network, NetworkChannel channel, int lastMessageId);
+
+  Future<RequestResult<String>> uploadFile(File file);
+
   Disposable listenForNetworkState(
       Network network,
       NetworkState Function() currentStateExtractor,
@@ -86,87 +158,8 @@ abstract class ChatOutputBackendService implements ChatBackendService {
       NetworkChannel channel, Function(ChannelTogglePreview) callback);
 }
 
-abstract class ChatInputBackendService implements ChatBackendService {
-  Future<RequestResult<ConnectResult>> connectChat();
-
-  Future<RequestResult<bool>> disconnectChat({bool waitForResult: false});
-
-  Future<RequestResult<NetworkWithState>> joinNetwork(
-      ChatNetworkPreferences preferences,
-      {bool waitForResult: false});
-
-  Future<RequestResult<bool>> leaveNetwork(Network network,
-      {bool waitForResult: false});
-
-  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
-      Network network,
-      {bool waitForResult: false});
-
-  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(Network network,
-      {bool waitForResult: false});
-
-  Future<RequestResult<bool>> enableNetwork(Network network,
-      {bool waitForResult: false});
-
-  Future<RequestResult<bool>> disableNetwork(Network network,
-      {bool waitForResult: false});
-
-  Future<RequestResult<Network>> editNetworkSettings(
-      Network network, ChatNetworkPreferences preferences,
-      {bool waitForResult: false});
-
-  Future<RequestResult<NetworkChannelWithState>> joinNetworkChannel(
-      Network network, ChatNetworkChannelPreferences preferences,
-      {bool waitForResult: false});
-
-  Future<RequestResult<NetworkChannelWithState>> openDirectMessagesChannel(
-      Network network, NetworkChannel channel, String nick,
-      {bool waitForResult: false});
-
-  Future<RequestResult<bool>> leaveNetworkChannel(
-      Network network, NetworkChannel channel,
-      {bool waitForResult: false});
-
-  Future<RequestResult<NetworkChannelUser>> printUserInfo(
-      Network network, NetworkChannel channel, String userNick,
-      {bool waitForResult: false});
-
-  Future<RequestResult<RegularMessage>> printNetworkChannelBannedUsers(
-      Network network, NetworkChannel channel,
-      {bool waitForResult: false});
-
-  Future<RequestResult<List<NetworkChannelUser>>> requestNetworkChannelUsers(
-      Network network, NetworkChannel channel,
-      {bool waitForResult: false});
-
-  Future<RequestResult<bool>> editNetworkChannelTopic(
-      Network network, NetworkChannel channel, String newTopic,
-      {bool waitForResult: false});
-
-  Future<RequestResult<bool>> onOpenNetworkChannel(
-      Network network, NetworkChannel channel);
-
-  Future<RequestResult<bool>> onNewDevicePushToken(String newToken,
-      {bool waitForResult: false});
-
-  Future<RequestResult<RegularMessage>> sendNetworkChannelRawMessage(
-      Network network, NetworkChannel channel, String rawMessage,
-      {bool waitForResult: false});
-
-  Future<RequestResult<MessageTogglePreview>> togglePreview(Network network,
-      NetworkChannel channel, RegularMessage message, MessagePreview preview);
-
-  Future<RequestResult<ChatLoadMoreData>> loadMoreHistory(
-      Network network, NetworkChannel channel, int lastMessageId);
-
-  Future<RequestResult<String>> uploadFile(File file);
-}
-
-abstract class ChatInputOutputBackendService
-    implements ChatInputBackendService, ChatOutputBackendService {}
-
 ChatNetworkPreferences createDefaultNetworkPreferences(BuildContext context) {
-  var backendService = Provider.of<ChatOutputBackendService>(context);
+  var backendService = Provider.of<ChatBackendService>(context);
   var chatConfig = backendService.chatConfig;
   var channels = chatConfig.defaultChannels;
 

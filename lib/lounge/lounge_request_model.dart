@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'lounge_request_model.g.dart';
 
-class LoungeRequestEventNames {
+class RequestLoungeEventNames {
   static const String networkNew = "network:new";
   static const String networkEdit = "network:edit";
   static const String names = "names";
@@ -20,108 +19,122 @@ class LoungeRequestEventNames {
   static const String networkGet = "network:get";
   static const String pushFCMToken = "push:fcmToken";
   static const String pushRegister = "push:register";
-  static const String pushUnregister = "push:unegister";
+  static const String pushUnregister = "push:unregister";
 }
 
-abstract class LoungeRequest extends SocketIOCommand {
-  final String name;
+abstract class LoungeRequest {
+  String get eventName;
 
-  LoungeRequest(this.name);
-
-  @override
-  String getName() => name;
-
-  @override
-  List<dynamic> getBody();
+  LoungeRequest();
 }
 
-class LoungeJsonRequest<T extends LoungeRequestBody> extends LoungeRequest {
-  final T body;
+abstract class LoungeEmptyRequest extends LoungeRequest {}
 
-  LoungeJsonRequest({@required String name, this.body}) : super(name);
-
-  /// Actually Lounge body looks like json,
-  /// but socket.io require List<dynamic> argument
-  /// in this case argument is List<Map<String, dynamic>>
-  /// Map<String, dynamic> is json root
+class UploadAuthLoungeEmptyRequest extends LoungeEmptyRequest {
   @override
-  List<dynamic> getBody() {
-    if (body != null) {
-      return [body.toJson()];
-    } else {
-      return [];
-    }
-  }
-
-  @override
-  String toString() {
-    return 'LoungeJsonRequest{name: $name, body: $body}';
-  }
+  String get eventName => RequestLoungeEventNames.uploadAuth;
 }
 
-class LoungeRawRequest extends LoungeRequest {
-  final List<dynamic> body;
-
-  LoungeRawRequest({@required String name, this.body = const []}) : super(name);
-
+class SignOutLoungeEmptyRequest extends LoungeEmptyRequest {
   @override
-  List<dynamic> getBody() => body;
-
-  @override
-  String toString() {
-    return 'LoungeRawRequest{name: $name, body: $body}';
-  }
+  String get eventName => RequestLoungeEventNames.signOut;
 }
 
-abstract class LoungeRequestBody {
+abstract class LoungeJsonRequest extends LoungeRequest {
   Map<String, dynamic> toJson();
 }
 
-class InputLoungeRequestBody extends LoungeRequestBody {
+abstract class LoungeRawRequest<T> extends LoungeRequest {
+  final T body;
+  LoungeRawRequest(this.body) : super();
+
+  LoungeRawRequest.name({@required this.body});
+
+  String get bodyAsString => body.toString();
+}
+
+class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
+  ChannelOpenedLoungeRawRequest(int body) : super(body);
+
+  ChannelOpenedLoungeRawRequest.name({@required int channelRemoteId})
+      : super(channelRemoteId);
+
+  @override
+  String get eventName => RequestLoungeEventNames.open;
+}
+
+class PushFCMTokenLoungeRawRequest extends LoungeRawRequest<String> {
+  PushFCMTokenLoungeRawRequest(String body) : super(body);
+
+  PushFCMTokenLoungeRawRequest.name({@required String deviceFCMToken})
+      : super(deviceFCMToken);
+
+  @override
+  String get eventName => RequestLoungeEventNames.pushFCMToken;
+}
+
+@JsonSerializable()
+class InputLoungeJsonRequest extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.input;
+
   final int target;
   final String content;
 
-  InputLoungeRequestBody({@required this.target, @required this.content});
+  InputLoungeJsonRequest(this.target, this.content);
+
+  InputLoungeJsonRequest.name({@required this.target, @required this.content});
+
+  factory InputLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$InputLoungeJsonRequestFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => {"target": target, "text": content};
+  Map<String, dynamic> toJson() => _$InputLoungeJsonRequestToJson(this);
 
   @override
   String toString() {
-    return 'InputLoungeRequestBody{target: $target, content: $content}';
+    return 'InputLoungeJsonRequest{target: $target, content: $content}';
   }
 }
 
 @JsonSerializable()
-class MoreLoungeRequestBody extends LoungeRequestBody {
+class MoreLoungeJsonRequest extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.more;
+
   final int target;
   final int lastId;
 
-  MoreLoungeRequestBody(this.target, this.lastId);
+  MoreLoungeJsonRequest(this.target, this.lastId);
+
+  MoreLoungeJsonRequest.name({@required this.target, @required this.lastId});
 
   @override
-  Map<String, dynamic> toJson() => _$MoreLoungeRequestBodyToJson(this);
+  Map<String, dynamic> toJson() => _$MoreLoungeJsonRequestToJson(this);
 
-  factory MoreLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$MoreLoungeRequestBodyFromJson(json);
+  factory MoreLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$MoreLoungeJsonRequestFromJson(json);
 
   @override
   String toString() {
-    return 'MoreLoungeRequestBody{target: $target, lastId: $lastId}';
+    return 'MoreLoungeJsonRequest{target: $target, lastId: $lastId}';
   }
 }
 
 @JsonSerializable()
-class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
+class MsgPreviewToggleLoungeJsonRequest extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.msgPreviewToggle;
+
   final int target;
   final int msgId;
   final String link;
   final bool shown;
 
-  MsgPreviewToggleLoungeRequestBody(
+  MsgPreviewToggleLoungeJsonRequest(
       this.target, this.msgId, this.link, this.shown);
 
-  MsgPreviewToggleLoungeRequestBody.name(
+  MsgPreviewToggleLoungeJsonRequest.name(
       {@required this.target,
       @required this.msgId,
       @required this.link,
@@ -129,126 +142,197 @@ class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
 
   @override
   String toString() {
-    return 'MsgPreviewToggleLoungeRequestBody{target: $target, '
+    return 'MsgPreviewToggleLoungeJsonRequest{target: $target, '
         'msgId: $msgId, link: $link, shown: $shown}';
   }
 
   @override
   Map<String, dynamic> toJson() =>
-      _$MsgPreviewToggleLoungeRequestBodyToJson(this);
+      _$MsgPreviewToggleLoungeJsonRequestToJson(this);
 
-  factory MsgPreviewToggleLoungeRequestBody.fromJson(
+  factory MsgPreviewToggleLoungeJsonRequest.fromJson(
           Map<dynamic, dynamic> json) =>
-      _$MsgPreviewToggleLoungeRequestBodyFromJson(json);
+      _$MsgPreviewToggleLoungeJsonRequestFromJson(json);
 }
 
 @JsonSerializable()
-class PushTokenLoungeRequestBody extends LoungeRequestBody {
+class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.pushFCMToken;
+
   final String token;
 
-  PushTokenLoungeRequestBody({@required this.token});
+  PushFCMTokenLoungeJsonRequest(this.token);
+
+  PushFCMTokenLoungeJsonRequest.name({@required this.token});
 
   @override
-  Map<String, dynamic> toJson() => _$PushTokenLoungeRequestBodyToJson(this);
+  Map<String, dynamic> toJson() => _$PushFCMTokenLoungeJsonRequestToJson(this);
 
-  factory PushTokenLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$PushTokenLoungeRequestBodyFromJson(json);
+  factory PushFCMTokenLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$PushFCMTokenLoungeJsonRequestFromJson(json);
 
   @override
   String toString() {
-    return 'PushTokenLoungeRequestBody{token: $token}';
+    return 'PushFCMTokenLoungeJsonRequest{token: $token}';
   }
 }
 
 @JsonSerializable()
-class NamesLoungeRequestBody extends LoungeRequestBody {
+class NamesLoungeJsonRequest extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.names;
+
   final int target;
 
   @override
   String toString() {
-    return 'NamesLoungeRequestBody{target: $target}';
+    return 'NamesLoungeJsonRequest{target: $target}';
   }
 
-  NamesLoungeRequestBody(this.target);
+  NamesLoungeJsonRequest(this.target);
 
-  NamesLoungeRequestBody.name({@required this.target});
+  NamesLoungeJsonRequest.name({@required this.target});
 
   @override
-  Map<String, dynamic> toJson() => _$NamesLoungeRequestBodyToJson(this);
+  Map<String, dynamic> toJson() => _$NamesLoungeJsonRequestToJson(this);
 
-  factory NamesLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$NamesLoungeRequestBodyFromJson(json);
+  factory NamesLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$NamesLoungeJsonRequestFromJson(json);
 }
 
 @JsonSerializable()
-class AuthLoungeRequestBody extends LoungeRequestBody {
+class AuthLoungeJsonRequestBody extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.auth;
+
   final String user;
   final String password;
 
   @override
   String toString() {
-    return 'AuthLoungeRequestBody{user: $user, password: $password}';
+    return 'AuthLoungeJsonRequestBody{user: $user, password: $password}';
   }
 
-  AuthLoungeRequestBody(this.user, this.password);
+  AuthLoungeJsonRequestBody(this.user, this.password);
 
-  AuthLoungeRequestBody.name({@required this.user, @required this.password});
+  AuthLoungeJsonRequestBody.name(
+      {@required this.user, @required this.password});
 
   @override
-  Map<String, dynamic> toJson() => _$AuthLoungeRequestBodyToJson(this);
+  Map<String, dynamic> toJson() => _$AuthLoungeJsonRequestBodyToJson(this);
 
-  factory AuthLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$AuthLoungeRequestBodyFromJson(json);
+  factory AuthLoungeJsonRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$AuthLoungeJsonRequestBodyFromJson(json);
 }
 
 @JsonSerializable()
-class NetworkNewLoungeRequestBody extends LoungeRequestBody {
-  final String host;
-  final String join;
-  final String name;
-  final String nick;
-  final String port;
-  final String realname;
-  final String password;
-  final String rejectUnauthorized;
-  final String tls;
-  final String username;
-
-  bool get isTls => tls == LoungeConstants.on;
-
-  bool get isRejectUnauthorized => rejectUnauthorized == LoungeConstants.on;
-
-  String get uri => "$host:$port";
-
-  @override
-  String toString() {
-    return 'NetworkNewLoungeRequestBody{host: $host, join: $join, name: $name,'
-        ' nick: $nick, port: $port, realname: $realname, password: $password,'
-        ' rejectUnauthorized: $rejectUnauthorized, tls: $tls,'
-        ' username: $username}';
-  }
-
-  NetworkNewLoungeRequestBody(
-      {@required this.host,
-      @required this.join,
-      @required this.name,
-      @required this.nick,
-      @required this.port,
-      @required this.realname,
-      @required this.rejectUnauthorized,
-      @required this.tls,
-      @required this.username,
-      @required this.password});
-
-  Map<String, dynamic> toJson() => _$NetworkNewLoungeRequestBodyToJson(this);
-
-  factory NetworkNewLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$NetworkNewLoungeRequestBodyFromJson(json);
-}
-
-@JsonSerializable()
-class NetworkEditLoungeRequestBody extends LoungeRequestBody {
+class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
   final String uuid;
+
+  @override
+  String get eventName => RequestLoungeEventNames.networkEdit;
+
+  NetworkEditLoungeJsonRequest.name(
+      {@required this.uuid,
+      @required String host,
+      @required String name,
+      @required String nick,
+      @required String port,
+      @required String realname,
+      @required String password,
+      @required String rejectUnauthorized,
+      @required String tls,
+      @required String username,
+      @required String commands})
+      : super.name(
+          host: host,
+          name: name,
+          nick: nick,
+          port: port,
+          realname: realname,
+          password: password,
+          rejectUnauthorized: rejectUnauthorized,
+          tls: tls,
+          username: username,
+          commands: commands,
+        );
+
+  NetworkEditLoungeJsonRequest(
+      this.uuid,
+      String host,
+      String name,
+      String nick,
+      String port,
+      String realname,
+      String password,
+      String rejectUnauthorized,
+      String tls,
+      String username,
+      String commands)
+      : super(host, name, nick, port, realname, password, rejectUnauthorized,
+            tls, username, commands);
+
+  Map<String, dynamic> toJson() => _$NetworkEditLoungeJsonRequestToJson(this);
+
+  factory NetworkEditLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$NetworkEditLoungeJsonRequestFromJson(json);
+}
+
+@JsonSerializable()
+class NetworkNewLoungeJsonRequest extends NetworkLoungeJsonRequest {
+  final String join;
+
+  @override
+  String get eventName => RequestLoungeEventNames.networkNew;
+
+  NetworkNewLoungeJsonRequest.name(
+      {@required this.join,
+      @required String host,
+      @required String name,
+      @required String nick,
+      @required String port,
+      @required String realname,
+      @required String password,
+      @required String rejectUnauthorized,
+      @required String tls,
+      @required String username,
+      @required String commands})
+      : super.name(
+          host: host,
+          name: name,
+          nick: nick,
+          port: port,
+          realname: realname,
+          password: password,
+          rejectUnauthorized: rejectUnauthorized,
+          tls: tls,
+          username: username,
+          commands: commands,
+        );
+
+  NetworkNewLoungeJsonRequest(
+      this.join,
+      String host,
+      String name,
+      String nick,
+      String port,
+      String realname,
+      String password,
+      String rejectUnauthorized,
+      String tls,
+      String username,
+      String commands)
+      : super(host, name, nick, port, realname, password, rejectUnauthorized,
+            tls, username, commands);
+
+  Map<String, dynamic> toJson() => _$NetworkNewLoungeJsonRequestToJson(this);
+
+  factory NetworkNewLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$NetworkNewLoungeJsonRequestFromJson(json);
+}
+
+abstract class NetworkLoungeJsonRequest extends LoungeJsonRequest {
   final String host;
   final String name;
   final String nick;
@@ -260,25 +344,27 @@ class NetworkEditLoungeRequestBody extends LoungeRequestBody {
   final String username;
   final String commands;
 
-  bool get isTls => tls == LoungeConstants.on;
+  bool get isTls => _toBoolean(tls);
 
-  bool get isRejectUnauthorized => rejectUnauthorized == LoungeConstants.on;
+  bool get isRejectUnauthorized => _toBoolean(rejectUnauthorized);
 
   String get uri => "$host:$port";
 
-  @override
-  String toString() {
-    return 'NetworkNewLoungeRequestBody{host: $host, uuid: $uuid,'
-        ' commands: $commands, name: $name,'
-        ' nick: $nick, port: $port, realname: $realname, password: $password,'
-        ' rejectUnauthorized: $rejectUnauthorized, tls: $tls,'
-        ' username: $username}';
-  }
+  NetworkLoungeJsonRequest(
+      this.host,
+      this.name,
+      this.nick,
+      this.port,
+      this.realname,
+      this.password,
+      this.rejectUnauthorized,
+      this.tls,
+      this.username,
+      this.commands);
 
-  NetworkEditLoungeRequestBody(
+  NetworkLoungeJsonRequest.name(
       {@required this.host,
       @required this.commands,
-      @required this.uuid,
       @required this.name,
       @required this.nick,
       @required this.port,
@@ -287,9 +373,7 @@ class NetworkEditLoungeRequestBody extends LoungeRequestBody {
       @required this.tls,
       @required this.username,
       @required this.password});
-
-  Map<String, dynamic> toJson() => _$NetworkEditLoungeRequestBodyToJson(this);
-
-  factory NetworkEditLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$NetworkEditLoungeRequestBodyFromJson(json);
 }
+
+bool _toBoolean(String loungeBoolean) =>
+    loungeBoolean == BooleanLoungeConstants.on;

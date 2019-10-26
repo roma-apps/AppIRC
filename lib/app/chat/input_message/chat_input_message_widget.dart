@@ -9,7 +9,7 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
-import 'package:flutter_appirc/app/upload/chat_upload_bloc.dart';
+import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_model.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';

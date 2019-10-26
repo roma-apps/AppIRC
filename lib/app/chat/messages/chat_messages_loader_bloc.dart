@@ -19,7 +19,7 @@ var _logger =
     MyLogger(logTag: "NetworkChannelMessagesLoaderBloc", enabled: true);
 
 class NetworkChannelMessagesLoaderBloc extends Providable {
-  final ChatInputOutputBackendService backendService;
+  final ChatBackendService backendService;
   final NetworkChannelMessagesSaverBloc messagesSaverBloc;
   final ChatDatabase db;
   final Network network;

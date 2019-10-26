@@ -12,7 +12,7 @@ import 'package:rxdart/rxdart.dart';
 var _logger = MyLogger(logTag: "ChatInitBloc", enabled: true);
 
 class ChatInitBloc extends Providable {
-  final ChatInputBackendService _backendService;
+  final ChatBackendService _backendService;
   final ChatConnectionBloc _connectionBloc;
   final ChatNetworksListBloc _networksListBloc;
   final ChatPreferences _startPreferences;

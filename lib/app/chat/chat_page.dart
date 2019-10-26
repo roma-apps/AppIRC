@@ -274,7 +274,7 @@ class ChatPage extends StatelessWidget {
                   var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
                       .getNetworkChannelBloc(activeChannel);
 
-                  ChatOutputBackendService backendService =
+                  ChatBackendService backendService =
                       Provider.of(context);
                   ChatDatabaseProvider chatDatabaseProvider =
                       Provider.of(context);

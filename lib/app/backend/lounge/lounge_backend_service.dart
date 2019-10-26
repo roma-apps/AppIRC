@@ -10,6 +10,7 @@ import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_model_adapter.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_socketio_adapter.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
@@ -22,18 +23,18 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/irc/irc_commands_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_helper.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:flutter_appirc/socketio/socketio_service.dart';
 import 'package:flutter_appirc/url/url_finder.dart';
 import 'package:rxdart/rxdart.dart';
 
-var _logger = MyLogger(logTag: "LoungeService", enabled: true);
+var _logger = MyLogger(logTag: "lounge_backend_service.dart", enabled: true);
 
 var _connectTimeout = Duration(seconds: 15);
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
@@ -42,8 +43,7 @@ const _timeoutForRequestsWithResponse = Duration(seconds: 10);
 const _timeBetweenCheckResultForRequestsWithResponse =
     Duration(milliseconds: 100);
 
-class LoungeBackendService extends Providable
-    implements ChatInputOutputBackendService {
+class LoungeBackendService extends Providable implements ChatBackendService {
   final LoungePreferences _loungePreferences;
   final SocketIOManager socketIOManager;
   SocketIOService _socketIOService;
@@ -58,13 +58,13 @@ class LoungeBackendService extends Providable
       .distinct();
 
   // ignore: close_sinks
-  BehaviorSubject<ChatConnectionState> _connectionStateController =
+  BehaviorSubject<ChatConnectionState> _connectionStateSubject =
       BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
 
   Stream<ChatConnectionState> get connectionStateStream =>
-      _connectionStateController.stream;
+      _connectionStateSubject.stream;
 
-  ChatConnectionState get connectionState => _connectionStateController.value;
+  ChatConnectionState get connectionState => _connectionStateSubject.value;
 
   // ignore: close_sinks
   BehaviorSubject<ChatConfig> _chatConfigSubject = BehaviorSubject();
@@ -78,7 +78,7 @@ class LoungeBackendService extends Providable
   ChatInitInformation chatInit;
 
   // ignore: close_sinks
-  BehaviorSubject<bool> _signOutController = BehaviorSubject();
+  BehaviorSubject<bool> _signOutSubject = BehaviorSubject();
 
   // lounge don't response properly to edit request
   // ignore: close_sinks
@@ -92,11 +92,17 @@ class LoungeBackendService extends Providable
       _loungePreferences != null &&
       _loungePreferences != LoungeConnectionPreferences.empty;
 
+  // Lounge API don't return all information required by the app
+  // So, in some cases we should store original request to use it in response
+  // handler
+  // For example, when lounge in public mode  we should save original
+  // network/channel join request to save password which doesn't exist in
+  // response
   final List<LoungeRequest> _pendingRequests = [];
 
   LoungeBackendService(this.socketIOManager, this._loungePreferences) {
-    addDisposable(subject: _signOutController);
-    addDisposable(subject: _connectionStateController);
+    addDisposable(subject: _signOutSubject);
+    addDisposable(subject: _connectionStateSubject);
     addDisposable(subject: _editNetworkRequests);
     addDisposable(subject: _messageTogglePreviewSubject);
     addDisposable(subject: _chatConfigSubject);
@@ -112,10 +118,10 @@ class LoungeBackendService extends Providable
 
     addDisposable(streamSubscription:
         _socketIOService.connectionStateStream.listen((socketState) {
-      var newBackendState = mapState(socketState);
+      var newBackendState = mapConnectionState(socketState);
       _logger.d(() => "newState socketState $socketState "
           " newBackendState $newBackendState");
-      _connectionStateController.add(newBackendState);
+      _connectionStateSubject.add(newBackendState);
     }));
     _logger.d(() => "init finished");
   }
@@ -149,7 +155,7 @@ class LoungeBackendService extends Providable
     ConnectResult connectResult =
         await _connect(_loungePreferences, _socketIOService);
 
-    // todo: rework
+
     if (connectResult.config != null) {
       this._chatConfigSubject.add(connectResult.config);
       this.chatInit = connectResult.chatInit;
@@ -178,7 +184,7 @@ class LoungeBackendService extends Providable
   Future<RequestResult<bool>> disconnectChat(
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
     disconnect();
     return RequestResult.name(isSentSuccessfully: true, result: null);
@@ -189,9 +195,10 @@ class LoungeBackendService extends Providable
       Network network, NetworkChannel channel, String newTopic,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, channel, "/topic $newTopic");
+    _sendInputRequest(
+        network, channel, TopicIRCCommand.name(newTopic: newTopic).asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -200,22 +207,20 @@ class LoungeBackendService extends Providable
       Network network, ChatNetworkPreferences networkPreferences,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
 
     // todo: open ticket for lounge
     // if you change nickname to registered nickname on Freenode
-    // then you should write additional query to identify user with passsword
+    // then you should write additional query to identify user with password
     // Lounge API should send this request once new settings arrived
     var userPreferences =
         networkPreferences.networkConnectionPreferences.userPreferences;
     var serverPreferences =
         networkPreferences.networkConnectionPreferences.serverPreferences;
 
-    var request = LoungeJsonRequest(
-        name: LoungeRequestEventNames.networkEdit,
-        body: toNetworkEditLoungeRequestBody(
-            network.remoteId, userPreferences, serverPreferences));
+    var request = toNetworkEditLoungeRequestBody(
+        network.remoteId, userPreferences, serverPreferences);
 
     // important to put request before send it
     _editNetworkRequests.add(networkPreferences);
@@ -229,9 +234,10 @@ class LoungeBackendService extends Providable
   Future<RequestResult<bool>> enableNetwork(Network network,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/connect");
+    _sendInputRequest(
+        network, network.lobbyChannel, ConnectIRCCommand().asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -239,9 +245,10 @@ class LoungeBackendService extends Providable
   Future<RequestResult<bool>> disableNetwork(Network network,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/disconnect");
+    _sendInputRequest(
+        network, network.lobbyChannel, DisconnectIRCCommand().asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -250,26 +257,24 @@ class LoungeBackendService extends Providable
       Network network, NetworkChannel channel,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
 
-    _sendRequest(
-        LoungeJsonRequest(
-            name: LoungeRequestEventNames.names,
-            body: NamesLoungeRequestBody.name(target: channel.remoteId)),
-        isNeedAddRequestToPending: false);
+    var request = NamesLoungeJsonRequest.name(target: channel.remoteId);
+    _sendRequest(request, isNeedAddRequestToPending: false);
 
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
   @override
-  Future<RequestResult<NetworkChannelUser>> printUserInfo(
+  Future<RequestResult<NetworkChannelUser>> requestUserInfo(
       Network network, NetworkChannel channel, String userNick,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, channel, "/whois $userNick");
+    _sendInputRequest(
+        network, channel, WhoIsIRCCommand.name(userNick: userNick).asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -277,18 +282,14 @@ class LoungeBackendService extends Providable
   Future<RequestResult<NetworkWithState>> joinNetwork(
       ChatNetworkPreferences networkPreferences,
       {bool waitForResult = false}) async {
-    var userPreferences =
-        networkPreferences.networkConnectionPreferences.userPreferences;
     var serverPreferences =
         networkPreferences.networkConnectionPreferences.serverPreferences;
 
     var channelsWithoutPassword = networkPreferences.channelsWithoutPassword;
     var channelNames = channelsWithoutPassword.map((channel) => channel.name);
     String join = channelNames.join(LoungeConstants.channelsNamesSeparator);
-    var request = JoinNetworkLoungeRequest(
-        networkPreferences,
-        toNetworkNewLoungeRequestBody(
-            userPreferences, join, serverPreferences));
+    var request = ChatNetworkNewLoungeJsonRequest.name(
+        networkPreferences: networkPreferences, join: join);
 
     var result;
     Disposable networkListener;
@@ -303,12 +304,13 @@ class LoungeBackendService extends Providable
 
         if (channelsWithPassword.isNotEmpty) {
           // it is bug in the lounge.
-          // We should wait some time after join network to start send requests to network
+          // We should wait some time after join network
+          // to start send requests to network
           // Lounge don't respond with error, it is just don't execute requests
           // It looks like bug exist only in public mode
           // Lounge doesn't execute request if network not created/connected
           // Lounge should send event when network is ready to receive commands
-          // Also lougne should return error if something wrong
+          // Also lounge should return error if something wrong
           // todo: open request for lounge server to fix this issue
           await Future.delayed(Duration(seconds: 5));
 
@@ -321,7 +323,8 @@ class LoungeBackendService extends Providable
             if (joinChannelResult.result != null) {
               var channel = joinChannelResult.result.channel;
               _logger.d(() =>
-                  "joinNetwork channelPreferences $channelPreferences result = $channel");
+                  "joinNetwork channelPreferences $channelPreferences "
+                      "result = $channel");
               assert(channel != null);
               networkFromResult.channels.add(channel);
             }
@@ -371,10 +374,8 @@ class LoungeBackendService extends Providable
     _logger.d(
         () => "joinNetworkChannel $preferences waitForResult $waitForResult");
 
-    var request = LoungeJsonRequest(
-        name: LoungeRequestEventNames.input,
-        body: JoinChannelInputLoungeRequestBody(
-            preferences, network.lobbyChannel.remoteId));
+    var request = ChatJoinChannelInputLoungeJsonRequest.name(
+        preferences, network.lobbyChannel.remoteId);
 
     var result;
     Disposable channelListener;
@@ -382,7 +383,8 @@ class LoungeBackendService extends Providable
         listenForNetworkChannelJoin(network, (channelWithState) async {
       var isForRequest = channelWithState.channel.name == preferences.name;
       _logger.d(() =>
-          "joinNetworkChannel listenForNetworkChannelJoin $channelWithState isForRequest= $isForRequest");
+          "joinNetworkChannel listenForNetworkChannelJoin $channelWithState "
+          "isForRequest= $isForRequest");
       if (isForRequest) {
         result = channelWithState;
         channelListener.dispose();
@@ -401,10 +403,9 @@ class LoungeBackendService extends Providable
   Future<RequestResult<NetworkChannelWithState>> openDirectMessagesChannel(
       Network network, NetworkChannel channel, String nick,
       {bool waitForResult = false}) async {
-    var request = LoungeJsonRequest(
-        name: LoungeRequestEventNames.input,
-        body: InputLoungeRequestBody(
-            target: channel.remoteId, content: "/query $nick"));
+    var request = InputLoungeJsonRequest.name(
+        target: channel.remoteId, // private channel name is equal to nickname
+        content: JoinIRCCommand.name(channelName: nick).asRawString);
 
     var result;
     Disposable channelListener;
@@ -426,9 +427,10 @@ class LoungeBackendService extends Providable
   Future<RequestResult<bool>> leaveNetwork(Network network,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/quit");
+    _sendInputRequest(
+        network, network.lobbyChannel, QuitIRCCommand().asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -437,9 +439,9 @@ class LoungeBackendService extends Providable
       Network network, NetworkChannel channel,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, channel, "/close");
+    _sendInputRequest(network, channel, CloseIRCCommand().asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -447,30 +449,19 @@ class LoungeBackendService extends Providable
   Disposable listenForMessages(Network network, NetworkChannel channel,
       NetworkChannelMessageListener listener) {
     var disposable = CompositeDisposable([]);
-    disposable
-        .add(createEventListenerDisposable(LoungeResponseEventNames.msg, (raw) {
-      var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    disposable.add(
+        createEventListenerDisposable(MsgLoungeResponseBody.eventName, (raw) {
+      var data = MsgLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
         toChatMessage(channel, data.msg).then((message) {
           _logger.d(() => "onNewMessage for {$data.chan}  $data");
           var type = detectRegularMessageType(data.msg.type);
           if (type == RegularMessageType.WHO_IS) {
-            var whoIsSpecialBody = toWhoIsSpecialMessageBody(data.msg.whois);
-
-            findUrls([
-              whoIsSpecialBody.actualHostname,
-              whoIsSpecialBody.realName,
-              whoIsSpecialBody.account,
-              whoIsSpecialBody.server,
-              whoIsSpecialBody.serverInfo
-            ]).then((urls) {
-              listener(SpecialMessage.name(
-                  channelRemoteId: data.chan,
-                  data: whoIsSpecialBody,
-                  specialType: SpecialMessageType.WHO_IS,
-                  date: DateTime.now(),
-                  linksInMessage: urls));
+            // lounge send whois message as regular
+            // but actually lounge client display it as special
+            _toWhoIsSpecialMessage(data).then((message) {
+              listener(message);
             });
           } else {
             listener(message);
@@ -480,9 +471,9 @@ class LoungeBackendService extends Providable
     }));
 
     disposable.add(createEventListenerDisposable(
-        LoungeResponseEventNames.msgSpecial, (raw) {
-      MessageSpecialLoungeResponseBody data =
-          MessageSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
+        MsgSpecialLoungeResponseBody.eventName, (raw) {
+      MsgSpecialLoungeResponseBody data =
+          MsgSpecialLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
         toSpecialMessages(channel, data).then((specialMessages) {
@@ -502,6 +493,25 @@ class LoungeBackendService extends Providable
     return disposable;
   }
 
+  Future<SpecialMessage> _toWhoIsSpecialMessage(
+      MsgLoungeResponseBody data) async {
+    var whoIsSpecialBody = toWhoIsSpecialMessageBody(data.msg.whois);
+
+    var linksInMessage = await findUrls([
+      whoIsSpecialBody.actualHostname,
+      whoIsSpecialBody.realName,
+      whoIsSpecialBody.account,
+      whoIsSpecialBody.server,
+      whoIsSpecialBody.serverInfo
+    ]);
+    return SpecialMessage.name(
+        channelRemoteId: data.chan,
+        data: whoIsSpecialBody,
+        specialType: SpecialMessageType.WHO_IS,
+        date: DateTime.now(),
+        linksInMessage: linksInMessage);
+  }
+
   @override
   Disposable listenForNetworkChannelJoin(
       Network network, NetworkChannelListener listener) {
@@ -509,38 +519,23 @@ class LoungeBackendService extends Providable
 
     var disposable = CompositeDisposable([]);
     disposable.add(
-        createEventListenerDisposable(LoungeResponseEventNames.join, (raw) {
+        createEventListenerDisposable(JoinLoungeResponseBody.eventName, (raw) {
       var parsed = JoinLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       _logger.d(() => "listenForNetworkChannelJoin "
           "parsed $parsed network.remoteId = $network.remoteId");
       if (parsed.network == network.remoteId) {
-        LoungeJsonRequest<JoinChannelInputLoungeRequestBody> request =
-            _pendingRequests.firstWhere((request) {
-          if (request is LoungeJsonRequest<JoinChannelInputLoungeRequestBody>) {
-            LoungeJsonRequest<JoinChannelInputLoungeRequestBody> joinRequest =
-                request;
-            if (joinRequest != null) {
-              if (joinRequest.body.preferences.name == parsed.chan.name) {
-                return true;
-              }
-            } else {
-              return false;
-            }
-
-            return false;
-          } else {
-            return false;
-          }
-        }, orElse: () => null);
+        ChatJoinChannelInputLoungeJsonRequest request =
+            _findJoinChannelOriginalRequest(_pendingRequests, parsed);
 
         var preferences;
 
         if (request != null) {
           preferences = ChatNetworkChannelPreferences.name(
-              localId: request.body.preferences.localId,
+              localId: request.preferences.localId,
               name: parsed.chan.name,
-              password: request.body.preferences.password);
+              password: request.preferences.password);
+          _pendingRequests.remove(request);
         } else {
           preferences = ChatNetworkChannelPreferences.name(
               name: parsed.chan.name, password: "");
@@ -563,8 +558,8 @@ class LoungeBackendService extends Providable
   Disposable listenForNetworkChannelLeave(
       Network network, NetworkChannel channel, VoidCallback listener) {
     var disposable = CompositeDisposable([]);
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.part), (raw) {
+    disposable.add(createEventListenerDisposable(
+        (PartLoungeResponseBody.eventName), (raw) {
       var parsed = PartLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.chan == channel.remoteId) {
@@ -582,9 +577,9 @@ class LoungeBackendService extends Providable
       NetworkChannelState Function() currentStateExtractor,
       NetworkChannelStateListener listener) {
     var disposable = CompositeDisposable([]);
-    disposable
-        .add(createEventListenerDisposable(LoungeResponseEventNames.msg, (raw) {
-      var data = MessageLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    disposable.add(
+        createEventListenerDisposable(MsgLoungeResponseBody.eventName, (raw) {
+      var data = MsgLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
         if (data.unread != null) {
@@ -595,7 +590,7 @@ class LoungeBackendService extends Providable
       }
     }));
     disposable.add(
-        createEventListenerDisposable(LoungeResponseEventNames.more, (raw) {
+        createEventListenerDisposable(MoreLoungeResponseBody.eventName, (raw) {
       var parsed = MoreLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == parsed.chan) {
@@ -606,7 +601,7 @@ class LoungeBackendService extends Providable
     }));
 
     disposable.add(
-        createEventListenerDisposable(LoungeResponseEventNames.topic, (raw) {
+        createEventListenerDisposable(TopicLoungeResponseBody.eventName, (raw) {
       var data = TopicLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
@@ -617,21 +612,19 @@ class LoungeBackendService extends Providable
     }));
 
     disposable.add(createEventListenerDisposable(
-        LoungeResponseEventNames.channelState, (raw) {
+        ChannelStateLoungeResponseBody.eventName, (raw) {
       var data =
           ChannelStateLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == data.chan) {
         var channelState = currentStateExtractor();
-        if (data.state == LoungeConstants.CHANNEL_STATE_CONNECTED) {
+        if (data.state == ChannelStateLoungeConstants.connected) {
           channelState.connected = true;
         } else {
           channelState.connected = false;
         }
 
         listener(channelState);
-//        var message = toIRCMessage(data.msg);
-//        listener(message);
       }
     }));
 
@@ -641,8 +634,8 @@ class LoungeBackendService extends Providable
   Disposable listenForNetworkChannelUsers(
       Network network, NetworkChannel channel, VoidCallback listener) {
     var disposable = CompositeDisposable([]);
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.users), (raw) {
+    disposable.add(createEventListenerDisposable(
+        (UsersLoungeResponseBody.eventName), (raw) {
       var parsed = UsersLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.chan == channel.remoteId) {
@@ -657,9 +650,9 @@ class LoungeBackendService extends Providable
   Disposable listenForNetworkJoin(NetworkListener listener) {
     var disposable = CompositeDisposable([]);
 
-    disposable.add(
-        createEventListenerDisposable(LoungeResponseEventNames.network, (raw) {
-      var parsed = NetworksLoungeResponseBody.fromJson(_preProcessRawData(raw));
+    disposable.add(createEventListenerDisposable(
+        NetworkLoungeResponseBody.eventName, (raw) {
+      var parsed = NetworkLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       _logger.d(() => "listenForNetworkJoin parsed = $parsed");
 
@@ -668,20 +661,10 @@ class LoungeBackendService extends Providable
         // It is possible to join only one network Lounge API per request
         // Lounge should send only one network in this response
         // todo: open ticket for lounge
+        ChatNetworkNewLoungeJsonRequest request =
+            _findOriginalJoinNetworkRequest(_pendingRequests, loungeNetwork);
 
-        JoinNetworkLoungeRequest request =
-            _pendingRequests.firstWhere((request) {
-          var loungeJsonRequest = request as JoinNetworkLoungeRequest;
-          if (loungeJsonRequest != null) {
-            if (loungeNetwork.name == loungeJsonRequest.body.name) {
-              return true;
-            } else {
-              return false;
-            }
-          } else {
-            return false;
-          }
-        }, orElse: () => null);
+        _pendingRequests.remove(request);
 
         var connectionPreferences =
             request.networkPreferences.networkConnectionPreferences;
@@ -718,8 +701,8 @@ class LoungeBackendService extends Providable
   @override
   Disposable listenForNetworkLeave(Network network, VoidCallback listener) {
     var disposable = CompositeDisposable([]);
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.quit), (raw) {
+    disposable.add(createEventListenerDisposable(
+        (QuitLoungeResponseBody.eventName), (raw) {
       var parsed = QuitLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.network == network.remoteId) {
@@ -735,7 +718,7 @@ class LoungeBackendService extends Providable
       NetworkChannelMessagePreviewListener listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(createEventListenerDisposable(
-        (LoungeResponseEventNames.msgPreview), (raw) {
+        (MsgPreviewLoungeResponseBody.eventName), (raw) {
       var parsed =
           MsgPreviewLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
@@ -775,8 +758,8 @@ class LoungeBackendService extends Providable
       }
     })));
 
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.nick), (raw) {
+    disposable.add(createEventListenerDisposable(
+        (NickLoungeResponseBody.eventName), (raw) {
       var parsed = NickLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.network == network.remoteId) {
@@ -787,7 +770,7 @@ class LoungeBackendService extends Providable
     }));
 
     disposable.add(createEventListenerDisposable(
-        (LoungeResponseEventNames.networkOptions), (raw) {
+        (NetworkOptionsLoungeResponseBody.eventName), (raw) {
       var parsed =
           NetworkOptionsLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
@@ -799,7 +782,7 @@ class LoungeBackendService extends Providable
     }));
 
     disposable.add(createEventListenerDisposable(
-        (LoungeResponseEventNames.networkStatus), (raw) {
+        (NetworkStatusLoungeResponseBody.eventName), (raw) {
       var parsed =
           NetworkStatusLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
@@ -814,23 +797,20 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<bool>> onOpenNetworkChannel(
+  Future<RequestResult<bool>> sendChannelOpenedEventToServer(
       Network network, NetworkChannel channel) async {
     _sendRequest(
-        LoungeRawRequest(
-            name: LoungeRequestEventNames.open, body: [channel.remoteId]),
+        ChannelOpenedLoungeRawRequest.name(channelRemoteId: channel.remoteId),
         isNeedAddRequestToPending: false);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
   @override
-  Future<RequestResult<bool>> onNewDevicePushToken(String newToken,
+  Future<RequestResult<bool>> sendDevicePushFCMTokenToServer(String newToken,
       {bool waitForResult = false}) async {
-    _sendRequest(
-        LoungeJsonRequest(
-            name: LoungeRequestEventNames.pushFCMToken,
-            body: PushTokenLoungeRequestBody(token: newToken)),
+    _sendRequest(PushFCMTokenLoungeRawRequest.name(deviceFCMToken: newToken),
         isNeedAddRequestToPending: false);
+
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -839,9 +819,10 @@ class LoungeBackendService extends Providable
       Network network,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/list");
+    _sendInputRequest(
+        network, network.lobbyChannel, ChannelsListIRCCommand().asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -850,9 +831,9 @@ class LoungeBackendService extends Providable
       Network network, NetworkChannel channel,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, channel, "/banlist");
+    _sendInputRequest(network, channel, BanListIRCCommand().asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -860,9 +841,10 @@ class LoungeBackendService extends Providable
   Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(Network network,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, network.lobbyChannel, "/ignorelist");
+    _sendInputRequest(
+        network, network.lobbyChannel, IgnoreListIRCCommand().asRawString);
     return RequestResult.name(isSentSuccessfully: true, result: null);
   }
 
@@ -871,7 +853,7 @@ class LoungeBackendService extends Providable
       Network network, NetworkChannel channel, String rawMessage,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
     _sendInputRequest(network, channel, rawMessage);
     return RequestResult.name(isSentSuccessfully: true, result: null);
@@ -881,8 +863,8 @@ class LoungeBackendService extends Providable
   Disposable listenForNetworkChannelNames(Network network,
       NetworkChannel channel, Function(List<NetworkChannelUser>) listener) {
     var disposable = CompositeDisposable([]);
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.names), (raw) {
+    disposable.add(createEventListenerDisposable(
+        (NamesLoungeResponseBody.eventName), (raw) {
       var parsed = NamesLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       _logger.d(() => "listenForNetworkChannelUsers $parsed for $channel");
@@ -895,72 +877,18 @@ class LoungeBackendService extends Providable
     }));
 
     return disposable;
-
-//  void _onUsersResponse(raw) {
-//    var parsed = UsersLoungeResponseBody.fromJson(_preProcessRawData(raw));
-//    _usersController.sink.add(parsed);
-//  }
   }
 
   _sendRequest(LoungeRequest request,
       {@required bool isNeedAddRequestToPending}) async {
     if (isNeedAddRequestToPending) {
-      // todo: rework
       _pendingRequests.add(request);
     }
 
     _logger.d(() => "_sendCommand $request");
-    return await _socketIOService.emit(request);
+    var socketIOCommand = toSocketIOCommand(request);
+    return await _socketIOService.emit(socketIOCommand);
   }
-
-//
-//  Future<K> _sendRequestWithResult<T extends LoungeRequest, K>(
-//      {@required T request,
-//      String resultEventName,
-//      @required K resultParser(dynamic),
-//      Duration timeout = _timeoutForRequestsWithResponse}) async {
-//    _logger.d(() => "_sendCommandWithResult start $request"
-//        " resultEventName $resultEventName"
-//        " requestWithResultInProgress = $requestWithResultInProgress");
-//
-//    var timeout = false;
-//
-//    // setup timeout
-//    Future.delayed(_timeoutForRequestsWithResponse, () {
-//      timeout = true;
-//    });
-//
-//    // avoid several requests with result in one time
-//    while (requestWithResultInProgress && !timeout) {
-//      await Future.delayed(_timeBetweenCheckAnotherRequestInProgress, () {});
-//    }
-//    var resultRaw;
-//
-//    if (!timeout) {
-//      var resultHandler = (raw) {
-//        _logger.d(() => "resultHandler $raw");
-//        resultRaw = raw;
-//      };
-//
-//      _socketIOService.on(resultEventName, resultHandler);
-//
-//      await _socketIOService.emit(request);
-//
-//      // wait for response or timeout
-//      while (timeout != true && resultRaw == null) {
-//        await Future.delayed(
-//            _timeBetweenCheckResultForRequestsWithResponse, () {});
-//      }
-//
-//      _socketIOService.off(resultEventName, resultHandler);
-//    }
-//
-//    if (timeout == true) {
-//      throw RequestWithResultTimeoutLoungeException(request);
-//    } else {
-//      return resultParser(resultRaw);
-//    }
-//  }
 
   disconnect() async {
     var result;
@@ -976,42 +904,43 @@ class LoungeBackendService extends Providable
     _socketIOService.dispose();
   }
 
-//  sendSettingsGetRequest() async =>
-//      await _sendRequest(LoungeRawRequest(name: "setting:get"));
-
   void _sendInputRequest(
       Network network, NetworkChannel channel, String message) {
-    if (message.startsWith("/collapse")) {
+    if (_isCollapseClientSideCommand(message)) {
       _channelTogglePreviewSubject
           .add(ChannelTogglePreview(network, channel, false));
-    } else if (message.startsWith("/expand")) {
+    } else if (_isExpandClientSideCommand(message)) {
       _channelTogglePreviewSubject
           .add(ChannelTogglePreview(network, channel, true));
     } else {
       _sendRequest(
-          LoungeJsonRequest(
-              name: LoungeRequestEventNames.input,
-              body: InputLoungeRequestBody(
-                  target: channel.remoteId, content: message)),
+          InputLoungeJsonRequest.name(
+              target: channel.remoteId, content: message),
           isNeedAddRequestToPending: false);
     }
   }
+
+  bool _isExpandClientSideCommand(String message) =>
+      message.startsWith(ClientSideLoungeIRCCommandConstants.expand);
+
+  bool _isCollapseClientSideCommand(String message) =>
+      message.startsWith(ClientSideLoungeIRCCommandConstants.collapse);
 
   @override
   Future<RequestResult<String>> uploadFile(File file) async {
     String uploadFileToken;
 
-    String token;
-    var tokenListener = (raw) {
-      token = raw.toString();
-    };
-    _socketIOService.on(LoungeResponseEventNames.uploadAuth, tokenListener);
-    _socketIOService
-        .emit(LoungeRawRequest(name: LoungeRequestEventNames.uploadAuth));
+    var disposable = _createEventListenerDisposable(
+        _socketIOService, UploadAuthLoungeResponseBody.eventName, (raw) {
+      var parsed = UploadAuthLoungeResponseBody.fromRaw(raw);
 
-    _doWaitForResult(() => token);
+      uploadFileToken = parsed.uploadAuthToken;
+    });
+    _socketIOService.emit(toSocketIOCommand(UploadAuthLoungeEmptyRequest()));
 
-    _socketIOService.off(LoungeResponseEventNames.uploadAuth, tokenListener);
+    _doWaitForResult(() => uploadFileToken);
+
+    disposable.dispose();
 
     String loungeUrl = _loungePreferences.connectionPreferences.host;
     var uploadedFileRemoteURL = await uploadFileToLounge(
@@ -1025,8 +954,8 @@ class LoungeBackendService extends Providable
       Function(ChatLoadMoreData) callback) {
     var disposable = CompositeDisposable([]);
 
-    disposable.add(
-        createEventListenerDisposable((LoungeResponseEventNames.more), (raw) {
+    disposable.add(createEventListenerDisposable(
+        (MoreLoungeResponseBody.eventName), (raw) {
       var parsed = MoreLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       _logger.d(() => "loadMoreHistory $parsed for $channel");
@@ -1043,13 +972,13 @@ class LoungeBackendService extends Providable
     var disposable = CompositeDisposable([]);
 
     disposable.add(StreamSubscriptionDisposable(
-        _signOutController.stream.listen((manualSignOut) {
+        _signOutSubject.stream.listen((manualSignOut) {
       if (manualSignOut == true) {
         callback();
       }
     })));
     disposable.add(createEventListenerDisposable(
-        (LoungeResponseEventNames.signOut), (raw) {
+        (SignOutLoungeResponseBody.eventName), (raw) {
       _logger.d(() => "listenForSignOut $raw");
       callback();
     }));
@@ -1069,20 +998,11 @@ class LoungeBackendService extends Providable
     }));
 
     _sendRequest(
-        LoungeJsonRequest(
-            name: LoungeRequestEventNames.more,
-            body: MoreLoungeRequestBody(channel.remoteId, lastMessageId)),
+        MoreLoungeJsonRequest.name(
+            target: channel.remoteId, lastId: lastMessageId),
         isNeedAddRequestToPending: false);
 
-    var isTimeout = false;
-    Future.delayed(_timeoutForRequestsWithResponse, () {
-      if (chatLoadMore == null) {
-        isTimeout = true;
-      }
-    });
-    while (chatLoadMore == null && !isTimeout) {
-      Future.delayed(_timeBetweenCheckResultForRequestsWithResponse);
-    }
+    _doWaitForResult(() => chatLoadMore);
 
     disposable.dispose();
 
@@ -1122,19 +1042,17 @@ class LoungeBackendService extends Providable
       NetworkChannel channel, RegularMessage message, MessagePreview preview,
       {bool waitForResult = false}) async {
     if (waitForResult) {
-      throw NotImplementedYetException();
+      throw NotImplementedYetLoungeException();
     }
 
     var shownInverted = !preview.shown;
     preview.shown = shownInverted;
     _sendRequest(
-        LoungeJsonRequest(
-            name: LoungeRequestEventNames.msgPreviewToggle,
-            body: MsgPreviewToggleLoungeRequestBody.name(
-                target: channel.remoteId,
-                msgId: message.messageRemoteId,
-                link: preview.link,
-                shown: shownInverted)),
+        MsgPreviewToggleLoungeJsonRequest.name(
+            target: channel.remoteId,
+            msgId: message.messageRemoteId,
+            link: preview.link,
+            shown: shownInverted),
         isNeedAddRequestToPending: false);
 
     var chatTogglePreview = MessageTogglePreview.name(
@@ -1145,33 +1063,17 @@ class LoungeBackendService extends Providable
   }
 
   void signOut() {
-    _signOutController.add(true);
+    _signOutSubject.add(true);
 
-    _sendRequest(LoungeRawRequest(name: LoungeRequestEventNames.signOut),
-        isNeedAddRequestToPending: false);
+    _sendRequest(SignOutLoungeEmptyRequest(), isNeedAddRequestToPending: false);
   }
-}
-
-ChatConnectionState mapState(SocketConnectionState socketState) {
-  switch (socketState) {
-    case SocketConnectionState.CONNECTED:
-      return ChatConnectionState.CONNECTED;
-      break;
-    case SocketConnectionState.DISCONNECTED:
-      return ChatConnectionState.DISCONNECTED;
-      break;
-    case SocketConnectionState.CONNECTING:
-      return ChatConnectionState.CONNECTING;
-      break;
-  }
-  throw Exception("invalid state $socketState");
 }
 
 Disposable _listenForConfiguration(SocketIOService _socketIOService,
     Function(ConfigurationLoungeResponseBody) listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
-      _socketIOService, (LoungeResponseEventNames.configuration), (raw) {
+      _socketIOService, (ConfigurationLoungeResponseBody.eventName), (raw) {
     var parsed =
         ConfigurationLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
@@ -1185,7 +1087,7 @@ Disposable _listenForAuth(
     SocketIOService _socketIOService, BooleanCallback listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
-      _socketIOService, (LoungeResponseEventNames.auth), (raw) {
+      _socketIOService, (AuthLoungeResponseBody.eventName), (raw) {
     _logger.d(() => "_listenForAuth = $raw}");
     var parsed = AuthLoungeResponseBody.fromJson(_preProcessRawData(raw));
     listener(parsed.success);
@@ -1198,16 +1100,10 @@ Disposable _listenForCommands(
     SocketIOService _socketIOService, Function(List<String>) listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
-      _socketIOService, (LoungeResponseEventNames.commands), (raw) {
-    var iterable = (raw as Iterable);
+      _socketIOService, (CommandsLoungeResponseBody.eventName), (raw) {
+    var parsed = CommandsLoungeResponseBody.fromRaw(raw);
 
-    var commands = List<String>();
-
-    iterable.forEach((obj) {
-      commands.add(obj.toString());
-    });
-
-    listener(commands);
+    listener(parsed.commands);
   }));
 
   return disposable;
@@ -1217,7 +1113,7 @@ Disposable _listenForAuthorized(
     SocketIOService _socketIOService, VoidCallback listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
-      _socketIOService, (LoungeResponseEventNames.authorized), (raw) {
+      _socketIOService, (AuthorizedLoungeResponseBody.eventName), (raw) {
     _logger.d(() => "_listenForAuthorized = $raw}");
     listener();
   }));
@@ -1229,7 +1125,7 @@ Disposable _listenForInit(SocketIOService _socketIOService,
     Function(ChatInitInformation init) listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
-      _socketIOService, (LoungeResponseEventNames.init), (raw) {
+      _socketIOService, (InitLoungeResponseBody.eventName), (raw) {
     _logger.d(() => "_listenForInit = $raw}");
     var parsed = InitLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
@@ -1332,15 +1228,11 @@ Future<ConnectResult> _connect(
       if (result.isPrivateModeResponseReceived &&
           !result.isAuthRequestSent &&
           authPreferencesExist) {
-        var authRequest = LoungeJsonRequest(
-            name: LoungeRequestEventNames.auth,
-            body: AuthLoungeRequestBody(
-              authPreferences.username,
-              authPreferences.password,
-            ));
+        var authRequest = AuthLoungeJsonRequestBody.name(
+            user: authPreferences.username, password: authPreferences.password);
 
         authResponse = null;
-        socketIOService.emit(authRequest);
+        socketIOService.emit(toSocketIOCommand(authRequest));
         result.isAuthRequestSent = true;
         _logger.d(() => "_connect send auth = $authRequest");
       }
@@ -1372,7 +1264,8 @@ Future<ConnectResult> _connect(
   var chatInitReceived = result.chatInit != null;
 
   _logger.d(() => "_connect result = $result configReceived = $configReceived"
-      " commandsReceived = $commandsReceived authorizedReceived = $authorizedReceived");
+      " commandsReceived = $commandsReceived "
+      "authorizedReceived = $authorizedReceived");
 
   if (authorizedResponseReceived) {
     result.config = toChatConfig(loungeConfig, loungeCommands);
@@ -1387,4 +1280,41 @@ Future<ConnectResult> _connect(
   }
 
   return result;
+}
+
+ChatJoinChannelInputLoungeJsonRequest _findJoinChannelOriginalRequest(
+    List<LoungeRequest> pendingRequests, JoinLoungeResponseBody parsed) {
+  return pendingRequests.firstWhere((request) {
+    if (request is ChatJoinChannelInputLoungeJsonRequest) {
+      ChatJoinChannelInputLoungeJsonRequest joinRequest = request;
+      if (joinRequest != null) {
+        if (joinRequest.preferences.name == parsed.chan.name) {
+          return true;
+        }
+      } else {
+        return false;
+      }
+
+      return false;
+    } else {
+      return false;
+    }
+  }, orElse: () => null);
+}
+
+ChatNetworkNewLoungeJsonRequest _findOriginalJoinNetworkRequest(
+    List<LoungeRequest> pendingRequests,
+    NetworkLoungeResponseBodyPart loungeNetwork) {
+  return pendingRequests.firstWhere((request) {
+    var loungeJsonRequest = request as ChatNetworkNewLoungeJsonRequest;
+    if (loungeJsonRequest != null) {
+      if (loungeNetwork.name == loungeJsonRequest.name) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }, orElse: () => null);
 }

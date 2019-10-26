@@ -1,7 +1,14 @@
-abstract class SocketIOCommand {
-  String getName();
+import 'package:flutter/widgets.dart';
 
-  List<dynamic> getBody();
+class SocketIOCommand {
+
+  final String eventName;
+  final List<dynamic> parameters;
+  SocketIOCommand(this.eventName, this.parameters);
+
+  SocketIOCommand.name({@required this.eventName, @required this.parameters});
+
+
 }
 
 

@@ -166,7 +166,7 @@ class SocketIOService extends Providable {
   Future<bool> connectAndWaitForResult() async => await _connect(_socketIO);
 
   emit(SocketIOCommand command) async =>
-      await _socketIO.emit(command.getName(), command.getBody());
+      await _socketIO.emit(command.eventName, command.parameters);
 
   disconnect() async {
     return await _manager.clearInstance(_socketIO);

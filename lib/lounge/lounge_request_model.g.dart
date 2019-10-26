@@ -6,24 +6,39 @@ part of 'lounge_request_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MoreLoungeRequestBody _$MoreLoungeRequestBodyFromJson(
+InputLoungeJsonRequest _$InputLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return MoreLoungeRequestBody(
+  return InputLoungeJsonRequest(
+    json['target'] as int,
+    json['content'] as String,
+  );
+}
+
+Map<String, dynamic> _$InputLoungeJsonRequestToJson(
+        InputLoungeJsonRequest instance) =>
+    <String, dynamic>{
+      'target': instance.target,
+      'content': instance.content,
+    };
+
+MoreLoungeJsonRequest _$MoreLoungeJsonRequestFromJson(
+    Map<String, dynamic> json) {
+  return MoreLoungeJsonRequest(
     json['target'] as int,
     json['lastId'] as int,
   );
 }
 
-Map<String, dynamic> _$MoreLoungeRequestBodyToJson(
-        MoreLoungeRequestBody instance) =>
+Map<String, dynamic> _$MoreLoungeJsonRequestToJson(
+        MoreLoungeJsonRequest instance) =>
     <String, dynamic>{
       'target': instance.target,
       'lastId': instance.lastId,
     };
 
-MsgPreviewToggleLoungeRequestBody _$MsgPreviewToggleLoungeRequestBodyFromJson(
+MsgPreviewToggleLoungeJsonRequest _$MsgPreviewToggleLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return MsgPreviewToggleLoungeRequestBody(
+  return MsgPreviewToggleLoungeJsonRequest(
     json['target'] as int,
     json['msgId'] as int,
     json['link'] as String,
@@ -31,8 +46,8 @@ MsgPreviewToggleLoungeRequestBody _$MsgPreviewToggleLoungeRequestBodyFromJson(
   );
 }
 
-Map<String, dynamic> _$MsgPreviewToggleLoungeRequestBodyToJson(
-        MsgPreviewToggleLoungeRequestBody instance) =>
+Map<String, dynamic> _$MsgPreviewToggleLoungeJsonRequestToJson(
+        MsgPreviewToggleLoungeJsonRequest instance) =>
     <String, dynamic>{
       'target': instance.target,
       'msgId': instance.msgId,
@@ -40,99 +55,67 @@ Map<String, dynamic> _$MsgPreviewToggleLoungeRequestBodyToJson(
       'shown': instance.shown,
     };
 
-PushTokenLoungeRequestBody _$PushTokenLoungeRequestBodyFromJson(
+PushFCMTokenLoungeJsonRequest _$PushFCMTokenLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return PushTokenLoungeRequestBody(
-    token: json['token'] as String,
+  return PushFCMTokenLoungeJsonRequest(
+    json['token'] as String,
   );
 }
 
-Map<String, dynamic> _$PushTokenLoungeRequestBodyToJson(
-        PushTokenLoungeRequestBody instance) =>
+Map<String, dynamic> _$PushFCMTokenLoungeJsonRequestToJson(
+        PushFCMTokenLoungeJsonRequest instance) =>
     <String, dynamic>{
       'token': instance.token,
     };
 
-NamesLoungeRequestBody _$NamesLoungeRequestBodyFromJson(
+NamesLoungeJsonRequest _$NamesLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return NamesLoungeRequestBody(
+  return NamesLoungeJsonRequest(
     json['target'] as int,
   );
 }
 
-Map<String, dynamic> _$NamesLoungeRequestBodyToJson(
-        NamesLoungeRequestBody instance) =>
+Map<String, dynamic> _$NamesLoungeJsonRequestToJson(
+        NamesLoungeJsonRequest instance) =>
     <String, dynamic>{
       'target': instance.target,
     };
 
-AuthLoungeRequestBody _$AuthLoungeRequestBodyFromJson(
+AuthLoungeJsonRequestBody _$AuthLoungeJsonRequestBodyFromJson(
     Map<String, dynamic> json) {
-  return AuthLoungeRequestBody(
+  return AuthLoungeJsonRequestBody(
     json['user'] as String,
     json['password'] as String,
   );
 }
 
-Map<String, dynamic> _$AuthLoungeRequestBodyToJson(
-        AuthLoungeRequestBody instance) =>
+Map<String, dynamic> _$AuthLoungeJsonRequestBodyToJson(
+        AuthLoungeJsonRequestBody instance) =>
     <String, dynamic>{
       'user': instance.user,
       'password': instance.password,
     };
 
-NetworkNewLoungeRequestBody _$NetworkNewLoungeRequestBodyFromJson(
+NetworkEditLoungeJsonRequest _$NetworkEditLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return NetworkNewLoungeRequestBody(
-    host: json['host'] as String,
-    join: json['join'] as String,
-    name: json['name'] as String,
-    nick: json['nick'] as String,
-    port: json['port'] as String,
-    realname: json['realname'] as String,
-    rejectUnauthorized: json['rejectUnauthorized'] as String,
-    tls: json['tls'] as String,
-    username: json['username'] as String,
-    password: json['password'] as String,
+  return NetworkEditLoungeJsonRequest(
+    json['uuid'] as String,
+    json['host'] as String,
+    json['name'] as String,
+    json['nick'] as String,
+    json['port'] as String,
+    json['realname'] as String,
+    json['password'] as String,
+    json['rejectUnauthorized'] as String,
+    json['tls'] as String,
+    json['username'] as String,
+    json['commands'] as String,
   );
 }
 
-Map<String, dynamic> _$NetworkNewLoungeRequestBodyToJson(
-        NetworkNewLoungeRequestBody instance) =>
+Map<String, dynamic> _$NetworkEditLoungeJsonRequestToJson(
+        NetworkEditLoungeJsonRequest instance) =>
     <String, dynamic>{
-      'host': instance.host,
-      'join': instance.join,
-      'name': instance.name,
-      'nick': instance.nick,
-      'port': instance.port,
-      'realname': instance.realname,
-      'password': instance.password,
-      'rejectUnauthorized': instance.rejectUnauthorized,
-      'tls': instance.tls,
-      'username': instance.username,
-    };
-
-NetworkEditLoungeRequestBody _$NetworkEditLoungeRequestBodyFromJson(
-    Map<String, dynamic> json) {
-  return NetworkEditLoungeRequestBody(
-    host: json['host'] as String,
-    commands: json['commands'] as String,
-    uuid: json['uuid'] as String,
-    name: json['name'] as String,
-    nick: json['nick'] as String,
-    port: json['port'] as String,
-    realname: json['realname'] as String,
-    rejectUnauthorized: json['rejectUnauthorized'] as String,
-    tls: json['tls'] as String,
-    username: json['username'] as String,
-    password: json['password'] as String,
-  );
-}
-
-Map<String, dynamic> _$NetworkEditLoungeRequestBodyToJson(
-        NetworkEditLoungeRequestBody instance) =>
-    <String, dynamic>{
-      'uuid': instance.uuid,
       'host': instance.host,
       'name': instance.name,
       'nick': instance.nick,
@@ -143,4 +126,38 @@ Map<String, dynamic> _$NetworkEditLoungeRequestBodyToJson(
       'tls': instance.tls,
       'username': instance.username,
       'commands': instance.commands,
+      'uuid': instance.uuid,
+    };
+
+NetworkNewLoungeJsonRequest _$NetworkNewLoungeJsonRequestFromJson(
+    Map<String, dynamic> json) {
+  return NetworkNewLoungeJsonRequest(
+    json['join'] as String,
+    json['host'] as String,
+    json['name'] as String,
+    json['nick'] as String,
+    json['port'] as String,
+    json['realname'] as String,
+    json['password'] as String,
+    json['rejectUnauthorized'] as String,
+    json['tls'] as String,
+    json['username'] as String,
+    json['commands'] as String,
+  );
+}
+
+Map<String, dynamic> _$NetworkNewLoungeJsonRequestToJson(
+        NetworkNewLoungeJsonRequest instance) =>
+    <String, dynamic>{
+      'host': instance.host,
+      'name': instance.name,
+      'nick': instance.nick,
+      'port': instance.port,
+      'realname': instance.realname,
+      'password': instance.password,
+      'rejectUnauthorized': instance.rejectUnauthorized,
+      'tls': instance.tls,
+      'username': instance.username,
+      'commands': instance.commands,
+      'join': instance.join,
     };

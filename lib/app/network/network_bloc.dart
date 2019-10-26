@@ -33,7 +33,7 @@ class NetworkTitle {
 }
 
 class NetworkBloc extends DisposableOwner {
-  final ChatInputBackendService backendService;
+  final ChatBackendService backendService;
   final Network network;
   final ChatNetworksStateBloc networksStateBloc;
   final ChatNetworkChannelsStateBloc channelsStateBloc;

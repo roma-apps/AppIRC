@@ -12,7 +12,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 var _logger = MyLogger(logTag: "ChatPreferencesSaverBloc", enabled: true);
 
 class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
-  final ChatOutputBackendService _backendService;
+  final ChatBackendService _backendService;
   final ChatNetworksStateBloc _stateBloc;
   final ChatPreferences _currentPreferences = ChatPreferences([]);
   final ChatPreferencesBloc chatPreferencesBloc;

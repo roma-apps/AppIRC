@@ -11,7 +11,7 @@ var _reconnectDuration = Duration(seconds: 5);
 MyLogger _logger = MyLogger(logTag: "chat_connection_bloc.dart", enabled: true);
 
 class ChatConnectionBloc extends Providable {
-  final ChatInputOutputBackendService backendService;
+  final ChatBackendService backendService;
 
 
   bool get isConnected => backendService.isConnected;

@@ -38,7 +38,7 @@ class LoungeResponseEventNames {
   static const String msgPreviewToggle = "msg:preview:toggle";
 }
 
-class LoungeResponseMessagePreviewType {
+class MessagePreviewTypeLoungeResponse {
   static const String link = "link";
   static const String loading = "loading";
   static const String image = "image";
@@ -46,33 +46,47 @@ class LoungeResponseMessagePreviewType {
   static const String video = "video";
 }
 
-abstract class LoungeRequestBody {
-  Map<String, dynamic> toJson();
-}
-
 abstract class LoungeResponseBody extends LoungeResponseBodyPart {}
 
 abstract class LoungeResponseBodyPart {}
 
-@JsonSerializable()
-class ChanLoungeResponseBody extends LoungeResponseBody {
-  int chan;
+class SignOutLoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.signOut;
+}
+class AuthorizedLoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.authorized;
+}
 
-  ChanLoungeResponseBody(this.chan);
+class UploadAuthLoungeResponseBody {
+  String uploadAuthToken;
 
-  @override
-  String toString() {
-    return 'ChanLoungeResponseBody{chan: $chan}';
+  UploadAuthLoungeResponseBody.fromRaw(dynamic raw) {
+    uploadAuthToken = raw?.toString();
   }
 
-  factory ChanLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$ChanLoungeResponseBodyFromJson(json);
+  static get eventName => LoungeResponseEventNames.uploadAuth;
+}
 
-  Map<String, dynamic> toJson() => _$ChanLoungeResponseBodyToJson(this);
+class CommandsLoungeResponseBody {
+  List<String> commands;
+
+  CommandsLoungeResponseBody.fromRaw(dynamic raw) {
+    var iterable = (raw as Iterable);
+
+    var commands = List<String>();
+
+    iterable.forEach((obj) {
+      commands.add(obj.toString());
+    });
+  }
+
+  static get eventName => LoungeResponseEventNames.commands;
 }
 
 @JsonSerializable()
 class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.msgPreview;
+
   final int target;
   final int msgId;
   final String link;
@@ -97,8 +111,10 @@ class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class MoreLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.more;
+
   final int chan;
-  final List<MsgLoungeResponseBody> messages;
+  final List<MsgLoungeResponseBodyPart> messages;
   final bool moreHistoryAvailable;
 
   MoreLoungeResponseBody(this.chan, this.messages, this.moreHistoryAvailable);
@@ -117,6 +133,8 @@ class MoreLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class ChangelogLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.changelog;
+
   final dynamic current;
   final dynamic latest;
   final dynamic packages;
@@ -137,6 +155,7 @@ class ChangelogLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class SyncSortLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.syncSort;
   final List<int> order;
   final String type;
   final String target;
@@ -156,6 +175,7 @@ class SyncSortLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class SettingsNewLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.settingNew;
   final String name;
   final dynamic value;
 
@@ -174,6 +194,8 @@ class SettingsNewLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
+  static get eventName => LoungeResponseEventNames.sessionsList;
+
   final bool current;
   final int active;
   final int lastUse;
@@ -193,13 +215,15 @@ class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
 }
 
 @JsonSerializable()
-class MessageLoungeResponseBody extends LoungeResponseBody {
+class MsgLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.msg;
+
   final int chan;
   final int highlight;
   final int unread;
-  final MsgLoungeResponseBody msg;
+  final MsgLoungeResponseBodyPart msg;
 
-  MessageLoungeResponseBody(this.chan, this.highlight, this.unread, this.msg);
+  MsgLoungeResponseBody(this.chan, this.highlight, this.unread, this.msg);
 
   @override
   String toString() {
@@ -207,30 +231,30 @@ class MessageLoungeResponseBody extends LoungeResponseBody {
         'highlight: $highlight, unread: $unread, msg: $msg}';
   }
 
-  factory MessageLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$MessageLoungeResponseBodyFromJson(json);
+  factory MsgLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$MsgLoungeResponseBodyFromJson(json);
 
-  Map<String, dynamic> toJson() => _$MessageLoungeResponseBodyToJson(this);
+  Map<String, dynamic> toJson() => _$MsgLoungeResponseBodyToJson(this);
 }
 
 @JsonSerializable()
-class MessageSpecialLoungeResponseBody extends LoungeResponseBody {
+class MsgSpecialLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.msgSpecial;
+
   final int chan;
   final dynamic data;
 
-  MessageSpecialLoungeResponseBody(this.chan, this.data);
+  MsgSpecialLoungeResponseBody(this.chan, this.data);
 
   @override
   String toString() {
     return 'MessageSpecialLoungeResponseBody{chan: $chan, data: $data}';
   }
 
-  factory MessageSpecialLoungeResponseBody.fromJson(
-          Map<String, dynamic> json) =>
-      _$MessageSpecialLoungeResponseBodyFromJson(json);
+  factory MsgSpecialLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$MsgSpecialLoungeResponseBodyFromJson(json);
 
-  Map<String, dynamic> toJson() =>
-      _$MessageSpecialLoungeResponseBodyToJson(this);
+  Map<String, dynamic> toJson() => _$MsgSpecialLoungeResponseBodyToJson(this);
 }
 
 @JsonSerializable()
@@ -275,6 +299,8 @@ class DefaultsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class ConfigurationLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.configuration;
+
   final String defaultTheme;
   final DefaultsLoungeResponseBodyPart defaults;
   final bool displayNetwork;
@@ -324,6 +350,8 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class AuthLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.auth;
+
   final bool success;
   final int serverHash;
 
@@ -342,7 +370,9 @@ class AuthLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {
-  final ChannelLoungeResponseBody chan;
+  static get eventName => LoungeResponseEventNames.join;
+
+  final ChannelLoungeResponseBodyPart chan;
   final int index;
   final String network;
 
@@ -361,6 +391,8 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class PartLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.part;
+
   final int chan;
 
   PartLoungeResponseBody(this.chan);
@@ -373,6 +405,8 @@ class PartLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class QuitLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.quit;
+
   final String network;
 
   QuitLoungeResponseBody(this.network);
@@ -390,6 +424,8 @@ class QuitLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.networkStatus;
+
   final bool connected;
   final String network;
   final bool secure;
@@ -411,6 +447,8 @@ class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.networkOptions;
+
   final String network;
   final ServerOptionsLoungeResponseBodyPart serverOptions;
 
@@ -460,6 +498,7 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class ChannelStateLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.channelState;
   final int chan;
   final int state;
 
@@ -478,6 +517,7 @@ class ChannelStateLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class UsersLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.users;
   final int chan;
   final int unread;
   final int highlight;
@@ -499,6 +539,8 @@ class UsersLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class NickLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.nick;
+
   final String network;
   final String nick;
 
@@ -516,7 +558,7 @@ class NickLoungeResponseBody extends LoungeResponseBody {
 }
 
 @JsonSerializable()
-class MsgLoungeResponseBody extends LoungeResponseBodyPart {
+class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final MsgFromLoungeResponseBodyPart from;
   final String command;
   final String type;
@@ -536,7 +578,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
   final int id;
   final WhoIsLoungeResponseBodyPart whois;
 
-  MsgLoungeResponseBody(
+  MsgLoungeResponseBodyPart(
       this.from,
       this.command,
       this.type,
@@ -556,7 +598,7 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
 
   @override
   String toString() {
-    return 'MsgLoungeResponseBody{from: $from, command: $command,'
+    return 'MsgLoungeResponseBodyPart{from: $from, command: $command,'
         ' type: $type, time: $time, new_nick: $new_nick, '
         'text: $text, hostmask: $hostmask, self: $self, '
         'highlight: $highlight, showInActive: $showInActive, '
@@ -565,10 +607,10 @@ class MsgLoungeResponseBody extends LoungeResponseBodyPart {
         'id: $id, whois: $whois}';
   }
 
-  factory MsgLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$MsgLoungeResponseBodyFromJson(json);
+  factory MsgLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$MsgLoungeResponseBodyPartFromJson(json);
 
-  Map<String, dynamic> toJson() => _$MsgLoungeResponseBodyToJson(this);
+  Map<String, dynamic> toJson() => _$MsgLoungeResponseBodyPartToJson(this);
 }
 
 @JsonSerializable()
@@ -616,16 +658,15 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
       @required this.idle,
       @required this.idleTime,
       @required this.logonTime,
-      @required this.logon,
-      // ignore: non_constant_identifier_names
-      @required this.actual_hostname,
+      @required this.logon, // ignore: non_constant_identifier_names
+      @required this.actual_hostname, // ignore: non_constant_identifier_names
       // ignore: non_constant_identifier_names
       @required this.actual_ip,
-      @required this.nick,
+      @required this.nick, // ignore: non_constant_identifier_names
       // ignore: non_constant_identifier_names
       @required this.real_name,
       @required this.secure,
-      @required this.server,
+      @required this.server, // ignore: non_constant_identifier_names
       // ignore: non_constant_identifier_names
       @required this.server_info});
 
@@ -686,6 +727,8 @@ class MsgPreviewLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class MsgPreviewLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.msgPreview;
+
   final int id;
   final int chan;
 
@@ -706,12 +749,14 @@ class MsgPreviewLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class InitLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.init;
+
   static final int undefinedActiveID = -1;
 
   final int active;
   final String applicationServerKey;
   final String token;
-  final List<NetworkLoungeResponseBody> networks;
+  final List<NetworkLoungeResponseBodyPart> networks;
   final PushSubscriptionLoungeResponseBodyPart pushSubscription;
 
   InitLoungeResponseBody(this.active, this.applicationServerKey, this.token,
@@ -754,6 +799,8 @@ class PushSubscriptionLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class NamesLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.names;
+
   final int id;
   final List<UserLoungeResponseBodyPart> users;
 
@@ -772,6 +819,8 @@ class NamesLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class TopicLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.topic;
+
   final int chan;
   final String topic;
 
@@ -854,24 +903,26 @@ class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
 }
 
 @JsonSerializable()
-class NetworksLoungeResponseBody extends LoungeResponseBody {
-  final List<NetworkLoungeResponseBody> networks;
+class NetworkLoungeResponseBody extends LoungeResponseBody {
+  static get eventName => LoungeResponseEventNames.network;
+
+  final List<NetworkLoungeResponseBodyPart> networks;
 
   @override
   String toString() {
-    return 'NetworksLoungeResponseBody{networks: $networks}';
+    return 'NetworkLoungeResponseBody{networks: $networks}';
   }
 
-  NetworksLoungeResponseBody(this.networks);
+  NetworkLoungeResponseBody(this.networks);
 
-  factory NetworksLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$NetworksLoungeResponseBodyFromJson(json);
+  factory NetworkLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$NetworkLoungeResponseBodyFromJson(json);
 
-  Map<String, dynamic> toJson() => _$NetworksLoungeResponseBodyToJson(this);
+  Map<String, dynamic> toJson() => _$NetworkLoungeResponseBodyToJson(this);
 }
 
 @JsonSerializable()
-class NetworkLoungeResponseBody extends LoungeResponseBodyPart {
+class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String uuid;
   final String name;
   final String host;
@@ -885,11 +936,11 @@ class NetworkLoungeResponseBody extends LoungeResponseBodyPart {
   final String username;
   final String realname;
   final List<dynamic> commands;
-  final List<ChannelLoungeResponseBody> channels;
+  final List<ChannelLoungeResponseBodyPart> channels;
   final ServerOptionsLoungeResponseBodyPart serverOptions;
   final NetworkStatusLoungeResponseBody status;
 
-  NetworkLoungeResponseBody(
+  NetworkLoungeResponseBodyPart(
       this.uuid,
       this.name,
       this.host,
@@ -920,19 +971,19 @@ class NetworkLoungeResponseBody extends LoungeResponseBodyPart {
         ' serverOptions: $serverOptions, status: $status}';
   }
 
-  factory NetworkLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$NetworkLoungeResponseBodyFromJson(json);
+  factory NetworkLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$NetworkLoungeResponseBodyPartFromJson(json);
 
-  Map<String, dynamic> toJson() => _$NetworkLoungeResponseBodyToJson(this);
+  Map<String, dynamic> toJson() => _$NetworkLoungeResponseBodyPartToJson(this);
 }
 
 @JsonSerializable()
-class ChannelLoungeResponseBody extends LoungeResponseBodyPart {
+class ChannelLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String name;
   final String type;
   final String key;
   final String pendingMessage;
-  final List<MsgLoungeResponseBody> messages;
+  final List<MsgLoungeResponseBodyPart> messages;
   final String inputHistory;
   final int inputHistoryPosition;
   final int id;
@@ -960,7 +1011,7 @@ class ChannelLoungeResponseBody extends LoungeResponseBodyPart {
         'unread: $unread, highlight: $highlight, users: $users}';
   }
 
-  ChannelLoungeResponseBody(
+  ChannelLoungeResponseBodyPart(
       this.name,
       this.type,
       this.key,
@@ -980,8 +1031,8 @@ class ChannelLoungeResponseBody extends LoungeResponseBodyPart {
       this.highlight,
       this.users);
 
-  factory ChannelLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$ChannelLoungeResponseBodyFromJson(json);
+  factory ChannelLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$ChannelLoungeResponseBodyPartFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ChannelLoungeResponseBodyToJson(this);
+  Map<String, dynamic> toJson() => _$ChannelLoungeResponseBodyPartToJson(this);
 }

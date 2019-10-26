@@ -61,8 +61,8 @@ ChatConfig toChatConfig(
         fileUploadMaxSizeInBytes: loungeConfig.fileUploadMaxFileSize,
         commands: commands);
 
-Future<ChatMessage> toChatMessage(
-    NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) async {
+Future<ChatMessage> toChatMessage(NetworkChannel channel,
+    MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
   var regularMessageType = detectRegularMessageType(msgLoungeResponseBody.type);
 
   if (regularMessageType == RegularMessageType.WHO_IS) {
@@ -108,8 +108,8 @@ Future<ChatMessage> toChatMessage(
   }
 }
 
-Future<SpecialMessage> toWhoIsSpecialMessage(
-    NetworkChannel channel, MsgLoungeResponseBody msgLoungeResponseBody) async {
+Future<SpecialMessage> toWhoIsSpecialMessage(NetworkChannel channel,
+    MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
   var whoIsSpecialBody = toWhoIsSpecialMessageBody(msgLoungeResponseBody.whois);
 
   var linksInMessage = await findUrls([
@@ -132,7 +132,7 @@ Future<SpecialMessage> toWhoIsSpecialMessage(
 // because lounge SpecialMessageType.CHANNELS_LIST_ITEM message
 // contains several ChatSpecialMessages
 Future<List<SpecialMessage>> toSpecialMessages(NetworkChannel channel,
-    MessageSpecialLoungeResponseBody messageSpecialLoungeResponseBody) async {
+    MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody) async {
   var messageType =
       detectSpecialMessageType(messageSpecialLoungeResponseBody.data);
 
@@ -150,7 +150,7 @@ Future<List<SpecialMessage>> toSpecialMessages(NetworkChannel channel,
 }
 
 Future<List<SpecialMessage>> toChannelsListSpecialMessages(
-    MessageSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
+    MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
     NetworkChannel channel,
     SpecialMessageType messageType) async {
   var iterable = messageSpecialLoungeResponseBody.data as Iterable;
@@ -178,7 +178,7 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
 }
 
 Future<SpecialMessage> toTextSpecialMessage(
-    MessageSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
+    MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
     NetworkChannel channel,
     SpecialMessageType messageType) async {
   var textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(
@@ -241,16 +241,16 @@ SpecialMessageType detectSpecialMessageType(data) {
 NetworkChannelType detectNetworkChannelType(String typeString) {
   var type = NetworkChannelType.UNKNOWN;
   switch (typeString) {
-    case LoungeChannelTypeConstants.lobby:
+    case ChannelTypeLoungeConstants.lobby:
       type = NetworkChannelType.LOBBY;
       break;
-    case LoungeChannelTypeConstants.special:
+    case ChannelTypeLoungeConstants.special:
       type = NetworkChannelType.SPECIAL;
       break;
-    case LoungeChannelTypeConstants.query:
+    case ChannelTypeLoungeConstants.query:
       type = NetworkChannelType.QUERY;
       break;
-    case LoungeChannelTypeConstants.channel:
+    case ChannelTypeLoungeConstants.channel:
       type = NetworkChannelType.CHANNEL;
       break;
   }
@@ -258,13 +258,13 @@ NetworkChannelType detectNetworkChannelType(String typeString) {
 }
 
 NetworkChannelState toNetworkChannelState(
-    ChannelLoungeResponseBody loungeChannel, NetworkChannelType type) {
+    ChannelLoungeResponseBodyPart loungeChannel, NetworkChannelType type) {
   // Private and special messages are always connected, but lounge sometimes
   // don't provide connected state for them
   var isConnected =
       type == NetworkChannelType.QUERY || type == NetworkChannelType.SPECIAL
           ? true
-          : loungeChannel.state == LoungeConstants.CHANNEL_STATE_CONNECTED;
+          : loungeChannel.state == ChannelStateLoungeConstants.connected;
   return NetworkChannelState.name(
       topic: loungeChannel.topic,
       firstUnreadRemoteMessageId: loungeChannel.firstUnread,
@@ -299,62 +299,62 @@ Future<ChatLoadMoreData> toChatLoadMore(NetworkChannel channel,
 RegularMessageType detectRegularMessageType(String stringType) {
   var type;
   switch (stringType) {
-    case LoungeMessageTypeConstants.unhandled:
+    case MessageTypeLoungeConstants.unhandled:
       type = RegularMessageType.UNHANDLED;
       break;
-    case LoungeMessageTypeConstants.topicSetBy:
+    case MessageTypeLoungeConstants.topicSetBy:
       type = RegularMessageType.TOPIC_SET_BY;
       break;
-    case LoungeMessageTypeConstants.topic:
+    case MessageTypeLoungeConstants.topic:
       type = RegularMessageType.TOPIC;
       break;
-    case LoungeMessageTypeConstants.message:
+    case MessageTypeLoungeConstants.message:
       type = RegularMessageType.MESSAGE;
       break;
-    case LoungeMessageTypeConstants.join:
+    case MessageTypeLoungeConstants.join:
       type = RegularMessageType.JOIN;
       break;
-    case LoungeMessageTypeConstants.mode:
+    case MessageTypeLoungeConstants.mode:
       type = RegularMessageType.MODE;
       break;
-    case LoungeMessageTypeConstants.motd:
+    case MessageTypeLoungeConstants.motd:
       type = RegularMessageType.MODE;
       break;
-    case LoungeMessageTypeConstants.whois:
+    case MessageTypeLoungeConstants.whois:
       type = RegularMessageType.WHO_IS;
       break;
-    case LoungeMessageTypeConstants.notice:
+    case MessageTypeLoungeConstants.notice:
       type = RegularMessageType.NOTICE;
       break;
-    case LoungeMessageTypeConstants.error:
+    case MessageTypeLoungeConstants.error:
       type = RegularMessageType.ERROR;
       break;
-    case LoungeMessageTypeConstants.away:
+    case MessageTypeLoungeConstants.away:
       type = RegularMessageType.AWAY;
       break;
 
-    case LoungeMessageTypeConstants.back:
+    case MessageTypeLoungeConstants.back:
       type = RegularMessageType.BACK;
       break;
-    case LoungeMessageTypeConstants.raw:
+    case MessageTypeLoungeConstants.raw:
       type = RegularMessageType.RAW;
       break;
-    case LoungeMessageTypeConstants.modeChannel:
+    case MessageTypeLoungeConstants.modeChannel:
       type = RegularMessageType.MODE_CHANNEL;
       break;
 
-    case LoungeMessageTypeConstants.quit:
+    case MessageTypeLoungeConstants.quit:
       type = RegularMessageType.QUIT;
       break;
 
-    case LoungeMessageTypeConstants.part:
+    case MessageTypeLoungeConstants.part:
       type = RegularMessageType.PART;
       break;
 
-    case LoungeMessageTypeConstants.nick:
+    case MessageTypeLoungeConstants.nick:
       type = RegularMessageType.NICK;
       break;
-    case LoungeMessageTypeConstants.ctcpRequest:
+    case MessageTypeLoungeConstants.ctcpRequest:
       type = RegularMessageType.CTCP_REQUEST;
       break;
 
@@ -365,44 +365,25 @@ RegularMessageType detectRegularMessageType(String stringType) {
   return type;
 }
 
-NetworkNewLoungeRequestBody toNetworkNewLoungeRequestBody(
+String toLoungeBoolean(bool boolValue) {
+  return boolValue != null
+      ? boolValue ? BooleanLoungeConstants.on : BooleanLoungeConstants.off
+      : null;
+}
+
+NetworkEditLoungeJsonRequest toNetworkEditLoungeRequestBody(
+    String remoteId,
     ChatNetworkUserPreferences userPreferences,
-    String join,
     ChatNetworkServerPreferences serverPreferences) {
-  return NetworkNewLoungeRequestBody(
+  return NetworkEditLoungeJsonRequest.name(
     username: userPreferences.username,
     nick: userPreferences.nickname,
-    join: join,
     realname: userPreferences.realName,
     password: userPreferences.password,
     host: serverPreferences.serverHost,
     port: serverPreferences.serverPort,
     rejectUnauthorized:
         toLoungeBoolean(serverPreferences.useOnlyTrustedCertificates),
-    tls: toLoungeBoolean(serverPreferences.useTls),
-    name: serverPreferences.name,
-  );
-}
-
-String toLoungeBoolean(bool boolValue) {
-  return boolValue != null
-      ? boolValue ? LoungeConstants.on : LoungeConstants.off
-      : null;
-}
-
-NetworkEditLoungeRequestBody toNetworkEditLoungeRequestBody(
-    String remoteId,
-    ChatNetworkUserPreferences userPreferences,
-    ChatNetworkServerPreferences serverPreferences) {
-  return NetworkEditLoungeRequestBody(
-    username: userPreferences.username,
-    nick: userPreferences.nickname,
-    realname: userPreferences.realName,
-    password: userPreferences.password,
-    host: serverPreferences.serverHost,
-    port: serverPreferences.serverPort,
-    rejectUnauthorized:
-    toLoungeBoolean(serverPreferences.useOnlyTrustedCertificates),
     tls: toLoungeBoolean(serverPreferences.useTls),
     name: serverPreferences.name,
     uuid: remoteId,
@@ -444,19 +425,19 @@ MessagePreview toMessagePreview(
 
 MessagePreviewType detectMessagePreviewType(String type) {
   switch (type) {
-    case LoungeResponseMessagePreviewType.image:
+    case MessagePreviewTypeLoungeResponse.image:
       return MessagePreviewType.IMAGE;
       break;
-    case LoungeResponseMessagePreviewType.link:
+    case MessagePreviewTypeLoungeResponse.link:
       return MessagePreviewType.LINK;
       break;
-    case LoungeResponseMessagePreviewType.loading:
+    case MessagePreviewTypeLoungeResponse.loading:
       return MessagePreviewType.LOADING;
       break;
-    case LoungeResponseMessagePreviewType.audio:
+    case MessagePreviewTypeLoungeResponse.audio:
       return MessagePreviewType.AUDIO;
       break;
-    case LoungeResponseMessagePreviewType.video:
+    case MessagePreviewTypeLoungeResponse.video:
       return MessagePreviewType.VIDEO;
       break;
   }
@@ -465,7 +446,7 @@ MessagePreviewType detectMessagePreviewType(String type) {
 }
 
 Future<NetworkChannelWithState> toNetworkChannelWithState(
-    ChannelLoungeResponseBody loungeChannel) async {
+    ChannelLoungeResponseBodyPart loungeChannel) async {
   var channel = NetworkChannel(
       ChatNetworkChannelPreferences.name(
           name: loungeChannel.name,
@@ -495,7 +476,7 @@ NetworkChannelUser toNetworkChannelUser(UserLoungeResponseBodyPart loungeUser) {
 }
 
 Future<NetworkWithState> toNetworkWithState(
-    NetworkLoungeResponseBody loungeNetwork) async {
+    NetworkLoungeResponseBodyPart loungeNetwork) async {
   var channelsWithState = <NetworkChannelWithState>[];
 
   for (var loungeChannel in loungeNetwork.channels) {

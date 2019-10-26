@@ -27,7 +27,7 @@ class ChatNetworkChannelsStateBloc extends ChatNetworkChannelsListListenerBloc {
       _anyStateChangedController.stream;
 
   final ChatActiveChannelBloc activeChannelBloc;
-  final ChatOutputBackendService backendService;
+  final ChatBackendService backendService;
 
   ChatNetworkChannelsStateBloc(
     this.backendService,

@@ -16,7 +16,7 @@ typedef LocalIdGenerator = int Function();
 class ChatNetworksListBloc extends Providable {
   final LocalIdGenerator nextChannelIdGenerator;
   final LocalIdGenerator nextNetworkIdGenerator;
-  final ChatInputOutputBackendService backendService;
+  final ChatBackendService backendService;
 
   final Map<Network, ChatNetworkChannelsListBloc> _networksChannelListBlocs =
       Map<Network, ChatNetworkChannelsListBloc>();

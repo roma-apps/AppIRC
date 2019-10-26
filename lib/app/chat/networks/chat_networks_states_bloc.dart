@@ -8,7 +8,7 @@ import 'package:rxdart/rxdart.dart';
 var _logger = MyLogger(logTag: "ChatNetworksStateBloc", enabled: true);
 
 class ChatNetworksStateBloc extends ChatNetworksListListenerBloc {
-  final ChatOutputBackendService _backendService;
+  final ChatBackendService _backendService;
   final Map<String, BehaviorSubject<NetworkState>> _states = Map();
 
   Stream<NetworkState> getNetworkStateStream(Network network) =>

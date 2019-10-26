@@ -20,7 +20,7 @@ var _logger =
 
 class NetworkChannelMessagesSaverBloc
     extends ChatNetworkChannelsListListenerBloc {
-  final ChatOutputBackendService backendService;
+  final ChatBackendService backendService;
   final ChatDatabase db;
 
   Map<int, Disposable> _channelsListeners = Map();

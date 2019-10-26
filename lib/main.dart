@@ -24,6 +24,7 @@ import 'package:flutter_appirc/app/chat/preferences/chat_preferences_saver_bloc.
 import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/state/chat_unread_bloc.dart';
+import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/app/db/chat_database.dart';
 import 'package:flutter_appirc/app/deep_link/chat_deep_link_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
@@ -41,7 +42,6 @@ import 'package:flutter_appirc/app/skin/app_irc_networks_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
-import 'package:flutter_appirc/app/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/form/form_skin_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
@@ -226,54 +226,45 @@ class AppIRCState extends State<AppIRC> {
             providable: loungeBackendService,
             child: Provider<LoungeBackendService>(
               providable: loungeBackendService,
-              child: Provider<ChatInputOutputBackendService>(
-                providable: loungeBackendService,
-                child: Provider<ChatOutputBackendService>(
-                  providable: loungeBackendService,
-                  child: Provider<ChatInputBackendService>(
-                    providable: loungeBackendService,
+              child: Provider(
+                providable: chatPreferencesBloc,
+                child: Provider(
+                  providable: connectionBloc,
+                  child: Provider(
+                    providable: networksListBloc,
                     child: Provider(
-                      providable: chatPreferencesBloc,
+                      providable: networkStatesBloc,
                       child: Provider(
-                        providable: connectionBloc,
+                        providable: channelsStatesBloc,
                         child: Provider(
-                          providable: networksListBloc,
+                          providable: networksBlocsBloc,
                           child: Provider(
-                            providable: networkStatesBloc,
+                            providable: channelsBlocsBloc,
                             child: Provider(
-                              providable: channelsStatesBloc,
+                              providable: activeChannelBloc,
                               child: Provider(
-                                providable: networksBlocsBloc,
+                                providable: chatInitBloc,
                                 child: Provider(
-                                  providable: channelsBlocsBloc,
+                                  providable: chatUnreadBloc,
                                   child: Provider(
-                                    providable: activeChannelBloc,
+                                    providable: chatPushesService,
                                     child: Provider(
-                                      providable: chatInitBloc,
+                                      providable: chatUploadBloc,
                                       child: Provider(
-                                        providable: chatUnreadBloc,
+                                        providable:
+                                            NetworkChannelMessagesSaverBloc(
+                                                loungeBackendService,
+                                                networksListBloc,
+                                                database),
                                         child: Provider(
-                                          providable: chatPushesService,
-                                          child: Provider(
-                                            providable: chatUploadBloc,
-                                            child: Provider(
-                                              providable:
-                                                  NetworkChannelMessagesSaverBloc(
-                                                      loungeBackendService,
-                                                      networksListBloc,
-                                                      database),
-                                              child: Provider(
-                                                providable:
-                                                    ChatPreferencesSaverBloc(
-                                                        loungeBackendService,
-                                                        networkStatesBloc,
-                                                        networksListBloc,
-                                                        chatPreferencesBloc,
-                                                        chatInitBloc),
-                                                child: _buildApp(ChatPage()),
-                                              ),
-                                            ),
-                                          ),
+                                          providable:
+                                              ChatPreferencesSaverBloc(
+                                                  loungeBackendService,
+                                                  networkStatesBloc,
+                                                  networksListBloc,
+                                                  chatPreferencesBloc,
+                                                  chatInitBloc),
+                                          child: _buildApp(ChatPage()),
                                         ),
                                       ),
                                     ),

@@ -25,7 +25,7 @@ class NetworkChannelBlocProvider extends Providable {
 final Duration usersListOutDateDuration = Duration(seconds: 15);
 
 class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
-  final ChatInputOutputBackendService backendService;
+  final ChatBackendService backendService;
   final Network network;
   NetworkChannel channel;
   final ChatNetworkChannelsStateBloc channelsStatesBloc;
@@ -122,7 +122,7 @@ class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
 
   Future<RequestResult<NetworkChannelUser>> printUserInfo(String userNick,
       {bool waitForResult: false}) async =>
-      await backendService.printUserInfo(
+      await backendService.requestUserInfo(
           network, channel, userNick, waitForResult: waitForResult);
 
   Future<RequestResult<ChatMessage>> printNetworkChannelBannedUsers(
@@ -141,7 +141,7 @@ class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
           network, channel, newTopic, waitForResult: waitForResult);
 
   Future<RequestResult<bool>> onOpenNetworkChannel() async =>
-      await backendService.onOpenNetworkChannel(network, channel);
+      await backendService.sendChannelOpenedEventToServer(network, channel);
 
   Future<RequestResult<ChatMessage>> sendNetworkChannelRawMessage(
       String rawMessage, {bool waitForResult: false}) async =>
