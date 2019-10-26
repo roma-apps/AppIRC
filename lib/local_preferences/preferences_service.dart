@@ -7,7 +7,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
-var _logger = MyLogger(logTag: "PreferencesService", enabled: true);
+var _logger = MyLogger(logTag: "preferences_service.dart", enabled: true);
 
 class PreferencesService extends Providable {
   StreamingSharedPreferences _preferences;
