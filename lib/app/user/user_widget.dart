@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 
 Widget buildUserNickWithPopupMenu(BuildContext context, Widget child,
     String nick, NetworkChannelBloc channelBloc,

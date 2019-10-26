@@ -12,8 +12,9 @@ import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_model.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware_type_ahead_widget.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_type_ahead_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -249,18 +250,21 @@ class NetworkChannelNewMessageState
       if (pickedFile != null) {
         _uploadFile(context, chatUploadBloc, pickedFile, inputMessageBloc);
       } else {
-        showPlatformDialog(
+        showPlatformAlertDialog(
             context: context,
-            builder: (_) => PlatformAlertDialog(
-                title: Text(
-                    AppLocalizations.of(context).tr("chat.new_message.attach"
-                        ".error.cant_access_file"))));
+            title:
+                Text(AppLocalizations.of(context).tr("chat.new_message.attach"
+                    ".error.title")),
+            content:
+                Text(AppLocalizations.of(context).tr("chat.new_message.attach"
+                    ".error.cant_access_file")));
       }
     });
   }
 
   Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc,
       File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
+    var appLocalizations = AppLocalizations.of(context);
     try {
       var asyncDialogResult =
           await doAsyncOperationWithDialog(context, asyncCode: () async {
@@ -278,40 +282,50 @@ class NetworkChannelNewMessageState
         }
       }
     } on ServerAuthInvalidLoungeUploadException {
-      showPlatformDialog(
+      showPlatformAlertDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(
-              title: Text(AppLocalizations.of(context)
-                  .tr("chat.new_message.attach.error.server_auth"))));
+          title: Text(
+            appLocalizations.tr("chat.new_message.attach.error.title"),
+          ),
+          content: Text(appLocalizations
+              .tr("chat.new_message.attach.error.server_auth")));
     } on FileSizeExceededLoungeUploadException catch (e) {
-      showPlatformDialog(
+      showPlatformAlertDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(
-                  title: Text(AppLocalizations.of(context)
-                      .tr("chat.new_message.attach.error.file_size", args: [
-                e.maximumPossibleUploadFileSizeInBytes.toString(),
-                e.actualSizeInBytes.toString()
-              ]))));
+          title: Text(
+            appLocalizations.tr("chat.new_message.attach.error.title"),
+          ),
+          content: Text(appLocalizations
+              .tr("chat.new_message.attach.error.file_size", args: [
+            e.maximumPossibleUploadFileSizeInBytes.toString(),
+            e.actualSizeInBytes.toString()
+          ])));
     } on InvalidHttpResponseCodeLoungeUploadException catch (e) {
-      showPlatformDialog(
+      showPlatformAlertDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(
-              title: Text(AppLocalizations.of(context).tr(
-                  "chat.new_message.attach.error.http_code",
-                  args: [e.responseCode.toString()]))));
+          title: Text(
+            appLocalizations.tr("chat.new_message.attach.error.title"),
+          ),
+          content: Text(appLocalizations.tr(
+              "chat.new_message.attach.error.http_code",
+              args: [e.responseCode.toString()])));
     } on InvalidHttpResponseBodyLoungeUploadException catch (e) {
-      showPlatformDialog(
+      showPlatformAlertDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(
-              title: Text(AppLocalizations.of(context).tr(
-                  "chat.new_message.attach.error.http_body",
-                  args: [e.responseBody]))));
+          title: Text(
+            appLocalizations.tr("chat.new_message.attach.error.title"),
+          ),
+          content: Text(appLocalizations.tr(
+              "chat.new_message.attach.error.http_body",
+              args: [e.responseBody])));
     } on TimeoutHttpLoungeUploadException {
-      showPlatformDialog(
+      showPlatformAlertDialog(
           context: context,
-          builder: (_) => PlatformAlertDialog(
-              title: Text(AppLocalizations.of(context).tr(
-                  "chat.new_message.attach.error.http_timeout"))));
+          title: Text(
+            appLocalizations.tr("chat.new_message.attach.error.title"),
+          ),
+          content: Text(appLocalizations
+              .tr("chat.new_message.attach.error.http_timeout")));
     }
   }
 }

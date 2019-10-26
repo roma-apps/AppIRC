@@ -6,7 +6,7 @@ import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_page.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_page.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware_popup_menu_widget.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 

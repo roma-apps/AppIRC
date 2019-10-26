@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/form/form_skin_bloc.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware_text_field.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_text_field.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';

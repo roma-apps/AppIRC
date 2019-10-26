@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_model.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 
 class NightAppSkinTheme extends AppIRCSkinTheme {
   static const String ID = "NightAppSkin";

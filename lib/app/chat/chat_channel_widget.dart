@@ -8,7 +8,7 @@ import 'package:flutter_appirc/app/chat/messages/chat_messages_model.dart';
 import 'package:flutter_appirc/app/message/list/messages_list_widget.dart';
 import 'package:flutter_appirc/app/message/regular/messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware_text_field.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_text_field.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 

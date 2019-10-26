@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 MyLogger _logger =

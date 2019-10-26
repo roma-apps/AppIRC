@@ -2,19 +2,19 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/connection/lounge_connection_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/form/lounge_preferences_form_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/async/async_dialog_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "LoungePreferencesFormWidget", enabled: true);
 
@@ -44,7 +44,6 @@ class LoungePreferencesFormWidgetState
   Widget build(BuildContext context) {
     LoungePreferencesFormBloc formBloc =
         Provider.of<LoungePreferencesFormBloc>(context);
-
 
     var loungeAuthPreferencesFormWidget =
         LoungeAuthPreferencesFormWidget(startPreferences.authPreferences);
@@ -93,11 +92,11 @@ class LoungePreferencesFormWidgetState
 
                       AsyncDialogResult<ConnectResult> dialogResult;
 
-                      dialogResult = await doAsyncOperationWithDialog(
-                          context,
+                      dialogResult = await doAsyncOperationWithDialog(context,
                           asyncCode: () async => await tryConnect(
                               context, currentLoungePreferences),
-                          cancellationValue: null, isDismissible: true);
+                          cancellationValue: null,
+                          isDismissible: true);
 
                       if (dialogResult.isNotCanceled) {
                         ConnectResult connectResult = dialogResult.result;
@@ -109,36 +108,24 @@ class LoungePreferencesFormWidgetState
                               !formBloc.isAuthFormEnabled) {
                             formBloc.isAuthFormEnabled = true;
                           } else {
-                            PlatformAlertDialog dialog;
                             if (connectResult.isSocketConnected) {
                               if (connectResult.isFailAuthResponseReceived) {
-                                dialog =
-                                    buildLoungeAuthFailAlertDialog(context);
+                                showLoungeAuthFailAlertDialog(context);
                               } else if (connectResult.isTimeout) {
-                                dialog = buildLoungeTimeoutAlertDialog(context);
+                                showLoungeTimeoutAlertDialog(context);
                               } else {
-                                dialog = buildLoungeConnectionErrorAlertDialog(
+                                showLoungeConnectionErrorAlertDialog(
                                     context, connectResult.error);
                               }
                             } else {
-                              dialog = buildLoungeConnectionErrorAlertDialog(
+                              showLoungeConnectionErrorAlertDialog(
                                   context, connectResult.error);
                             }
-
-                            showPlatformDialog(
-                                androidBarrierDismissible: true,
-                                context: context,
-                                builder: (_) => dialog);
                           }
                         }
                       }
                     } on InvalidConnectionResponseException catch (e) {
-                      showPlatformDialog(
-                          androidBarrierDismissible: true,
-                          context: context,
-                          builder: (_) =>
-                              buildLoungeConnectionInvalidResponseDialog(
-                                  context, e));
+                      showLoungeConnectionInvalidResponseDialog(context, e);
                     }
                   };
                 }
@@ -173,8 +160,8 @@ class LoungePreferencesFormWidgetState
     return connectResult;
   }
 
-  PlatformAlertDialog buildLoungeConnectionErrorAlertDialog(
-      BuildContext context, dynamic error) {
+  Future showLoungeConnectionErrorAlertDialog(
+      BuildContext context, dynamic error) async {
     var appLocalizations = AppLocalizations.of(context);
 
     String title = appLocalizations
@@ -189,16 +176,14 @@ class LoungePreferencesFormWidgetState
     } else {
       content = appLocalizations
           .tr('lounge.preferences.connection.dialog.connection_error.content'
-          '.no_exception');
+              '.no_exception');
     }
 
-    return PlatformAlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: <Widget>[createOkPlatformDialogAction(context)]);
+    return showPlatformAlertDialog(
+        context: context, title: Text(title), content: Text(content));
   }
 
-  PlatformAlertDialog buildLoungeAuthFailAlertDialog(BuildContext context) {
+  Future showLoungeAuthFailAlertDialog(BuildContext context) async {
     var appLocalizations = AppLocalizations.of(context);
 
     String title = appLocalizations
@@ -207,13 +192,11 @@ class LoungePreferencesFormWidgetState
     String content = appLocalizations
         .tr('lounge.preferences.connection.dialog.auth_fail.content');
 
-    return PlatformAlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: <Widget>[createOkPlatformDialogAction(context)]);
+    return showPlatformAlertDialog(
+        context: context, title: Text(title), content: Text(content));
   }
 
-  PlatformAlertDialog buildLoungeTimeoutAlertDialog(BuildContext context) {
+  Future showLoungeTimeoutAlertDialog(BuildContext context) async {
     var appLocalizations = AppLocalizations.of(context);
 
     String title = appLocalizations
@@ -222,14 +205,12 @@ class LoungePreferencesFormWidgetState
     String content = appLocalizations
         .tr('lounge.preferences.connection.dialog.timeout.content');
 
-    return PlatformAlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: <Widget>[createOkPlatformDialogAction(context)]);
+    return showPlatformAlertDialog(
+        context: context, title: Text(title), content: Text(content));
   }
 
-  PlatformAlertDialog buildLoungeConnectionInvalidResponseDialog(
-      BuildContext context, InvalidConnectionResponseException exception) {
+  Future showLoungeConnectionInvalidResponseDialog(BuildContext context,
+      InvalidConnectionResponseException exception) async {
     var appLocalizations = AppLocalizations.of(context);
 
     String title = appLocalizations.tr(
@@ -238,17 +219,7 @@ class LoungePreferencesFormWidgetState
     String content = appLocalizations.tr(
         'lounge.preferences.connection.dialog.invalid_response_error.content');
 
-    return PlatformAlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: <Widget>[createOkPlatformDialogAction(context)]);
+    return showPlatformAlertDialog(
+        context: context, title: Text(title), content: Text(content));
   }
-}
-
-PlatformDialogAction createOkPlatformDialogAction(BuildContext context) {
-  return PlatformDialogAction(
-    child: Text(AppLocalizations.of(context).tr("lounge.preferences"
-        ".connection.dialog.action.ok")),
-    onPressed: () => Navigator.pop(context),
-  );
 }

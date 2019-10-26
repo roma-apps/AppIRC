@@ -11,10 +11,17 @@
       }
     }
   },
-  "async_dialog": {
-    "title": "Operation in progress",
-    "action": {
-      "cancel": "Cancel"
+  "dialog": {
+    "async": {
+      "title": "Operation in progress",
+      "action": {
+        "cancel": "Cancel"
+      }
+    },
+    "alert": {
+      "action": {
+        "ok": "OK"
+      }
     }
   },
   "lounge": {
@@ -47,9 +54,6 @@
           "timeout": {
             "title": "Response timeout",
             "content": "Check your network connection"
-          },
-          "action": {
-            "ok": "OK"
           }
         }
       },
@@ -312,6 +316,7 @@
           "photo": "Photo"
         },
         "error": {
+          "title": "Upload error",
           "cant_access_file": "Can't access file",
           "server_auth": "Server don't accept new files",
           "file_size": "File exceeds maximum size {}. Actual size is {}",

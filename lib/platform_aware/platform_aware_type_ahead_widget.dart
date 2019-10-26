@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart' as CupertinoTypeAhead;
 import 'package:flutter_typeahead/flutter_typeahead.dart' as MaterialTypeAhead;
 

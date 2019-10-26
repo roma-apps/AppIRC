@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 
 typedef AndroidThemeDataCreator = ThemeData Function();
 typedef IOSThemeDataCreator = CupertinoThemeData Function();

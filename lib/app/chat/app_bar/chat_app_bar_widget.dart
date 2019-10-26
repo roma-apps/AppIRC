@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_skin_bloc.dart';
-import 'package:flutter_appirc/platform_widgets/platform_aware.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class ChatAppBarWidget extends StatelessWidget {
