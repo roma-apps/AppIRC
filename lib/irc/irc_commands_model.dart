@@ -42,7 +42,7 @@ class ChannelsListIRCCommand extends IRCCommand {
 
 class QuitIRCCommand extends IRCCommand {
   @override
-  String get asRawString => "/list";
+  String get asRawString => "/quit";
 }
 
 class CloseIRCCommand extends IRCCommand {
