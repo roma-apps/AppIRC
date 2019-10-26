@@ -5,6 +5,4 @@ class SocketIOManagerProvider extends Providable {
   final SocketIOManager manager;
 
   SocketIOManagerProvider(this.manager);
-
-
 }

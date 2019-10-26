@@ -108,12 +108,10 @@ class SocketIOService extends Providable {
 
     _logger.d(() => "init _socketIO = $_socketIO");
 
-    addDisposable(
-        disposable: _listenConnectionState(
-            (state) {
-              _logger.d(() => "onNewState => $state");
-              _connectionStateController.add(state);
-            }));
+    addDisposable(disposable: _listenConnectionState((state) {
+      _logger.d(() => "onNewState => $state");
+      _connectionStateController.add(state);
+    }));
   }
 
   Disposable _listenConnectionState(
@@ -192,7 +190,7 @@ class SocketIOService extends Providable {
     return SocketOptions(
         //Socket IO server URI
         host, //Enable or disable platform channel logging
-        enableLogging: true,
+        enableLogging: _logger.enabled,
         transports: [
           Transports.WEB_SOCKET,
           Transports.POLLING
