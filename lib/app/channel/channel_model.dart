@@ -114,6 +114,4 @@ class VisibleMessagesBounds {
   String toString() {
     return 'VisibleMessagesBounds{min: $min, max: $max}';
   }
-
-
 }

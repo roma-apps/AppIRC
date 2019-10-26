@@ -158,7 +158,7 @@ class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
         .networkChannelBloc;
   }
 
-  Future<RequestResult<ChatLoadMore>> loadMoreHistory(
+  Future<RequestResult<ChatLoadMoreData>> loadMoreHistory(
       RegularMessage oldestMessage) async {
     return backendService.loadMoreHistory(network, channel, oldestMessage.messageRemoteId);
   }

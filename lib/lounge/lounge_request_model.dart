@@ -137,7 +137,8 @@ class MsgPreviewToggleLoungeRequestBody extends LoungeRequestBody {
   Map<String, dynamic> toJson() =>
       _$MsgPreviewToggleLoungeRequestBodyToJson(this);
 
-  factory MsgPreviewToggleLoungeRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+  factory MsgPreviewToggleLoungeRequestBody.fromJson(
+          Map<dynamic, dynamic> json) =>
       _$MsgPreviewToggleLoungeRequestBodyFromJson(json);
 }
 
@@ -267,7 +268,8 @@ class NetworkEditLoungeRequestBody extends LoungeRequestBody {
 
   @override
   String toString() {
-    return 'NetworkNewLoungeRequestBody{host: $host, uuid: $uuid, commands: $commands, name: $name,'
+    return 'NetworkNewLoungeRequestBody{host: $host, uuid: $uuid,'
+        ' commands: $commands, name: $name,'
         ' nick: $nick, port: $port, realname: $realname, password: $password,'
         ' rejectUnauthorized: $rejectUnauthorized, tls: $tls,'
         ' username: $username}';

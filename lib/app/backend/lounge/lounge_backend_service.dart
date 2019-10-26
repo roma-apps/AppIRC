@@ -26,7 +26,7 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
-import 'package:flutter_appirc/lounge/lounge_upload_file_helper.dart';
+import 'package:flutter_appirc/lounge/upload/lounge_upload_file_helper.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:flutter_appirc/socketio/socketio_service.dart';
@@ -54,7 +54,8 @@ class LoungeBackendService extends Providable
   bool get isConnected => connectionState == ChatConnectionState.CONNECTED;
 
   Stream<bool> get isConnectedStream => connectionStateStream
-      .map((state) => state == ChatConnectionState.CONNECTED).distinct();
+      .map((state) => state == ChatConnectionState.CONNECTED)
+      .distinct();
 
   // ignore: close_sinks
   BehaviorSubject<ChatConnectionState> _connectionStateController =
@@ -67,6 +68,7 @@ class LoungeBackendService extends Providable
 
   // ignore: close_sinks
   BehaviorSubject<ChatConfig> _chatConfigSubject = BehaviorSubject();
+
   Stream<ChatConfig> get chatConfigStream => _chatConfigSubject.stream;
 
   @override
@@ -454,7 +456,7 @@ class LoungeBackendService extends Providable
           _logger.d(() => "onNewMessage for {$data.chan}  $data");
           var type = detectRegularMessageType(data.msg.type);
           if (type == RegularMessageType.WHO_IS) {
-            var whoIsSpecialBody = toSpecialMessageWhoIs(data.msg.whois);
+            var whoIsSpecialBody = toWhoIsSpecialMessageBody(data.msg.whois);
 
             findUrls([
               whoIsSpecialBody.actualHostname,
@@ -468,7 +470,7 @@ class LoungeBackendService extends Providable
                   data: whoIsSpecialBody,
                   specialType: SpecialMessageType.WHO_IS,
                   date: DateTime.now(),
-                  linksInText: urls));
+                  linksInMessage: urls));
             });
           } else {
             listener(message);
@@ -998,33 +1000,29 @@ class LoungeBackendService extends Providable
   @override
   Future<RequestResult<String>> uploadFile(File file) async {
     String uploadFileToken;
+
+    String token;
     var tokenListener = (raw) {
-      if (raw is String && raw.isNotEmpty) {
-        uploadFileToken = raw;
-      }
+      token = raw.toString();
     };
     _socketIOService.on(LoungeResponseEventNames.uploadAuth, tokenListener);
     _socketIOService
         .emit(LoungeRawRequest(name: LoungeRequestEventNames.uploadAuth));
 
-    await Future.delayed(Duration(seconds: 1));
+    _doWaitForResult(() => token);
 
     _socketIOService.off(LoungeResponseEventNames.uploadAuth, tokenListener);
 
-    if (uploadFileToken != null) {
-      String loungeUrl = _loungePreferences.connectionPreferences.host;
-      var uploadedFileRemoteURL =
-          await uploadFileToLounge(loungeUrl, uploadFileToken, file);
+    String loungeUrl = _loungePreferences.connectionPreferences.host;
+    var uploadedFileRemoteURL = await uploadFileToLounge(
+        loungeUrl, file, uploadFileToken, chatConfig.fileUploadMaxSizeInBytes);
 
-      return RequestResult.name(
-          isSentSuccessfully: true, result: uploadedFileRemoteURL);
-    } else {
-      throw ServerAuthUploadException();
-    }
+    return RequestResult.name(
+        isSentSuccessfully: true, result: uploadedFileRemoteURL);
   }
 
   Disposable listenForLoadMore(Network network, NetworkChannel channel,
-      Function(ChatLoadMore) callback) {
+      Function(ChatLoadMoreData) callback) {
     var disposable = CompositeDisposable([]);
 
     disposable.add(
@@ -1060,11 +1058,11 @@ class LoungeBackendService extends Providable
   }
 
   @override
-  Future<RequestResult<ChatLoadMore>> loadMoreHistory(
+  Future<RequestResult<ChatLoadMoreData>> loadMoreHistory(
       Network network, NetworkChannel channel, int lastMessageId) async {
     var disposable = CompositeDisposable([]);
 
-    ChatLoadMore chatLoadMore;
+    ChatLoadMoreData chatLoadMore;
 
     disposable.add(listenForLoadMore(network, channel, (loadMoreResponse) {
       chatLoadMore = loadMoreResponse;
@@ -1235,7 +1233,7 @@ Disposable _listenForInit(SocketIOService _socketIOService,
     _logger.d(() => "_listenForInit = $raw}");
     var parsed = InitLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
-    toChatInit(parsed).then((chatInit) {
+    toChatInitInformation(parsed).then((chatInit) {
       listener(chatInit);
     });
   }));

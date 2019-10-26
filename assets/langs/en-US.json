@@ -314,8 +314,10 @@
         "error": {
           "cant_access_file": "Can't access file",
           "server_auth": "Server don't accept new files",
-          "file_size": "File exceeds maximum size",
-          "transport_error": "Error during uploading"
+          "file_size": "File exceeds maximum size {}. Actual size is {}",
+          "http_code": "Invalid http code: {}",
+          "http_body": "Invalid http response body: {}",
+          "http_timeout": "Timeout during uploading"
         }
       }
     },

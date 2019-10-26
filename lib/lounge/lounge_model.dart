@@ -21,6 +21,29 @@ class LoungeChannelTypeConstants {
   static const channel = "channel";
 }
 
+class LoungeMessageTypeConstants {
+
+  static const lobby = "lobby";
+  static const unhandled = "unhandled";
+  static const topicSetBy = "topic_set_by";
+  static const topic = "topic";
+  static const message = "message";
+  static const join = "join";
+  static const mode = "mode";
+  static const motd = "motd";
+  static const whois = "whois";
+  static const notice = "notice";
+  static const error = "error";
+  static const away = "away";
+  static const back = "back";
+  static const raw = "raw";
+  static const modeChannel = "mode_channel";
+  static const quit = "quit";
+  static const part = "part";
+  static const nick = "nick";
+  static const ctcpRequest = "ctcp_request";
+}
+
 @JsonSerializable()
 class LoungeConnectionPreferences extends JsonPreferences {
    String host;

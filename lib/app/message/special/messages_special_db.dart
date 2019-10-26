@@ -137,7 +137,7 @@ SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
       channelRemoteId: messageDB.channelRemoteId,
       data: body,
       specialType: type,
-      linksInText: messageDB.linksJsonEncoded != null
+      linksInMessage: messageDB.linksJsonEncoded != null
           ? convertLinks(messageDB) : null,
       date: DateTime.fromMicrosecondsSinceEpoch(
           messageDB.dateMicrosecondsSinceEpoch));

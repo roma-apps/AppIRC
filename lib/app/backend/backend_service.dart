@@ -156,7 +156,7 @@ abstract class ChatInputBackendService implements ChatBackendService {
   Future<RequestResult<MessageTogglePreview>> togglePreview(Network network,
       NetworkChannel channel, RegularMessage message, MessagePreview preview);
 
-  Future<RequestResult<ChatLoadMore>> loadMoreHistory(
+  Future<RequestResult<ChatLoadMoreData>> loadMoreHistory(
       Network network, NetworkChannel channel, int lastMessageId);
 
   Future<RequestResult<String>> uploadFile(File file);

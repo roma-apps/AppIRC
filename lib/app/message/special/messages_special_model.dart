@@ -19,12 +19,12 @@ class SpecialMessage extends ChatMessage {
       @required this.specialType,
       int messageLocalId,
       @required DateTime date,
-      @required List<String> linksInText})
+      @required List<String> linksInMessage})
       : super(
           ChatMessageType.SPECIAL,
           channelRemoteId,
           date,
-          linksInText,
+          linksInMessage,
           messageLocalId: messageLocalId,
         );
 

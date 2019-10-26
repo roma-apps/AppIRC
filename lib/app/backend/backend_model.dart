@@ -25,12 +25,12 @@ class ChatPushMessage {
 
 
 
-class ChatLoadMore {
+class ChatLoadMoreData {
   List<ChatMessage> messages;
   bool moreHistoryAvailable;
-  ChatLoadMore(this.messages, this.moreHistoryAvailable);
+  ChatLoadMoreData(this.messages, this.moreHistoryAvailable);
 
-  ChatLoadMore.name({@required this.messages, @required this
+  ChatLoadMoreData.name({@required this.messages, @required this
       .moreHistoryAvailable});
 
 

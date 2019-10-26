@@ -951,7 +951,8 @@ class ChannelLoungeResponseBody extends LoungeResponseBodyPart {
   String toString() {
     return 'ChannelLoungeResponseBody{name: $name, type: $type, key: $key,'
         ' pendingMessage: $pendingMessage, messages: $messages, '
-        'inputHistory: $inputHistory, inputHistoryPosition: $inputHistoryPosition, '
+        'inputHistory: $inputHistory,'
+        ' inputHistoryPosition: $inputHistoryPosition, '
         'id: $id, moreHistoryAvailable: $moreHistoryAvailable, '
         'historyLoading: $historyLoading, editTopic: $editTopic, '
         'scrolledToBottom: $scrolledToBottom, topic: $topic, '
