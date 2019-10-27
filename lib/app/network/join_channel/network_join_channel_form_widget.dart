@@ -1,5 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Icons, TextInputAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
@@ -8,7 +7,7 @@ import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences
 import 'package:flutter_appirc/app/backend/lounge/preferences/page/lounge_edit_preferences_page.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/list/networks_list_widget.dart';
-import 'package:flutter_appirc/app/network/preferences/network_preferences_page.dart';
+import 'package:flutter_appirc/app/network/preferences/page/network_new_preferences_page.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/skin_day_night_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -53,12 +52,15 @@ class ChatDrawerWidget extends StatelessWidget {
           ChatBackendService backendService = Provider.of(context);
 
           Navigator.push(context, platformPageRoute(builder: (context) {
-            var newChatNetworkPage = NewChatNetworkPage(
-              context,
-              backendService.chatConfig.createDefaultNetworkPreferences(),
-              !backendService.chatConfig.lockNetwork,
-              backendService.chatConfig.displayNetwork,
-              () {
+            var networkEnabled = !backendService.chatConfig.lockNetwork;
+            var newChatNetworkPage = NewChatNetworkPage.name(
+              context: context,
+              startValues:
+                  backendService.chatConfig.createDefaultNetworkPreferences(),
+              serverPreferencesEnabled: networkEnabled,
+              serverPreferencesVisible:
+                  backendService.chatConfig.displayNetwork,
+              outerCallback: () {
                 Navigator.pop(context);
               },
             );

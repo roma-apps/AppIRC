@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/chat/networks/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_bloc.dart';
@@ -53,31 +52,8 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
 
                   var pressed = dataValid
                       ? () async {
-                          var dialogResult = await doAsyncOperationWithDialog(
-                              context: context,
-                              asyncCode: () async {
-                                var chatNetworkChannelPreferences =
-                                    ChatNetworkChannelPreferences.name(
-                                        name: networkChannelJoinFormBloc
-                                            .extractChannel(),
-                                        password: networkChannelJoinFormBloc
-                                            .extractPassword());
-                                _logger.d(() =>
-                                    "startJoinChannel $chatNetworkChannelPreferences");
-                                var joinResult =
-                                    await networkBloc.joinNetworkChannel(
-                                        chatNetworkChannelPreferences,
-                                        waitForResult: true);
-                                _logger.d(() =>
-                                    "startJoinChannel result $joinResult");
-                              },
-                              cancellationValue: null,
-                              isDismissible: true);
-
-                          if (dialogResult.isNotCanceled) {
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                          }
+                          _onJoinClicked(
+                              context, networkChannelJoinFormBloc, networkBloc);
                         }
                       : null;
                   return createSkinnedPlatformButton(
@@ -85,7 +61,6 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
                     child: Text(
                       appLocalizations
                           .tr('chat.network.join_channel.action.join'),
-                      style: TextStyle(color: Colors.white),
                     ),
                     onPressed: pressed,
                   );
@@ -94,5 +69,38 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
         ),
       )),
     );
+  }
+
+  Future _onJoinClicked(
+      BuildContext context,
+      NetworkChannelJoinFormBloc networkChannelJoinFormBloc,
+      NetworkBloc networkBloc) async {
+    var dialogResult = await doAsyncOperationWithDialog(
+        context: context,
+        asyncCode: () async {
+          var chatNetworkChannelPreferences =
+              ChatNetworkChannelPreferences.name(
+                  name: networkChannelJoinFormBloc.extractChannel(),
+                  password: networkChannelJoinFormBloc.extractPassword());
+          _logger.d(() => "startJoinChannel $chatNetworkChannelPreferences");
+          var joinResult = await networkBloc.joinNetworkChannel(
+              chatNetworkChannelPreferences,
+              waitForResult: true);
+          _logger.d(() => "startJoinChannel result $joinResult");
+        },
+        cancellationValue: null,
+        isDismissible: true);
+
+    if (dialogResult.isNotCanceled) {
+      _dismissDialog(context);
+      _goBack(context);
+    }
+  }
+
+  void _dismissDialog(BuildContext context) {
+    Navigator.pop(context);
+  }
+  void _goBack(BuildContext context) {
+    Navigator.pop(context);
   }
 }

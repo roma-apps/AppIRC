@@ -8,26 +8,32 @@ import 'package:flutter_appirc/provider/provider.dart';
 var _preferenceKeyPrefix = "chat.network";
 
 class ChatNetworkExpandStateBloc extends Providable {
-  BoolPreferencesBloc preferenceBloc;
+  BoolPreferencesBloc _preferenceBloc;
 
-  Stream<bool> get expandedStream => preferenceBloc.valueStream(defaultValue: true);
-  bool get expanded => preferenceBloc.getValue(defaultValue: true);
+  Stream<bool> get expandedStream =>
+      _preferenceBloc.valueStream(defaultValue: true);
+  bool get expanded => _preferenceBloc.getValue(defaultValue: true);
 
   ChatNetworkExpandStateBloc(
       PreferencesService preferencesService, Network network) {
     var networkLocalId = network.localId;
-    preferenceBloc = BoolPreferencesBloc(
+    _preferenceBloc = BoolPreferencesBloc(
         preferencesService, "$_preferenceKeyPrefix.$networkLocalId");
-    addDisposable(disposable: preferenceBloc);
+    addDisposable(disposable: _preferenceBloc);
   }
 
-  expand() {
-    preferenceBloc.setValue(true);
+  void expand() {
+    _preferenceBloc.setValue(true);
   }
 
-  collapse() {
-    preferenceBloc.setValue(false);
+  void collapse() {
+    _preferenceBloc.setValue(false);
   }
 
 
+  void dispose() {
+
+    super.dispose();
+    _preferenceBloc.dispose();
+  }
 }

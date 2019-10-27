@@ -1,5 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Icons, TextInputAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
@@ -11,7 +11,7 @@ import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 
 class ChatNetworkPreferencesFormWidget extends StatefulWidget {
   final ChatNetworkPreferences startValues;
-  final ChatNetworkPreferencesActionCallback callback;
+  final Function(BuildContext context, ChatNetworkPreferences preferences) callback;
   final String buttonText;
 
   ChatNetworkPreferencesFormWidget(
@@ -24,7 +24,7 @@ class ChatNetworkPreferencesFormWidget extends StatefulWidget {
 
 class ChatNetworkPreferencesFormWidgetState
     extends State<ChatNetworkPreferencesFormWidget> {
-  final ChatNetworkPreferencesActionCallback callback;
+  final Function(BuildContext context, ChatNetworkPreferences preferences) callback;
   final ChatNetworkPreferences startValues;
   final String buttonText;
 

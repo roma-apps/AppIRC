@@ -52,7 +52,6 @@ class ChatNetworkServerPreferences extends JsonPreferences {
     @required this.useOnlyTrustedCertificates,
   });
 
-
   @override
   String toString() {
     return 'ChatNetworkServerPreferences{name: $name, serverHost: '
@@ -121,19 +120,16 @@ class ChatNetworkChannelPreferences extends JsonPreferences {
   Map<String, dynamic> toJson() => _$ChatNetworkChannelPreferencesToJson(this);
 }
 
-typedef ChatNetworkPreferencesActionCallback = void Function(
-    BuildContext context, ChatNetworkPreferences preferences);
-
 @JsonSerializable()
 class ChatNetworkPreferences extends JsonPreferences {
+  static const String channelsSeparator = " ";
   int get localId => networkConnectionPreferences?.localId;
 
   int get localIdOrUndefined => localId != null ? localId : -1;
-  static const String channelsSeparator = " ";
 
   ChatNetworkConnectionPreferences networkConnectionPreferences;
 
-  List<ChatNetworkChannelPreferences> channels;
+  final List<ChatNetworkChannelPreferences> channels;
 
   ChatNetworkPreferences(this.networkConnectionPreferences, this.channels);
 
@@ -167,8 +163,8 @@ class ChatNetworkPreferences extends JsonPreferences {
 class ChatNetworkConnectionPreferences extends JsonPreferences {
   int localId;
 
-  ChatNetworkServerPreferences serverPreferences;
-  ChatNetworkUserPreferences userPreferences;
+  final ChatNetworkServerPreferences serverPreferences;
+  final ChatNetworkUserPreferences userPreferences;
 
   ChatNetworkConnectionPreferences(
       {@required this.serverPreferences,
@@ -191,8 +187,6 @@ class ChatNetworkConnectionPreferences extends JsonPreferences {
   @override
   Map<String, dynamic> toJson() =>
       _$ChatNetworkConnectionPreferencesToJson(this);
-
-
 }
 
 class NetworkState {
@@ -217,8 +211,6 @@ class NetworkState {
     return 'NetworkState{connected: $connected, secure: $secure,'
         ' nick: $nick, name: $name}';
   }
-
-
 }
 
 class NetworkWithState {

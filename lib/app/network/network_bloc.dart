@@ -1,36 +1,29 @@
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
+import 'package:flutter_appirc/app/chat/channels/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/networks/chat_networks_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
-import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/app/chat/channels/chat_network_channels_states_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/special/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-
-
 /// It is not possible to simple use NetworkBloc as Provider
 /// app shouldn't dispose NetworkBloc instances during UI changes
 /// NetworkBloc disposed in ChatNetworksBlocsBloc
 class NetworkBlocProvider extends Providable {
-  NetworkBloc networkBloc;
+  final NetworkBloc networkBloc;
   NetworkBlocProvider(this.networkBloc);
-
-
 }
 
 class NetworkTitle {
-  String name;
-  String nick;
+  final String name;
+  final String nick;
   NetworkTitle(this.name, this.nick);
-
-
 }
 
 class NetworkBloc extends DisposableOwner {
@@ -45,27 +38,26 @@ class NetworkBloc extends DisposableOwner {
   Stream<NetworkState> get _networkStateStream =>
       networksStateBloc.getNetworkStateStream(network);
 
+  NetworkTitle get networkTitle =>
+      NetworkTitle(_networkState.name, _networkState.nick);
+  Stream<NetworkTitle> get networkTitleStream => _networkStateStream
+      .map((state) => NetworkTitle(_networkState.name, _networkState.nick))
+      .distinct();
 
-  NetworkTitle get networkTitle => NetworkTitle(_networkState.name,
-    _networkState.nick);
-  Stream<NetworkTitle> get networkTitleStream => _networkStateStream.map(
-          (state) => NetworkTitle(_networkState.name,
-              _networkState.nick)).distinct();
-  
   String get networkNick => _networkState.nick;
 
-  Stream<String> get networkNickStream => _networkStateStream.map((state) =>
-  state?.nick).distinct();
-  
+  Stream<String> get networkNickStream =>
+      _networkStateStream.map((state) => state?.nick).distinct();
+
   String get networkName => _networkState.name;
 
-  Stream<String> get networkNameStream => _networkStateStream.map((state) =>
-  state?.name).distinct();
-  
+  Stream<String> get networkNameStream =>
+      _networkStateStream.map((state) => state?.name).distinct();
+
   bool get networkConnected => _networkState.connected;
 
-  Stream<bool> get networkConnectedStream => _networkStateStream.map(
-          (state) => state?.connected).distinct();
+  Stream<bool> get networkConnectedStream =>
+      _networkStateStream.map((state) => state?.connected).distinct();
 
   NetworkBloc(this.backendService, this.network, this.networksStateBloc,
       this.channelsStateBloc, this.activeChannelBloc);
@@ -110,8 +102,9 @@ class NetworkBloc extends DisposableOwner {
       var initMessages = <ChatMessage>[];
       var initUsers = <NetworkChannelUser>[];
       return RequestResult<NetworkChannelWithState>(
-          true, NetworkChannelWithState(alreadyJoinedChannel, channelState,
-        initMessages, initUsers));
+          true,
+          NetworkChannelWithState(
+              alreadyJoinedChannel, channelState, initMessages, initUsers));
     } else {
       return await backendService.joinNetworkChannel(network, preferences,
           waitForResult: waitForResult);
@@ -121,8 +114,7 @@ class NetworkBloc extends DisposableOwner {
   Future<RequestResult<bool>> leaveNetwork({bool waitForResult: false}) async =>
       await backendService.leaveNetwork(network, waitForResult: waitForResult);
 
-   static NetworkBloc of(BuildContext context) {
+  static NetworkBloc of(BuildContext context) {
     return Provider.of<NetworkBlocProvider>(context).networkBloc;
   }
-
 }

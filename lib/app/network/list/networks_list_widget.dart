@@ -27,46 +27,50 @@ class NetworksListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    TextSkinBloc textSkinBloc = Provider.of(context);
     var networksListBloc = Provider.of<ChatNetworksListBloc>(context);
 
     var networksListWidget = StreamBuilder<List<Network>>(
         stream: networksListBloc.networksStream,
+        initialData: networksListBloc.networks,
         builder: (BuildContext context, AsyncSnapshot<List<Network>> snapshot) {
-          var listItemCount =
-              (snapshot.data == null ? 0 : snapshot.data.length);
+          var networks = snapshot.data ?? [];
 
-          if (listItemCount > 0) {
-            return Container(
-              child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: listItemCount,
-                  separatorBuilder: (context, index) => Divider(
-                        color: Provider.of<NetworkListSkinBloc>(context)
-                            .separatorColor,
-                      ),
-                  itemBuilder: (BuildContext context, int index) {
-                    var network = snapshot.data[index];
-
-                    return _networkItem(context, network);
-                  }),
-            );
+          if (networks.isNotEmpty) {
+            return _buildNetworksListWidget(networks);
           } else {
-            return Center(
-              child: Text(
-                  AppLocalizations.of(context).tr("chat.networks_list.empty"),
-                  style: textSkinBloc.defaultTextStyle),
-            );
+            return _buildEmptyListWidget(context);
           }
         });
 
     return networksListWidget;
   }
 
+  Container _buildNetworksListWidget(List<Network> networks) {
+    return Container(
+      child: ListView.separated(
+          shrinkWrap: true,
+          itemCount: networks.length,
+          separatorBuilder: (context, index) => Divider(
+                color: Provider.of<NetworkListSkinBloc>(context).separatorColor,
+              ),
+          itemBuilder: (BuildContext context, int index) {
+            var network = networks[index];
+            return _networkItem(context, network);
+          }),
+    );
+  }
+
+  Center _buildEmptyListWidget(BuildContext context) {
+    TextSkinBloc textSkinBloc = Provider.of(context);
+    return Center(
+      child: Text(AppLocalizations.of(context).tr("chat.networks_list.empty"),
+          style: textSkinBloc.defaultTextStyle),
+    );
+  }
+
   Widget _networkItem(BuildContext context, Network network) {
     var preferencesService = Provider.of<PreferencesService>(context);
-    var ircChatActiveChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var channel = network.lobbyChannel;
     var expandBloc = ChatNetworkExpandStateBloc(preferencesService, network);
 
@@ -79,36 +83,43 @@ class NetworksListWidget extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           var expanded = snapshot.data;
           return StreamBuilder<NetworkChannel>(
-              stream: ircChatActiveChannelBloc.activeChannelStream,
+              stream: activeChannelBloc.activeChannelStream,
               builder: (BuildContext context,
                   AsyncSnapshot<NetworkChannel> snapshot) {
                 var activeChannel = snapshot.data;
                 var isChannelActive =
                     activeChannel?.remoteId == channel.remoteId;
 
-                return _buildNetworkRow(context, ircChatActiveChannelBloc,
-                    network, channel, isChannelActive, expanded, expandBloc);
+                return _buildNetworkRow(
+                    context, network, isChannelActive, expanded);
               });
         },
       ),
     );
   }
 
-  _buildNetworkRow(
-      BuildContext context,
-      ChatActiveChannelBloc ircChatActiveChannelBloc,
-      Network network,
-      NetworkChannel channel,
-      bool isChannelActive,
-      bool expanded,
-      ChatNetworkExpandStateBloc expandBloc) {
-    var networkExpandedStateIcon;
+  _buildNetworkRow(BuildContext context, Network network, bool isChannelActive,
+      bool expanded) {
+    var channel = network.lobbyChannel;
+    var networkChannelItemRow = _buildNetworkChannelItemWidget(
+        context, network, channel, expanded, isChannelActive);
 
     if (expanded == true) {
-      networkExpandedStateIcon = Icons.arrow_drop_down;
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            networkChannelItemRow,
+            NetworkChannelsListWidget(network, onActionCallback, true)
+          ]);
     } else {
-      networkExpandedStateIcon = Icons.arrow_right;
+      return networkChannelItemRow;
     }
+  }
+
+  Widget _buildNetworkChannelItemWidget(BuildContext context, Network network,
+      NetworkChannel channel, bool expanded, bool isChannelActive) {
+    IconData networkExpandedStateIcon = _calculateExpandIcon(expanded);
 
     var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
 
@@ -123,54 +134,10 @@ class NetworksListWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            PlatformIconButton(
-              icon: Icon(networkExpandedStateIcon,
-                  color: networkListSkinBloc
-                      .getNetworkItemIconColor(isChannelActive)),
-              onPressed: () {
-                if (expanded) {
-                  expandBloc.collapse();
-                } else {
-                  expandBloc.expand();
-                }
-              },
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () async {
-                  if (onActionCallback != null) {
-                    onActionCallback();
-                  }
-
-                  ircChatActiveChannelBloc.changeActiveChanel(channel);
-                },
-                child: StreamBuilder<NetworkTitle>(
-                    stream: networkBloc.networkTitleStream,
-                    initialData: networkBloc.networkTitle,
-                    builder: (context, snapshot) {
-                      var title = snapshot.data;
-
-                      var networkTitle = "${title.name} (${title.nick})";
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(networkTitle,
-                            style: networkListSkinBloc
-                                .getNetworkItemTextStyle(isChannelActive)),
-                      );
-                    }),
-              ),
-            ),
-            StreamBuilder(
-                stream: networkBloc.networkConnectedStream,
-                initialData: networkBloc.networkConnected,
-                builder: (context, snapshot) {
-                  var connected = snapshot.data;
-                  return buildConnectionIcon(
-                      context,
-                      networkListSkinBloc
-                          .getNetworkItemIconColor(isChannelActive),
-                      connected);
-                }),
+            _buildToggleExpandButton(context, networkBloc.network,
+                networkExpandedStateIcon, isChannelActive, expanded),
+            _buildNetworkTitle(context, networkBloc, isChannelActive),
+            _buildConnectionIcon(context, networkBloc, isChannelActive),
             buildChannelUnreadCountBadge(context, channelBloc, isChannelActive),
             buildNetworkPopupMenuButton(context, networkBloc,
                 networkListSkinBloc.getNetworkItemIconColor(isChannelActive))
@@ -181,17 +148,88 @@ class NetworksListWidget extends StatelessWidget {
             color: networkListSkinBloc
                 .getNetworkItemBackgroundColor(isChannelActive)),
         child: row);
+    return rowContainer;
+  }
 
+  StreamBuilder<bool> _buildConnectionIcon(
+      BuildContext context, NetworkBloc networkBloc, bool isChannelActive) {
+    var networkListSkinBloc = Provider.of<NetworkListSkinBloc>(context);
+    return StreamBuilder(
+        stream: networkBloc.networkConnectedStream,
+        initialData: networkBloc.networkConnected,
+        builder: (context, snapshot) {
+          var connected = snapshot.data;
+          return buildConnectionIcon(
+              context,
+              networkListSkinBloc.getNetworkItemIconColor(isChannelActive),
+              connected);
+        });
+  }
+
+  Expanded _buildNetworkTitle(
+      BuildContext context, NetworkBloc networkBloc, bool isChannelActive) {
+    NetworkListSkinBloc networkListSkinBloc = Provider.of(context);
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () async {
+          if (onActionCallback != null) {
+            onActionCallback();
+          }
+          NetworkChannel channel = networkBloc.network.lobbyChannel;
+
+          var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+
+          activeChannelBloc.changeActiveChanel(channel);
+        },
+        child: StreamBuilder<NetworkTitle>(
+            stream: networkBloc.networkTitleStream,
+            initialData: networkBloc.networkTitle,
+            builder: (context, snapshot) {
+              var title = snapshot.data;
+
+              var networkTitle = "${title.name} (${title.nick})";
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(networkTitle,
+                    style: networkListSkinBloc
+                        .getNetworkItemTextStyle(isChannelActive)),
+              );
+            }),
+      ),
+    );
+  }
+
+  PlatformIconButton _buildToggleExpandButton(
+      BuildContext context,
+      Network network,
+      IconData networkExpandedStateIcon,
+      bool isChannelActive,
+      bool expanded) {
+    NetworkListSkinBloc networkListSkinBloc = Provider.of(context);
+    PreferencesService preferencesService = Provider.of(context);
+    return PlatformIconButton(
+      icon: Icon(networkExpandedStateIcon,
+          color: networkListSkinBloc.getNetworkItemIconColor(isChannelActive)),
+      onPressed: () {
+        var expandBloc =
+            ChatNetworkExpandStateBloc(preferencesService, network);
+        if (expanded) {
+          expandBloc.collapse();
+        } else {
+          expandBloc.expand();
+        }
+      },
+    );
+  }
+
+  IconData _calculateExpandIcon(bool expanded) {
+    IconData networkExpandedStateIcon;
     if (expanded == true) {
-      return Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            rowContainer,
-            NetworkChannelsListWidget(network, onActionCallback, true)
-          ]);
+      networkExpandedStateIcon = Icons.arrow_drop_down;
     } else {
-      return rowContainer;
+      networkExpandedStateIcon = Icons.arrow_right;
     }
+    return networkExpandedStateIcon;
   }
 }
