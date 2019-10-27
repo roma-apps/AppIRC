@@ -94,15 +94,15 @@ class AppIRC extends StatefulWidget {
 class AppIRCState extends State<AppIRC> {
   bool isInitStarted = false;
   bool isInitSuccess = false;
-  LoungeBackendService loungeBackendService;
+  LoungeBackendService _loungeBackendService;
 
-  ChatDatabase database;
+  ChatDatabase _database;
 
-  Widget createdWidget;
+  Widget _createdWidget;
 
-  LoungePreferences loungePreferences;
+  LoungePreferences _loungePreferences;
 
-  PushesService pushesService = PushesService();
+  PushesService _pushesService = PushesService();
 
   @override
   Widget build(BuildContext context) {
@@ -112,163 +112,174 @@ class AppIRCState extends State<AppIRC> {
       if (!isInitStarted) {
         isInitStarted = true;
         Timer.run(() async {
-          database = await $FloorChatDatabase
-              .databaseBuilder('flutter_database.db')
-              .build();
-
-          database.regularMessagesDao.deleteAllRegularMessages();
-          database.specialMessagesDao.deleteAllSpecialMessages();
-
-          await pushesService.init();
-          await pushesService.askPermissions();
-          await pushesService.configure();
-
-          loungePreferencesBloc
-              .valueStream(defaultValue: LoungePreferences.empty)
-              .listen((newPreferences) {
-            _onLoungeChanged(context, newPreferences);
-          });
-          isInitSuccess = true;
+          await _init(context, loungePreferencesBloc);
           setState(() {});
         });
       }
 
       return _buildApp(SplashPage());
     } else {
-      if (loungePreferences == null) {
+      if (_loungePreferences == null) {
         return _buildAppForStartLoungePreferences();
       } else {
-        if (loungeBackendService == null) {
+        if (_loungeBackendService == null) {
           return _buildAppForStartLoungePreferences();
         } else {
-          return createdWidget;
+          return _createdWidget;
         }
       }
     }
+  }
+
+  Future _init(BuildContext context, LoungePreferencesBloc loungePreferencesBloc) async {
+       _database = await $FloorChatDatabase
+        .databaseBuilder('flutter_database.db')
+        .build();
+
+    _database.regularMessagesDao.deleteAllRegularMessages();
+    _database.specialMessagesDao.deleteAllSpecialMessages();
+
+    await _pushesService.init();
+    await _pushesService.askPermissions();
+    await _pushesService.configure();
+
+    loungePreferencesBloc
+        .valueStream(defaultValue: LoungePreferences.empty)
+        .listen((newPreferences) {
+      _onLoungeChanged(context, newPreferences);
+    });
+    isInitSuccess = true;
   }
 
   void _onLoungeChanged(
       BuildContext context, LoungePreferences newPreferences) async {
     if (newPreferences != null &&
         newPreferences != LoungePreferences.empty &&
-        newPreferences != loungePreferences) {
-      loungePreferences = newPreferences;
+        newPreferences != _loungePreferences) {
+      _loungePreferences = newPreferences;
 
-      _logger.d(() => "_onLoungeChanged $newPreferences");
+      await _recreateChatApp(newPreferences, context);
 
-      var preferencesService = Provider.of<PreferencesService>(context);
-      var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
-      var loungeBackendService = LoungeBackendService(
-          socketManagerProvider.manager, loungePreferences);
+      setState(() {});
+    }
+  }
 
-      await loungeBackendService.init();
+  Future _recreateChatApp(LoungePreferences newPreferences, BuildContext context) async {
 
-      loungeBackendService.listenForSignOut(() {
-        loungeBackendService.dispose();
-        this.loungeBackendService = null;
-        this.loungePreferences.authPreferences = null;
+    _logger.d(() => "_onLoungeChanged $newPreferences");
 
-        var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
-        loungePreferencesBloc.setValue(LoungePreferences.empty);
-        setState(() {});
-      });
+    var preferencesService = Provider.of<PreferencesService>(context);
+    var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
+    var loungeBackendService = LoungeBackendService(
+        socketManagerProvider.manager, _loungePreferences);
 
-      var chatPushesService =
-          ChatPushesService(pushesService, loungeBackendService);
+    await loungeBackendService.init();
 
-      this.loungeBackendService = loungeBackendService;
+    loungeBackendService.listenForSignOut(() {
+      loungeBackendService.dispose();
+      this._loungeBackendService = null;
+      this._loungePreferences.authPreferences = null;
 
-      var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);
+      var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
+      loungePreferencesBloc.setValue(LoungePreferences.empty);
+      setState(() {});
+    });
 
-      var networksListBloc = ChatNetworksListBloc(
+    var chatPushesService =
+        ChatPushesService(_pushesService, loungeBackendService);
+
+    this._loungeBackendService = loungeBackendService;
+
+    var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);
+
+    var networksListBloc = ChatNetworksListBloc(
+      loungeBackendService,
+      nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
+      nextChannelIdGenerator:
+          chatPreferencesBloc.getNextNetworkChannelLocalId,
+    );
+
+    var connectionBloc = ChatConnectionBloc(loungeBackendService);
+    var networkStatesBloc =
+        ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+
+    var _startPreferences =
+        chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+
+    var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
+        networksListBloc, _startPreferences);
+
+    var activeChannelBloc = ChatActiveChannelBloc(
         loungeBackendService,
-        nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
-        nextChannelIdGenerator:
-            chatPreferencesBloc.getNextNetworkChannelLocalId,
-      );
+        chatInitBloc,
+        networksListBloc,
+        preferencesService,
+        chatPushesService);
 
-      var connectionBloc = ChatConnectionBloc(loungeBackendService);
-      var networkStatesBloc =
-          ChatNetworksStateBloc(loungeBackendService, networksListBloc);
+    var channelsStatesBloc = ChatNetworkChannelsStateBloc(
+        loungeBackendService, networksListBloc, activeChannelBloc);
 
-      var _startPreferences =
-          chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+    var channelsBlocsBloc = ChatNetworkChannelsBlocsBloc(
+        loungeBackendService, networksListBloc, channelsStatesBloc);
+    var networksBlocsBloc = ChatNetworksBlocsBloc(
+        loungeBackendService,
+        networksListBloc,
+        networkStatesBloc,
+        channelsStatesBloc,
+        activeChannelBloc);
 
-      var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
-          networksListBloc, _startPreferences);
+    var chatDeepLinkBloc = ChatDeepLinkBloc(loungeBackendService,
+        chatInitBloc, networksListBloc, networksBlocsBloc, activeChannelBloc);
 
-      var activeChannelBloc = ChatActiveChannelBloc(
-          loungeBackendService,
-          chatInitBloc,
-          networksListBloc,
-          preferencesService,
-          chatPushesService);
+    var chatUploadBloc = ChatUploadBloc(loungeBackendService);
 
-      var channelsStatesBloc = ChatNetworkChannelsStateBloc(
-          loungeBackendService, networksListBloc, activeChannelBloc);
-
-      var channelsBlocsBloc = ChatNetworkChannelsBlocsBloc(
-          loungeBackendService, networksListBloc, channelsStatesBloc);
-      var networksBlocsBloc = ChatNetworksBlocsBloc(
-          loungeBackendService,
-          networksListBloc,
-          networkStatesBloc,
-          channelsStatesBloc,
-          activeChannelBloc);
-
-      var chatDeepLinkBloc = ChatDeepLinkBloc(loungeBackendService,
-          chatInitBloc, networksListBloc, networksBlocsBloc, activeChannelBloc);
-
-      var chatUploadBloc = ChatUploadBloc(loungeBackendService);
-
-      var chatUnreadBloc = ChatUnreadBloc(channelsStatesBloc);
-      createdWidget = Provider(
-        providable: chatDeepLinkBloc,
-        child: Provider(
-          providable: ChatDatabaseProvider(database),
-          child: Provider<ChatBackendService>(
+    var chatUnreadBloc = ChatUnreadBloc(channelsStatesBloc);
+    _createdWidget = Provider(
+      providable: chatDeepLinkBloc,
+      child: Provider(
+        providable: ChatDatabaseProvider(_database),
+        child: Provider<ChatBackendService>(
+          providable: loungeBackendService,
+          child: Provider<LoungeBackendService>(
             providable: loungeBackendService,
-            child: Provider<LoungeBackendService>(
-              providable: loungeBackendService,
+            child: Provider(
+              providable: chatPreferencesBloc,
               child: Provider(
-                providable: chatPreferencesBloc,
+                providable: connectionBloc,
                 child: Provider(
-                  providable: connectionBloc,
+                  providable: networksListBloc,
                   child: Provider(
-                    providable: networksListBloc,
+                    providable: networkStatesBloc,
                     child: Provider(
-                      providable: networkStatesBloc,
+                      providable: channelsStatesBloc,
                       child: Provider(
-                        providable: channelsStatesBloc,
+                        providable: networksBlocsBloc,
                         child: Provider(
-                          providable: networksBlocsBloc,
+                          providable: channelsBlocsBloc,
                           child: Provider(
-                            providable: channelsBlocsBloc,
+                            providable: activeChannelBloc,
                             child: Provider(
-                              providable: activeChannelBloc,
+                              providable: chatInitBloc,
                               child: Provider(
-                                providable: chatInitBloc,
+                                providable: chatUnreadBloc,
                                 child: Provider(
-                                  providable: chatUnreadBloc,
+                                  providable: chatPushesService,
                                   child: Provider(
-                                    providable: chatPushesService,
+                                    providable: chatUploadBloc,
                                     child: Provider(
-                                      providable: chatUploadBloc,
-                                      child: Provider(
-                                        providable:
-                                            NetworkChannelMessagesSaverBloc(
-                                                loungeBackendService,
-                                                networksListBloc,
-                                                database),
-                                        child: Provider(
-                                          providable: ChatPreferencesSaverBloc(
+                                      providable:
+                                          NetworkChannelMessagesSaverBloc(
                                               loungeBackendService,
-                                              networkStatesBloc,
                                               networksListBloc,
-                                              chatPreferencesBloc,
-                                              chatInitBloc),
-                                          child: _buildApp(ChatPage()),
-                                        ),
+                                              _database),
+                                      child: Provider(
+                                        providable: ChatPreferencesSaverBloc(
+                                            loungeBackendService,
+                                            networkStatesBloc,
+                                            networksListBloc,
+                                            chatPreferencesBloc,
+                                            chatInitBloc),
+                                        child: _buildApp(ChatPage()),
                                       ),
                                     ),
                                   ),
@@ -285,10 +296,8 @@ class AppIRCState extends State<AppIRC> {
             ),
           ),
         ),
-      );
-
-      setState(() {});
-    }
+      ),
+    );
   }
 
   Widget _buildAppForStartLoungePreferences() => _buildApp(
