@@ -1,4 +1,7 @@
-import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/form/field/form_field_bloc.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
+import 'package:flutter_appirc/form/form_bloc.dart';
+import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 
 class NetworkChannelJoinFormBloc extends FormBloc {
   FormValueFieldBloc<String> channelFieldBloc;
@@ -6,8 +9,10 @@ class NetworkChannelJoinFormBloc extends FormBloc {
 
   NetworkChannelJoinFormBloc(
       {String startChannel = "", String startPassword = ""}) {
-    channelFieldBloc = FormValueFieldBloc<String>(startChannel,
-        validators: [NoWhitespaceTextValidator.instance, NotEmptyTextValidator.instance]);
+    channelFieldBloc = FormValueFieldBloc<String>(startChannel, validators: [
+      NoWhitespaceTextValidator.instance,
+      NotEmptyTextValidator.instance
+    ]);
     passwordFieldBloc = FormValueFieldBloc<String>(startPassword,
         validators: [NoWhitespaceTextValidator.instance]);
   }

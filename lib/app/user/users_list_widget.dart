@@ -2,10 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/app/user/users_list_bloc.dart';
-import 'package:flutter_appirc/platform_aware/platform_aware_text_field.dart';
+import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 
@@ -37,7 +37,6 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
     ChannelUsersListBloc channelUsersListBloc =
         Provider.of<ChannelUsersListBloc>(context);
 
-
     return StreamBuilder<List<NetworkChannelUser>>(
         stream: channelUsersListBloc.usersStream,
         initialData: channelUsersListBloc.users,
@@ -51,11 +50,13 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
               body = Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
-                    child: Text(appLocalizations.tr("chat.users_list.search"
-                        ".users_not_found"),
+                    child: Text(
+                        appLocalizations.tr("chat.users_list.search"
+                            ".users_not_found"),
                         style: TextStyle(
-                            color:
-                                AppSkinBloc.of(context).appSkinTheme.textColor))),
+                            color: AppSkinBloc.of(context)
+                                .appSkinTheme
+                                .textColor))),
               );
             } else {
               body = Flexible(
@@ -69,16 +70,14 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
             }
             return Column(
               children: <Widget>[
-                buildPlatformTextField(
-                  context,
-                  channelUsersListBloc.filterFieldBloc,
-                  filterController,
-                  AppLocalizations.of(context).tr("chat.users_list.search"
-                      ".field.filter"
-                      ".label"),
-                  AppLocalizations.of(context).tr("chat.users_list.search"
-                      ".field.filter"
-                      ".hint"),
+                buildFormTextField(
+                  context: context,
+                  bloc: channelUsersListBloc.filterFieldBloc,
+                  controller: filterController,
+                  label: AppLocalizations.of(context)
+                      .tr("chat.users_list.search.field.filter.label"),
+                  hint: AppLocalizations.of(context)
+                      .tr("chat.users_list.search.field.filter.hint"),
                 ),
                 body,
               ],

@@ -10,6 +10,7 @@ import 'package:flutter_appirc/app/chat/channels/chat_network_channels_states_bl
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/special/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 

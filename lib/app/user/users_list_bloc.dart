@@ -1,6 +1,6 @@
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
-import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';

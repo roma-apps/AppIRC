@@ -3,15 +3,14 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/connection/lounge_connection_preferences_form_bloc.dart';
-import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
+import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 MyLogger _logger = MyLogger(
-    logTag:
-    "lounge_connection_preferences_form_widget.dart",
-    enabled: true);
+    logTag: "lounge_connection_preferences_form_widget.dart", enabled: true);
 
 class LoungeConnectionPreferencesFormWidget extends StatefulWidget {
   final LoungeConnectionPreferences _startPreferences;
@@ -45,7 +44,6 @@ class LoungeConnectionPreferencesFormWidgetState
         Provider.of<LoungeConnectionPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
 
-
     // temp hack to fill data by test buttons
     // it also cause strange cursors bugs on Android
     // TODO: remove hack
@@ -55,15 +53,18 @@ class LoungeConnectionPreferencesFormWidgetState
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        buildFormTitle(context,
-            appLocalizations.tr('lounge.preferences.connection.title')),
+        buildFormTitle(
+            context: context,
+            title: appLocalizations.tr('lounge.preferences.connection.title')),
         buildFormTextRow(
-          context,
-          loungePreferencesFormBloc.hostFieldBloc,
-          _hostController,
-          Icons.cloud,
-          appLocalizations.tr('lounge.preferences.connection.field.host.label'),
-          appLocalizations.tr('lounge.preferences.connection.field.host.hint'),
+          context: context,
+          bloc: loungePreferencesFormBloc.hostFieldBloc,
+          controller: _hostController,
+          icon: Icons.cloud,
+          label: appLocalizations.tr('lounge.preferences.connection.field.host'
+              '.label'),
+          hint: appLocalizations.tr('lounge.preferences.connection.field.host'
+              '.hint'),
           textInputAction: TextInputAction.done,
         )
       ],

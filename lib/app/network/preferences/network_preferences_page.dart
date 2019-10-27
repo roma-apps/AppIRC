@@ -7,7 +7,8 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
-import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
+import 'package:flutter_appirc/form/form_validation.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -141,7 +142,7 @@ class ChatNetworkPageState extends State<ChatNetworkPage> {
       var alreadyExist = await chatBloc.isNetworkWithNameExist(networkName);
       ValidationError error;
       if (alreadyExist) {
-        error = NotUniqueValidationError();
+        error = NotUniqueTextValidationError();
       }
       return error;
     });

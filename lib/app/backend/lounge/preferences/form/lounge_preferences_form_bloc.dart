@@ -1,6 +1,7 @@
 import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/connection/lounge_connection_preferences_form_bloc.dart';
-import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/form/field/form_field_bloc.dart';
+import 'package:flutter_appirc/form/form_bloc.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:rxdart/rxdart.dart';
 

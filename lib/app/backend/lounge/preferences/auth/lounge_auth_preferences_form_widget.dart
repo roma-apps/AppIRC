@@ -3,7 +3,8 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_bloc.dart';
-import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
+import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
@@ -24,8 +25,10 @@ class LoungeAuthPreferencesFormWidgetState
   TextEditingController _passwordController;
 
   LoungeAuthPreferencesFormWidgetState(this._startPreferences) {
-    _usernameController = TextEditingController(text: _startPreferences?.username);
-    _passwordController = TextEditingController(text: _startPreferences?.password);
+    _usernameController =
+        TextEditingController(text: _startPreferences?.username);
+    _passwordController =
+        TextEditingController(text: _startPreferences?.password);
   }
 
   @override
@@ -43,30 +46,30 @@ class LoungeAuthPreferencesFormWidgetState
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         buildFormTitle(
-            context, appLocalizations.tr('lounge.preferences.auth.title')),
+            context: context,
+            title: appLocalizations.tr('lounge.preferences.auth.title')),
         buildFormTextRow(
-          context,
-          formBloc.usernameFieldBloc,
-          _usernameController,
-          Icons.account_box,
-          appLocalizations
-              .tr('lounge.preferences.auth.field.username.label'),
-          appLocalizations
-              .tr('lounge.preferences.auth.field.username'
-                  '.hint'),
+          context: context,
+          bloc: formBloc.usernameFieldBloc,
+          controller: _usernameController,
+          icon: Icons.account_box,
+          label: appLocalizations.tr('lounge.preferences.auth.field.username'
+              '.label'),
+          hint: appLocalizations.tr('lounge.preferences.auth.field.username'
+              '.hint'),
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.none,
           nextBloc: formBloc.passwordFieldBloc,
         ),
         buildFormTextRow(
-          context,
-          formBloc.passwordFieldBloc,
-          _passwordController,
-          Icons.lock,
-          appLocalizations
-              .tr('lounge.preferences.auth.field.password.label'),
-          appLocalizations
-              .tr('lounge.preferences.auth.field.password.hint'),
+          context: context,
+          bloc: formBloc.passwordFieldBloc,
+          controller: _passwordController,
+          icon: Icons.lock,
+          label: appLocalizations.tr('lounge.preferences.auth.field.password'
+              '.label'),
+          hint: appLocalizations.tr('lounge.preferences.auth.field.password'
+              '.hint'),
           obscureText: true,
           textCapitalization: TextCapitalization.none,
           textInputAction: TextInputAction.done,

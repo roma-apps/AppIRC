@@ -1,4 +1,6 @@
-import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/form/field/form_field_bloc.dart';
+import 'package:flutter_appirc/form/form_bloc.dart';
+import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ChannelTopicFormBloc extends FormBloc {

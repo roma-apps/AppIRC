@@ -5,7 +5,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_widget_form.dart';
-import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 
@@ -69,15 +69,14 @@ class ChatNetworkPreferencesFormWidgetState
                     child: NetworkUserPreferencesFormWidget(startValues
                         .networkConnectionPreferences.userPreferences)),
                 buildFormTextRow(
-                  context,
-                  formBloc.channelsFieldBloc,
-                  _channelsController,
-                  Icons.list,
-                  appLocalizations.tr('irc.connection.preferences.field'
-                      '.channels'
-                      '.label'),
-                  appLocalizations.tr('irc.connection.preferences.field'
-                      '.channels.hint'),
+                  context: context,
+                  bloc: formBloc.channelsFieldBloc,
+                  controller: _channelsController,
+                  icon: Icons.list,
+                  label: appLocalizations
+                      .tr('irc.connection.preferences.field.channels.label'),
+                  hint: appLocalizations
+                      .tr('irc.connection.preferences.field.channels.hint'),
                   textInputAction: TextInputAction.done,
                 )
               ],

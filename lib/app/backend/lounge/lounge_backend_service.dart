@@ -22,7 +22,6 @@ import 'package:flutter_appirc/app/message/special/messages_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-import 'package:flutter_appirc/form/form_widgets.dart';
 import 'package:flutter_appirc/irc/irc_commands_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
@@ -1084,7 +1083,7 @@ Disposable _listenForConfiguration(SocketIOService _socketIOService,
 }
 
 Disposable _listenForAuth(
-    SocketIOService _socketIOService, BooleanCallback listener) {
+    SocketIOService _socketIOService, Function(bool success) listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
       _socketIOService, (AuthLoungeResponseBody.eventName), (raw) {

@@ -35,7 +35,9 @@ import 'package:flutter_appirc/app/push_notifications/chat_pushes_service.dart';
 import 'package:flutter_appirc/app/skin/app_irc_app_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_button_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_chat_app_bar_skin_bloc.dart';
-import 'package:flutter_appirc/app/skin/app_irc_form_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_form_boolean_field_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_form_text_field_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_form_title_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_messages_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_networks_list_skin_bloc.dart';
@@ -43,7 +45,9 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
-import 'package:flutter_appirc/form/form_skin_bloc.dart';
+import 'package:flutter_appirc/form/field/boolean/form_boolean_field_skin_bloc.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_skin_bloc.dart';
+import 'package:flutter_appirc/form/form_title_skin_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
@@ -257,13 +261,12 @@ class AppIRCState extends State<AppIRC> {
                                                 networksListBloc,
                                                 database),
                                         child: Provider(
-                                          providable:
-                                              ChatPreferencesSaverBloc(
-                                                  loungeBackendService,
-                                                  networkStatesBloc,
-                                                  networksListBloc,
-                                                  chatPreferencesBloc,
-                                                  chatInitBloc),
+                                          providable: ChatPreferencesSaverBloc(
+                                              loungeBackendService,
+                                              networkStatesBloc,
+                                              networksListBloc,
+                                              chatPreferencesBloc,
+                                              chatInitBloc),
                                           child: _buildApp(ChatPage()),
                                         ),
                                       ),
@@ -330,42 +333,51 @@ class AppIRCState extends State<AppIRC> {
                         child: Provider<ChatInputMessageSkinBloc>(
                           providable:
                               AppIRCChatInputMessageSkinBloc(appSkinTheme),
-                          child: Provider<FormSkinBloc>(
-                            providable: AppIRCFormSkinBloc(appSkinTheme),
-                            child: Provider<MessagesRegularSkinBloc>(
+                          child: Provider<FormTitleSkinBloc>(
+                            providable: AppIRCFormTitleSkinBloc(appSkinTheme),
+                            child: Provider<FormBooleanFieldSkinBloc>(
                               providable:
-                                  AppIRCMessagesRegularSkinBloc(appSkinTheme),
-                              child: Provider<MessagesSpecialSkinBloc>(
+                                  AppIRCFormBooleanFieldSkinBloc(appSkinTheme),
+                              child: Provider<FormTextFieldSkinBloc>(
                                 providable:
-                                    AppIRCMessagesSpecialSkinBloc(appSkinTheme),
-                                child: Provider<NetworkListSkinBloc>(
-                                  providable:
-                                      AppIRCNetworkListSkinBloc(appSkinTheme),
-                                  child: Provider<ButtonSkinBloc>(
-                                    providable:
-                                        AppIRCButtonSkinBloc(appSkinTheme),
-                                    child: Provider(
-                                      providable: ColoredNicknamesBloc(
-                                          appSkinTheme.coloredNicknamesData),
-                                      child: PlatformApp(
-                                          title: "AppIRC",
-                                          localizationsDelegates: [
-                                            //app-specific localization
-                                            EasylocaLizationDelegate(
-                                                locale: data.locale,
-                                                path: 'assets/langs'),
-                                          ],
-                                          supportedLocales: [
-                                            Locale('en', 'US')
-                                          ],
-                                          locale: data.savedLocale,
-                                          android: (_) => MaterialAppData(
-                                              theme: appSkinTheme
-                                                  .androidThemeDataCreator()),
-                                          ios: (_) => CupertinoAppData(
-                                              theme: appSkinTheme
-                                                  .iosThemeDataCreator()),
-                                          home: child),
+                                    AppIRCFormTextFieldSkinBloc(appSkinTheme),
+                                child: Provider<MessagesRegularSkinBloc>(
+                                  providable: AppIRCMessagesRegularSkinBloc(
+                                      appSkinTheme),
+                                  child: Provider<MessagesSpecialSkinBloc>(
+                                    providable: AppIRCMessagesSpecialSkinBloc(
+                                        appSkinTheme),
+                                    child: Provider<NetworkListSkinBloc>(
+                                      providable: AppIRCNetworkListSkinBloc(
+                                          appSkinTheme),
+                                      child: Provider<ButtonSkinBloc>(
+                                        providable:
+                                            AppIRCButtonSkinBloc(appSkinTheme),
+                                        child: Provider(
+                                          providable: ColoredNicknamesBloc(
+                                              appSkinTheme
+                                                  .coloredNicknamesData),
+                                          child: PlatformApp(
+                                              title: "AppIRC",
+                                              localizationsDelegates: [
+                                                //app-specific localization
+                                                EasylocaLizationDelegate(
+                                                    locale: data.locale,
+                                                    path: 'assets/langs'),
+                                              ],
+                                              supportedLocales: [
+                                                Locale('en', 'US')
+                                              ],
+                                              locale: data.savedLocale,
+                                              android: (_) => MaterialAppData(
+                                                  theme: appSkinTheme
+                                                      .androidThemeDataCreator()),
+                                              ios: (_) => CupertinoAppData(
+                                                  theme: appSkinTheme
+                                                      .iosThemeDataCreator()),
+                                              home: child),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),

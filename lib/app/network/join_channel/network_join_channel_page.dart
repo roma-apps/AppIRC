@@ -80,8 +80,8 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
                   return createSkinnedPlatformButton(
                     context,
                     child: Text(
-                      appLocalizations.tr('chat.network.join_channel.action.'
-                          '.join'),
+                      appLocalizations
+                          .tr('chat.network.join_channel.action.join'),
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: pressed,

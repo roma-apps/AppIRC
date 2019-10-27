@@ -1,5 +1,9 @@
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/form/field/form_field_bloc.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
+import 'package:flutter_appirc/form/form_bloc.dart';
+import 'package:flutter_appirc/form/form_validation.dart';
+import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 
 class NetworkServerPreferencesFormBloc extends FormBloc {
   final Validator<String> networkValidator;

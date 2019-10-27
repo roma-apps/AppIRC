@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/topic/channel_topic_form_bloc.dart';
-import 'package:flutter_appirc/platform_aware/platform_aware_text_field.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -34,13 +34,13 @@ class NetworkChannelTopicWidgetState extends State<NetworkChannelTopicWidget> {
   Widget build(BuildContext context) {
     var formBloc = Provider.of<ChannelTopicFormBloc>(context);
 
-    return buildPlatformTextField(
-        context,
-        formBloc.topicFieldBloc,
-        _topicController,
-        AppLocalizations.of(context)
+    return buildFormTextField(
+        context: context,
+        bloc: formBloc.topicFieldBloc,
+        controller: _topicController,
+        label: AppLocalizations.of(context)
             .tr("chat.channel.topic.dialog.field.edit.label"),
-        AppLocalizations.of(context)
+        hint: AppLocalizations.of(context)
             .tr("chat.channel.topic.dialog.field.edit.hint"),
         minLines: 1,
         textInputAction: TextInputAction.done);

@@ -11,6 +11,7 @@ import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/preview/messages_preview_model.dart';
 import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 

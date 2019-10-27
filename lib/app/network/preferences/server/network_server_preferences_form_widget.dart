@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_form_bloc.dart';
-import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/form/field/boolean/form_boolean_field_widget.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
+import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class ChatNetworkServerPreferencesFormWidget extends StatefulWidget {
@@ -45,53 +47,55 @@ class ChatNetworkServerPreferencesFormWidgetState
 
     return Column(
       children: <Widget>[
-        buildFormTitle(context,
-            appLocalizations.tr('irc.connection.preferences.server.title')),
+        buildFormTitle(
+            context: context,
+            title:
+                appLocalizations.tr('irc.connection.preferences.server.title')),
         buildFormTextRow(
-          context,
-          formBloc.nameFieldBloc,
-          _nameController,
-          Icons.account_circle,
-          appLocalizations.tr('irc.connection.preferences.server'
+          context: context,
+          bloc: formBloc.nameFieldBloc,
+          controller: _nameController,
+          icon: Icons.account_circle,
+          label: appLocalizations.tr('irc.connection.preferences.server'
               '.field.name.label'),
-          appLocalizations
+          hint: appLocalizations
               .tr('irc.connection.preferences.server.field.name.hint'),
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.hostFieldBloc,
         ),
         buildFormTextRow(
-          context,
-          formBloc.hostFieldBloc,
-          _hostController,
-          Icons.cloud,
-          appLocalizations
+          context: context,
+          bloc: formBloc.hostFieldBloc,
+          controller: _hostController,
+          icon: Icons.cloud,
+          label: appLocalizations
               .tr('irc.connection.preferences.server.field.host.label'),
-          appLocalizations
+          hint: appLocalizations
               .tr('irc.connection.preferences.server.field.host.hint'),
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.portFieldBloc,
         ),
         buildFormTextRow(
-            context,
-            formBloc.portFieldBloc,
-            _portController,
-            Icons.cloud,
-            appLocalizations
+            context: context,
+            bloc: formBloc.portFieldBloc,
+            controller: _portController,
+            icon: Icons.cloud,
+            label: appLocalizations
                 .tr('irc.connection.preferences.server.field.port.label'),
-            appLocalizations
+            hint: appLocalizations
                 .tr('irc.connection.preferences.server.field.port.hint'),
             textInputAction: TextInputAction.done,
             keyboardType: TextInputType.number),
         buildFormBooleanRow(
-            context,
-            appLocalizations
+            context: context,
+            title: appLocalizations
                 .tr('irc.connection.preferences.server.field.use_tls.label'),
-            formBloc.tlsFieldBloc),
+            bloc: formBloc.tlsFieldBloc),
         buildFormBooleanRow(
-            context,
-            appLocalizations
-                .tr('irc.connection.preferences.server.field.trusted_only.label'),
-            formBloc.trustedFieldBloc)
+            context: context,
+            title: appLocalizations.tr(
+                'irc.connection.preferences.server.field.trusted_only.label'),
+            bloc: formBloc.trustedFieldBloc)
       ],
     );
   }

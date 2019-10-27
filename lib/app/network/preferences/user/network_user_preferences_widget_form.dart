@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_form_bloc.dart';
-import 'package:flutter_appirc/form/form_widgets.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
+import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 class NetworkUserPreferencesFormWidget extends StatefulWidget {
@@ -51,55 +52,67 @@ class NetworkUserPreferencesFormState
     return Column(
       children: <Widget>[
         buildFormTitle(
-            context, appLocalizations.tr('irc.connection.preferences.user.title')),
+            context: context,
+            title: appLocalizations.tr('irc.connection.preferences'
+                '.user.title')),
         buildFormTextRow(
-          context,
-          formBloc.nickFieldBloc,
-          _nickController,
-          Icons.account_circle,
-          appLocalizations.tr('irc.connection.preferences.user.field.nick.label'),
-          appLocalizations.tr('irc.connection.preferences.user.field.nick.hint'),
+          context: context,
+          bloc: formBloc.nickFieldBloc,
+          controller: _nickController,
+          icon: Icons.account_circle,
+          label: appLocalizations
+              .tr('irc.connection.preferences.user.field.nick.label'),
+          hint: appLocalizations
+              .tr('irc.connection.preferences.user.field.nick.hint'),
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.passwordFieldBloc,
         ),
         buildFormTextRow(
-          context,
-          formBloc.passwordFieldBloc,
-          _passwordController,
-          Icons.lock,
-          appLocalizations.tr('irc.connection.preferences.user.field.password.label'),
-          appLocalizations.tr('irc.connection.preferences.user.field.password.hint'),
+          context: context,
+          bloc: formBloc.passwordFieldBloc,
+          controller: _passwordController,
+          icon: Icons.lock,
+          label: appLocalizations
+              .tr('irc.connection.preferences.user.field.password.label'),
+          hint: appLocalizations
+              .tr('irc.connection.preferences.user.field.password.hint'),
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.none,
           obscureText: true,
           nextBloc: formBloc.realNameFieldBloc,
         ),
         buildFormTextRow(
-          context,
-          formBloc.realNameFieldBloc,
-          _realNameController,
-          Icons.account_circle,
-          appLocalizations.tr('irc.connection.preferences.user.field.real_name.label'),
-          appLocalizations.tr('irc.connection.preferences.user.field.real_name.hint'),
+          context:context,
+          bloc:formBloc.realNameFieldBloc,
+          controller:_realNameController,
+          icon:Icons.account_circle,
+          label:appLocalizations
+              .tr('irc.connection.preferences.user.field.real_name.label'),
+          hint:appLocalizations
+              .tr('irc.connection.preferences.user.field.real_name.hint'),
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.userNameFieldBloc,
         ),
         buildFormTextRow(
-          context,
-          formBloc.userNameFieldBloc,
-          _userNameController,
-          Icons.account_circle,
-          appLocalizations.tr('irc.connection.preferences.user.field.user_name.label'),
-          appLocalizations.tr('irc.connection.preferences.user.field.user_name.hint'),
+          context:context,
+          bloc:formBloc.userNameFieldBloc,
+          controller:_userNameController,
+          icon:Icons.account_circle,
+          label:appLocalizations
+              .tr('irc.connection.preferences.user.field.user_name.label'),
+          hint:appLocalizations
+              .tr('irc.connection.preferences.user.field.user_name.hint'),
           textInputAction: TextInputAction.done,
         ),
         buildFormTextRow(
-          context,
-          formBloc.commandsFieldBloc,
-          _commandsController,
-          Icons.settings,
-          appLocalizations.tr('irc.connection.preferences.user.field.commands.label'),
-          appLocalizations.tr('irc.connection.preferences.user.field.commands.hint'),
+          context:context,
+          bloc:formBloc.commandsFieldBloc,
+          controller:_commandsController,
+          icon:Icons.settings,
+          label:appLocalizations
+              .tr('irc.connection.preferences.user.field.commands.label'),
+          hint:appLocalizations
+              .tr('irc.connection.preferences.user.field.commands.hint'),
           textInputAction: TextInputAction.newline,
           minLines: 1,
           maxLines: 4,

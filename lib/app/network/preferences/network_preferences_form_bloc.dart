@@ -1,7 +1,11 @@
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_form_bloc.dart';
-import 'package:flutter_appirc/form/form_blocs.dart';
+import 'package:flutter_appirc/form/field/form_field_bloc.dart';
+import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
+import 'package:flutter_appirc/form/form_bloc.dart';
+import 'package:flutter_appirc/form/form_validation.dart';
+import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 
 class ChatNetworkPreferencesFormBloc extends FormBloc {
   static const channelsNamesSeparator = " ";

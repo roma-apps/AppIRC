@@ -1,88 +1,79 @@
+import 'package:flutter/cupertino.dart' show OverlayVisibilityMode;
+import 'package:flutter/material.dart' show InputDecoration;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/material.dart' show InputDecoration;
-import 'package:flutter/cupertino.dart' show OverlayVisibilityMode;
-import 'package:flutter_appirc/form/form_blocs.dart';
-import 'package:flutter_appirc/form/form_skin_bloc.dart';
-import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-MyLogger _logger = MyLogger(logTag: "platform_aware_text_field.dart",
-    enabled: true);
-
-PlatformTextField buildPlatformTextField(
-    BuildContext context,
-    FormValueFieldBloc<String> bloc,
-    TextEditingController controller,
-    String labelText,
-    String hint, {
-      TextInputType keyboardType,
-      List<TextInputFormatter> formatters,
-      int maxLength,
-      int minLines,
-      int maxLines,
-      bool obscureText = false,
-      bool autoCorrect = false,
-      TextAlign textAlign: TextAlign.start,
-      TextCapitalization textCapitalization = TextCapitalization.sentences,
-      TextInputAction textInputAction = TextInputAction.next,
-      bool expands = false,
-      VoidCallback onEditingComplete,
-      ValueChanged<String> onSubmitted,
-    }) {
-  var formSkinBloc = Provider.of<FormSkinBloc>(context);
+PlatformTextField buildPlatformTextField({
+  @required BuildContext context,
+  @required TextEditingController controller,
+  @required String label,
+  @required String hint,
+  @required TextStyle labelStyle,
+  @required TextStyle hintStyle,
+  @required TextStyle editStyle,
+  TextStyle disabledLabelStyle,
+  TextStyle disabledHintStyle,
+  TextStyle disabledEditStyle,
+  bool enabled = true,
+  Function(String newValue) onChanged,
+  FocusNode focusNode,
+  TextInputType keyboardType,
+  List<TextInputFormatter> formatters,
+  int maxLength,
+  int minLines,
+  int maxLines,
+  bool obscureText = false,
+  bool autoCorrect = false,
+  TextAlign textAlign: TextAlign.start,
+  TextCapitalization textCapitalization = TextCapitalization.sentences,
+  TextInputAction textInputAction = TextInputAction.next,
+  bool expands = false,
+  VoidCallback onEditingComplete,
+  ValueChanged<String> onSubmitted,
+}) {
   var androidBuilder;
   var iosBuilder;
 
-  Color labelColor;
-  Color hintColor;
-  Color textEditColor;
-  if (bloc.enabled) {
-    labelColor = formSkinBloc.textRowInputDecorationLabelTextStyle.color;
-    hintColor = formSkinBloc.textRowInputDecorationHintTextStyle.color;
-    textEditColor = formSkinBloc.textRowEditTextStyle.color;
-  } else {
-    labelColor = formSkinBloc.disabledTextColor;
-    hintColor = formSkinBloc.disabledTextColor;
-    textEditColor = formSkinBloc.disabledTextColor;
-  }
+  assert(enabled != null);
+
+  TextStyle _editStyle = enabled ? editStyle : disabledEditStyle;
+  TextStyle _hintStyle = enabled ? hintStyle : disabledHintStyle;
+  TextStyle _labelStyle = enabled ? labelStyle : disabledLabelStyle;
 
   androidBuilder = (_) {
     return MaterialTextFieldData(
-        enabled: bloc.enabled,
+        enabled: enabled,
         enableInteractiveSelection: true,
-        style: formSkinBloc.textRowEditTextStyle.copyWith(color: textEditColor),
+        style: _editStyle,
         decoration: InputDecoration(
-            enabled: bloc.enabled,
-            labelText: labelText,
+            enabled: enabled,
+            labelText: label,
             hintText: hint,
-            labelStyle: formSkinBloc.textRowInputDecorationLabelTextStyle
-                .copyWith(color: labelColor),
-            hintStyle: formSkinBloc.textRowInputDecorationHintTextStyle
-                .copyWith(color: hintColor)));
+            labelStyle: _labelStyle,
+            hintStyle: _hintStyle));
   };
 
   iosBuilder = (_) => CupertinoTextFieldData(
-      enabled: bloc.enabled,
+      enabled: enabled,
       placeholder: hint,
       padding: EdgeInsets.all(8),
-      style: formSkinBloc.textRowEditTextStyle.copyWith(color: textEditColor),
+      style: _editStyle,
       prefixMode: OverlayVisibilityMode.notEditing,
-      prefix: labelText != null ? Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Text(
-          labelText,
-          style: formSkinBloc.textRowInputDecorationLabelTextStyle
-              .copyWith(color: labelColor),
-        ),
-      ) : null,
-      placeholderStyle: formSkinBloc.textRowInputDecorationHintTextStyle
-          .copyWith(color: hintColor));
+      prefix: label != null
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                label,
+                style: _labelStyle,
+              ),
+            )
+          : null,
+      placeholderStyle: _hintStyle);
 
   var platformTextField = PlatformTextField(
       keyboardType: keyboardType,
-      focusNode: bloc.focusNode,
+      focusNode: focusNode,
       inputFormatters: formatters,
       maxLength: maxLength,
       minLines: minLines,
@@ -98,9 +89,6 @@ PlatformTextField buildPlatformTextField(
       android: androidBuilder,
       ios: iosBuilder,
       controller: controller,
-      onChanged: (newValue) {
-        _logger.d(() => "onChanged $newValue");
-        bloc.onNewValue(newValue);
-      });
+      onChanged: onChanged);
   return platformTextField;
 }

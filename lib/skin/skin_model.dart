@@ -67,6 +67,8 @@ abstract class PlatformSkinTheme {
 
   TextStyle get textInputDecorationHintStyle;
 
+  TextStyle get textInputDecorationErrorStyle;
+
   TextStyle get textTitleStyle;
 
   TextStyle get textEditTextStyle;
@@ -104,6 +106,11 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   @override
   TextStyle get textInputDecorationLabelStyle => textTheme.body1;
 
+
+  @override
+  TextStyle get textInputDecorationErrorStyle =>  textTheme.body1.copyWith
+    (color:Colors.red);
+
   @override
   TextStyle get textRegularMediumStyle => textTheme.body1;
 
@@ -140,6 +147,7 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
 
   @override
   Color get backgroundColor => theme.backgroundColor;
+
 
 }
 
@@ -195,6 +203,10 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
 
   @override
   TextStyle get textInputDecorationLabelStyle => textTheme.textStyle;
+
+  @override
+  TextStyle get textInputDecorationErrorStyle =>
+      textTheme.textStyle.copyWith(color:Colors.red);
 
   @override
   TextStyle get textRegularMediumStyle => textTheme.textStyle;
