@@ -8,43 +8,43 @@ import 'package:rxdart/rxdart.dart';
 var _logger = MyLogger(logTag: "users_list_bloc.dart", enabled: true);
 
 class ChannelUsersListBloc extends Providable {
-  NetworkChannelBloc channelBloc;
+  final NetworkChannelBloc _channelBloc;
 
   // ignore: close_sinks
-  BehaviorSubject<List<NetworkChannelUser>> _usersController;
+  BehaviorSubject<List<NetworkChannelUser>> _usersSubject;
 
-  Stream<List<NetworkChannelUser>> get usersStream => _usersController.stream;
+  Stream<List<NetworkChannelUser>> get usersStream => _usersSubject.stream;
 
-  List<NetworkChannelUser> get users => _usersController.value;
+  List<NetworkChannelUser> get users => _usersSubject.value;
 
   FormValueFieldBloc<String> filterFieldBloc;
 
-  ChannelUsersListBloc(this.channelBloc) {
-    _usersController = BehaviorSubject(seedValue: channelBloc.users);
+  ChannelUsersListBloc(this._channelBloc) {
+    _usersSubject = BehaviorSubject(seedValue: _channelBloc.users);
 
     filterFieldBloc = FormValueFieldBloc("");
 
     addDisposable(
         streamSubscription: filterFieldBloc.valueStream.listen((filter) {
-      onNeedChangeUsersList();
+      _onNeedChangeUsersList();
     }));
 
     addDisposable(
-        streamSubscription: channelBloc.usersStream.listen((newUsers) {
-      onNeedChangeUsersList();
+        streamSubscription: _channelBloc.usersStream.listen((newUsers) {
+      _onNeedChangeUsersList();
     }));
 
     addDisposable(disposable: filterFieldBloc);
-    addDisposable(subject: _usersController);
+    addDisposable(subject: _usersSubject);
   }
 
-  onNeedChangeUsersList() {
+  _onNeedChangeUsersList() {
     var filter = filterFieldBloc.value;
-    var filteredUsers = channelBloc.users.where((user) {
+    var filteredUsers = _channelBloc.users.where((user) {
       return user.nick.contains(RegExp(filter, caseSensitive: false));
     }).toList();
 
     _logger.d(() => "filteredUsers for $filter: $filteredUsers ");
-    _usersController.add(filteredUsers);
+    _usersSubject.add(filteredUsers);
   }
 }

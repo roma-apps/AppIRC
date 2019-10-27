@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 
@@ -25,10 +26,10 @@ List<PlatformAwarePopupMenuAction> buildUserNickPopupMenuActions(
     NetworkChannelBloc channelBloc,
     String nick,
     actionCallback(PlatformAwarePopupMenuAction action)) {
-  var of = AppLocalizations.of(context);
+  var appLocalizations = AppLocalizations.of(context);
   return <PlatformAwarePopupMenuAction>[
     PlatformAwarePopupMenuAction(
-        text: of.tr("chat.user.action.information"),
+        text: appLocalizations.tr("chat.user.action.information"),
         iconData: Icons.account_box,
         actionCallback: (action) {
           channelBloc.printUserInfo(nick);
@@ -37,7 +38,7 @@ List<PlatformAwarePopupMenuAction> buildUserNickPopupMenuActions(
           }
         }),
     PlatformAwarePopupMenuAction(
-        text: of.tr("chat.user.action"
+        text: appLocalizations.tr("chat.user.action"
             ".direct_messages"),
         iconData: Icons.message,
         actionCallback: (action) {

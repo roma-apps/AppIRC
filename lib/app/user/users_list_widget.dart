@@ -15,25 +15,23 @@ class ChannelUsersListWidget extends StatefulWidget {
 }
 
 class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
-  TextEditingController filterController;
+  TextEditingController _filterController;
 
   @override
   void initState() {
     super.initState();
-    filterController = TextEditingController();
+    _filterController = TextEditingController();
   }
 
   @override
   void dispose() {
     super.dispose();
-    filterController.dispose();
+    _filterController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var appLocalizations = AppLocalizations.of(context);
 
-    TextSkinBloc textSkinBloc = Provider.of(context);
     ColoredNicknamesBloc coloredNicknamesBloc = Provider.of(context);
     ChannelUsersListBloc channelUsersListBloc =
         Provider.of<ChannelUsersListBloc>(context);
@@ -48,44 +46,69 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
           if (users != null) {
             Widget body;
             if (users.isEmpty) {
-              body = Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                    child: Text(
-                        appLocalizations.tr("chat.users_list.search"
-                            ".users_not_found"),
-                        style: textSkinBloc.defaultTextStyle)),
-              );
+              body = _buildEmptyListWidget(context);
             } else {
-              body = Flexible(
-                child: ListView.builder(
-                    itemCount: users.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return _buildUserListItem(
-                          context, users[index], coloredNicknamesBloc);
-                    }),
-              );
+              body = _buildUserListWidget(users, coloredNicknamesBloc);
             }
-            return Column(
-              children: <Widget>[
-                buildFormTextField(
-                  context: context,
-                  bloc: channelUsersListBloc.filterFieldBloc,
-                  controller: filterController,
-                  label: AppLocalizations.of(context)
-                      .tr("chat.users_list.search.field.filter.label"),
-                  hint: AppLocalizations.of(context)
-                      .tr("chat.users_list.search.field.filter.hint"),
-                ),
-                body,
-              ],
-            );
+            return _buildSearchableUserListWidget(
+                context, channelUsersListBloc, body);
           } else {
-            return Center(
-                child: Text(appLocalizations.tr("chat.users_list.loading"),
-                    style: textSkinBloc.defaultTextStyle));
+            return _buildLoadingWidget(context);
           }
         });
+  }
+
+  Center _buildLoadingWidget(BuildContext context) {
+    var appLocalizations = AppLocalizations.of(context);
+
+    TextSkinBloc textSkinBloc = Provider.of(context);
+    return Center(
+        child: Text(appLocalizations.tr("chat.users_list.loading"),
+            style: textSkinBloc.defaultTextStyle));
+  }
+
+  Column _buildSearchableUserListWidget(BuildContext context,
+      ChannelUsersListBloc channelUsersListBloc, Widget body) {
+    return Column(
+      children: <Widget>[
+        buildFormTextField(
+          context: context,
+          bloc: channelUsersListBloc.filterFieldBloc,
+          controller: _filterController,
+          label: AppLocalizations.of(context)
+              .tr("chat.users_list.search.field.filter.label"),
+          hint: AppLocalizations.of(context)
+              .tr("chat.users_list.search.field.filter.hint"),
+        ),
+        body,
+      ],
+    );
+  }
+
+  Flexible _buildUserListWidget(List<NetworkChannelUser> users,
+      ColoredNicknamesBloc coloredNicknamesBloc) {
+    return Flexible(
+      child: ListView.builder(
+          itemCount: users.length,
+          itemBuilder: (BuildContext context, int index) {
+            return _buildUserListItem(
+                context, users[index], coloredNicknamesBloc);
+          }),
+    );
+  }
+
+  Padding _buildEmptyListWidget(BuildContext context) {
+    var appLocalizations = AppLocalizations.of(context);
+
+    TextSkinBloc textSkinBloc = Provider.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Center(
+          child: Text(
+              appLocalizations
+                  .tr("chat.users_list.search.users_not_found"),
+              style: textSkinBloc.defaultTextStyle)),
+    );
   }
 }
 

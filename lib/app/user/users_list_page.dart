@@ -10,33 +10,34 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class NetworkChannelUsersPage extends StatefulWidget {
-  final Network network;
-  final NetworkChannel channel;
+  final Network _network;
+  final NetworkChannel _channel;
 
-  NetworkChannelUsersPage(this.network, this.channel);
+  NetworkChannelUsersPage(this._network, this._channel);
 
   @override
   State<StatefulWidget> createState() {
-    return NetworkChannelUsersPageState(network, channel);
+    return NetworkChannelUsersPageState(_network, _channel);
   }
 }
 
 class NetworkChannelUsersPageState extends State<NetworkChannelUsersPage> {
-  final Network network;
-  final NetworkChannel channel;
+  final Network _network;
+  final NetworkChannel _channel;
 
-  NetworkChannelUsersPageState(this.network, this.channel);
+  NetworkChannelUsersPageState(this._network, this._channel);
 
   @override
   Widget build(BuildContext context) {
     var channelBloc =
-        ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(channel);
+        ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(_channel);
 
     var channelUsersListBloc = ChannelUsersListBloc(channelBloc);
 
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        title: Text(AppLocalizations.of(context).tr('chat.users_list.title')),
+        title: Text(AppLocalizations.of(context)
+            .tr('chat.users_list.title')),
       ),
       body: SafeArea(
         child: Padding(
