@@ -41,6 +41,8 @@ import 'package:flutter_appirc/app/skin/app_irc_form_title_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_messages_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_messages_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_networks_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_popup_menu_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_text_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
@@ -55,7 +57,9 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/pushes/push_service.dart';
 import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
+import 'package:flutter_appirc/skin/popup_menu_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
+import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:rxdart/rxdart.dart';
@@ -65,6 +69,10 @@ import 'app/skin/app_irc_chat_input_message_skin_bloc.dart';
 import 'app/skin/themes/day_app_irc_skin_theme.dart';
 
 var _logger = MyLogger(logTag: "main.dart", enabled: true);
+
+final String appTitle = "AppIRC";
+final String relativePathToLangsFolder = 'assets/langs';
+final List<Locale> supportedLocales = [Locale('en', 'US')];
 
 Future main() async {
 //  changeToCupertinoPlatformAware();
@@ -131,10 +139,10 @@ class AppIRCState extends State<AppIRC> {
     }
   }
 
-  Future _init(BuildContext context, LoungePreferencesBloc loungePreferencesBloc) async {
-       _database = await $FloorChatDatabase
-        .databaseBuilder('flutter_database.db')
-        .build();
+  Future _init(
+      BuildContext context, LoungePreferencesBloc loungePreferencesBloc) async {
+    _database =
+        await $FloorChatDatabase.databaseBuilder('flutter_database.db').build();
 
     _database.regularMessagesDao.deleteAllRegularMessages();
     _database.specialMessagesDao.deleteAllSpecialMessages();
@@ -164,14 +172,14 @@ class AppIRCState extends State<AppIRC> {
     }
   }
 
-  Future _recreateChatApp(LoungePreferences newPreferences, BuildContext context) async {
-
+  Future _recreateChatApp(
+      LoungePreferences newPreferences, BuildContext context) async {
     _logger.d(() => "_onLoungeChanged $newPreferences");
 
     var preferencesService = Provider.of<PreferencesService>(context);
     var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
-    var loungeBackendService = LoungeBackendService(
-        socketManagerProvider.manager, _loungePreferences);
+    var loungeBackendService =
+        LoungeBackendService(socketManagerProvider.manager, _loungePreferences);
 
     await loungeBackendService.init();
 
@@ -195,8 +203,7 @@ class AppIRCState extends State<AppIRC> {
     var networksListBloc = ChatNetworksListBloc(
       loungeBackendService,
       nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
-      nextChannelIdGenerator:
-          chatPreferencesBloc.getNextNetworkChannelLocalId,
+      nextChannelIdGenerator: chatPreferencesBloc.getNextNetworkChannelLocalId,
     );
 
     var connectionBloc = ChatConnectionBloc(loungeBackendService);
@@ -209,12 +216,8 @@ class AppIRCState extends State<AppIRC> {
     var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
         networksListBloc, _startPreferences);
 
-    var activeChannelBloc = ChatActiveChannelBloc(
-        loungeBackendService,
-        chatInitBloc,
-        networksListBloc,
-        preferencesService,
-        chatPushesService);
+    var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,
+        chatInitBloc, networksListBloc, preferencesService, chatPushesService);
 
     var channelsStatesBloc = ChatNetworkChannelsStateBloc(
         loungeBackendService, networksListBloc, activeChannelBloc);
@@ -228,8 +231,8 @@ class AppIRCState extends State<AppIRC> {
         channelsStatesBloc,
         activeChannelBloc);
 
-    var chatDeepLinkBloc = ChatDeepLinkBloc(loungeBackendService,
-        chatInitBloc, networksListBloc, networksBlocsBloc, activeChannelBloc);
+    var chatDeepLinkBloc = ChatDeepLinkBloc(loungeBackendService, chatInitBloc,
+        networksListBloc, networksBlocsBloc, activeChannelBloc);
 
     var chatUploadBloc = ChatUploadBloc(loungeBackendService);
 
@@ -331,6 +334,8 @@ class AppIRCState extends State<AppIRC> {
                 var data = EasyLocalizationProvider.of(context).data;
 
                 var appIRCAppSkinBloc = AppIRCAppSkinBloc(appSkinTheme);
+
+
                 return Provider(
                   providable: appIRCAppSkinBloc,
                   child: Provider<AppSkinBloc>(
@@ -359,32 +364,39 @@ class AppIRCState extends State<AppIRC> {
                                     child: Provider<NetworkListSkinBloc>(
                                       providable: AppIRCNetworkListSkinBloc(
                                           appSkinTheme),
-                                      child: Provider<ButtonSkinBloc>(
-                                        providable:
-                                            AppIRCButtonSkinBloc(appSkinTheme),
-                                        child: Provider(
-                                          providable: ColoredNicknamesBloc(
-                                              appSkinTheme
-                                                  .coloredNicknamesData),
-                                          child: PlatformApp(
-                                              title: "AppIRC",
-                                              localizationsDelegates: [
-                                                //app-specific localization
-                                                EasylocaLizationDelegate(
-                                                    locale: data.locale,
-                                                    path: 'assets/langs'),
-                                              ],
-                                              supportedLocales: [
-                                                Locale('en', 'US')
-                                              ],
-                                              locale: data.savedLocale,
-                                              android: (_) => MaterialAppData(
-                                                  theme: appSkinTheme
-                                                      .androidThemeDataCreator()),
-                                              ios: (_) => CupertinoAppData(
-                                                  theme: appSkinTheme
-                                                      .iosThemeDataCreator()),
-                                              home: child),
+                                      child: Provider<PopupMenuSkinBloc>(
+                                        providable: AppIRCPopupMenuSkinBloc(
+                                            appSkinTheme),
+                                        child: Provider<TextSkinBloc>(
+                                          providable:
+                                              AppIRCTextSkinBloc(appSkinTheme),
+                                          child: Provider<ButtonSkinBloc>(
+                                            providable: AppIRCButtonSkinBloc(
+                                                appSkinTheme),
+                                            child: Provider(
+                                              providable: ColoredNicknamesBloc(
+                                                  appSkinTheme
+                                                      .coloredNicknamesData),
+                                              child: PlatformApp(
+                                                  title: appTitle,
+                                                  localizationsDelegates: [
+                                                    //app-specific localization
+                                                    EasylocaLizationDelegate(
+                                                        locale: data.locale,
+                                                        path: relativePathToLangsFolder),
+                                                  ],
+                                                  supportedLocales:
+                                                      supportedLocales,
+                                                  locale: data.savedLocale,
+                                                  android: (_) => MaterialAppData(
+                                                      theme: appSkinTheme
+                                                          .androidThemeDataCreator()),
+                                                  ios: (_) => CupertinoAppData(
+                                                      theme: appSkinTheme
+                                                          .iosThemeDataCreator()),
+                                                  home: child),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),

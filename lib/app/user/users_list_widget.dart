@@ -7,7 +7,7 @@ import 'package:flutter_appirc/app/user/users_list_bloc.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/app_skin_bloc.dart';
+import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 
 class ChannelUsersListWidget extends StatefulWidget {
   @override
@@ -33,6 +33,7 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
 
+    TextSkinBloc textSkinBloc = Provider.of(context);
     ColoredNicknamesBloc coloredNicknamesBloc = Provider.of(context);
     ChannelUsersListBloc channelUsersListBloc =
         Provider.of<ChannelUsersListBloc>(context);
@@ -53,10 +54,7 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
                     child: Text(
                         appLocalizations.tr("chat.users_list.search"
                             ".users_not_found"),
-                        style: TextStyle(
-                            color: AppSkinBloc.of(context)
-                                .appSkinTheme
-                                .textColor))),
+                        style: textSkinBloc.defaultTextStyle)),
               );
             } else {
               body = Flexible(
@@ -85,9 +83,7 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
           } else {
             return Center(
                 child: Text(appLocalizations.tr("chat.users_list.loading"),
-                    style: TextStyle(
-                        color:
-                            AppSkinBloc.of(context).appSkinTheme.textColor)));
+                    style: textSkinBloc.defaultTextStyle));
           }
         });
   }

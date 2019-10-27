@@ -5,11 +5,8 @@ import 'package:flutter_appirc/form/form_title_skin_bloc.dart';
 class AppIRCFormTitleSkinBloc extends FormTitleSkinBloc {
   final AppIRCSkinTheme theme;
 
-
   AppIRCFormTitleSkinBloc(this.theme);
-
 
   @override
   TextStyle get titleTextStyle => theme.platformSkinTheme.textTitleStyle;
-
 }

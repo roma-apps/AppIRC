@@ -16,7 +16,8 @@ import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_type_ahead_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/app_skin_bloc.dart';
+import 'package:flutter_appirc/skin/popup_menu_skin_bloc.dart';
+import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -72,12 +73,14 @@ class NetworkChannelNewMessageState
 
     var channelBloc = NetworkChannelBloc.of(context);
     ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
-    var appSkinTheme = AppSkinBloc.of(context).appSkinTheme;
-    var popupBackgroundColor = appSkinTheme.backgroundColor;
+//    var appSkinTheme = AppSkinBloc.of(context).appSkinTheme;
 
-    var hintText = AppLocalizations.of(context).tr("chat.new_message.field"
-        ".enter_message"
-        ".hint");
+    PopupMenuSkinBloc popupMenuSkinBloc = Provider.of(context);
+    TextSkinBloc textSkinBloc = Provider.of(context);
+
+    var popupBackgroundColor = popupMenuSkinBloc.backgroundColor;
+    var hintText = AppLocalizations.of(context)
+        .tr("chat.new_message.field.enter_message.hint");
 
     ChatConnectionBloc chatConnectionBloc = Provider.of(context);
 
@@ -128,9 +131,7 @@ class NetworkChannelNewMessageState
                       textInputAction: inputAction,
                       onSubmitted: submitted,
                       controller: inputMessageBloc.messageController,
-                      style: DefaultTextStyle.of(context)
-                          .style
-                          .copyWith(fontStyle: FontStyle.italic),
+                      style: textSkinBloc.defaultItalicTextStyle,
                       decoration: InputDecoration(
                           hintText: hintText,
                           hintStyle:
@@ -143,9 +144,7 @@ class NetworkChannelNewMessageState
                       controller: inputMessageBloc.messageController,
                       textInputAction: inputAction,
                       onSubmitted: submitted,
-                      style: DefaultTextStyle.of(context).style.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: appSkinTheme.textColor),
+                      style: textSkinBloc.defaultItalicTextStyle,
                       placeholder: hintText));
             },
           );

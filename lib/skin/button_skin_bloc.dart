@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+
+import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';

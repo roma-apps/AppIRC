@@ -16,8 +16,9 @@ import 'package:flutter_appirc/app/message/special/messages_special_widgets.dart
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/app_skin_bloc.dart';
+
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
+import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
 var _logger =
@@ -319,6 +320,8 @@ class _NetworkChannelMessagesListWidgetState
   }
 
   StreamBuilder<bool> _buildListViewEmptyWidget(BuildContext context) {
+
+    TextSkinBloc textSkinBloc = Provider.of(context);
     var channelBloc = NetworkChannelBloc.of(context);
     return StreamBuilder<bool>(
       stream: channelBloc.networkChannelConnectedStream,
@@ -331,15 +334,14 @@ class _NetworkChannelMessagesListWidgetState
               child: Text(
                   AppLocalizations.of(context).tr("chat.messages_list"
                       ".empty.connected"),
-                  style: TextStyle(
-                      color: AppSkinBloc.of(context).appSkinTheme.textColor)));
+                  style: textSkinBloc.defaultTextStyle));
         } else {
           return Center(
               child: Text(
                   AppLocalizations.of(context).tr("chat.messages_list.empty"
                       ".not_connected"),
-                  style: TextStyle(
-                      color: AppSkinBloc.of(context).appSkinTheme.textColor)));
+                  style:
+                      textSkinBloc.defaultTextStyle));
         }
       },
     );

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/regular/messages_regular_skin_bloc.dart';
-import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
+import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,8 +33,7 @@ Widget buildRegularMessageBody(
   var regularMessageBodyTextStyle = messagesSkin.regularMessageBodyTextStyle;
 
   if (links?.isNotEmpty == true) {
-    var linkTextStyle =
-        messagesSkin.modifyToLinkTextStyle(regularMessageBodyTextStyle);
+    var linkTextStyle = messagesSkin.linkTextStyle;
 
     spanBuilders.addAll(links.map((link) {
       return HighlightStringSpanBuilder(link, linkTextStyle,
@@ -74,7 +73,7 @@ Widget buildRegularMessageBody(
   }
 
   if (includedInSearch) {
-    var searchHighlightStyle = messagesSkin.createMessageHighlightTextStyle();
+    var searchHighlightStyle = messagesSkin.messageHighlightTextStyle;
 
     spanBuilders.add(
         HighlightStringSpanBuilder(searchTerm, searchHighlightStyle, null));

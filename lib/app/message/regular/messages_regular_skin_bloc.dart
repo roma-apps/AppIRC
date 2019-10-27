@@ -11,12 +11,12 @@ abstract class MessagesRegularSkinBloc extends SkinBloc {
 
   Color get searchBackgroundColor;
 
-  TextStyle modifyToLinkTextStyle(TextStyle textStyle);
 
   TextStyle createNickTextStyle(Color color);
   TextStyle createDateTextStyle(Color color);
   TextStyle createMessageSubTitleTextStyle(Color color);
-  TextStyle createMessageHighlightTextStyle();
+  TextStyle linkTextStyle;
+  TextStyle messageHighlightTextStyle;
 
   Color findTitleColorDataForMessage(RegularMessageType messageType);
 

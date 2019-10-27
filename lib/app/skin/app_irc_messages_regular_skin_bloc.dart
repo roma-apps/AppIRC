@@ -6,37 +6,62 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 class AppIRCMessagesRegularSkinBloc extends MessagesRegularSkinBloc {
   final AppIRCSkinTheme theme;
 
-  AppIRCMessagesRegularSkinBloc(this.theme);
+  @override
+  TextStyle messageHighlightTextStyle;
 
-  TextStyle get regularMessageBodyTextStyle => theme.platformSkinTheme.textRegularSmallStyle;
+  @override
+  TextStyle linkTextStyle;
 
+  TextStyle createDateTextStyle(Color color) =>
+      _getSubTitleTextStyleForColor(color);
+
+  TextStyle createMessageSubTitleTextStyle(Color color) =>
+      _getSubTitleTextStyleForColor(color);
+
+
+  TextStyle createNickTextStyle(Color color) =>
+      _getNicknameTextStyleForColor(color);
+
+  Map<Color, TextStyle> _subTitleColorToTextStyle = Map();
+  Map<Color, TextStyle> _nicknameColorToTextStyle = Map();
+
+  TextStyle _getSubTitleTextStyleForColor(Color color) {
+    if (!_subTitleColorToTextStyle.containsKey(color)) {
+      _subTitleColorToTextStyle[color] =
+          theme.platformSkinTheme.textRegularSmallStyle.copyWith(color: color);
+    }
+    return _subTitleColorToTextStyle[color];
+  }
+
+  TextStyle _getNicknameTextStyleForColor(Color color) {
+    if (!_nicknameColorToTextStyle.containsKey(color)) {
+      _nicknameColorToTextStyle[color] =
+          theme.platformSkinTheme.textRegularSmallStyle.copyWith(color: color);
+    }
+    return _nicknameColorToTextStyle[color];
+  }
+
+  AppIRCMessagesRegularSkinBloc(this.theme) {
+    messageHighlightTextStyle = regularMessageBodyTextStyle.copyWith(
+        backgroundColor: highlightServerBackgroundColor);
+    linkTextStyle =
+        regularMessageBodyTextStyle.copyWith(color: theme.linkColor);
+  }
+
+  TextStyle get regularMessageBodyTextStyle =>
+      theme.platformSkinTheme.textRegularSmallStyle;
 
   @override
   Color get searchBackgroundColor => theme.searchBackgroundColor;
-  TextStyle modifyToLinkTextStyle(TextStyle textStyle) => textStyle.copyWith(color: theme.linkColor);
-
-  TextStyle createNickTextStyle(Color color) =>
-      theme.platformSkinTheme.textBoldSmallStyle.copyWith(color: color);
-
-  TextStyle createDateTextStyle(Color color) =>
-      theme.platformSkinTheme.textBoldSmallStyle.copyWith(color: color);
-
-  TextStyle createMessageSubTitleTextStyle(Color color) =>
-      theme.platformSkinTheme.textRegularSmallStyle.copyWith(color: color);
 
   Color findTitleColorDataForMessage(RegularMessageType messageType) =>
       theme.findMessageColorByType(messageType);
 
+  @override
+  Color get highlightSearchBackgroundColor =>
+      theme.highlightSearchBackgroundColor;
 
   @override
-  TextStyle createMessageHighlightTextStyle() => regularMessageBodyTextStyle
-      .copyWith(backgroundColor: highlightServerBackgroundColor);
-
-  @override
-  Color get highlightSearchBackgroundColor =>   theme.highlightSearchBackgroundColor;
-
-
-  @override
-  Color get highlightServerBackgroundColor =>   theme.highlightServerBackgroundColor;
-
+  Color get highlightServerBackgroundColor =>
+      theme.highlightServerBackgroundColor;
 }

@@ -78,7 +78,6 @@ abstract class PlatformSkinTheme {
   Color get onBackgroundColor;
 
   Color get backgroundColor;
-
 }
 
 class AndroidAppSkinTheme extends PlatformSkinTheme {
@@ -86,7 +85,25 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
 
   TextTheme get textTheme => theme.textTheme;
 
-  AndroidAppSkinTheme(this.theme);
+  @override
+  TextStyle textRegularSmallStyle;
+
+  @override
+  TextStyle textInputDecorationErrorStyle;
+
+  @override
+  TextStyle textInputDecorationHintStyle;
+
+  @override
+  TextStyle textTitleStyle;
+
+  AndroidAppSkinTheme(this.theme) {
+    textInputDecorationHintStyle =
+        textEditTextStyle.copyWith(color: theme.hintColor);
+    textTitleStyle = textTheme.headline.copyWith(color: onPrimaryColor);
+    textRegularSmallStyle = textTheme.body2.copyWith(fontSize: 14);
+    textInputDecorationErrorStyle = textTheme.body1.copyWith(color: Colors.red);
+  }
 
   Color get buttonColor => theme.buttonColor;
 
@@ -100,26 +117,10 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textEditTextStyle => textTheme.body1;
 
   @override
-  TextStyle get textInputDecorationHintStyle =>
-      textEditTextStyle.copyWith(color: theme.hintColor);
-
-  @override
   TextStyle get textInputDecorationLabelStyle => textTheme.body1;
-
-
-  @override
-  TextStyle get textInputDecorationErrorStyle =>  textTheme.body1.copyWith
-    (color:Colors.red);
 
   @override
   TextStyle get textRegularMediumStyle => textTheme.body1;
-
-  @override
-  TextStyle get textRegularSmallStyle => textTheme.body2.copyWith(fontSize: 14);
-
-  @override
-  TextStyle get textTitleStyle =>
-      textTheme.headline.copyWith(color: onPrimaryColor);
 
   @override
   Color get primaryColor => theme.colorScheme.primary;
@@ -147,8 +148,6 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
 
   @override
   Color get backgroundColor => theme.backgroundColor;
-
-
 }
 
 class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
@@ -183,17 +182,26 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
   Color get onSecondaryColor =>
       androidAppSkinTheme.theme.colorScheme.onSecondary;
 
+  @override
+  TextStyle textBoldSmallStyle;
+
+  @override
+  TextStyle textRegularSmallStyle;
+  @override
+  TextStyle textInputDecorationErrorStyle;
+
   MaterialBasedIOSAppSkinTheme(this.androidAppSkinTheme) {
     theme = MaterialBasedCupertinoThemeData(
         materialTheme: androidAppSkinTheme.theme);
+
+    textBoldSmallStyle = textTheme.navTitleTextStyle.copyWith(fontSize: 12);
+    textRegularSmallStyle = textTheme.textStyle.copyWith(fontSize: 12);
+    textInputDecorationErrorStyle =
+        textTheme.textStyle.copyWith(color: Colors.red);
   }
 
   @override
   TextStyle get textBoldMediumStyle => textTheme.navTitleTextStyle;
-
-  @override
-  TextStyle get textBoldSmallStyle =>
-      textTheme.navTitleTextStyle.copyWith(fontSize: 12);
 
   @override
   TextStyle get textEditTextStyle => textTheme.textStyle;
@@ -205,15 +213,7 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textInputDecorationLabelStyle => textTheme.textStyle;
 
   @override
-  TextStyle get textInputDecorationErrorStyle =>
-      textTheme.textStyle.copyWith(color:Colors.red);
-
-  @override
   TextStyle get textRegularMediumStyle => textTheme.textStyle;
-
-  @override
-  TextStyle get textRegularSmallStyle =>
-      textTheme.textStyle.copyWith(fontSize: 12);
 
   @override
   TextStyle get textTitleStyle => textTheme.navTitleTextStyle;

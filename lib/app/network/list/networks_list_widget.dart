@@ -17,7 +17,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_popup_menu_widget.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/app_skin_bloc.dart';
+import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class NetworksListWidget extends StatelessWidget {
@@ -27,6 +27,8 @@ class NetworksListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    TextSkinBloc textSkinBloc = Provider.of(context);
     var networksListBloc = Provider.of<ChatNetworksListBloc>(context);
 
     var networksListWidget = StreamBuilder<List<Network>>(
@@ -54,8 +56,7 @@ class NetworksListWidget extends StatelessWidget {
             return Center(
               child: Text(
                   AppLocalizations.of(context).tr("chat.networks_list.empty"),
-                  style: TextStyle(
-                      color: AppSkinBloc.of(context).appSkinTheme.textColor)),
+                  style: textSkinBloc.defaultTextStyle),
             );
           }
         });

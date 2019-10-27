@@ -6,7 +6,22 @@ import 'package:flutter_appirc/form/field/text/form_text_field_skin_bloc.dart';
 class AppIRCFormTextFieldSkinBloc extends FormTextFieldSkinBloc {
   final AppIRCSkinTheme theme;
 
-  AppIRCFormTextFieldSkinBloc(this.theme);
+  @override
+  TextStyle disabledLabelStyle;
+
+  @override
+  TextStyle disabledHintStyle;
+
+  @override
+  TextStyle disabledEditStyle;
+
+  AppIRCFormTextFieldSkinBloc(this.theme) {
+    disabledLabelStyle = labelStyle.copyWith(color: theme.disabledTextColor);
+
+    disabledHintStyle = hintStyle.copyWith(color: theme.disabledTextColor);
+
+    disabledEditStyle = editStyle.copyWith(color: theme.disabledTextColor);
+  }
 
   @override
   TextStyle get labelStyle => theme.platformSkinTheme.textInputDecorationLabelStyle;
@@ -20,14 +35,5 @@ class AppIRCFormTextFieldSkinBloc extends FormTextFieldSkinBloc {
   @override
   TextStyle get errorStyle => theme.platformSkinTheme
       .textInputDecorationErrorStyle;
-
-  @override
-  TextStyle get disabledLabelStyle => labelStyle.copyWith(color: Colors.grey);
-
-  @override
-  TextStyle get disabledHintStyle => hintStyle.copyWith(color: Colors.grey);
-
-  @override
-  TextStyle get disabledEditStyle => editStyle.copyWith(color: Colors.grey);
 
 }

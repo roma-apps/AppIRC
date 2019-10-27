@@ -32,10 +32,10 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_form_
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
 import 'package:flutter_appirc/skin/skin_preference_bloc.dart';
+import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "chat_page.dart", enabled: true);
@@ -353,6 +353,7 @@ class ChatPage extends StatelessWidget {
 
   Widget _buildDisconnectedWidget(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
+    TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -361,8 +362,7 @@ class ChatPage extends StatelessWidget {
           Text(
               appLocalizations.tr("chat.state.connection"
                   ".status.disconnected"),
-              style: TextStyle(
-                  color: AppSkinBloc.of(context).appSkinTheme.textColor)),
+              style: textSkinBloc.defaultTextStyle),
           createSkinnedPlatformButton(context,
               child: Text(appLocalizations.tr(
                   "chat.state.connection.action.reconnect")), onPressed: () {
@@ -374,13 +374,14 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  Widget _buildConnectingWidget(BuildContext context) => Center(
+  Widget _buildConnectingWidget(BuildContext context) {
+    TextSkinBloc textSkinBloc = Provider.of(context);
+    return Center(
       child: Text(
-          AppLocalizations.of(context).tr("chat.state.connection"
-              ".status"
-              ".connecting"),
-          style: TextStyle(
-              color: AppSkinBloc.of(context).appSkinTheme.textColor)));
+          AppLocalizations.of(context)
+        .tr("chat.state.connection.status.connecting"),
+          style: textSkinBloc.defaultTextStyle));
+  }
 
   Widget _buildConnectedWidget(BuildContext context) {
     var initBloc = Provider.of<ChatInitBloc>(context);
@@ -425,12 +426,12 @@ class ChatPage extends StatelessWidget {
   }
 
   Center _buildNoActiveChannelMessage(BuildContext context) {
+    TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
       child: Text(
-          AppLocalizations.of(context).tr('chat'
-              '.state.active_channel_not_selected'),
-          style:
-              TextStyle(color: AppSkinBloc.of(context).appSkinTheme.textColor)),
-    );
+          AppLocalizations.of(context)
+        .tr('chat.state.active_channel_not_selected'),
+          style: textSkinBloc.defaultTextStyle,
+    ));
   }
 }

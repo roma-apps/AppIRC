@@ -5,18 +5,12 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_model.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 
-
-
 class DayAppSkinTheme extends AppIRCSkinTheme {
   static const String ID = "DayAppSkin";
 
   DayAppSkinTheme()
-      : super(
-            ID,
-            ColoredNicknamesData(Colors.primaries),
-            () =>_androidDayThemeData,
-            () => MaterialBasedCupertinoThemeData(
-                materialTheme: _androidDayThemeData));
+      : super(ID, ColoredNicknamesData(Colors.primaries), () => _themeData,
+            () => MaterialBasedCupertinoThemeData(materialTheme: _themeData));
 
   Color findMessageColorByType(RegularMessageType regularMessageType) {
     Color color;
@@ -87,16 +81,17 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   Color get linkColor => Colors.lightBlue;
 
   @override
-  Color get activeListItemColor => _androidDayThemeData.primaryColor;
+  Color get activeListItemColor => _themeData.primaryColor;
 
   @override
-  Color get appBackgroundColor => _androidDayThemeData.scaffoldBackgroundColor;
+  Color get appBackgroundColor => _themeData.scaffoldBackgroundColor;
 
   @override
-  Color get appBarColor => _androidDayThemeData.primaryColor;
+  Color get appBarColor => _themeData.primaryColor;
 
   @override
-  Color get chatInputColor => isMaterial ? _androidDayThemeData.primaryColor : _androidDayThemeData.bottomAppBarColor;
+  Color get chatInputColor =>
+      isMaterial ? _themeData.primaryColor : _themeData.bottomAppBarColor;
 
   @override
   Color get notActiveListItemColor => appBackgroundColor;
@@ -105,171 +100,178 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   Color get onActiveListItemColor => onAppBackgroundColor;
 
   @override
-  Color get onAppBackgroundColor => _androidDayThemeData.colorScheme.onBackground;
+  Color get onAppBackgroundColor => _themeData.colorScheme.onBackground;
 
   @override
-  Color get onAppBarColor => isMaterial ? _androidDayThemeData.colorScheme.onPrimary : _androidDayThemeData.buttonColor;
+  Color get onAppBarColor =>
+      isMaterial ? _themeData.colorScheme.onPrimary : _themeData.buttonColor;
 
   @override
   Color get onChatInputColor => onAppBarColor;
 
   @override
-  Color get onChatInputHintColor => _androidDayThemeData.hintColor;
+  Color get onChatInputHintColor => _themeData.hintColor;
 
   @override
   Color get onNotActiveListItemColor => onAppBackgroundColor;
 
   @override
-  Color get highlightSearchBackgroundColor => _androidDayThemeData
-      .primaryColorLight;
-
+  Color get highlightSearchBackgroundColor => _themeData.primaryColorLight;
 
   @override
-  Color get highlightServerBackgroundColor => _androidDayThemeData
-      .primaryColorDark;
+  Color get highlightServerBackgroundColor => _themeData.primaryColorDark;
 
   @override
-  Color get searchBackgroundColor => _androidDayThemeData.primaryColorDark;
+  Color get searchBackgroundColor => _themeData.primaryColorDark;
+
+  @override
+  TextStyle get defaultTextStyle => _themeData.textTheme.body1;
+
+  @override
+  Color get disabledTextColor => Colors.grey;
 }
 
-ThemeData _androidDayThemeData = ThemeData(
+ThemeData _themeData = ThemeData(
   primarySwatch: Colors.amber,
   brightness: Brightness.light,
-  primaryColor: Color( 0xffffc107 ),
+  primaryColor: Color(0xffffc107),
   primaryColorBrightness: Brightness.light,
-  primaryColorLight: Color( 0xffffecb3 ),
-  primaryColorDark: Color( 0xffffa000 ),
-  accentColor: Color( 0xffffc107 ),
+  primaryColorLight: Color(0xffffecb3),
+  primaryColorDark: Color(0xffffa000),
+  accentColor: Color(0xffffc107),
   accentColorBrightness: Brightness.light,
-  canvasColor: Color( 0xfffafafa ),
-  scaffoldBackgroundColor: Color( 0xfffafafa ),
-  bottomAppBarColor: Color( 0xffffffff ),
-  cardColor: Color( 0xffffffff ),
-  dividerColor: Color( 0x1f000000 ),
-  highlightColor: Color( 0x66bcbcbc ),
-  splashColor: Color( 0x66c8c8c8 ),
-  selectedRowColor: Color( 0xfff5f5f5 ),
-  unselectedWidgetColor: Color( 0x8a000000 ),
-  disabledColor: Color( 0x61000000 ),
-  buttonColor: Color( 0xffffc107 ),
-  toggleableActiveColor: Color( 0xffffb300 ),
-  secondaryHeaderColor: Color( 0xfffff8e1 ),
-  textSelectionColor: Color( 0xffffe082 ),
-  cursorColor: Color( 0xff4285f4 ),
-  textSelectionHandleColor: Color( 0xffffd54f ),
-  backgroundColor: Color( 0xffffe082 ),
-  dialogBackgroundColor: Color( 0xffffffff ),
-  indicatorColor: Color( 0xffffc107 ),
-  hintColor: Color( 0x8a000000 ),
-  errorColor: Color( 0xffd32f2f ),
+  canvasColor: Color(0xfffafafa),
+  scaffoldBackgroundColor: Color(0xfffafafa),
+  bottomAppBarColor: Color(0xffffffff),
+  cardColor: Color(0xffffffff),
+  dividerColor: Color(0x1f000000),
+  highlightColor: Color(0x66bcbcbc),
+  splashColor: Color(0x66c8c8c8),
+  selectedRowColor: Color(0xfff5f5f5),
+  unselectedWidgetColor: Color(0x8a000000),
+  disabledColor: Color(0x61000000),
+  buttonColor: Color(0xffffc107),
+  toggleableActiveColor: Color(0xffffb300),
+  secondaryHeaderColor: Color(0xfffff8e1),
+  textSelectionColor: Color(0xffffe082),
+  cursorColor: Color(0xff4285f4),
+  textSelectionHandleColor: Color(0xffffd54f),
+  backgroundColor: Color(0xffffe082),
+  dialogBackgroundColor: Color(0xffffffff),
+  indicatorColor: Color(0xffffc107),
+  hintColor: Color(0x8a000000),
+  errorColor: Color(0xffd32f2f),
   buttonTheme: ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
     height: 36,
-    padding: EdgeInsets.only(top:0,bottom:0,left:16, right:16),
-    shape:     RoundedRectangleBorder(
-      side: BorderSide(color: Color( 0xff000000 ), width: 0, style: BorderStyle.none, ),
+    padding: EdgeInsets.only(top: 0, bottom: 0, left: 16, right: 16),
+    shape: RoundedRectangleBorder(
+      side: BorderSide(
+        color: Color(0xff000000),
+        width: 0,
+        style: BorderStyle.none,
+      ),
       borderRadius: BorderRadius.all(Radius.circular(2.0)),
-    )
-    ,
-    alignedDropdown: false ,
-    buttonColor: Color( 0xffffc107 ),
-    disabledColor: Color( 0x61000000 ),
-    highlightColor: Color( 0x29000000 ),
-    splashColor: Color( 0x1f000000 ),
-    focusColor: Color( 0x1f000000 ),
-    hoverColor: Color( 0x0a000000 ),
+    ),
+    alignedDropdown: false,
+    buttonColor: Color(0xffffc107),
+    disabledColor: Color(0x61000000),
+    highlightColor: Color(0x29000000),
+    splashColor: Color(0x1f000000),
+    focusColor: Color(0x1f000000),
+    hoverColor: Color(0x0a000000),
     colorScheme: ColorScheme(
-      primary: Color( 0xffffc107 ),
-      primaryVariant: Color( 0xffffa000 ),
-      secondary: Color( 0xffffc107 ),
-      secondaryVariant: Color( 0xffffa000 ),
-      surface: Color( 0xffffffff ),
-      background: Color( 0xffffe082 ),
-      error: Color( 0xffd32f2f ),
-      onPrimary: Color( 0xff000000 ),
-      onSecondary: Color( 0xff000000 ),
-      onSurface: Color( 0xff000000 ),
-      onBackground: Color( 0xff000000 ),
-      onError: Color( 0xffffffff ),
+      primary: Color(0xffffc107),
+      primaryVariant: Color(0xffffa000),
+      secondary: Color(0xffffc107),
+      secondaryVariant: Color(0xffffa000),
+      surface: Color(0xffffffff),
+      background: Color(0xffffe082),
+      error: Color(0xffd32f2f),
+      onPrimary: Color(0xff000000),
+      onSecondary: Color(0xff000000),
+      onSurface: Color(0xff000000),
+      onBackground: Color(0xff000000),
+      onError: Color(0xffffffff),
       brightness: Brightness.light,
     ),
   ),
   textTheme: TextTheme(
     display4: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display3: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display2: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display1: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     headline: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     title: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     subhead: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     body2: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     body1: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     caption: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     button: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     subtitle: TextStyle(
-      color: Color( 0xff000000 ),
+      color: Color(0xff000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     overline: TextStyle(
-      color: Color( 0xff000000 ),
+      color: Color(0xff000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
@@ -277,79 +279,79 @@ ThemeData _androidDayThemeData = ThemeData(
   ),
   primaryTextTheme: TextTheme(
     display4: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display3: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display2: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display1: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     headline: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     title: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     subhead: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     body2: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     body1: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     caption: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     button: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     subtitle: TextStyle(
-      color: Color( 0xff000000 ),
+      color: Color(0xff000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     overline: TextStyle(
-      color: Color( 0xff000000 ),
+      color: Color(0xff000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
@@ -357,105 +359,105 @@ ThemeData _androidDayThemeData = ThemeData(
   ),
   accentTextTheme: TextTheme(
     display4: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display3: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display2: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     display1: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     headline: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     title: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     subhead: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     body2: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     body1: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     caption: TextStyle(
-      color: Color( 0x8a000000 ),
+      color: Color(0x8a000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     button: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     subtitle: TextStyle(
-      color: Color( 0xff000000 ),
+      color: Color(0xff000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     overline: TextStyle(
-      color: Color( 0xff000000 ),
+      color: Color(0xff000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
   ),
-  inputDecorationTheme:   InputDecorationTheme(
+  inputDecorationTheme: InputDecorationTheme(
     labelStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     helperStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     hintStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     errorStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
@@ -463,65 +465,89 @@ ThemeData _androidDayThemeData = ThemeData(
     errorMaxLines: null,
     hasFloatingPlaceholder: true,
     isDense: false,
-    contentPadding: EdgeInsets.only(top:12,bottom:12,left:0, right:0),
-    isCollapsed : false,
+    contentPadding: EdgeInsets.only(top: 12, bottom: 12, left: 0, right: 0),
+    isCollapsed: false,
     prefixStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     suffixStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     counterStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     filled: false,
-    fillColor: Color( 0x00000000 ),
+    fillColor: Color(0x00000000),
     errorBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
+      borderSide: BorderSide(
+        color: Color(0xff000000),
+        width: 1,
+        style: BorderStyle.solid,
+      ),
       borderRadius: BorderRadius.all(Radius.circular(4.0)),
     ),
     focusedBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
+      borderSide: BorderSide(
+        color: Color(0xff000000),
+        width: 1,
+        style: BorderStyle.solid,
+      ),
       borderRadius: BorderRadius.all(Radius.circular(4.0)),
     ),
     focusedErrorBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
+      borderSide: BorderSide(
+        color: Color(0xff000000),
+        width: 1,
+        style: BorderStyle.solid,
+      ),
       borderRadius: BorderRadius.all(Radius.circular(4.0)),
     ),
     disabledBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
+      borderSide: BorderSide(
+        color: Color(0xff000000),
+        width: 1,
+        style: BorderStyle.solid,
+      ),
       borderRadius: BorderRadius.all(Radius.circular(4.0)),
     ),
     enabledBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
+      borderSide: BorderSide(
+        color: Color(0xff000000),
+        width: 1,
+        style: BorderStyle.solid,
+      ),
       borderRadius: BorderRadius.all(Radius.circular(4.0)),
     ),
     border: UnderlineInputBorder(
-      borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
+      borderSide: BorderSide(
+        color: Color(0xff000000),
+        width: 1,
+        style: BorderStyle.solid,
+      ),
       borderRadius: BorderRadius.all(Radius.circular(4.0)),
     ),
   ),
   iconTheme: IconThemeData(
-    color: Color( 0xdd000000 ),
+    color: Color(0xdd000000),
     opacity: 1,
     size: 24,
   ),
   primaryIconTheme: IconThemeData(
-    color: Color( 0xff000000 ),
+    color: Color(0xff000000),
     opacity: 1,
     size: 24,
   ),
   accentIconTheme: IconThemeData(
-    color: Color( 0xff000000 ),
+    color: Color(0xff000000),
     opacity: 1,
     size: 24,
   ),
@@ -540,7 +566,7 @@ ThemeData _androidDayThemeData = ThemeData(
     valueIndicatorColor: null,
     showValueIndicator: null,
     valueIndicatorTextStyle: TextStyle(
-      color: Color( 0xdd000000 ),
+      color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
@@ -548,39 +574,46 @@ ThemeData _androidDayThemeData = ThemeData(
   ),
   tabBarTheme: TabBarTheme(
     indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: Color( 0xdd000000 ),
-    unselectedLabelColor: Color( 0xb2000000 ),
+    labelColor: Color(0xdd000000),
+    unselectedLabelColor: Color(0xb2000000),
   ),
   chipTheme: ChipThemeData(
-    backgroundColor: Color( 0x1f000000 ),
+    backgroundColor: Color(0x1f000000),
     brightness: Brightness.light,
-    deleteIconColor: Color( 0xde000000 ),
-    disabledColor: Color( 0x0c000000 ),
-    labelPadding: EdgeInsets.only(top:0,bottom:0,left:8, right:8),
+    deleteIconColor: Color(0xde000000),
+    disabledColor: Color(0x0c000000),
+    labelPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 8),
     labelStyle: TextStyle(
-      color: Color( 0xde000000 ),
+      color: Color(0xde000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    padding: EdgeInsets.only(top:4,bottom:4,left:4, right:4),
+    padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
     secondaryLabelStyle: TextStyle(
-      color: Color( 0x3d000000 ),
+      color: Color(0x3d000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    secondarySelectedColor: Color( 0x3dffc107 ),
-    selectedColor: Color( 0x3d000000 ),
-    shape: StadiumBorder( side: BorderSide(color: Color( 0xff000000 ), width: 0, style: BorderStyle.none, ) ),
+    secondarySelectedColor: Color(0x3dffc107),
+    selectedColor: Color(0x3d000000),
+    shape: StadiumBorder(
+        side: BorderSide(
+      color: Color(0xff000000),
+      width: 0,
+      style: BorderStyle.none,
+    )),
   ),
   dialogTheme: DialogTheme(
-      shape:     RoundedRectangleBorder(
-        side: BorderSide(color: Color( 0xff000000 ), width: 0, style: BorderStyle.none, ),
-        borderRadius: BorderRadius.all(Radius.circular(0.0)),
-      )
-
-  ),
+      shape: RoundedRectangleBorder(
+    side: BorderSide(
+      color: Color(0xff000000),
+      width: 0,
+      style: BorderStyle.none,
+    ),
+    borderRadius: BorderRadius.all(Radius.circular(0.0)),
+  )),
 //    cupertinoOverrideTheme: CupertinoThemeData(
 //      primaryColor: Colors.amber,
 //        textTheme: CupertinoTextThemeData(

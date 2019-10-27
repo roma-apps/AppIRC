@@ -5,15 +5,34 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 class AppIRCChannelsListSkinBloc extends ChannelsListSkinBloc {
   final AppIRCSkinTheme theme;
 
-  AppIRCChannelsListSkinBloc(this.theme);
+  TextStyle _activeChannelItemTextStyle;
+  TextStyle _nonActiveChannelItemTextStyle;
+
+  TextStyle _activeChannelUnreadTextStyle;
+  TextStyle _nonActiveChannelUnreadTextStyle;
+
+  AppIRCChannelsListSkinBloc(this.theme) {
+    _activeChannelItemTextStyle = theme.platformSkinTheme.textRegularMediumStyle
+        .copyWith(color: theme.onActiveListItemColor);
+
+    _nonActiveChannelItemTextStyle = theme.platformSkinTheme.textRegularMediumStyle
+        .copyWith(color: theme.onNotActiveListItemColor);
+
+    _activeChannelUnreadTextStyle = theme.platformSkinTheme
+        .textRegularMediumStyle.copyWith(
+          color: theme.platformSkinTheme.onPrimaryColor);
+    _nonActiveChannelUnreadTextStyle = theme.platformSkinTheme
+        .textRegularMediumStyle
+          .copyWith(color: theme.platformSkinTheme.onPrimaryColor);
+
+  }
+
 
   TextStyle getChannelItemTextStyle(bool isChannelActive) {
     if (isChannelActive) {
-      return theme.platformSkinTheme.textRegularMediumStyle
-          .copyWith(color: theme.onActiveListItemColor);
+      return _activeChannelItemTextStyle;
     } else {
-      return theme.platformSkinTheme.textRegularMediumStyle
-          .copyWith(color: theme.onNotActiveListItemColor);
+      return _nonActiveChannelItemTextStyle;
     }
   }
 
@@ -35,11 +54,9 @@ class AppIRCChannelsListSkinBloc extends ChannelsListSkinBloc {
 
   TextStyle getChannelUnreadTextStyle(bool isChannelActive) {
     if (!isChannelActive) {
-      return theme.platformSkinTheme.textRegularMediumStyle.copyWith(
-          color: theme.platformSkinTheme.onPrimaryColor);
+      return _activeChannelUnreadTextStyle;
     } else {
-      return theme.platformSkinTheme.textRegularMediumStyle
-          .copyWith(color: theme.platformSkinTheme.onPrimaryColor);
+      return _nonActiveChannelUnreadTextStyle;
     }
   }
 

@@ -12,19 +12,17 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   Color get linkColor => Colors.lightBlue;
 
   @override
-  Color get activeListItemColor => _androidNightThemeData.primaryColor;
+  Color get activeListItemColor => _themeData.primaryColor;
 
   @override
-  Color get appBackgroundColor =>
-      _androidNightThemeData.scaffoldBackgroundColor;
+  Color get appBackgroundColor => _themeData.scaffoldBackgroundColor;
 
   @override
-  Color get appBarColor => _androidNightThemeData.primaryColor;
+  Color get appBarColor => _themeData.primaryColor;
 
   @override
-  Color get chatInputColor => isMaterial
-      ? _androidNightThemeData.primaryColor
-      : _androidNightThemeData.bottomAppBarColor;
+  Color get chatInputColor =>
+      isMaterial ? _themeData.primaryColor : _themeData.bottomAppBarColor;
 
   @override
   Color get notActiveListItemColor => appBackgroundColor;
@@ -33,44 +31,34 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   Color get onActiveListItemColor => onAppBackgroundColor;
 
   @override
-  Color get onAppBackgroundColor =>
-      _androidNightThemeData.colorScheme.onBackground;
+  Color get onAppBackgroundColor => _themeData.colorScheme.onBackground;
 
   @override
-  Color get onAppBarColor => isMaterial
-      ? _androidNightThemeData.colorScheme.onPrimary
-      : _androidNightThemeData.buttonColor;
+  Color get onAppBarColor =>
+      isMaterial ? _themeData.colorScheme.onPrimary : _themeData.buttonColor;
 
   @override
   Color get onChatInputColor => onAppBarColor;
 
   @override
-  Color get onChatInputHintColor => _androidNightThemeData.hintColor;
+  Color get onChatInputHintColor => _themeData.hintColor;
 
   @override
   Color get onNotActiveListItemColor => onAppBackgroundColor;
 
   @override
-  Color get highlightSearchBackgroundColor => _androidNightThemeData
-      .primaryColorDark;
-
+  Color get highlightSearchBackgroundColor => _themeData.primaryColorDark;
 
   @override
-  Color get highlightServerBackgroundColor => _androidNightThemeData
-      .primaryColorLight;
+  Color get highlightServerBackgroundColor => _themeData.primaryColorLight;
 
   NightAppSkinTheme()
-      : super(
-            ID,
-            ColoredNicknamesData(Colors.primaries),
-            () => _androidNightThemeData,
-            () {
-              var materialBasedCupertinoThemeData = MaterialBasedCupertinoThemeData(
-                materialTheme: _androidNightThemeData);
+      : super(ID, ColoredNicknamesData(Colors.primaries), () => _themeData, () {
+          var materialBasedCupertinoThemeData =
+              MaterialBasedCupertinoThemeData(materialTheme: _themeData);
 
-
-              return materialBasedCupertinoThemeData;
-            });
+          return materialBasedCupertinoThemeData;
+        });
 
   Color findMessageColorByType(RegularMessageType regularMessageType) {
     Color color;
@@ -137,12 +125,17 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
     return color;
   }
 
+  @override
+  Color get searchBackgroundColor => _themeData.primaryColorDark;
 
   @override
-  Color get searchBackgroundColor => _androidNightThemeData.primaryColorDark;
+  TextStyle get defaultTextStyle => _themeData.textTheme.body1;
+
+  @override
+  Color get disabledTextColor => Colors.grey;
 }
 
-ThemeData _androidNightThemeData = ThemeData(
+ThemeData _themeData = ThemeData(
     primarySwatch: MaterialColor(4280361249, {
       50: Color(0xfff2f2f2),
       100: Color(0xffe6e6e6),
@@ -629,5 +622,4 @@ ThemeData _androidNightThemeData = ThemeData(
 //        textStyle: TextStyle(color: Color(0xff1e88e5))
 //
 //      )
-    )
-);
+    ));
