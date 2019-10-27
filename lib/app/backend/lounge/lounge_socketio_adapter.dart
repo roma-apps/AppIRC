@@ -17,14 +17,14 @@ SocketIOCommand toSocketIOCommand(LoungeRequest request) {
 
 ChatConnectionState mapConnectionState(SocketConnectionState socketState) {
   switch (socketState) {
-    case SocketConnectionState.CONNECTED:
-      return ChatConnectionState.CONNECTED;
+    case SocketConnectionState.connected:
+      return ChatConnectionState.connected;
       break;
-    case SocketConnectionState.DISCONNECTED:
-      return ChatConnectionState.DISCONNECTED;
+    case SocketConnectionState.disconnected:
+      return ChatConnectionState.disconnected;
       break;
-    case SocketConnectionState.CONNECTING:
-      return ChatConnectionState.CONNECTING;
+    case SocketConnectionState.connecting:
+      return ChatConnectionState.connecting;
       break;
   }
   throw Exception("invalid state $socketState");

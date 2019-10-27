@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 
-enum ChatInitState { NOT_STARTED, IN_PROGRESS, FINISHED }
+enum ChatInitState { notStarted, inProgress, finished }
 
 class ChatInitInformation {
   int activeChannelRemoteId;

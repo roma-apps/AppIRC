@@ -33,7 +33,7 @@ class ChatConnectionBloc extends Providable {
   void _reconnectIfNeeded() async {
     _logger.d(() => "_reconnectIfNeeded = $connectionState "
         "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
-    if (connectionState == ChatConnectionState.DISCONNECTED) {
+    if (connectionState == ChatConnectionState.disconnected) {
       var connectivityResult = await (Connectivity().checkConnectivity());
 
       var connected;

@@ -9,4 +9,4 @@ class PushMessage {
   }
 }
 
-enum PushMessageType { DEFAULT, LAUNCH, RESUME }
+enum PushMessageType { foreground, launch, resume }

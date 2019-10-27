@@ -38,17 +38,17 @@ bool get _isMaterialCompatible =>
 bool get _isCupertinoCompatible => Platform.isIOS || Platform.isMacOS;
 
 enum UIPlatform {
-  MATERIAL, CUPERTINO
+  material, cupertino
 }
 
 
 UIPlatform detectCurrentUIPlatform() {
   if(isMaterial) {
-    return UIPlatform.MATERIAL;
+    return UIPlatform.material;
   }
 
   if(isCupertino) {
-    return UIPlatform.CUPERTINO;
+    return UIPlatform.cupertino;
   }
 
   throw("Platform not supported");

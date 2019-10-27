@@ -75,62 +75,62 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   Color findMessageColorByType(RegularMessageType regularMessageType) {
     Color color;
     switch (regularMessageType) {
-      case RegularMessageType.TOPIC_SET_BY:
+      case RegularMessageType.topicSetBy:
         color = Colors.lightBlue;
         break;
-      case RegularMessageType.TOPIC:
+      case RegularMessageType.topic:
         color = Colors.lightBlue;
         break;
-      case RegularMessageType.WHO_IS:
+      case RegularMessageType.whoIs:
         color = Colors.lightBlue;
         break;
-      case RegularMessageType.UNHANDLED:
+      case RegularMessageType.unhandled:
         color = Colors.grey;
         break;
-      case RegularMessageType.UNKNOWN:
+      case RegularMessageType.unknown:
         color = Colors.redAccent;
         break;
-      case RegularMessageType.MESSAGE:
+      case RegularMessageType.message:
         color = Colors.grey;
         break;
-      case RegularMessageType.JOIN:
+      case RegularMessageType.join:
         color = Colors.lightGreen;
         break;
 
-      case RegularMessageType.AWAY:
+      case RegularMessageType.away:
         color = Colors.lightBlue;
         break;
-      case RegularMessageType.MODE:
+      case RegularMessageType.mode:
         color = Colors.grey;
         break;
-      case RegularMessageType.MOTD:
+      case RegularMessageType.motd:
         color = Colors.grey;
         break;
-      case RegularMessageType.NOTICE:
+      case RegularMessageType.notice:
         color = Colors.grey;
         break;
-      case RegularMessageType.ERROR:
+      case RegularMessageType.error:
         color = Colors.redAccent;
         break;
-      case RegularMessageType.BACK:
+      case RegularMessageType.back:
         color = Colors.lightGreen;
         break;
-      case RegularMessageType.MODE_CHANNEL:
+      case RegularMessageType.modeChannel:
         color = Colors.grey;
         break;
-      case RegularMessageType.QUIT:
+      case RegularMessageType.quit:
         color = Colors.redAccent;
         break;
-      case RegularMessageType.RAW:
+      case RegularMessageType.raw:
         color = Colors.grey;
         break;
-      case RegularMessageType.PART:
+      case RegularMessageType.part:
         color = Colors.redAccent;
         break;
-      case RegularMessageType.NICK:
+      case RegularMessageType.nick:
         color = Colors.lightBlue;
         break;
-      case RegularMessageType.CTCP_REQUEST:
+      case RegularMessageType.ctcpRequest:
         color = Colors.lightBlue;
         break;
     }

@@ -116,4 +116,4 @@ class ChatPreferencesSaverBloc extends ChatNetworkChannelsListListenerBloc {
 }
 
 _isNeedSaveChannel(NetworkChannel channel) =>
-    channel.type == NetworkChannelType.CHANNEL;
+    channel.type == NetworkChannelType.channel;

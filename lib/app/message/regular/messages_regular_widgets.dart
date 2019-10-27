@@ -58,15 +58,15 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message,
     bool isHighlightedBySearch, String searchTerm) {
   var regularMessageType = message.regularMessageType;
 
-  if (regularMessageType == RegularMessageType.AWAY ||
-      regularMessageType == RegularMessageType.JOIN ||
-      regularMessageType == RegularMessageType.TOPIC_SET_BY ||
-      regularMessageType == RegularMessageType.MOTD ||
-      regularMessageType == RegularMessageType.MODE_CHANNEL ||
-      regularMessageType == RegularMessageType.BACK) {
+  if (regularMessageType == RegularMessageType.away ||
+      regularMessageType == RegularMessageType.join ||
+      regularMessageType == RegularMessageType.topicSetBy ||
+      regularMessageType == RegularMessageType.motd ||
+      regularMessageType == RegularMessageType.modeChannel ||
+      regularMessageType == RegularMessageType.back) {
     return SizedBox.shrink();
   }
-  if (regularMessageType == RegularMessageType.MODE) {
+  if (regularMessageType == RegularMessageType.mode) {
     if (!isHaveLongText(message)) {
       return SizedBox.shrink();
     }
@@ -183,28 +183,28 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
   var appLocalizations = AppLocalizations.of(context);
   String str;
   switch (regularMessageType) {
-    case RegularMessageType.TOPIC_SET_BY:
+    case RegularMessageType.topicSetBy:
       str = appLocalizations.tr("chat.message.regular.sub_message.topic_set_by");
       break;
-    case RegularMessageType.TOPIC:
+    case RegularMessageType.topic:
       str = appLocalizations.tr("chat.message.regular.sub_message.topic");
       break;
-    case RegularMessageType.WHO_IS:
+    case RegularMessageType.whoIs:
       str = appLocalizations.tr("chat.message.regular.sub_message.who_is");
       break;
-    case RegularMessageType.UNHANDLED:
+    case RegularMessageType.unhandled:
       str = null;
       break;
-    case RegularMessageType.UNKNOWN:
+    case RegularMessageType.unknown:
       str = appLocalizations.tr("chat.message.regular.sub_message.unknown");
       break;
-    case RegularMessageType.MESSAGE:
+    case RegularMessageType.message:
       str = null;
       break;
-    case RegularMessageType.JOIN:
+    case RegularMessageType.join:
       str = appLocalizations.tr("chat.message.regular.sub_message.join");
       break;
-    case RegularMessageType.MODE:
+    case RegularMessageType.mode:
       if (isHaveLongText(message)) {
         str = appLocalizations.tr("chat.message.regular.sub_message.mode_long");
       } else {
@@ -213,39 +213,39 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
       }
 
       break;
-    case RegularMessageType.MOTD:
+    case RegularMessageType.motd:
       str = appLocalizations.tr("chat.message.regular.sub_message.motd", args: [message.text]);
       break;
-    case RegularMessageType.NOTICE:
+    case RegularMessageType.notice:
       str = appLocalizations.tr("chat.message.regular.sub_message.notice");
       break;
-    case RegularMessageType.ERROR:
+    case RegularMessageType.error:
       str = appLocalizations.tr("chat.message.regular.sub_message.error");
       break;
-    case RegularMessageType.AWAY:
+    case RegularMessageType.away:
       str = appLocalizations.tr("chat.message.regular.sub_message.away");
       break;
-    case RegularMessageType.BACK:
+    case RegularMessageType.back:
       str = appLocalizations.tr("chat.message.regular.sub_message.back");
       break;
-    case RegularMessageType.MODE_CHANNEL:
+    case RegularMessageType.modeChannel:
       str = appLocalizations
           .tr("chat.message.regular.sub_message.channel_mode", args: [message.text]);
       break;
-    case RegularMessageType.QUIT:
+    case RegularMessageType.quit:
       str = appLocalizations.tr("chat.message.regular.sub_message.quit");
       break;
-    case RegularMessageType.RAW:
+    case RegularMessageType.raw:
       str = null;
       break;
-    case RegularMessageType.PART:
+    case RegularMessageType.part:
       str = appLocalizations.tr("chat.message.regular.sub_message.part");
       break;
-    case RegularMessageType.NICK:
+    case RegularMessageType.nick:
       str =
           appLocalizations.tr("chat.message.regular.sub_message.nick", args: [message.newNick]);
       break;
-    case RegularMessageType.CTCP_REQUEST:
+    case RegularMessageType.ctcpRequest:
       str = appLocalizations.tr("chat.message.regular.sub_message.ctcp_request");
       break;
   }
@@ -264,20 +264,20 @@ Widget buildPreview(
 
   var previewBody;
   switch (preview.type) {
-    case MessagePreviewType.LINK:
+    case MessagePreviewType.link:
       previewBody = buildMessageLinkPreview(context, preview);
 
       break;
-    case MessagePreviewType.IMAGE:
+    case MessagePreviewType.image:
       previewBody = buildMessageImagePreview(context, preview);
       break;
-    case MessagePreviewType.LOADING:
+    case MessagePreviewType.loading:
       previewBody = Text("Loading");
       break;
-    case MessagePreviewType.AUDIO:
+    case MessagePreviewType.audio:
       previewBody = buildMessageAudioPreview(context, preview);
       break;
-    case MessagePreviewType.VIDEO:
+    case MessagePreviewType.video:
       previewBody = buildMessageVideoPreview(context, preview);
       break;
   }
@@ -335,7 +335,7 @@ Widget _buildPreviewThumb(BuildContext context, String thumb) {
 isNeedHighlight(RegularMessage message) =>
     message.highlight == true ||
     message.regularMessageType ==
-        RegularMessageType.UNKNOWN;
+        RegularMessageType.unknown;
 
 bool isHaveLongText(RegularMessage message) =>
     message.text != null ? message.text.length > 10 : false;
@@ -343,62 +343,62 @@ bool isHaveLongText(RegularMessage message) =>
 IconData _findTitleIconDataForMessage(RegularMessage message) {
   IconData icon;
   switch (message.regularMessageType) {
-    case RegularMessageType.TOPIC_SET_BY:
+    case RegularMessageType.topicSetBy:
       icon = Icons.assistant_photo;
       break;
-    case RegularMessageType.TOPIC:
+    case RegularMessageType.topic:
       icon = Icons.title;
       break;
-    case RegularMessageType.WHO_IS:
+    case RegularMessageType.whoIs:
       icon = Icons.account_circle;
       break;
-    case RegularMessageType.UNHANDLED:
+    case RegularMessageType.unhandled:
       icon = Icons.info;
       break;
-    case RegularMessageType.UNKNOWN:
+    case RegularMessageType.unknown:
       icon = Icons.help;
       break;
-    case RegularMessageType.MESSAGE:
+    case RegularMessageType.message:
       icon = Icons.message;
       break;
-    case RegularMessageType.JOIN:
+    case RegularMessageType.join:
       icon = Icons.arrow_forward;
       break;
 
-    case RegularMessageType.AWAY:
+    case RegularMessageType.away:
       icon = Icons.arrow_forward;
       break;
-    case RegularMessageType.MODE:
+    case RegularMessageType.mode:
       icon = Icons.info;
       break;
-    case RegularMessageType.MOTD:
+    case RegularMessageType.motd:
       icon = Icons.info;
       break;
-    case RegularMessageType.NOTICE:
+    case RegularMessageType.notice:
       icon = Icons.info;
       break;
-    case RegularMessageType.ERROR:
+    case RegularMessageType.error:
       icon = Icons.error;
       break;
-    case RegularMessageType.BACK:
+    case RegularMessageType.back:
       icon = Icons.arrow_forward;
       break;
-    case RegularMessageType.MODE_CHANNEL:
+    case RegularMessageType.modeChannel:
       icon = Icons.info;
       break;
-    case RegularMessageType.QUIT:
+    case RegularMessageType.quit:
       icon = Icons.exit_to_app;
       break;
-    case RegularMessageType.RAW:
+    case RegularMessageType.raw:
       icon = Icons.info;
       break;
-    case RegularMessageType.PART:
+    case RegularMessageType.part:
       icon = Icons.arrow_forward;
       break;
-    case RegularMessageType.NICK:
+    case RegularMessageType.nick:
       icon = Icons.accessibility_new;
       break;
-    case RegularMessageType.CTCP_REQUEST:
+    case RegularMessageType.ctcpRequest:
       icon = Icons.info;
       break;
   }

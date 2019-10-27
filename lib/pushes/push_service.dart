@@ -34,11 +34,11 @@ class PushesService extends Providable {
 
     _fcm.configure(
         onMessage: (data) async =>
-            _onNewMessage(PushMessage(PushMessageType.DEFAULT, data)),
+            _onNewMessage(PushMessage(PushMessageType.foreground, data)),
         onLaunch: (data) async =>
-            _onNewMessage(PushMessage(PushMessageType.LAUNCH, data)),
+            _onNewMessage(PushMessage(PushMessageType.launch, data)),
         onResume: (data) async =>
-            _onNewMessage(PushMessage(PushMessageType.RESUME, data)));
+            _onNewMessage(PushMessage(PushMessageType.resume, data)));
 
     _fcm.setAutoInitEnabled(true);
 

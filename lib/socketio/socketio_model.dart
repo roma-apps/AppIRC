@@ -8,4 +8,4 @@ class SocketIOCommand {
   SocketIOCommand.name({@required this.eventName, @required this.parameters});
 }
 
-enum SocketConnectionState { CONNECTED, DISCONNECTED, CONNECTING }
+enum SocketConnectionState { connected, disconnected, connecting }

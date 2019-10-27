@@ -51,15 +51,15 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   Stream<bool> get chatConfigExistStream =>
       chatConfigStream.map((chatConfig) => chatConfig != null);
 
-  bool get isConnected => connectionState == ChatConnectionState.CONNECTED;
+  bool get isConnected => connectionState == ChatConnectionState.connected;
 
   Stream<bool> get isConnectedStream => connectionStateStream
-      .map((state) => state == ChatConnectionState.CONNECTED)
+      .map((state) => state == ChatConnectionState.connected)
       .distinct();
 
   // ignore: close_sinks
   BehaviorSubject<ChatConnectionState> _connectionStateSubject =
-      BehaviorSubject(seedValue: ChatConnectionState.DISCONNECTED);
+      BehaviorSubject(seedValue: ChatConnectionState.disconnected);
 
   Stream<ChatConnectionState> get connectionStateStream =>
       _connectionStateSubject.stream;
@@ -88,7 +88,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   @override
   bool get isReadyToConnect =>
       _socketIOService != null &&
-      connectionState == ChatConnectionState.DISCONNECTED &&
+      connectionState == ChatConnectionState.disconnected &&
       _loungePreferences != null &&
       _loungePreferences != LoungeConnectionPreferences.empty;
 
@@ -457,7 +457,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
         toChatMessage(channel, data.msg).then((message) {
           _logger.d(() => "onNewMessage for {$data.chan}  $data");
           var type = detectRegularMessageType(data.msg.type);
-          if (type == RegularMessageType.WHO_IS) {
+          if (type == RegularMessageType.whoIs) {
             // lounge send whois message as regular
             // but actually lounge client display it as special
             _toWhoIsSpecialMessage(data).then((message) {
@@ -507,7 +507,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     return SpecialMessage.name(
         channelRemoteId: data.chan,
         data: whoIsSpecialBody,
-        specialType: SpecialMessageType.WHO_IS,
+        specialType: SpecialMessageType.whoIs,
         date: DateTime.now(),
         linksInMessage: linksInMessage);
   }

@@ -93,19 +93,19 @@ class NetworkChannelsListWidget extends StatelessWidget {
     var iconData = Icons.message;
 
     switch (channel.type) {
-      case NetworkChannelType.LOBBY:
+      case NetworkChannelType.lobby:
         iconData = Icons.message;
         break;
-      case NetworkChannelType.SPECIAL:
+      case NetworkChannelType.special:
         iconData = Icons.list;
         break;
-      case NetworkChannelType.QUERY:
+      case NetworkChannelType.query:
         iconData = Icons.account_circle;
         break;
-      case NetworkChannelType.CHANNEL:
+      case NetworkChannelType.channel:
         iconData = Icons.group;
         break;
-      case NetworkChannelType.UNKNOWN:
+      case NetworkChannelType.unknown:
         iconData = Icons.message;
         break;
     }

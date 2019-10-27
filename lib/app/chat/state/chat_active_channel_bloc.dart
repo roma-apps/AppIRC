@@ -51,11 +51,11 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
       var chanIdString = chatPushMessage.data?.chanId;
       if (chanIdString != null) {
         var channelRemoteId = int.parse(chanIdString);
-        if (chatPushMessage.type == PushMessageType.RESUME) {
+        if (chatPushMessage.type == PushMessageType.resume) {
           var channel = await findChannelWithRemoteID(channelRemoteId);
 
           changeActiveChanel(channel);
-        } else if (chatPushMessage.type == PushMessageType.LAUNCH) {
+        } else if (chatPushMessage.type == PushMessageType.launch) {
           _channelRemoteIdFromLaunchPushMessage = channelRemoteId;
         }
       } else {
@@ -66,7 +66,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
     _logger.i(() => "start creating");
 
     addDisposable(streamSubscription: _chatInitBloc.stateStream.listen((state) {
-      if (state == ChatInitState.FINISHED &&
+      if (state == ChatInitState.finished &&
           _networksListBloc.networks.isNotEmpty) {
         tryRestoreActiveChannel();
       }
@@ -80,7 +80,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
   }
 
   void tryRestoreActiveChannel() async {
-    if (_chatInitBloc.state != ChatInitState.FINISHED) {
+    if (_chatInitBloc.state != ChatInitState.finished) {
       return;
     }
 
@@ -156,7 +156,7 @@ class ChatActiveChannelBloc extends ChatNetworkChannelsListListenerBloc {
   }
 
   changeActiveChanel(NetworkChannel newActiveChannel) async {
-    if (_chatInitBloc.state != ChatInitState.FINISHED) {
+    if (_chatInitBloc.state != ChatInitState.finished) {
       return;
     }
 

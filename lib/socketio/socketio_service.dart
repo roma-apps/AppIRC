@@ -16,7 +16,7 @@ class SocketIOService extends Providable {
 
   // ignore: close_sinks
   BehaviorSubject<SocketConnectionState> _connectionStateController =
-      BehaviorSubject(seedValue: SocketConnectionState.DISCONNECTED);
+      BehaviorSubject(seedValue: SocketConnectionState.disconnected);
 
   Stream<SocketConnectionState> get connectionStateStream =>
       _connectionStateController.stream;
@@ -117,23 +117,23 @@ class SocketIOService extends Providable {
   Disposable _listenConnectionState(
       void Function(SocketConnectionState) listener) {
     SocketEventListener connectListener =
-        (_) => listener(SocketConnectionState.CONNECTED);
+        (_) => listener(SocketConnectionState.connected);
     SocketEventListener disconnectListener =
-        (_) => listener(SocketConnectionState.DISCONNECTED);
+        (_) => listener(SocketConnectionState.disconnected);
     SocketEventListener connectErrorListener =
-        (_) => listener(SocketConnectionState.DISCONNECTED);
+        (_) => listener(SocketConnectionState.disconnected);
     SocketEventListener connectTimeoutListener =
-        (_) => listener(SocketConnectionState.DISCONNECTED);
+        (_) => listener(SocketConnectionState.disconnected);
     SocketEventListener connectingListener =
-        (_) => listener(SocketConnectionState.CONNECTING);
+        (_) => listener(SocketConnectionState.connecting);
     SocketEventListener reconnectListener =
-        (_) => listener(SocketConnectionState.CONNECTED);
+        (_) => listener(SocketConnectionState.connected);
     SocketEventListener reconnectFailedListener =
-        (_) => listener(SocketConnectionState.DISCONNECTED);
+        (_) => listener(SocketConnectionState.disconnected);
     SocketEventListener reconnectErrorListener =
-        (_) => listener(SocketConnectionState.DISCONNECTED);
+        (_) => listener(SocketConnectionState.disconnected);
     SocketEventListener reconnectingListener =
-        (_) => listener(SocketConnectionState.CONNECTING);
+        (_) => listener(SocketConnectionState.connecting);
     onConnect(connectListener);
     onDisconnect(disconnectListener);
     onConnectError(connectErrorListener);
@@ -176,7 +176,7 @@ class SocketIOService extends Providable {
     if (!disposed) {
       disposed = true;
       super.dispose();
-      if (connectionState == SocketConnectionState.CONNECTED) {
+      if (connectionState == SocketConnectionState.connected) {
         try {
           _manager.clearInstance(_socketIO);
         } on Exception catch (e) {

@@ -69,7 +69,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
           messages.add(newMessage);
         }
 
-        if (newMessage.chatMessageType == ChatMessageType.SPECIAL) {
+        if (newMessage.chatMessageType == ChatMessageType.special) {
           _onSpecialMessagesChanged();
         }
         _onMessagesChanged();
@@ -161,7 +161,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
     SpecialMessage latestTextMessage = messages.lastWhere((message) {
       if (message.isSpecial) {
         var specialMessage = message as SpecialMessage;
-        if (specialMessage.specialType == SpecialMessageType.TEXT) {
+        if (specialMessage.specialType == SpecialMessageType.text) {
           return true;
         } else {
           return false;
@@ -175,7 +175,7 @@ class NetworkChannelMessagesLoaderBloc extends Providable {
       messages.removeWhere((message) {
         if (message.isSpecial) {
           var specialMessage = message as SpecialMessage;
-          if (specialMessage.specialType == SpecialMessageType.TEXT) {
+          if (specialMessage.specialType == SpecialMessageType.text) {
             return specialMessage != latestTextMessage;
           } else {
             return false;

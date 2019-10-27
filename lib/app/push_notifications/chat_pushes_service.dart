@@ -57,14 +57,14 @@ class ChatPushesService extends Providable {
     addDisposable(streamSubscription:
         _backendService.connectionStateStream.listen((connectionState) {
       var token = _pushesService.token;
-      if (token != null && connectionState == ChatConnectionState.CONNECTED) {
+      if (token != null && connectionState == ChatConnectionState.connected) {
         _backendService.sendDevicePushFCMTokenToServer(token);
       }
     }));
     addDisposable(
         streamSubscription: _pushesService.tokenStream.listen((token) {
       if (token != null &&
-          _backendService.connectionState == ChatConnectionState.CONNECTED) {
+          _backendService.connectionState == ChatConnectionState.connected) {
         _backendService.sendDevicePushFCMTokenToServer(token);
       }
     }));

@@ -11,7 +11,7 @@ class SpecialMessage extends ChatMessage {
 
   SpecialMessage(int channelLocalId, int channelRemoteId, this.specialType,
       this.data, DateTime date, List<String> linksInText)
-      : super(ChatMessageType.SPECIAL, channelRemoteId, date, linksInText);
+      : super(ChatMessageType.special, channelRemoteId, date, linksInText);
 
   SpecialMessage.name(
       {@required int channelRemoteId,
@@ -21,7 +21,7 @@ class SpecialMessage extends ChatMessage {
       @required DateTime date,
       @required List<String> linksInMessage})
       : super(
-          ChatMessageType.SPECIAL,
+          ChatMessageType.special,
           channelRemoteId,
           date,
           linksInMessage,
@@ -33,7 +33,7 @@ class SpecialMessage extends ChatMessage {
       data.isContainsText(searchTerm, ignoreCase: ignoreCase);
 }
 
-enum SpecialMessageType { WHO_IS, CHANNELS_LIST_ITEM, TEXT }
+enum SpecialMessageType { whoIs, channelsListItem, text }
 
 abstract class SpecialMessageBody {
   Map<String, dynamic> toJson();

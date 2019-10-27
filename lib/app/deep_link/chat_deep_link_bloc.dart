@@ -22,7 +22,7 @@ class ChatDeepLinkBloc extends Providable {
       ._networksListBloc,
       this.networksBlocsBloc, this.activeChannelBloc) {
     _chatInitBloc.stateStream.listen((newState) {
-      if (newState == ChatInitState.FINISHED) {
+      if (newState == ChatInitState.finished) {
         initUniLinks();
       }
     });

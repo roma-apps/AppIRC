@@ -18,7 +18,7 @@ Widget buildChannelPopupMenuButton(BuildContext context,
   var channel = channelBloc.channel;
   var network = networkBloc.network;
 
-  if (channel.type == NetworkChannelType.LOBBY) {
+  if (channel.type == NetworkChannelType.lobby) {
     return buildNetworkPopupMenuButton(context, networkBloc, iconColor);
   }
 
@@ -36,19 +36,19 @@ List<PlatformAwarePopupMenuAction> _buildMenuItems(
           .getNetworkChannelBloc(channel);
 
   switch (channel.type) {
-    case NetworkChannelType.LOBBY:
+    case NetworkChannelType.lobby:
       menuItems = [];
       break;
-    case NetworkChannelType.SPECIAL:
+    case NetworkChannelType.special:
       menuItems = [_buildCloseMenuItem(context, channelBloc)];
       break;
-    case NetworkChannelType.QUERY:
+    case NetworkChannelType.query:
       menuItems = _buildUserChannelMenuItems(context, channelBloc);
       break;
-    case NetworkChannelType.CHANNEL:
+    case NetworkChannelType.channel:
       menuItems = _buildChannelMenuItems(context, channelBloc);
       break;
-    case NetworkChannelType.UNKNOWN:
+    case NetworkChannelType.unknown:
       menuItems = [];
       break;
   }

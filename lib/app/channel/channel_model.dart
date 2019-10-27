@@ -15,11 +15,11 @@ class NetworkChannel {
 
   final int remoteId;
 
-  bool get isLobby => type == NetworkChannelType.LOBBY;
+  bool get isLobby => type == NetworkChannelType.lobby;
 
-  bool get isCanHaveSeveralUsers => type == NetworkChannelType.CHANNEL;
+  bool get isCanHaveSeveralUsers => type == NetworkChannelType.channel;
 
-  bool get isCanHaveTopic => type == NetworkChannelType.CHANNEL;
+  bool get isCanHaveTopic => type == NetworkChannelType.channel;
 
   NetworkChannel(this.channelPreferences, this.type, this.remoteId);
 
@@ -40,7 +40,7 @@ class NetworkChannel {
   }
 }
 
-enum NetworkChannelType { LOBBY, SPECIAL, QUERY, CHANNEL, UNKNOWN }
+enum NetworkChannelType { lobby, special, query, channel, unknown }
 
 class NetworkChannelWithState {
   final NetworkChannel channel;

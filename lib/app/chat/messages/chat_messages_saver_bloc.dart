@@ -110,11 +110,11 @@ class NetworkChannelMessagesSaverBloc
 
     int id;
     switch (chatMessageType) {
-      case ChatMessageType.SPECIAL:
+      case ChatMessageType.special:
         var specialMessageDB = toSpecialMessageDB(newMessage);
         id = await db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
         break;
-      case ChatMessageType.REGULAR:
+      case ChatMessageType.regular:
         var regularMessageDB = toRegularMessageDB(newMessage);
         id = await db.regularMessagesDao.insertRegularMessage(regularMessageDB);
         break;
@@ -153,6 +153,6 @@ void updatePreview(
   }
 
   oldMessage.previews
-      .removeWhere((preview) => preview.type == MessagePreviewType.LOADING);
+      .removeWhere((preview) => preview.type == MessagePreviewType.loading);
   oldMessage.previews.add(previewForMessage.messagePreview);
 }

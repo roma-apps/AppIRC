@@ -17,10 +17,10 @@ import 'package:flutter_appirc/provider/provider.dart';
 Widget buildSpecialMessageWidget(BuildContext context,
     SpecialMessage specialMessage, bool includedInSearch, String searchTerm) {
   switch (specialMessage.specialType) {
-    case SpecialMessageType.WHO_IS:
+    case SpecialMessageType.whoIs:
       return _buildWhoIsMessage(context, specialMessage);
       break;
-    case SpecialMessageType.CHANNELS_LIST_ITEM:
+    case SpecialMessageType.channelsListItem:
       var channelInfoItem =
           specialMessage.data as NetworkChannelInfoSpecialMessageBody;
       return Padding(
@@ -40,7 +40,7 @@ Widget buildSpecialMessageWidget(BuildContext context,
         ),
       );
       break;
-    case SpecialMessageType.TEXT:
+    case SpecialMessageType.text:
       var textSpecialMessage = specialMessage.data as TextSpecialMessageBody;
       return Text(textSpecialMessage.message);
   }

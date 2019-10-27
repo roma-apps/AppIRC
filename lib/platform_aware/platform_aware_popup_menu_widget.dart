@@ -24,10 +24,10 @@ Widget createPlatformPopupMenuButton(BuildContext context,
     @required List<PlatformAwarePopupMenuAction> actions,
     bool enabled = true}) {
   switch (detectCurrentUIPlatform()) {
-    case UIPlatform.MATERIAL:
+    case UIPlatform.material:
       return _buildMaterialPopupButton(child, actions, enabled);
       break;
-    case UIPlatform.CUPERTINO:
+    case UIPlatform.cupertino:
       return _buildCupertinoPopupButton(context, child, actions, enabled);
       break;
   }
@@ -58,10 +58,10 @@ Widget _buildCupertinoPopupButton(BuildContext context, Widget child,
 showPlatformAwarePopup(BuildContext context, RelativeRect position,
     List<PlatformAwarePopupMenuAction> actions) {
   switch (detectCurrentUIPlatform()) {
-    case UIPlatform.MATERIAL:
+    case UIPlatform.material:
       return showMaterialPopup(context, position, actions);
       break;
-    case UIPlatform.CUPERTINO:
+    case UIPlatform.cupertino:
       return showCupertinoPopup(context, actions);
       break;
   }

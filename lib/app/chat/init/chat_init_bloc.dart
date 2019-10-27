@@ -17,15 +17,15 @@ class ChatInitBloc extends Providable {
   final ChatNetworksListBloc _networksListBloc;
   final ChatPreferences _startPreferences;
 
-  bool get isInitNotStarted => state == ChatInitState.NOT_STARTED;
+  bool get isInitNotStarted => state == ChatInitState.notStarted;
 
-  bool get isInitInProgress => state == ChatInitState.IN_PROGRESS;
+  bool get isInitInProgress => state == ChatInitState.inProgress;
 
-  bool get isInitFinished => state == ChatInitState.FINISHED;
+  bool get isInitFinished => state == ChatInitState.finished;
 
   // ignore: close_sinks
   BehaviorSubject<ChatInitState> _stateController = BehaviorSubject(
-      seedValue: ChatInitState.NOT_STARTED);
+      seedValue: ChatInitState.notStarted);
 
   Stream<ChatInitState> get stateStream => _stateController.stream;
 
@@ -66,7 +66,7 @@ class ChatInitBloc extends Providable {
     _logger.d(() => "_sendStartRequests $state");
     if (isInitNotStarted) {
       _logger.d(() => "_sendStartRequests $state");
-      _stateController.add(ChatInitState.IN_PROGRESS);
+      _stateController.add(ChatInitState.inProgress);
 
       // server restores state automatically in private mode
       if (_backendService.chatConfig.public) {
@@ -79,7 +79,7 @@ class ChatInitBloc extends Providable {
           await _networksListBloc.onNetworkJoined(network);
         }
       }
-      _stateController.add(ChatInitState.FINISHED);
+      _stateController.add(ChatInitState.finished);
     }
   }
 }

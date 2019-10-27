@@ -65,10 +65,10 @@ Future<ChatMessage> toChatMessage(NetworkChannel channel,
     MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
   var regularMessageType = detectRegularMessageType(msgLoungeResponseBody.type);
 
-  if (regularMessageType == RegularMessageType.WHO_IS) {
+  if (regularMessageType == RegularMessageType.whoIs) {
     return await toWhoIsSpecialMessage(channel, msgLoungeResponseBody);
   } else {
-    var isCTCP = regularMessageType == RegularMessageType.CTCP_REQUEST;
+    var isCTCP = regularMessageType == RegularMessageType.ctcpRequest;
     var text =
         isCTCP ? msgLoungeResponseBody.ctcpMessage : msgLoungeResponseBody.text;
 
@@ -123,7 +123,7 @@ Future<SpecialMessage> toWhoIsSpecialMessage(NetworkChannel channel,
   return SpecialMessage.name(
       channelRemoteId: channel.remoteId,
       data: whoIsSpecialBody,
-      specialType: SpecialMessageType.WHO_IS,
+      specialType: SpecialMessageType.whoIs,
       date: DateTime.now(),
       linksInMessage: linksInMessage);
 }
@@ -136,12 +136,12 @@ Future<List<SpecialMessage>> toSpecialMessages(NetworkChannel channel,
   var messageType =
       detectSpecialMessageType(messageSpecialLoungeResponseBody.data);
 
-  if (messageType == SpecialMessageType.TEXT) {
+  if (messageType == SpecialMessageType.text) {
     return [
       await toTextSpecialMessage(
           messageSpecialLoungeResponseBody, channel, messageType)
     ];
-  } else if (messageType == SpecialMessageType.CHANNELS_LIST_ITEM) {
+  } else if (messageType == SpecialMessageType.channelsListItem) {
     return await toChannelsListSpecialMessages(
         messageSpecialLoungeResponseBody, channel, messageType);
   } else {
@@ -210,7 +210,7 @@ SpecialMessageType detectSpecialMessageType(data) {
     }
 
     if (textMessage != null && textMessage.text != null) {
-      return SpecialMessageType.TEXT;
+      return SpecialMessageType.text;
     } else {
       throw Exception("Invalid special message data = $data");
     }
@@ -228,7 +228,7 @@ SpecialMessageType detectSpecialMessageType(data) {
       }
 
       if (channelListItem != null && channelListItem.channel != null) {
-        return SpecialMessageType.CHANNELS_LIST_ITEM;
+        return SpecialMessageType.channelsListItem;
       } else {
         throw Exception("Invalid special message data = $data");
       }
@@ -239,19 +239,19 @@ SpecialMessageType detectSpecialMessageType(data) {
 }
 
 NetworkChannelType detectNetworkChannelType(String typeString) {
-  var type = NetworkChannelType.UNKNOWN;
+  var type = NetworkChannelType.unknown;
   switch (typeString) {
     case ChannelTypeLoungeConstants.lobby:
-      type = NetworkChannelType.LOBBY;
+      type = NetworkChannelType.lobby;
       break;
     case ChannelTypeLoungeConstants.special:
-      type = NetworkChannelType.SPECIAL;
+      type = NetworkChannelType.special;
       break;
     case ChannelTypeLoungeConstants.query:
-      type = NetworkChannelType.QUERY;
+      type = NetworkChannelType.query;
       break;
     case ChannelTypeLoungeConstants.channel:
-      type = NetworkChannelType.CHANNEL;
+      type = NetworkChannelType.channel;
       break;
   }
   return type;
@@ -262,7 +262,7 @@ NetworkChannelState toNetworkChannelState(
   // Private and special messages are always connected, but lounge sometimes
   // don't provide connected state for them
   var isConnected =
-      type == NetworkChannelType.QUERY || type == NetworkChannelType.SPECIAL
+      type == NetworkChannelType.query || type == NetworkChannelType.special
           ? true
           : loungeChannel.state == ChannelStateLoungeConstants.connected;
   return NetworkChannelState.name(
@@ -300,66 +300,66 @@ RegularMessageType detectRegularMessageType(String stringType) {
   var type;
   switch (stringType) {
     case MessageTypeLoungeConstants.unhandled:
-      type = RegularMessageType.UNHANDLED;
+      type = RegularMessageType.unhandled;
       break;
     case MessageTypeLoungeConstants.topicSetBy:
-      type = RegularMessageType.TOPIC_SET_BY;
+      type = RegularMessageType.topicSetBy;
       break;
     case MessageTypeLoungeConstants.topic:
-      type = RegularMessageType.TOPIC;
+      type = RegularMessageType.topic;
       break;
     case MessageTypeLoungeConstants.message:
-      type = RegularMessageType.MESSAGE;
+      type = RegularMessageType.message;
       break;
     case MessageTypeLoungeConstants.join:
-      type = RegularMessageType.JOIN;
+      type = RegularMessageType.join;
       break;
     case MessageTypeLoungeConstants.mode:
-      type = RegularMessageType.MODE;
+      type = RegularMessageType.mode;
       break;
     case MessageTypeLoungeConstants.motd:
-      type = RegularMessageType.MODE;
+      type = RegularMessageType.mode;
       break;
     case MessageTypeLoungeConstants.whois:
-      type = RegularMessageType.WHO_IS;
+      type = RegularMessageType.whoIs;
       break;
     case MessageTypeLoungeConstants.notice:
-      type = RegularMessageType.NOTICE;
+      type = RegularMessageType.notice;
       break;
     case MessageTypeLoungeConstants.error:
-      type = RegularMessageType.ERROR;
+      type = RegularMessageType.error;
       break;
     case MessageTypeLoungeConstants.away:
-      type = RegularMessageType.AWAY;
+      type = RegularMessageType.away;
       break;
 
     case MessageTypeLoungeConstants.back:
-      type = RegularMessageType.BACK;
+      type = RegularMessageType.back;
       break;
     case MessageTypeLoungeConstants.raw:
-      type = RegularMessageType.RAW;
+      type = RegularMessageType.raw;
       break;
     case MessageTypeLoungeConstants.modeChannel:
-      type = RegularMessageType.MODE_CHANNEL;
+      type = RegularMessageType.modeChannel;
       break;
 
     case MessageTypeLoungeConstants.quit:
-      type = RegularMessageType.QUIT;
+      type = RegularMessageType.quit;
       break;
 
     case MessageTypeLoungeConstants.part:
-      type = RegularMessageType.PART;
+      type = RegularMessageType.part;
       break;
 
     case MessageTypeLoungeConstants.nick:
-      type = RegularMessageType.NICK;
+      type = RegularMessageType.nick;
       break;
     case MessageTypeLoungeConstants.ctcpRequest:
-      type = RegularMessageType.CTCP_REQUEST;
+      type = RegularMessageType.ctcpRequest;
       break;
 
     default:
-      type = RegularMessageType.UNKNOWN;
+      type = RegularMessageType.unknown;
   }
 
   return type;
@@ -426,19 +426,19 @@ MessagePreview toMessagePreview(
 MessagePreviewType detectMessagePreviewType(String type) {
   switch (type) {
     case MessagePreviewTypeLoungeResponse.image:
-      return MessagePreviewType.IMAGE;
+      return MessagePreviewType.image;
       break;
     case MessagePreviewTypeLoungeResponse.link:
-      return MessagePreviewType.LINK;
+      return MessagePreviewType.link;
       break;
     case MessagePreviewTypeLoungeResponse.loading:
-      return MessagePreviewType.LOADING;
+      return MessagePreviewType.loading;
       break;
     case MessagePreviewTypeLoungeResponse.audio:
-      return MessagePreviewType.AUDIO;
+      return MessagePreviewType.audio;
       break;
     case MessagePreviewTypeLoungeResponse.video:
-      return MessagePreviewType.VIDEO;
+      return MessagePreviewType.video;
       break;
   }
 

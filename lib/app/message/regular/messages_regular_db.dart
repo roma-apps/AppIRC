@@ -175,61 +175,61 @@ class RegularMessageDB implements ChatMessageDB {
 RegularMessageType regularMessageTypeIdToType(int id) {
   switch (id) {
     case 1:
-      return RegularMessageType.TOPIC_SET_BY;
+      return RegularMessageType.topicSetBy;
       break;
     case 2:
-      return RegularMessageType.TOPIC;
+      return RegularMessageType.topic;
       break;
     case 3:
-      return RegularMessageType.WHO_IS;
+      return RegularMessageType.whoIs;
       break;
     case 4:
-      return RegularMessageType.UNHANDLED;
+      return RegularMessageType.unhandled;
       break;
     case 5:
-      return RegularMessageType.UNKNOWN;
+      return RegularMessageType.unknown;
       break;
     case 6:
-      return RegularMessageType.MESSAGE;
+      return RegularMessageType.message;
       break;
     case 7:
-      return RegularMessageType.JOIN;
+      return RegularMessageType.join;
       break;
     case 8:
-      return RegularMessageType.MODE;
+      return RegularMessageType.mode;
       break;
     case 9:
-      return RegularMessageType.MOTD;
+      return RegularMessageType.motd;
       break;
     case 10:
-      return RegularMessageType.NOTICE;
+      return RegularMessageType.notice;
       break;
     case 11:
-      return RegularMessageType.ERROR;
+      return RegularMessageType.error;
       break;
     case 12:
-      return RegularMessageType.AWAY;
+      return RegularMessageType.away;
       break;
     case 13:
-      return RegularMessageType.BACK;
+      return RegularMessageType.back;
       break;
     case 14:
-      return RegularMessageType.RAW;
+      return RegularMessageType.raw;
       break;
     case 15:
-      return RegularMessageType.MODE_CHANNEL;
+      return RegularMessageType.modeChannel;
       break;
     case 16:
-      return RegularMessageType.QUIT;
+      return RegularMessageType.quit;
       break;
     case 17:
-      return RegularMessageType.PART;
+      return RegularMessageType.part;
       break;
     case 18:
-      return RegularMessageType.NICK;
+      return RegularMessageType.nick;
       break;
     case 19:
-      return RegularMessageType.CTCP_REQUEST;
+      return RegularMessageType.ctcpRequest;
       break;
   }
 
@@ -238,61 +238,61 @@ RegularMessageType regularMessageTypeIdToType(int id) {
 
 int regularMessageTypeTypeToId(RegularMessageType type) {
   switch (type) {
-    case RegularMessageType.TOPIC_SET_BY:
+    case RegularMessageType.topicSetBy:
       return 1;
       break;
-    case RegularMessageType.TOPIC:
+    case RegularMessageType.topic:
       return 2;
       break;
-    case RegularMessageType.WHO_IS:
+    case RegularMessageType.whoIs:
       return 3;
       break;
-    case RegularMessageType.UNHANDLED:
+    case RegularMessageType.unhandled:
       return 4;
       break;
-    case RegularMessageType.UNKNOWN:
+    case RegularMessageType.unknown:
       return 5;
       break;
-    case RegularMessageType.MESSAGE:
+    case RegularMessageType.message:
       return 6;
       break;
-    case RegularMessageType.JOIN:
+    case RegularMessageType.join:
       return 7;
       break;
-    case RegularMessageType.MODE:
+    case RegularMessageType.mode:
       return 8;
       break;
-    case RegularMessageType.MOTD:
+    case RegularMessageType.motd:
       return 9;
       break;
-    case RegularMessageType.NOTICE:
+    case RegularMessageType.notice:
       return 10;
       break;
-    case RegularMessageType.ERROR:
+    case RegularMessageType.error:
       return 11;
       break;
-    case RegularMessageType.AWAY:
+    case RegularMessageType.away:
       return 12;
       break;
-    case RegularMessageType.BACK:
+    case RegularMessageType.back:
       return 13;
       break;
-    case RegularMessageType.RAW:
+    case RegularMessageType.raw:
       return 14;
       break;
-    case RegularMessageType.MODE_CHANNEL:
+    case RegularMessageType.modeChannel:
       return 15;
       break;
-    case RegularMessageType.QUIT:
+    case RegularMessageType.quit:
       return 16;
       break;
-    case RegularMessageType.PART:
+    case RegularMessageType.part:
       return 17;
       break;
-    case RegularMessageType.NICK:
+    case RegularMessageType.nick:
       return 18;
       break;
-    case RegularMessageType.CTCP_REQUEST:
+    case RegularMessageType.ctcpRequest:
       return 19;
       break;
   }

@@ -48,7 +48,7 @@ class RegularMessage extends ChatMessage {
       this.fromRemoteId,
       this.fromNick,
       this.fromMode)
-      : super(ChatMessageType.REGULAR, channelRemoteId, date, linksInText);
+      : super(ChatMessageType.regular, channelRemoteId, date, linksInText);
 
   RegularMessage.name(int channelRemoteId,
       {@required this.command,
@@ -68,7 +68,7 @@ class RegularMessage extends ChatMessage {
       @required this.nicknames,
       int messageLocalId,
       @required this.fromMode})
-      : super(ChatMessageType.REGULAR, channelRemoteId, date, linksInText,
+      : super(ChatMessageType.regular, channelRemoteId, date, linksInText,
             messageLocalId: messageLocalId);
 
   bool get isHaveFromNick => fromNick != null;
@@ -103,23 +103,23 @@ class RegularMessage extends ChatMessage {
 }
 
 enum RegularMessageType {
-  TOPIC_SET_BY,
-  TOPIC,
-  WHO_IS,
-  UNHANDLED,
-  UNKNOWN,
-  MESSAGE,
-  JOIN,
-  MODE,
-  MOTD,
-  NOTICE,
-  ERROR,
-  AWAY,
-  BACK,
-  RAW,
-  MODE_CHANNEL,
-  QUIT,
-  PART,
-  NICK,
-  CTCP_REQUEST,
+  topicSetBy,
+  topic,
+  whoIs,
+  unhandled,
+  unknown,
+  message,
+  join,
+  mode,
+  motd,
+  notice,
+  error,
+  away,
+  back,
+  raw,
+  modeChannel,
+  quit,
+  part,
+  nick,
+  ctcpRequest,
 }

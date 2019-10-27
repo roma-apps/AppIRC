@@ -1,1 +1,1 @@
-enum ChatConnectionState { CONNECTED, CONNECTING, DISCONNECTED }
+enum ChatConnectionState { connected, connecting, disconnected }

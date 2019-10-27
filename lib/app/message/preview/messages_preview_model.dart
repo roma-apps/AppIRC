@@ -60,4 +60,4 @@ class MessagePreview {
   Map<String, dynamic> toJson() => _$MessagePreviewToJson(this);
 }
 
-enum MessagePreviewType { LINK, IMAGE, LOADING, AUDIO, VIDEO }
+enum MessagePreviewType { link, image, loading, audio, video }

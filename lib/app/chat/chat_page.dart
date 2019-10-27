@@ -214,15 +214,15 @@ class ChatPage extends StatelessWidget {
                 String content;
 
                 switch (connectionState) {
-                  case ChatConnectionState.CONNECTED:
+                  case ChatConnectionState.connected:
                     content = AppLocalizations.of(context)
                         .tr('chat.state.connection.status.connected');
                     break;
-                  case ChatConnectionState.CONNECTING:
+                  case ChatConnectionState.connecting:
                     content = AppLocalizations.of(context)
                         .tr('chat.state.connection.status.connecting');
                     break;
-                  case ChatConnectionState.DISCONNECTED:
+                  case ChatConnectionState.disconnected:
                     content = AppLocalizations.of(context)
                         .tr('chat.state.connection.status.disconnected');
                     break;
@@ -336,14 +336,14 @@ class ChatPage extends StatelessWidget {
             AsyncSnapshot<ChatConnectionState> snapshot) {
           var connectionState = snapshot.data;
           switch (connectionState) {
-            case ChatConnectionState.CONNECTED:
+            case ChatConnectionState.connected:
               return _buildConnectedWidget(context);
 
               break;
-            case ChatConnectionState.CONNECTING:
+            case ChatConnectionState.connecting:
               return _buildConnectingWidget(context);
               break;
-            case ChatConnectionState.DISCONNECTED:
+            case ChatConnectionState.disconnected:
               return _buildDisconnectedWidget(context);
               break;
           }
@@ -393,7 +393,7 @@ class ChatPage extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           var currentInitState = snapshot.data;
           _logger.d(() => "currentInitState $currentInitState");
-          if (currentInitState == ChatInitState.FINISHED) {
+          if (currentInitState == ChatInitState.finished) {
             return _buildConnectedAlreadyInitWidget(context);
           } else {
             return _buildConnectedNoInitWidget();

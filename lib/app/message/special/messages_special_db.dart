@@ -76,13 +76,13 @@ class SpecialMessageDB implements ChatMessageDB {
 SpecialMessageType specialMessageTypeIdToType(int id) {
   switch (id) {
     case 1:
-      return SpecialMessageType.WHO_IS;
+      return SpecialMessageType.whoIs;
       break;
     case 2:
-      return SpecialMessageType.CHANNELS_LIST_ITEM;
+      return SpecialMessageType.channelsListItem;
       break;
     case 3:
-      return SpecialMessageType.TEXT;
+      return SpecialMessageType.text;
       break;
   }
 
@@ -91,13 +91,13 @@ SpecialMessageType specialMessageTypeIdToType(int id) {
 
 int specialMessageTypeTypeToId(SpecialMessageType type) {
   switch (type) {
-    case SpecialMessageType.WHO_IS:
+    case SpecialMessageType.whoIs:
       return 1;
       break;
-    case SpecialMessageType.CHANNELS_LIST_ITEM:
+    case SpecialMessageType.channelsListItem:
       return 2;
       break;
-    case SpecialMessageType.TEXT:
+    case SpecialMessageType.text:
       return 3;
       break;
   }
@@ -121,13 +121,13 @@ SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
   var decodedJson = json.decode(messageDB.dataJsonEncoded);
   var body;
   switch (type) {
-    case SpecialMessageType.WHO_IS:
+    case SpecialMessageType.whoIs:
       body = WhoIsSpecialMessageBody.fromJson(decodedJson);
       break;
-    case SpecialMessageType.CHANNELS_LIST_ITEM:
+    case SpecialMessageType.channelsListItem:
       body = NetworkChannelInfoSpecialMessageBody.fromJson(decodedJson);
       break;
-    case SpecialMessageType.TEXT:
+    case SpecialMessageType.text:
       body = TextSpecialMessageBody.fromJson(decodedJson);
       break;
   }

@@ -23,10 +23,10 @@ abstract class ChatMessageDB {
 ChatMessageType chatMessageTypeIdToType(int id) {
   switch (id) {
     case chatMessageTypeRegularId:
-      return ChatMessageType.REGULAR;
+      return ChatMessageType.regular;
       break;
     case chatMessageTypeSpecialId:
-      return ChatMessageType.SPECIAL;
+      return ChatMessageType.special;
       break;
   }
 
@@ -35,10 +35,10 @@ ChatMessageType chatMessageTypeIdToType(int id) {
 
 int chatMessageTypeTypeToId(ChatMessageType type) {
   switch (type) {
-    case ChatMessageType.REGULAR:
+    case ChatMessageType.regular:
       return chatMessageTypeRegularId;
       break;
-    case ChatMessageType.SPECIAL:
+    case ChatMessageType.special:
       return chatMessageTypeSpecialId;
       break;
   }

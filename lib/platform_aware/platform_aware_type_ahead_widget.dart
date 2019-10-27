@@ -70,7 +70,7 @@ Widget createPlatformTypeAhead<T>(BuildContext context, {Key key,
   bool keepSuggestionsOnSuggestionSelected: false,
   bool autoFlipDirection: false}) {
   switch (detectCurrentUIPlatform()) {
-    case UIPlatform.MATERIAL:
+    case UIPlatform.material:
       var data = android();
       return MaterialTypeAhead.TypeAheadField(
           suggestionsCallback: (pattern) => suggestionsCallback(pattern),
@@ -99,7 +99,7 @@ Widget createPlatformTypeAhead<T>(BuildContext context, {Key key,
 
       );
       break;
-    case UIPlatform.CUPERTINO:
+    case UIPlatform.cupertino:
       var data = ios();
 
       return CupertinoTypeAhead.CupertinoTypeAheadField(

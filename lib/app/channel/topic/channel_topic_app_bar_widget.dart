@@ -35,20 +35,20 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
               String subTitleText;
 
               switch (connectionState) {
-                case ChatConnectionState.CONNECTED:
+                case ChatConnectionState.connected:
                   subTitleText = topic;
                   break;
-                case ChatConnectionState.CONNECTING:
+                case ChatConnectionState.connecting:
                   subTitleText = AppLocalizations.of(context)
                       .tr("chat.state.connection.status.connecting");
                   break;
-                case ChatConnectionState.DISCONNECTED:
+                case ChatConnectionState.disconnected:
                   subTitleText = AppLocalizations.of(context)
                       .tr("chat.state.connection.status.disconnected");
                   break;
               }
 
-              if (connectionState == ChatConnectionState.CONNECTED &&
+              if (connectionState == ChatConnectionState.connected &&
                   channel.isCanHaveTopic) {
                 return GestureDetector(
                     onTap: () {

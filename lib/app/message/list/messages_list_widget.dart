@@ -278,12 +278,12 @@ class _NetworkChannelMessagesListWidgetState
     var chatMessageType = message.chatMessageType;
 
     switch (chatMessageType) {
-      case ChatMessageType.SPECIAL:
+      case ChatMessageType.special:
         var specialMessage = message as SpecialMessage;
         messageBody = buildSpecialMessageWidget(
             context, specialMessage, inSearchResults, searchTerm);
         break;
-      case ChatMessageType.REGULAR:
+      case ChatMessageType.regular:
         messageBody =
             buildRegularMessage(context, message, inSearchResults, searchTerm);
         break;
@@ -350,7 +350,7 @@ Widget _buildLoadMoreButton(BuildContext context, List<ChatMessage> messages) =>
     createSkinnedPlatformButton(context, onPressed: () {
       doAsyncOperationWithDialog(context, asyncCode: () async {
         var oldestRegularMessage = messages.firstWhere(
-                (message) => message.chatMessageType == ChatMessageType.REGULAR)
+                (message) => message.chatMessageType == ChatMessageType.regular)
             as RegularMessage;
 
         var channelBloc = NetworkChannelBloc.of(context);
@@ -363,7 +363,7 @@ Widget _buildLoadMoreButton(BuildContext context, List<ChatMessage> messages) =>
 _isNeedPrintChatMessage(ChatMessage message) {
   if (message is RegularMessage) {
     var regularMessageType = message.regularMessageType;
-    return regularMessageType != RegularMessageType.RAW;
+    return regularMessageType != RegularMessageType.raw;
   } else {
     return true;
   }

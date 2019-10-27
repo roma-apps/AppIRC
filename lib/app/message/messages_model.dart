@@ -22,9 +22,9 @@ abstract class ChatMessage {
       this.chatMessageType, this.channelRemoteId, this.date, this.linksInText,
       {this.messageLocalId});
 
-  bool get isSpecial => chatMessageType == ChatMessageType.SPECIAL;
+  bool get isSpecial => chatMessageType == ChatMessageType.special;
 
-  bool get isRegular => chatMessageType == ChatMessageType.REGULAR;
+  bool get isRegular => chatMessageType == ChatMessageType.regular;
 
   @override
   bool operator ==(Object other) =>
@@ -50,4 +50,4 @@ bool isContainsSearchTerm(String text, String searchTerm, {bool ignoreCase}) {
   }
 }
 
-enum ChatMessageType { SPECIAL, REGULAR }
+enum ChatMessageType { special, regular }
