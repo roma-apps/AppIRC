@@ -73,7 +73,7 @@ showMaterialPopup(BuildContext context, RelativeRect position,
   showMenu(
           context: context,
           position: position,
-          items: convertToMaterialActions(actions))
+          items: _convertToMaterialActions(actions))
       .then((selected) {
     selected?.actionCallback(selected);
   });
@@ -114,7 +114,7 @@ Widget _buildMaterialPopupButton(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: child,
       ),
-      itemBuilder: (_) => convertToMaterialActions(actions),
+      itemBuilder: (_) => _convertToMaterialActions(actions),
       onSelected: enabled
           ? (PlatformAwarePopupMenuAction selectedItem) {
               selectedItem.actionCallback(selectedItem);
@@ -124,15 +124,15 @@ Widget _buildMaterialPopupButton(
   }
 }
 
-List<PopupMenuItem<PlatformAwarePopupMenuAction>> convertToMaterialActions(
+List<PopupMenuItem<PlatformAwarePopupMenuAction>> _convertToMaterialActions(
     List<PlatformAwarePopupMenuAction> actions) {
   return actions
-      .map((action) => buildDropdownMenuItemRow(
+      .map((action) => _buildDropdownMenuItemRow(
           text: action.text, iconData: action.iconData, value: action))
       .toList();
 }
 
-PopupMenuItem<T> buildDropdownMenuItemRow<T>(
+PopupMenuItem<T> _buildDropdownMenuItemRow<T>(
         {@required String text,
         @required IconData iconData,
         @required T value}) =>

@@ -1,8 +1,7 @@
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart' show InputDecoration;
+import 'package:flutter/cupertino.dart' show OverlayVisibilityMode;
 import 'package:flutter_appirc/form/form_blocs.dart';
 import 'package:flutter_appirc/form/form_skin_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -44,9 +43,9 @@ PlatformTextField buildPlatformTextField(
     hintColor = formSkinBloc.textRowInputDecorationHintTextStyle.color;
     textEditColor = formSkinBloc.textRowEditTextStyle.color;
   } else {
-    labelColor = Colors.grey;
-    hintColor = Colors.grey;
-    textEditColor = Colors.grey;
+    labelColor = formSkinBloc.disabledTextColor;
+    hintColor = formSkinBloc.disabledTextColor;
+    textEditColor = formSkinBloc.disabledTextColor;
   }
 
   androidBuilder = (_) {
