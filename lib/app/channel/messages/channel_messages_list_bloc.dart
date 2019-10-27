@@ -8,14 +8,15 @@ var _logger = MyLogger(logTag: "channel_messages_list_bloc.dart", enabled: true)
 
 class ChannelMessagesListBloc extends Providable {
   // ignore: close_sinks
-  BehaviorSubject<bool> _searchEnabledController =
+  BehaviorSubject<bool> _searchEnabledSubject =
       BehaviorSubject(seedValue: false);
 
   Stream<bool> get searchEnabledStream =>
-      _searchEnabledController.stream.distinct();
-  bool get searchEnabled => _searchEnabledController.value;
+      _searchEnabledSubject.stream.distinct();
+  bool get searchEnabled => _searchEnabledSubject.value;
 
-  VisibleMessagesBounds visibleMessagesBounds;
+  VisibleMessagesBounds _visibleMessagesBounds;
+  VisibleMessagesBounds get visibleMessagesBounds => _visibleMessagesBounds;
 
   bool get isNeedSearch =>
       _mapIsNeedSearchTerm(searchEnabled, searchFieldBloc.value);
@@ -29,13 +30,13 @@ class ChannelMessagesListBloc extends Providable {
   FormValueFieldBloc<String> searchFieldBloc = FormValueFieldBloc("");
   ChannelMessagesListBloc() {
     addDisposable(
-        streamSubscription: _searchEnabledController.stream.listen((enabled) {
+        streamSubscription: _searchEnabledSubject.stream.listen((enabled) {
       if (!enabled) {
         searchFieldBloc.onNewValue("");
       }
     }));
 
-    addDisposable(subject: _searchEnabledController);
+    addDisposable(subject: _searchEnabledSubject);
     addDisposable(disposable: searchFieldBloc);
   }
 
@@ -43,19 +44,19 @@ class ChannelMessagesListBloc extends Providable {
       searchEnabled && searchTerm?.isNotEmpty == true;
 
   void onVisibleMessagesBounds(VisibleMessagesBounds visibleMessagesBounds) {
-    this.visibleMessagesBounds = visibleMessagesBounds;
+    this._visibleMessagesBounds = visibleMessagesBounds;
     _logger.d(() => "visibleMessagesBounds $visibleMessagesBounds");
   }
 
   void onNeedShowSearch() {
-    _searchEnabledController.add(true);
+    _searchEnabledSubject.add(true);
   }
 
   void onNeedHideSearch() {
-    _searchEnabledController.add(false);
+    _searchEnabledSubject.add(false);
   }
 
   void onNeedToggleSearch() {
-    _searchEnabledController.add(!_searchEnabledController.value);
+    _searchEnabledSubject.add(!_searchEnabledSubject.value);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization_delegate.dart';
 import 'package:flutter/material.dart' show Divider, Icons;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channels_list_widget.dart';
 import 'package:flutter_appirc/app/channel/state/channel_connection_status_widget.dart';
@@ -13,6 +13,7 @@ import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_expand_state_bloc.dart';
 import 'package:flutter_appirc/app/network/list/networks_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
+import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/network_popup_menu_widget.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
@@ -139,8 +140,11 @@ class NetworksListWidget extends StatelessWidget {
             _buildNetworkTitle(context, networkBloc, isChannelActive),
             _buildConnectionIcon(context, networkBloc, isChannelActive),
             buildChannelUnreadCountBadge(context, channelBloc, isChannelActive),
-            buildNetworkPopupMenuButton(context, networkBloc,
-                networkListSkinBloc.getNetworkItemIconColor(isChannelActive))
+            buildNetworkPopupMenuButton(
+                context: context,
+                networkBloc: networkBloc,
+                iconColor: networkListSkinBloc
+                    .getNetworkItemIconColor(isChannelActive))
           ],
         ));
     var rowContainer = Container(

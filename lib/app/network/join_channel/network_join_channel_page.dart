@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/chat/networks/chat_networks_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_bloc.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_widget.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
+import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';

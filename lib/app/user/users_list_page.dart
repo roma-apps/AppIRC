@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/channels/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
@@ -29,15 +29,14 @@ class NetworkChannelUsersPageState extends State<NetworkChannelUsersPage> {
 
   @override
   Widget build(BuildContext context) {
-    var channelBloc =
-        ChatNetworkChannelsBlocsBloc.of(context).getNetworkChannelBloc(_channel);
+    var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
+        .getNetworkChannelBloc(_channel);
 
     var channelUsersListBloc = ChannelUsersListBloc(channelBloc);
 
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        title: Text(AppLocalizations.of(context)
-            .tr('chat.users_list.title')),
+        title: Text(AppLocalizations.of(context).tr('chat.users_list.title')),
       ),
       body: SafeArea(
         child: Padding(

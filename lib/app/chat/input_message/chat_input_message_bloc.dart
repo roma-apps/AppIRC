@@ -114,7 +114,7 @@ class NamesAutoCompleteProvider extends AutoCompleteProvider {
 
     if (lastWord != null &&
         lastWord.length > minimumCharsCountForAutoComplete) {
-      var users = await channelBloc.getUsers();
+      var users = await channelBloc.retrieveUsers();
       return compute(
           _calculateSuggestions,
           NamesAutoCompleteRequest(

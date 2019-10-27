@@ -6,6 +6,12 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'network_model.g.dart';
 
+class NetworkTitle {
+  final String name;
+  final String nick;
+  NetworkTitle(this.name, this.nick);
+}
+
 class Network {
   int get localId => connectionPreferences.localId;
 

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_page.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
+import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_edit_preferences_page.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
@@ -11,23 +12,26 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 Widget buildNetworkPopupMenuButton(
-  BuildContext context,
-  NetworkBloc networkBloc,
-  Color iconColor,
-) {
+    {@required BuildContext context,
+    @required NetworkBloc networkBloc,
+    @required Color iconColor}) {
   return createPlatformPopupMenuButton(
     context,
     child: Icon(
       Icons.more_vert,
       color: iconColor,
     ),
-    actions:
-        _buildDropdownItems(context, networkBloc.networkConnected, networkBloc),
+    actions: _buildDropdownItems(
+        context: context,
+        connected: networkBloc.networkConnected,
+        networkBloc: networkBloc),
   );
 }
 
 List<PlatformAwarePopupMenuAction> _buildDropdownItems(
-    BuildContext context, bool connected, NetworkBloc networkBloc) {
+    {@required BuildContext context,
+    @required bool connected,
+    @required NetworkBloc networkBloc}) {
   ChatBackendService backendService = Provider.of(context);
 
   var items = <PlatformAwarePopupMenuAction>[

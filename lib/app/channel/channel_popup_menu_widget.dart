@@ -13,22 +13,29 @@ import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.d
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-Widget buildChannelPopupMenuButton(BuildContext context,
-    NetworkBloc networkBloc, NetworkChannelBloc channelBloc, Color iconColor) {
+Widget buildChannelPopupMenuButton(
+    {@required BuildContext context,
+    @required NetworkBloc networkBloc,
+    @required NetworkChannelBloc channelBloc,
+    @required Color iconColor}) {
   var channel = channelBloc.channel;
   var network = networkBloc.network;
 
   if (channel.type == NetworkChannelType.lobby) {
-    return buildNetworkPopupMenuButton(context, networkBloc, iconColor);
+    return buildNetworkPopupMenuButton(
+        context: context, networkBloc: networkBloc, iconColor: iconColor);
   }
 
   return createPlatformPopupMenuButton(context,
       child: Icon(Icons.more_vert, color: iconColor),
-      actions: _buildMenuItems(context, network, channel));
+      actions: _buildMenuItems(
+          context: context, network: network, channel: channel));
 }
 
 List<PlatformAwarePopupMenuAction> _buildMenuItems(
-    BuildContext context, Network network, NetworkChannel channel) {
+    {@required BuildContext context,
+    @required Network network,
+    @required NetworkChannel channel}) {
   List<PlatformAwarePopupMenuAction> menuItems;
 
   NetworkChannelBloc channelBloc =
@@ -112,8 +119,7 @@ PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
     BuildContext context, NetworkChannelBloc channelBloc) {
   var appLocalizations = AppLocalizations.of(context);
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations
-          .tr("chat.channel.action.user_information"),
+      text: appLocalizations.tr("chat.channel.action.user_information"),
       iconData: Icons.account_box,
       actionCallback: (action) {
         channelBloc.printUserInfo(channelBloc.channel.name);

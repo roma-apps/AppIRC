@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';

@@ -5,8 +5,8 @@ import 'package:rxdart/rxdart.dart';
 
 class ChannelTopicFormBloc extends FormBloc {
 
-  FormValueFieldBloc<String> topicFieldBloc;
-  
+  FormValueFieldBloc<String> _topicFieldBloc;
+  FormValueFieldBloc<String> get topicFieldBloc => _topicFieldBloc;
   // ignore: close_sinks
   BehaviorSubject<bool> _isPossibleToChangeTopicController = BehaviorSubject
     (seedValue: false);
@@ -22,7 +22,7 @@ class ChannelTopicFormBloc extends FormBloc {
     addDisposable(subject: _isPossibleToChangeTopicController);
 
 
-    topicFieldBloc = FormValueFieldBloc<String>(
+    _topicFieldBloc = FormValueFieldBloc<String>(
         _initTopic,
         validators: []);
 

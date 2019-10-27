@@ -1,5 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show TextInputAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/topic/channel_topic_form_bloc.dart';
@@ -69,37 +69,43 @@ void showTopicDialog(BuildContext context, NetworkChannelBloc channelBloc) {
             child: NetworkChannelTopicWidget(topicString),
           ),
           actions: <Widget>[
-            StreamBuilder<bool>(
-                stream: topicFormBloc.isPossibleToChangeTopicStream,
-                initialData: topicFormBloc.isPossibleToChangeTopic,
-                builder: (context, snapshot) {
-                  var isPossibleToChange = snapshot.data;
-                  var onPressed;
-                  if (isPossibleToChange) {
-                    onPressed = () {
-                      channelBloc.editNetworkChannelTopic(
-                          topicFormBloc.extractTopic());
-                      topicFormBloc.dispose();
-                      Navigator.pop(context);
-                    };
-                  }
-                  return PlatformDialogAction(
-                    child: Text(AppLocalizations.of(context)
-                        .tr("chat.channel.topic.dialog.action.change")),
-                    onPressed: onPressed,
-                  );
-                }),
-            PlatformDialogAction(
-              child: Text(AppLocalizations.of(context)
-                  .tr("chat.channel.topic.dialog.action.cancel")),
-              onPressed: () {
-                // TODO: check
-                topicFormBloc.dispose();
-                Navigator.pop(context);
-              },
-            )
+            _buildEditTopicActionWidget(topicFormBloc, channelBloc),
+            _buildCancelActionWidget(context)
           ],
         );
       },
       androidBarrierDismissible: true);
+}
+
+PlatformDialogAction _buildCancelActionWidget(BuildContext context) {
+  return PlatformDialogAction(
+    child: Text(AppLocalizations.of(context)
+        .tr("chat.channel.topic.dialog.action.cancel")),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  );
+}
+
+StreamBuilder<bool> _buildEditTopicActionWidget(
+    ChannelTopicFormBloc topicFormBloc, NetworkChannelBloc channelBloc) {
+  return StreamBuilder<bool>(
+      stream: topicFormBloc.isPossibleToChangeTopicStream,
+      initialData: topicFormBloc.isPossibleToChangeTopic,
+      builder: (context, snapshot) {
+        var isPossibleToChange = snapshot.data;
+        var onPressed;
+        if (isPossibleToChange) {
+          onPressed = () {
+            channelBloc.editNetworkChannelTopic(topicFormBloc.extractTopic());
+            topicFormBloc.dispose();
+            Navigator.pop(context);
+          };
+        }
+        return PlatformDialogAction(
+          child: Text(AppLocalizations.of(context)
+              .tr("chat.channel.topic.dialog.action.change")),
+          onPressed: onPressed,
+        );
+      });
 }

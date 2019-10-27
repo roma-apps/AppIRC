@@ -8,23 +8,10 @@ import 'package:flutter_appirc/app/chat/networks/chat_networks_states_bloc.dart'
 import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/message/messages_model.dart';
 import 'package:flutter_appirc/app/message/special/messages_special_model.dart';
+import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-
-/// It is not possible to simple use NetworkBloc as Provider
-/// app shouldn't dispose NetworkBloc instances during UI changes
-/// NetworkBloc disposed in ChatNetworksBlocsBloc
-class NetworkBlocProvider extends Providable {
-  final NetworkBloc networkBloc;
-  NetworkBlocProvider(this.networkBloc);
-}
-
-class NetworkTitle {
-  final String name;
-  final String nick;
-  NetworkTitle(this.name, this.nick);
-}
 
 class NetworkBloc extends DisposableOwner {
   final ChatBackendService backendService;

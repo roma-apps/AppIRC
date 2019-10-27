@@ -1,11 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart' show CupertinoNavigationBar;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show AppBar, Colors, Drawer, Icons, ScaffoldState;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
 import 'package:flutter_appirc/app/channel/topic/channel_topic_app_bar_widget.dart';
@@ -172,8 +171,12 @@ class ChatPage extends StatelessWidget {
               .getNetworkChannelBloc(channel);
 
           List<Widget> items = [
-            buildChannelPopupMenuButton(context, networkBloc, channelBloc,
-                Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor)
+            buildChannelPopupMenuButton(
+                context: context,
+                networkBloc: networkBloc,
+                channelBloc: channelBloc,
+                iconColor:
+                    Provider.of<ChatAppBarSkinBloc>(context).iconAppBarColor)
           ];
 
           items.insert(
@@ -274,8 +277,7 @@ class ChatPage extends StatelessWidget {
                   var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
                       .getNetworkChannelBloc(activeChannel);
 
-                  ChatBackendService backendService =
-                      Provider.of(context);
+                  ChatBackendService backendService = Provider.of(context);
                   ChatDatabaseProvider chatDatabaseProvider =
                       Provider.of(context);
 
@@ -377,10 +379,10 @@ class ChatPage extends StatelessWidget {
   Widget _buildConnectingWidget(BuildContext context) {
     TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
-      child: Text(
-          AppLocalizations.of(context)
-        .tr("chat.state.connection.status.connecting"),
-          style: textSkinBloc.defaultTextStyle));
+        child: Text(
+            AppLocalizations.of(context)
+                .tr("chat.state.connection.status.connecting"),
+            style: textSkinBloc.defaultTextStyle));
   }
 
   Widget _buildConnectedWidget(BuildContext context) {
@@ -406,10 +408,9 @@ class ChatPage extends StatelessWidget {
       Center(child: PlatformCircularProgressIndicator());
 
   Widget _buildConnectedAlreadyInitWidget(BuildContext context) {
-
     ChatBackendService backendService = Provider.of(context);
-    var startValues = backendService
-        .chatConfig.createDefaultNetworkPreferences();
+    var startValues =
+        backendService.chatConfig.createDefaultNetworkPreferences();
     return Provider(
       providable: ChatNetworkPreferencesFormBloc(
           startValues,
@@ -428,10 +429,9 @@ class ChatPage extends StatelessWidget {
   Center _buildNoActiveChannelMessage(BuildContext context) {
     TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
-      child: Text(
-          AppLocalizations.of(context)
-        .tr('chat.state.active_channel_not_selected'),
-          style: textSkinBloc.defaultTextStyle,
+        child: Text(
+      AppLocalizations.of(context).tr('chat.state.active_channel_not_selected'),
+      style: textSkinBloc.defaultTextStyle,
     ));
   }
 }
