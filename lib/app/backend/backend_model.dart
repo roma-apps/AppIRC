@@ -19,41 +19,35 @@ class ChatPushMessage {
 
   @override
   String toString() {
-    return 'ChatPushMessage{type: $type, notification: $notification, data: $data}';
+    return 'ChatPushMessage{type: $type, notification: $notification,'
+        ' data: $data}';
   }
 }
-
-
 
 class ChatLoadMoreData {
   List<ChatMessage> messages;
   bool moreHistoryAvailable;
   ChatLoadMoreData(this.messages, this.moreHistoryAvailable);
 
-  ChatLoadMoreData.name({@required this.messages, @required this
-      .moreHistoryAvailable});
-
-
+  ChatLoadMoreData.name(
+      {@required this.messages, @required this.moreHistoryAvailable});
 }
-
 
 class ChannelTogglePreview {
   Network network;
   NetworkChannel networkChannel;
   bool allPreviewsShown;
-  ChannelTogglePreview(this.network, this.networkChannel,
-      this.allPreviewsShown);
+  ChannelTogglePreview(
+      this.network, this.networkChannel, this.allPreviewsShown);
 
-  ChannelTogglePreview.name(this.network, this.networkChannel,
-      this.allPreviewsShown);
+  ChannelTogglePreview.name(
+      this.network, this.networkChannel, this.allPreviewsShown);
 
   @override
   String toString() {
     return 'ChannelTogglePreview{network: $network,'
         ' networkChannel: $networkChannel, allPreviewsShown: $allPreviewsShown}';
   }
-
-
 }
 
 class MessageTogglePreview {
@@ -74,10 +68,7 @@ class MessageTogglePreview {
         'networkChannel: $networkChannel, message: $message,'
         ' preview: $preview, newShownValue: $newShownValue}';
   }
-
-
 }
-
 
 @JsonSerializable()
 class ChatPushMessageNotification {
@@ -111,6 +102,7 @@ class ChatPushMessageData {
     return 'ChatPushMessageData{chanId: $chanId, body: $body,'
         ' type: $type, timestamp: $timestamp, title: $title}';
   }
+
   factory ChatPushMessageData.fromJson(Map<dynamic, dynamic> json) =>
       _$ChatPushMessageDataFromJson(json);
 
@@ -128,7 +120,8 @@ class RequestResult<T> {
 
   @override
   String toString() {
-    return 'RequestResult{isSentSuccessfully: $isSentSuccessfully, result: $result}';
+    return 'RequestResult{isSentSuccessfully: $isSentSuccessfully,'
+        ' result: $result}';
   }
 }
 

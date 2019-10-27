@@ -20,7 +20,6 @@ class ChatDrawerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: <Widget>[
         Expanded(child: NetworksListWidget(onActionCallback)),
@@ -56,7 +55,7 @@ class ChatDrawerWidget extends StatelessWidget {
           Navigator.push(context, platformPageRoute(builder: (context) {
             var newChatNetworkPage = NewChatNetworkPage(
               context,
-              createDefaultNetworkPreferences(context),
+              backendService.chatConfig.createDefaultNetworkPreferences(),
               !backendService.chatConfig.lockNetwork,
               backendService.chatConfig.displayNetwork,
               () {
@@ -83,11 +82,10 @@ class ChatDrawerWidget extends StatelessWidget {
         iosIcon: Icon(CupertinoIcons.settings),
       );
   Widget _buildSignOutButton(BuildContext context) => PlatformIconButton(
-        onPressed: () async {
-          var loungeBackendService = Provider.of<LoungeBackendService>(context);
+      onPressed: () async {
+        var loungeBackendService = Provider.of<LoungeBackendService>(context);
 
-          loungeBackendService.signOut();
-        },
-        icon: Icon(Icons.exit_to_app)
-      );
+        loungeBackendService.signOut();
+      },
+      icon: Icon(Icons.exit_to_app));
 }

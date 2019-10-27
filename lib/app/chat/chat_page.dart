@@ -405,9 +405,10 @@ class ChatPage extends StatelessWidget {
       Center(child: PlatformCircularProgressIndicator());
 
   Widget _buildConnectedAlreadyInitWidget(BuildContext context) {
-    var startValues = createDefaultNetworkPreferences(context);
 
     ChatBackendService backendService = Provider.of(context);
+    var startValues = backendService
+        .chatConfig.createDefaultNetworkPreferences();
     return Provider(
       providable: ChatNetworkPreferencesFormBloc(
           startValues,

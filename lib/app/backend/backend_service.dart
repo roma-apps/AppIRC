@@ -157,12 +157,3 @@ abstract class ChatBackendService implements Providable {
   Disposable listenForChannelPreviewToggle(Network network,
       NetworkChannel channel, Function(ChannelTogglePreview) callback);
 }
-
-ChatNetworkPreferences createDefaultNetworkPreferences(BuildContext context) {
-  var backendService = Provider.of<ChatBackendService>(context);
-  var chatConfig = backendService.chatConfig;
-  var channels = chatConfig.defaultChannels;
-
-  return ChatNetworkPreferences(chatConfig.defaultNetwork,
-      [ChatNetworkChannelPreferences.name(name: channels, password: "")]);
-}

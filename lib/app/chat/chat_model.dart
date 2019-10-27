@@ -51,6 +51,12 @@ class ChatConfig {
       @required this.useHexIp,
       @required this.fileUploadMaxSizeInBytes,
       @required this.commands});
+
+
+  ChatNetworkPreferences createDefaultNetworkPreferences() =>
+      ChatNetworkPreferences(defaultNetwork, [
+        ChatNetworkChannelPreferences.name(name: defaultChannels, password: "")
+      ]);
 }
 
 class ServerNameNotUniqueException implements Exception {}
@@ -95,4 +101,7 @@ class NetworkChannelUser {
         'secureConnection: $secureConnection, connectedTo: $connectedTo, '
         'connectedAt: $connectedAt, idleSince: $idleSince, mode: $mode}';
   }
+
 }
+
+
