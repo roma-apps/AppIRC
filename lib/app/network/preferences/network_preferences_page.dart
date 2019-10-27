@@ -26,12 +26,15 @@ class NewChatNetworkPage extends ChatNetworkPage {
           final ChatNetworksListBloc chatBloc =
               Provider.of<ChatNetworksListBloc>(context);
 
-          var dialogResult =
-              await doAsyncOperationWithDialog(context, asyncCode: () async {
-            var result = await chatBloc.joinNetwork(preferences);
+          var dialogResult = await doAsyncOperationWithDialog(
+              context: context,
+              asyncCode: () async {
+                var result = await chatBloc.joinNetwork(preferences);
 
-            return result;
-          }, cancellationValue: null, isDismissible: true);
+                return result;
+              },
+              cancellationValue: null,
+              isDismissible: true);
 
           if (dialogResult.isNotCanceled) {
             successCallback();
@@ -52,10 +55,13 @@ class EditChatNetworkPage extends ChatNetworkPage {
             startValues, (context, preferences) async {
           final NetworkBloc networkBloc = NetworkBloc.of(context);
 
-          var result =
-              await doAsyncOperationWithDialog(context, asyncCode: () async {
-            return await networkBloc.editNetworkSettings(preferences);
-          }, cancellationValue: null, isDismissible: true);
+          var result = await doAsyncOperationWithDialog(
+              context: context,
+              asyncCode: () async {
+                return await networkBloc.editNetworkSettings(preferences);
+              },
+              cancellationValue: null,
+              isDismissible: true);
 
           if (result.isNotCanceled) {
             Navigator.pop(context);

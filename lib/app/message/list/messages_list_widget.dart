@@ -16,13 +16,11 @@ import 'package:flutter_appirc/app/message/special/messages_special_widgets.dart
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
-var _logger =
-    MyLogger(logTag: "messages_list_widget.dart", enabled: true);
+var _logger = MyLogger(logTag: "messages_list_widget.dart", enabled: true);
 
 class NetworkChannelMessagesListWidget extends StatefulWidget {
   NetworkChannelMessagesListWidget();
@@ -320,7 +318,6 @@ class _NetworkChannelMessagesListWidgetState
   }
 
   StreamBuilder<bool> _buildListViewEmptyWidget(BuildContext context) {
-
     TextSkinBloc textSkinBloc = Provider.of(context);
     var channelBloc = NetworkChannelBloc.of(context);
     return StreamBuilder<bool>(
@@ -340,8 +337,7 @@ class _NetworkChannelMessagesListWidgetState
               child: Text(
                   AppLocalizations.of(context).tr("chat.messages_list.empty"
                       ".not_connected"),
-                  style:
-                      textSkinBloc.defaultTextStyle));
+                  style: textSkinBloc.defaultTextStyle));
         }
       },
     );
@@ -350,14 +346,18 @@ class _NetworkChannelMessagesListWidgetState
 
 Widget _buildLoadMoreButton(BuildContext context, List<ChatMessage> messages) =>
     createSkinnedPlatformButton(context, onPressed: () {
-      doAsyncOperationWithDialog(context, asyncCode: () async {
-        var oldestRegularMessage = messages.firstWhere(
-                (message) => message.chatMessageType == ChatMessageType.regular)
-            as RegularMessage;
+      doAsyncOperationWithDialog(
+          context: context,
+          asyncCode: () async {
+            var oldestRegularMessage = messages.firstWhere((message) =>
+                    message.chatMessageType == ChatMessageType.regular)
+                as RegularMessage;
 
-        var channelBloc = NetworkChannelBloc.of(context);
-        return await channelBloc.loadMoreHistory(oldestRegularMessage);
-      }, cancellationValue: null, isDismissible: true);
+            var channelBloc = NetworkChannelBloc.of(context);
+            return await channelBloc.loadMoreHistory(oldestRegularMessage);
+          },
+          cancellationValue: null,
+          isDismissible: true);
     },
         child: Text(AppLocalizations.of(context).tr("chat.messages_list.action"
             ".load_more")));

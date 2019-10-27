@@ -266,7 +266,8 @@ class NetworkChannelNewMessageState
     var appLocalizations = AppLocalizations.of(context);
     try {
       var asyncDialogResult =
-          await doAsyncOperationWithDialog(context, asyncCode: () async {
+          await doAsyncOperationWithDialog(context:context, asyncCode: ()
+          async {
         var uploadRequestResult = await chatUploadBloc.uploadFile(pickedFile);
 
         return uploadRequestResult;

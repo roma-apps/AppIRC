@@ -8,7 +8,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 var _logger = MyLogger(logTag: "async_dialog.dart", enabled: true);
 
 Future<AsyncDialogResult<T>> doAsyncOperationWithDialog<T>(
-  BuildContext context, {
+    {   @required BuildContext context,
   @required Future<T> asyncCode(),
   @required T cancellationValue,
   @required bool isDismissible,
@@ -42,8 +42,6 @@ class AsyncProgressDialog {
 
   bool get isShowing => _isShowing;
 
-//  BuildContext _dismissingContext;
-
   final Widget title;
   final Widget content;
   final Widget cancelAction;
@@ -56,7 +54,6 @@ class AsyncProgressDialog {
     if (_isShowing) {
       try {
         _isShowing = false;
-//        Navigator.of(_dismissingContext).pop(true);
         Navigator.of(context).pop();
         result = true;
       } catch (_) {
@@ -65,7 +62,6 @@ class AsyncProgressDialog {
     } else {
       result = false;
     }
-//    _dismissingContext = null;
     return result;
   }
 
@@ -83,8 +79,8 @@ class AsyncProgressDialog {
           if (cancelableOperation != null) {
             actions.add(PlatformDialogAction(
                 child: cancelAction ??
-                    Text(AppLocalizations.of(context).tr("dialog.async"
-                        ".action.cancel")),
+                    Text(AppLocalizations.of(context)
+                        .tr("dialog.async.action.cancel")),
                 onPressed: () {
                   cancelableOperation.cancel();
                   hide(context);
@@ -93,7 +89,8 @@ class AsyncProgressDialog {
 
           return PlatformAlertDialog(
             title: title ??
-                Text(AppLocalizations.of(context).tr("dialog.async.title")),
+                Text(AppLocalizations.of(context)
+                    .tr("dialog.async.title")),
             content: content ??
                 Row(
                     mainAxisAlignment: MainAxisAlignment.center,
