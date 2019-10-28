@@ -934,7 +934,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     });
     _socketIOService.emit(toSocketIOCommand(UploadAuthLoungeEmptyRequest()));
 
-    _doWaitForResult(() => uploadFileToken);
+    await _doWaitForResult(() => uploadFileToken);
 
     disposable.dispose();
 

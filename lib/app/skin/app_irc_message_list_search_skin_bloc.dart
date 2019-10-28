@@ -10,9 +10,11 @@ class AppIRCMessageListSearchSkinBloc extends MessageListSearchSkinBloc {
 
   AppIRCMessageListSearchSkinBloc(this.theme) {
     searchBoxDecoration =
-        BoxDecoration(color: theme.platformSkinTheme.secondaryColor);
+        BoxDecoration(color: theme.searchBackgroundColor);
   }
 
   @override
-  Color get disabledColor => theme.searchBackgroundColor;
+  Color get disabledColor => theme.disabledColor;
+  @override
+  Color get iconColor => theme.platformSkinTheme.textRegularSmallStyle.color;
 }

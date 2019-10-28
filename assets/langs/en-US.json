@@ -315,6 +315,7 @@
           "file": "File",
           "audio": "Audio",
           "video": "Video",
+          "camera": "Camera",
           "image": "Image",
           "photo": "Photo"
         },

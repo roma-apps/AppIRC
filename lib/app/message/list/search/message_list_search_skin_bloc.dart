@@ -5,4 +5,5 @@ abstract class MessageListSearchSkinBloc extends SkinBloc {
 
   BoxDecoration get searchBoxDecoration;
   Color get disabledColor;
+  Color get iconColor;
 }

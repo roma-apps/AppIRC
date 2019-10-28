@@ -85,9 +85,7 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
                 controller: _searchController,
                 label: labelText,
                 hint: AppLocalizations.of(context)
-                    .tr("chat.messages_list.search.field"
-                        ".filter"
-                        ".hint")),
+                    .tr("chat.messages_list.search.field.filter.hint")),
           );
         });
   }
@@ -101,14 +99,11 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
             .tr("chat.messages_list.search.field.filter"
                 ".label.nothing_found");
       } else {
-        labelText = AppLocalizations.of(context).tr(
-            "chat.messages_list.search.field.filter"
-            ".label"
-            ".found",
-            args: [
-              searchState.selectedFoundMessagePosition.toString(),
-              searchState.maxPossibleSelectedFoundPosition.toString()
-            ]);
+        labelText = AppLocalizations.of(context)
+            .tr("chat.messages_list.search.field.filter.label.found", args: [
+          searchState.selectedFoundMessagePosition.toString(),
+          searchState.maxPossibleSelectedFoundPosition.toString()
+        ]);
       }
     } else {
       // empty label if search not started
@@ -124,6 +119,7 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
     return PlatformIconButton(
       icon: Icon(
         Icons.cancel,
+        color: messagesListSearchSkinBloc.iconColor,
       ),
       onPressed: () {
         channelBloc.messagesBloc.onNeedHideSearch();
@@ -145,8 +141,9 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
           return PlatformIconButton(
             icon: Icon(
               Icons.keyboard_arrow_down,
-//                        color: networkListSkinBloc
-//                            .getNetworkItemIconColor(isChannelActive)
+              color: enabled
+                  ? messagesListSearchSkinBloc.iconColor
+                  : disabledColor,
             ),
             onPressed: enabled
                 ? () {
@@ -171,6 +168,9 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
           return PlatformIconButton(
             icon: Icon(
               Icons.keyboard_arrow_up,
+              color: enabled
+                  ? messagesListSearchSkinBloc.iconColor
+                  : disabledColor,
             ),
             onPressed: enabled
                 ? () {
