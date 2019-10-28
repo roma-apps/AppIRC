@@ -1,4 +1,4 @@
-import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_model.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
 import 'package:flutter_appirc/form/form_bloc.dart';
@@ -12,7 +12,7 @@ class NetworkUserPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<String> commandsFieldBloc;
 
   NetworkUserPreferencesFormBloc(
-      ChatNetworkUserPreferences preferences, bool isNeedShowCommands) {
+      NetworkUserPreferences preferences, bool isNeedShowCommands) {
     nickFieldBloc = FormValueFieldBloc<String>(preferences.nickname,
         validators: [
           NotEmptyTextValidator.instance,
@@ -32,7 +32,7 @@ class NetworkUserPreferencesFormBloc extends FormBloc {
   List<FormFieldBloc> get children =>
       [nickFieldBloc, passwordFieldBloc, realNameFieldBloc, userNameFieldBloc];
 
-  ChatNetworkUserPreferences extractData() => ChatNetworkUserPreferences(
+  NetworkUserPreferences extractData() => NetworkUserPreferences(
       nickname: nickFieldBloc.value,
       password: passwordFieldBloc.value,
       realName: realNameFieldBloc.value,

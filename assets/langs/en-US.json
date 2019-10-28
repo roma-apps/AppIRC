@@ -299,6 +299,9 @@
           "channel_mode": "Channel mode: {}",
           "ctcp_request": "CTCP request"
         }
+      },
+      "preview": {
+        "loading": "Loading..."
       }
     },
     "new_message": {

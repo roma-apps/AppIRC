@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
+import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 
 class ChatConfig {
-  final ChatNetworkConnectionPreferences defaultNetwork;
+  final NetworkConnectionPreferences defaultNetwork;
   final String defaultChannels;
 
   final bool fileUpload;
@@ -52,16 +53,15 @@ class ChatConfig {
       @required this.fileUploadMaxSizeInBytes,
       @required this.commands});
 
-
-  ChatNetworkPreferences createDefaultNetworkPreferences() =>
-      ChatNetworkPreferences(defaultNetwork, [
-        ChatNetworkChannelPreferences.name(name: defaultChannels, password: "")
+  NetworkPreferences createDefaultNetworkPreferences() =>
+      NetworkPreferences(defaultNetwork, [
+        ChannelPreferences.name(name: defaultChannels, password: "")
       ]);
 }
 
 class ServerNameNotUniqueException implements Exception {}
 
-class NetworkChannelUser {
+class ChannelUser {
   final String nick;
   final String hostMask;
   final String realName;
@@ -73,7 +73,7 @@ class NetworkChannelUser {
 
   String mode;
 
-  NetworkChannelUser(
+  ChannelUser(
       this.nick,
       this.hostMask,
       this.realName,
@@ -83,7 +83,7 @@ class NetworkChannelUser {
       this.connectedAt,
       this.idleSince);
 
-  NetworkChannelUser.name(
+  ChannelUser.name(
       {this.nick,
       this.hostMask,
       this.realName,
@@ -96,12 +96,9 @@ class NetworkChannelUser {
 
   @override
   String toString() {
-    return 'NetworkChannelUser{nick: $nick, hostMask: $hostMask, '
+    return 'ChannelUser{nick: $nick, hostMask: $hostMask, '
         'realName: $realName, channels: $channels, '
         'secureConnection: $secureConnection, connectedTo: $connectedTo, '
         'connectedAt: $connectedAt, idleSince: $idleSince, mode: $mode}';
   }
-
 }
-
-

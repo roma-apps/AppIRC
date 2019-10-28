@@ -1,0 +1,144 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/network/join_channel/network_join_channel_page.dart';
+import 'package:flutter_appirc/app/network/network_bloc.dart';
+import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
+import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
+import 'package:flutter_appirc/app/network/preferences/page/network_edit_preferences_page.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
+import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+Widget buildNetworkPopupMenuButton(
+    {@required BuildContext context,
+    @required NetworkBloc networkBloc,
+    @required Color iconColor}) {
+  return createPlatformPopupMenuButton(
+    context,
+    child: Icon(
+      Icons.more_vert,
+      color: iconColor,
+    ),
+    actions: _buildDropdownItems(
+        context: context,
+        connected: networkBloc.networkConnected,
+        networkBloc: networkBloc),
+  );
+}
+
+List<PlatformAwarePopupMenuAction> _buildDropdownItems(
+    {@required BuildContext context,
+    @required bool connected,
+    @required NetworkBloc networkBloc}) {
+  ChatBackendService backendService = Provider.of(context);
+
+  var items = <PlatformAwarePopupMenuAction>[
+    _buildEditAction(context, networkBloc, backendService),
+    _buildJoinChannelAction(context, networkBloc),
+    _buildChannelsListAction(context, networkBloc),
+    _buildIgnoredUsersListAction(context, networkBloc),
+  ];
+
+  if (connected) {
+    _buildDisconnectionAction(context, items, networkBloc);
+  } else {
+    _buildConnectAction(context, items, networkBloc);
+  }
+  _buildLeaveAction(context, items, networkBloc);
+  return items;
+}
+
+void _buildLeaveAction(BuildContext context,
+    List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return items.add(PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("chat.network.action.exit"),
+      iconData: Icons.clear,
+      actionCallback: (action) {
+        networkBloc.leaveNetwork();
+      }));
+}
+
+void _buildConnectAction(BuildContext context,
+    List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return items.add(PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("chat.network.action.connect"),
+      iconData: Icons.cloud,
+      actionCallback: (action) {
+        networkBloc.enableNetwork();
+      }));
+}
+
+void _buildDisconnectionAction(BuildContext context,
+    List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return items.add(PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("chat.network.action.disconnect"),
+      iconData: Icons.cloud_off,
+      actionCallback: (action) {
+        networkBloc.disableNetwork();
+      }));
+}
+
+PlatformAwarePopupMenuAction _buildIgnoredUsersListAction(
+    BuildContext context, NetworkBloc networkBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("chat.network.action.list_ignored_users"),
+      iconData: Icons.list,
+      actionCallback: (action) {
+        networkBloc.printNetworkIgnoredUsers();
+      });
+}
+
+PlatformAwarePopupMenuAction _buildChannelsListAction(
+    BuildContext context, NetworkBloc networkBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("chat.network.action.list_all_channels"),
+      iconData: Icons.list,
+      actionCallback: (action) {
+        networkBloc.printNetworkAvailableChannels();
+      });
+}
+
+PlatformAwarePopupMenuAction _buildJoinChannelAction(
+    BuildContext context, NetworkBloc networkBloc) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("chat.network.action.join_channel"),
+      iconData: Icons.add,
+      actionCallback: (action) {
+        Navigator.push(
+            context,
+            platformPageRoute(
+                builder: (_) => NetworkJoinChannelPage(networkBloc.network)));
+      });
+}
+
+PlatformAwarePopupMenuAction _buildEditAction(BuildContext context,
+    NetworkBloc networkBloc, ChatBackendService backendService) {
+  var appLocalizations = AppLocalizations.of(context);
+  return PlatformAwarePopupMenuAction(
+      text: appLocalizations.tr("chat.network.action.edit"),
+      iconData: Icons.edit,
+      actionCallback: (action) {
+        Navigator.push(
+            context,
+            platformPageRoute(
+                builder: (_) => Provider(
+                      providable: NetworkBlocProvider(networkBloc),
+                      child: EditNetworkPreferencesPage(
+                          context: context,
+                          startValues: NetworkPreferences(
+                              networkBloc.network.connectionPreferences, []),
+                          serverPreferencesEnabled:
+                              !backendService.chatConfig.lockNetwork,
+                          serverPreferencesVisible:
+                              backendService.chatConfig.displayNetwork),
+                    )));
+      });
+}

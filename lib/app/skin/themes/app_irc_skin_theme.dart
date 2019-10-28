@@ -1,5 +1,5 @@
 import 'package:flutter/painting.dart';
-import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_model.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
 
@@ -38,7 +38,7 @@ abstract class AppIRCSkinTheme extends AppSkinTheme {
 
   TextStyle get defaultTextStyle;
 
-  Color get disabledTextColor;
+  Color get disabledColor;
 
   Color findMessageColorByType(RegularMessageType regularMessageType);
 

@@ -1,4 +1,7 @@
-import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
+import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
+import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
@@ -7,9 +10,9 @@ import 'package:flutter_appirc/form/form_bloc.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
 import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 
-class ChatNetworkPreferencesFormBloc extends FormBloc {
+class NetworkPreferencesFormBloc extends FormBloc {
   static const channelsNamesSeparator = " ";
-  Validator<String> networkValidator;
+  final Validator<String> networkValidator;
   NetworkServerPreferencesFormBloc serverFormBloc;
   NetworkUserPreferencesFormBloc userFormBloc;
 
@@ -17,14 +20,15 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
 
   FormValueFieldBloc<String> channelsFieldBloc;
 
-  final ChatNetworkPreferences preferences;
+  final NetworkPreferences preferences;
 
-  ChatNetworkPreferencesFormBloc(
-      this.preferences,
-      bool isNeedShowChannels,
-      bool isNeedShowCommands,
-      bool serverPreferencesEnabled,
-      this.serverPreferencesVisible) {
+  NetworkPreferencesFormBloc.name(
+      {@required this.preferences,
+      @required this.networkValidator,
+      @required bool isNeedShowChannels,
+      @required bool isNeedShowCommands,
+      @required bool serverPreferencesEnabled,
+      @required this.serverPreferencesVisible}) {
     serverFormBloc = NetworkServerPreferencesFormBloc(
         preferences.networkConnectionPreferences.serverPreferences,
         networkValidator,
@@ -44,17 +48,31 @@ class ChatNetworkPreferencesFormBloc extends FormBloc {
 
   @override
   List<FormFieldBloc> get children {
-    return serverPreferencesVisible ? [serverFormBloc, userFormBloc] : [userFormBloc];
+    return serverPreferencesVisible
+        ? [serverFormBloc, userFormBloc]
+        : [userFormBloc];
   }
 
-  ChatNetworkPreferences extractData() => ChatNetworkPreferences(
-      ChatNetworkConnectionPreferences(
+  NetworkPreferences extractData() => NetworkPreferences(
+      NetworkConnectionPreferences(
           localId: preferences.localId,
           serverPreferences: serverFormBloc.extractData(),
           userPreferences: userFormBloc.extractData()),
       channelsFieldBloc.value
-          .split(ChatNetworkPreferences.channelsSeparator)
-          .map((channelName) => ChatNetworkChannelPreferences.name(
+          .split(NetworkPreferences.channelsSeparator)
+          .map((channelName) => ChannelPreferences.name(
               name: channelName, password: ""))
           .toList());
+}
+
+CustomValidator<String> buildNetworkValidator(NetworkListBloc networkListBloc)  {
+  var networkValidator = CustomValidator<String>((networkName) async {
+    var alreadyExist = await networkListBloc.isNetworkWithNameExist(networkName);
+    ValidationError error;
+    if (alreadyExist) {
+      error = NotUniqueTextValidationError();
+    }
+    return error;
+  });
+  return networkValidator;
 }

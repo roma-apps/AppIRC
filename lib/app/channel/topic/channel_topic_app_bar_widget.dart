@@ -1,16 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/channel/topic/channel_topic_form_widget.dart';
+import 'package:flutter_appirc/app/channel/topic/channel_topic_dialog.dart';
 import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_widget.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
+import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
+import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
+class ChannelTopicTitleAppBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var channelBloc = NetworkChannelBloc.of(context);
+    var channelBloc = ChannelBloc.of(context);
     var chatBloc = Provider.of<ChatConnectionBloc>(context);
 
     return StreamBuilder<ChatConnectionState>(
@@ -21,15 +21,13 @@ class NetworkChannelTopicTitleAppBarWidget extends StatelessWidget {
           ChatConnectionState connectionState = snapshot.data;
 
           return StreamBuilder<String>(
-            stream: channelBloc.networkChannelTopicStream,
-            initialData: channelBloc.networkChannelTopic,
-            builder: (BuildContext context,
-                AsyncSnapshot<String> snapshot) {
+            stream: channelBloc.channelTopicStream,
+            initialData: channelBloc.channelTopic,
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
               String topic = snapshot.data;
 
               var channel = channelBloc.channel;
               var channelName = channel.name;
-
 
               String subTitleText;
 

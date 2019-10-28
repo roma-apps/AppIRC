@@ -3,14 +3,15 @@ import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/channel/messages/channel_messages_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/channels/chat_network_channels_states_bloc.dart';
+import 'package:flutter_appirc/app/channel/messages/channel_message_list_bloc.dart';
+import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
+import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_bloc.dart';
-import 'package:flutter_appirc/app/chat/messages/chat_messages_list_bloc.dart';
-import 'package:flutter_appirc/app/message/messages_model.dart';
-import 'package:flutter_appirc/app/message/preview/messages_preview_model.dart';
-import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/list/message_list_model.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
+import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
+import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -18,54 +19,54 @@ import 'package:rxdart/rxdart.dart';
 
 final Duration _usersListOutDateDuration = Duration(seconds: 15);
 
-class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
+class ChannelBloc extends DisposableOwner implements MoreHistoryOwner {
   final ChatBackendService _backendService;
   final Network network;
-  NetworkChannel _channel;
-  NetworkChannel get channel => _channel;
-  final ChatNetworkChannelsStateBloc _channelsStatesBloc;
+  Channel _channel;
+  Channel get channel => _channel;
+  final ChannelStatesBloc _channelsStatesBloc;
 
   ChatInputMessageBloc _inputMessageBloc;
 
-  ChannelMessagesListBloc _messagesBloc;
+  ChannelMessageListBloc _messagesBloc;
 
-  ChannelMessagesListBloc get messagesBloc => _messagesBloc;
+  ChannelMessageListBloc get messagesBloc => _messagesBloc;
 
   ChatInputMessageBloc get inputMessageBloc => _inputMessageBloc;
 
-  NetworkChannelBloc(this._backendService, this.network,
-      NetworkChannelWithState channelWithState, this._channelsStatesBloc) {
+  ChannelBloc(this._backendService, this.network,
+      ChannelWithState channelWithState, this._channelsStatesBloc) {
     _channel = channelWithState.channel;
     _usersSubject =
         BehaviorSubject(seedValue: channelWithState.initUsers ?? []);
 
-    _messagesBloc = ChannelMessagesListBloc();
+    _messagesBloc = ChannelMessageListBloc();
     addDisposable(disposable: _messagesBloc);
 
     addDisposable(subject: _usersSubject);
     addDisposable(
         disposable: _backendService
-            .listenForNetworkChannelNames(network, channel, (newUsers) {
+            .listenForChannelNames(network, channel, (newUsers) {
       _usersSubject.add(newUsers);
     }));
     addDisposable(
         disposable:
-            _backendService.listenForNetworkChannelUsers(network, channel, () {
-      _backendService.requestNetworkChannelUsers(network, channel);
+            _backendService.listenForChannelUsers(network, channel, () {
+      _backendService.requestChannelUsers(network, channel);
     }));
     _inputMessageBloc = ChatInputMessageBloc(_backendService.chatConfig, this);
     addDisposable(disposable: _inputMessageBloc);
   }
 
   // ignore: close_sinks
-  BehaviorSubject<List<NetworkChannelUser>> _usersSubject;
+  BehaviorSubject<List<ChannelUser>> _usersSubject;
 
-  Stream<List<NetworkChannelUser>> get usersStream => _usersSubject.stream;
+  Stream<List<ChannelUser>> get usersStream => _usersSubject.stream;
 
-  List<NetworkChannelUser> get users => _usersSubject.value;
+  List<ChannelUser> get users => _usersSubject.value;
   DateTime _lastUsersRefreshDate;
 
-  Future<List<NetworkChannelUser>> retrieveUsers({forceRefresh: false}) async {
+  Future<List<ChannelUser>> retrieveUsers({forceRefresh: false}) async {
     if (forceRefresh || _lastUsersRefreshDate == null) {
       await requestUsersListUpdate();
     } else {
@@ -82,84 +83,84 @@ class NetworkChannelBloc extends DisposableOwner implements MoreHistoryOwner {
 
   requestUsersListUpdate() async {
     _lastUsersRefreshDate = DateTime.now();
-    await _backendService.requestNetworkChannelUsers(network, channel,
+    await _backendService.requestChannelUsers(network, channel,
         waitForResult: false);
   }
 
-  NetworkChannelState get networkChannelState =>
-      _channelsStatesBloc.getNetworkChannelState(network, channel);
+  ChannelState get channelState =>
+      _channelsStatesBloc.getChannelState(network, channel);
 
-  Stream<NetworkChannelState> get _networkChannelStateStream =>
-      _channelsStatesBloc.getNetworkChannelStateStream(network, channel);
+  Stream<ChannelState> get _channelStateStream =>
+      _channelsStatesBloc.getChannelStateStream(network, channel);
 
-  bool get networkChannelConnected => networkChannelState.connected;
+  bool get channelConnected => channelState.connected;
 
-  Stream<bool> get networkChannelConnectedStream =>
-      _networkChannelStateStream.map((state) => state?.connected).distinct();
+  Stream<bool> get channelConnectedStream =>
+      _channelStateStream.map((state) => state?.connected).distinct();
 
-  bool get networkChannelMoreHistoryAvailable =>
-      networkChannelState?.moreHistoryAvailable;
+  bool get moreHistoryAvailable =>
+      channelState?.moreHistoryAvailable;
 
-  Stream<bool> get networkChannelMoreHistoryAvailableStream =>
-      _networkChannelStateStream
+  Stream<bool> get moreHistoryAvailableStream =>
+      _channelStateStream
           .map((state) => state?.moreHistoryAvailable)
           .distinct();
 
-  int get networkChannelUnreadCount => networkChannelState.unreadCount;
+  int get channelUnreadCount => channelState.unreadCount;
 
-  Stream<int> get networkChannelUnreadCountStream =>
-      _networkChannelStateStream.map((state) => state?.unreadCount).distinct();
+  Stream<int> get channelUnreadCountStream =>
+      _channelStateStream.map((state) => state?.unreadCount).distinct();
 
-  String get networkChannelTopic => networkChannelState.topic;
+  String get channelTopic => channelState.topic;
 
-  Stream<String> get networkChannelTopicStream =>
-      _networkChannelStateStream.map((state) => state?.topic).distinct();
+  Stream<String> get channelTopicStream =>
+      _channelStateStream.map((state) => state?.topic).distinct();
 
-  Future<RequestResult<bool>> leaveNetworkChannel(
+  Future<RequestResult<bool>> leaveChannel(
           {bool waitForResult: false}) async =>
-      await _backendService.leaveNetworkChannel(network, channel,
+      await _backendService.leaveChannel(network, channel,
           waitForResult: waitForResult);
 
-  Future<RequestResult<NetworkChannelUser>> printUserInfo(String userNick,
+  Future<RequestResult<ChannelUser>> printUserInfo(String userNick,
           {bool waitForResult: false}) async =>
       await _backendService.requestUserInfo(network, channel, userNick,
           waitForResult: waitForResult);
 
-  Future<RequestResult<ChatMessage>> printNetworkChannelBannedUsers(
+  Future<RequestResult<ChatMessage>> printChannelBannedUsers(
           {bool waitForResult: false}) async =>
-      await _backendService.printNetworkChannelBannedUsers(network, channel,
+      await _backendService.printChannelBannedUsers(network, channel,
           waitForResult: waitForResult);
 
-  Future<RequestResult<bool>> editNetworkChannelTopic(String newTopic,
+  Future<RequestResult<bool>> editChannelTopic(String newTopic,
           {bool waitForResult: false}) async =>
-      await _backendService.editNetworkChannelTopic(network, channel, newTopic,
+      await _backendService.editChannelTopic(network, channel, newTopic,
           waitForResult: waitForResult);
 
-  Future<RequestResult<bool>> onOpenNetworkChannel() async =>
+  Future<RequestResult<bool>> onOpenChannel() async =>
       await _backendService.sendChannelOpenedEventToServer(network, channel);
 
-  Future<RequestResult<ChatMessage>> sendNetworkChannelRawMessage(
+  Future<RequestResult<ChatMessage>> sendChannelRawMessage(
           String rawMessage,
           {bool waitForResult: false}) async =>
-      await _backendService.sendNetworkChannelRawMessage(
+      await _backendService.sendChannelRawMessage(
           network, channel, rawMessage,
           waitForResult: waitForResult);
 
-  Future<RequestResult<NetworkChannelWithState>> openDirectMessagesChannel(
+  Future<RequestResult<ChannelWithState>> openDirectMessagesChannel(
           String nick) async =>
       await _backendService.openDirectMessagesChannel(network, channel, nick);
 
-  static NetworkChannelBloc of(BuildContext context) {
-    return Provider.of<NetworkChannelBlocProvider>(context).networkChannelBloc;
+  static ChannelBloc of(BuildContext context) {
+    return Provider.of<ChannelBlocProvider>(context).channelBloc;
   }
 
-  Future<RequestResult<ChatLoadMoreData>> loadMoreHistory(
+  Future<RequestResult<MessageListLoadMore>> loadMoreHistory(
       RegularMessage oldestMessage) async {
     return _backendService.loadMoreHistory(
         network, channel, oldestMessage.messageRemoteId);
   }
 
-  Future<RequestResult<MessageTogglePreview>> togglePreview(
+  Future<RequestResult<ToggleMessagePreviewData>> togglePreview(
       RegularMessage message, MessagePreview preview) {
     return _backendService.togglePreview(network, channel, message, preview);
   }

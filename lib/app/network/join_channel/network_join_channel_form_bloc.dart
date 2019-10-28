@@ -3,11 +3,11 @@ import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
 import 'package:flutter_appirc/form/form_bloc.dart';
 import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 
-class NetworkChannelJoinFormBloc extends FormBloc {
+class NetworkJoinChannelFormBloc extends FormBloc {
   FormValueFieldBloc<String> channelFieldBloc;
   FormValueFieldBloc<String> passwordFieldBloc;
 
-  NetworkChannelJoinFormBloc(
+  NetworkJoinChannelFormBloc(
       {String startChannel = "", String startPassword = ""}) {
     channelFieldBloc = FormValueFieldBloc<String>(startChannel, validators: [
       NoWhitespaceTextValidator.instance,

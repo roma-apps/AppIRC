@@ -5,27 +5,27 @@ import 'package:flutter/material.dart'
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
+import 'package:flutter_appirc/app/channel/channel_blocs_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/channel/channel_popup_menu_widget.dart';
+import 'package:flutter_appirc/app/channel/channel_popup_menu.dart';
+import 'package:flutter_appirc/app/channel/list/unread_count/channel_list_unread_count_bloc.dart';
 import 'package:flutter_appirc/app/channel/topic/channel_topic_app_bar_widget.dart';
+import 'package:flutter_appirc/app/chat/active_channel/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_widget.dart';
-import 'package:flutter_appirc/app/chat/channels/chat_network_channels_blocs_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_channel_widget.dart';
+import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
+import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
+import 'package:flutter_appirc/app/chat/db/chat_database.dart';
+import 'package:flutter_appirc/app/chat/drawer/chat_drawer_page.dart';
+import 'package:flutter_appirc/app/chat/drawer/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
-import 'package:flutter_appirc/app/chat/messages/chat_messages_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/messages/chat_messages_loader_bloc.dart';
-import 'package:flutter_appirc/app/chat/messages/chat_messages_saver_bloc.dart';
-import 'package:flutter_appirc/app/chat/networks/chat_networks_blocs_bloc.dart';
-import 'package:flutter_appirc/app/chat/networks/chat_networks_list_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_active_channel_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
-import 'package:flutter_appirc/app/chat/state/chat_unread_bloc.dart';
-import 'package:flutter_appirc/app/db/chat_database.dart';
-import 'package:flutter_appirc/app/drawer/chat_drawer_page.dart';
-import 'package:flutter_appirc/app/drawer/chat_drawer_widget.dart';
+import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
+import 'package:flutter_appirc/app/message/message_loader_bloc.dart';
+import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
+import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
+import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
@@ -91,7 +91,7 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildMenuIcon(BuildContext context, Function() onPressed) {
-    ChatUnreadBloc chatUnreadBloc = Provider.of<ChatUnreadBloc>(context);
+    ChannelListUnreadCountBloc chatUnreadBloc = Provider.of<ChannelListUnreadCountBloc>(context);
 
     return StreamBuilder<int>(
         stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
@@ -152,23 +152,23 @@ class ChatPage extends StatelessWidget {
   Widget _buildTrailing(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
 
-    return StreamBuilder<NetworkChannel>(
+    return StreamBuilder<Channel>(
       stream: activeChannelBloc.activeChannelStream,
       builder: (BuildContext context,
-          AsyncSnapshot<NetworkChannel> activeChannelSnapshot) {
+          AsyncSnapshot<Channel> activeChannelSnapshot) {
         var channel = activeChannelSnapshot.data;
         if (channel == null) {
           return SizedBox.shrink();
         } else {
-          var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
+          var networkListBloc = Provider.of<NetworkListBloc>(context);
 
           var network = networkListBloc.findNetworkWithChannel(channel);
 
           var networkBloc =
-              ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
+              NetworkBlocsBloc.of(context).getNetworkBloc(network);
 
-          var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
-              .getNetworkChannelBloc(channel);
+          var channelBloc = ChannelBlocsBloc.of(context)
+              .getChannelBloc(channel);
 
           List<Widget> items = [
             buildChannelPopupMenuButton(
@@ -199,10 +199,10 @@ class ChatPage extends StatelessWidget {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
 
-    return StreamBuilder<NetworkChannel>(
+    return StreamBuilder<Channel>(
       stream: activeChannelBloc.activeChannelStream,
       builder: (BuildContext context,
-          AsyncSnapshot<NetworkChannel> activeChannelSnapshot) {
+          AsyncSnapshot<Channel> activeChannelSnapshot) {
         var channel = activeChannelSnapshot.data;
         if (channel == null) {
           return StreamBuilder<ChatConnectionState>(
@@ -234,11 +234,11 @@ class ChatPage extends StatelessWidget {
                 return ChatAppBarWidget(title, content);
               });
         } else {
-          var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
-              .getNetworkChannelBloc(channel);
+          var channelBloc = ChannelBlocsBloc.of(context)
+              .getChannelBloc(channel);
           return Provider(
-              providable: NetworkChannelBlocProvider(channelBloc),
-              child: NetworkChannelTopicTitleAppBarWidget());
+              providable: ChannelBlocProvider(channelBloc),
+              child: ChannelTopicTitleAppBarWidget());
         }
       },
     );
@@ -246,13 +246,13 @@ class ChatPage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
-    var networkListBloc = Provider.of<ChatNetworksListBloc>(context);
+    var networkListBloc = Provider.of<NetworkListBloc>(context);
 
     return SafeArea(
-        child: StreamBuilder<NetworkChannel>(
+        child: StreamBuilder<Channel>(
             stream: activeChannelBloc.activeChannelStream,
             builder:
-                (BuildContext context, AsyncSnapshot<NetworkChannel> snapshot) {
+                (BuildContext context, AsyncSnapshot<Channel> snapshot) {
               var activeChannel = snapshot.data;
               if (activeChannel == null) {
                 return StreamBuilder<bool>(
@@ -274,17 +274,17 @@ class ChatPage extends StatelessWidget {
                 if (network == null) {
                   return SizedBox.shrink();
                 } else {
-                  var channelBloc = ChatNetworkChannelsBlocsBloc.of(context)
-                      .getNetworkChannelBloc(activeChannel);
+                  var channelBloc = ChannelBlocsBloc.of(context)
+                      .getChannelBloc(activeChannel);
 
                   ChatBackendService backendService = Provider.of(context);
                   ChatDatabaseProvider chatDatabaseProvider =
                       Provider.of(context);
 
-                  var messagesLoaderBloc = NetworkChannelMessagesLoaderBloc(
+                  var messagesLoaderBloc = MessageLoaderBloc(
                       backendService,
                       chatDatabaseProvider.db,
-                      Provider.of<NetworkChannelMessagesSaverBloc>(context),
+                      Provider.of<MessageSaverBloc>(context),
                       channelBloc.network,
                       channelBloc.channel);
 
@@ -299,7 +299,7 @@ class ChatPage extends StatelessWidget {
                           _logger.d(() => "initFinished $initFinished"
                               "messages $length");
                           if (initFinished && length != null) {
-                            var chatListMessagesBloc = ChatMessagesListBloc(
+                            var chatListMessagesBloc = MessageListBloc(
                                 channelBloc.messagesBloc,
                                 messagesLoaderBloc,
                                 channelBloc);
@@ -309,10 +309,10 @@ class ChatPage extends StatelessWidget {
 
                             return Provider(
                                 providable:
-                                    NetworkChannelBlocProvider(channelBloc),
+                                    ChannelBlocProvider(channelBloc),
                                 child: Provider(
                                   providable: chatListMessagesBloc,
-                                  child: NetworkChannelWidget(),
+                                  child: ChannelWidget(),
                                 ));
                           } else {
                             return Center(
@@ -411,16 +411,18 @@ class ChatPage extends StatelessWidget {
     ChatBackendService backendService = Provider.of(context);
     var startValues =
         backendService.chatConfig.createDefaultNetworkPreferences();
+    NetworkListBloc networkListBloc = Provider.of(context);
     return Provider(
-      providable: ChatNetworkPreferencesFormBloc(
-          startValues,
-          true,
-          false,
-          !backendService.chatConfig.lockNetwork,
-          backendService.chatConfig.displayNetwork),
-      child: ChatNetworkPreferencesFormWidget(startValues,
+      providable: NetworkPreferencesFormBloc.name(
+          preferences: startValues,
+          isNeedShowChannels: true,
+          isNeedShowCommands: false,
+          serverPreferencesEnabled: !backendService.chatConfig.lockNetwork,
+          serverPreferencesVisible: backendService.chatConfig.displayNetwork,
+          networkValidator: buildNetworkValidator(networkListBloc)),
+      child: NetworkPreferencesFormWidget(startValues,
           (context, preferences) async {
-        var networksBloc = Provider.of<ChatNetworksListBloc>(context);
+        var networksBloc = Provider.of<NetworkListBloc>(context);
         await networksBloc.joinNetwork(preferences);
       }, AppLocalizations.of(context).tr('irc.connection.new.action.connect')),
     );

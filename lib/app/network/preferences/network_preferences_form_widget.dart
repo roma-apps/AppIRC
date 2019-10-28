@@ -1,41 +1,43 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons, TextInputAction;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
+import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_form_widget.dart';
-import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_widget_form.dart';
+import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_form_widget.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 
-class ChatNetworkPreferencesFormWidget extends StatefulWidget {
-  final ChatNetworkPreferences startValues;
-  final Function(BuildContext context, ChatNetworkPreferences preferences) callback;
+class NetworkPreferencesFormWidget extends StatefulWidget {
+  final NetworkPreferences startValues;
+  final Function(BuildContext context, NetworkPreferences preferences)
+      callback;
   final String buttonText;
 
-  ChatNetworkPreferencesFormWidget(
+  NetworkPreferencesFormWidget(
       this.startValues, this.callback, this.buttonText);
 
   @override
   State<StatefulWidget> createState() =>
-      ChatNetworkPreferencesFormWidgetState(startValues, callback, buttonText);
+      NetworkPreferencesFormWidgetState(startValues, callback, buttonText);
 }
 
-class ChatNetworkPreferencesFormWidgetState
-    extends State<ChatNetworkPreferencesFormWidget> {
-  final Function(BuildContext context, ChatNetworkPreferences preferences) callback;
-  final ChatNetworkPreferences startValues;
+class NetworkPreferencesFormWidgetState
+    extends State<NetworkPreferencesFormWidget> {
+  final Function(BuildContext context, NetworkPreferences preferences)
+      callback;
+  final NetworkPreferences startValues;
   final String buttonText;
 
   TextEditingController _channelsController;
 
-  ChatNetworkPreferencesFormWidgetState(
+  NetworkPreferencesFormWidgetState(
       this.startValues, this.callback, this.buttonText) {
     _channelsController = TextEditingController(
         text: startValues.channelsWithoutPassword
             .map((channel) => channel.name)
-            .join(ChatNetworkPreferencesFormBloc.channelsNamesSeparator));
+            .join(NetworkPreferencesFormBloc.channelsNamesSeparator));
   }
 
   @override
@@ -46,8 +48,8 @@ class ChatNetworkPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    ChatNetworkPreferencesFormBloc formBloc =
-        Provider.of<ChatNetworkPreferencesFormBloc>(context);
+    NetworkPreferencesFormBloc formBloc =
+        Provider.of<NetworkPreferencesFormBloc>(context);
 
     var appLocalizations = AppLocalizations.of(context);
     return Padding(
@@ -60,7 +62,7 @@ class ChatNetworkPreferencesFormWidgetState
                 formBloc.serverFormBloc.visible
                     ? Provider(
                         providable: formBloc.serverFormBloc,
-                        child: ChatNetworkServerPreferencesFormWidget(
+                        child: NetworkServerPreferencesFormWidget(
                             startValues.networkConnectionPreferences
                                 .serverPreferences))
                     : SizedBox.shrink(),

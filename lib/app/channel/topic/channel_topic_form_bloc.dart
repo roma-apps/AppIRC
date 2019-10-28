@@ -8,18 +8,18 @@ class ChannelTopicFormBloc extends FormBloc {
   FormValueFieldBloc<String> _topicFieldBloc;
   FormValueFieldBloc<String> get topicFieldBloc => _topicFieldBloc;
   // ignore: close_sinks
-  BehaviorSubject<bool> _isPossibleToChangeTopicController = BehaviorSubject
+  BehaviorSubject<bool> _isPossibleToChangeTopicSubject = BehaviorSubject
     (seedValue: false);
 
   final String _initTopic;
   Stream<bool> get isPossibleToChangeTopicStream =>
-      _isPossibleToChangeTopicController.stream.distinct();
+      _isPossibleToChangeTopicSubject.stream.distinct();
   bool get isPossibleToChangeTopic =>
-      _isPossibleToChangeTopicController.value;
+      _isPossibleToChangeTopicSubject.value;
 
   ChannelTopicFormBloc(this._initTopic) {
 
-    addDisposable(subject: _isPossibleToChangeTopicController);
+    addDisposable(subject: _isPossibleToChangeTopicSubject);
 
 
     _topicFieldBloc = FormValueFieldBloc<String>(
@@ -29,7 +29,7 @@ class ChannelTopicFormBloc extends FormBloc {
     addDisposable(streamSubscription: topicFieldBloc.valueStream.listen(
             (newTopic) {
       // topic changed
-      _isPossibleToChangeTopicController.add(newTopic != _initTopic);
+      _isPossibleToChangeTopicSubject.add(newTopic != _initTopic);
     }));
   }
 

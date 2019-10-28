@@ -1,10 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/chat/networks/chat_networks_blocs_bloc.dart';
+import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_bloc.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_widget.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
+import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -14,27 +15,27 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "network_join_channel_page.dart", enabled: true);
 
-class NetworkChannelJoinPage extends StatefulWidget {
+class NetworkJoinChannelPage extends StatefulWidget {
   final Network network;
 
-  NetworkChannelJoinPage(this.network);
+  NetworkJoinChannelPage(this.network);
 
   @override
   State<StatefulWidget> createState() {
-    return NetworkChannelJoinPageState(network);
+    return NetworkJoinChannelPageState(network);
   }
 }
 
-class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
+class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
   final Network network;
 
-  NetworkChannelJoinPageState(this.network);
+  NetworkJoinChannelPageState(this.network);
 
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context);
-    var networkChannelJoinFormBloc = NetworkChannelJoinFormBloc();
-    var networkBloc = ChatNetworksBlocsBloc.of(context).getNetworkBloc(network);
+    var channelJoinFormBloc = NetworkJoinChannelFormBloc();
+    var networkBloc = NetworkBlocsBloc.of(context).getNetworkBloc(network);
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: Text(appLocalizations.tr('chat.network.join_channel.title')),
@@ -42,19 +43,20 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
       body: SafeArea(
           child: Provider(
         providable: NetworkBlocProvider(networkBloc),
-        child: Provider<NetworkChannelJoinFormBloc>(
-          providable: networkChannelJoinFormBloc,
+        child: Provider<NetworkJoinChannelFormBloc>(
+          providable: channelJoinFormBloc,
           child: ListView(children: <Widget>[
-            NetworkChannelJoinFormWidget("", ""),
+            NetworkJoinChannelFormWidget.name(
+                startChannelName: "", startPassword: ""),
             StreamBuilder<bool>(
-                stream: networkChannelJoinFormBloc.dataValidStream,
+                stream: channelJoinFormBloc.dataValidStream,
                 builder: (context, snapshot) {
                   var dataValid = snapshot.data == true;
 
                   var pressed = dataValid
                       ? () async {
                           _onJoinClicked(
-                              context, networkChannelJoinFormBloc, networkBloc);
+                              context, channelJoinFormBloc, networkBloc);
                         }
                       : null;
                   return createSkinnedPlatformButton(
@@ -74,18 +76,18 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
 
   Future _onJoinClicked(
       BuildContext context,
-      NetworkChannelJoinFormBloc networkChannelJoinFormBloc,
+      NetworkJoinChannelFormBloc channelJoinFormBloc,
       NetworkBloc networkBloc) async {
     var dialogResult = await doAsyncOperationWithDialog(
         context: context,
         asyncCode: () async {
-          var chatNetworkChannelPreferences =
-              ChatNetworkChannelPreferences.name(
-                  name: networkChannelJoinFormBloc.extractChannel(),
-                  password: networkChannelJoinFormBloc.extractPassword());
-          _logger.d(() => "startJoinChannel $chatNetworkChannelPreferences");
-          var joinResult = await networkBloc.joinNetworkChannel(
-              chatNetworkChannelPreferences,
+          var chatChannelPreferences =
+              ChannelPreferences.name(
+                  name: channelJoinFormBloc.extractChannel(),
+                  password: channelJoinFormBloc.extractPassword());
+          _logger.d(() => "startJoinChannel $chatChannelPreferences");
+          var joinResult = await networkBloc.joinChannel(
+              chatChannelPreferences,
               waitForResult: true);
           _logger.d(() => "startJoinChannel result $joinResult");
         },
@@ -101,6 +103,7 @@ class NetworkChannelJoinPageState extends State<NetworkChannelJoinPage> {
   void _dismissDialog(BuildContext context) {
     Navigator.pop(context);
   }
+
   void _goBack(BuildContext context) {
     Navigator.pop(context);
   }

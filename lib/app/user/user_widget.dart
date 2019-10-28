@@ -2,31 +2,45 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
+import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
+import 'package:flutter_appirc/provider/provider.dart';
 
-Widget buildUserNickWithPopupMenu(BuildContext context, Widget child,
-    String nick, NetworkChannelBloc channelBloc,
-    {Function(PlatformAwarePopupMenuAction action) actionCallback}) {
+Widget buildUserNickWithPopupMenu(
+    {@required BuildContext context,
+    @required String nick,
+    @required Function(PlatformAwarePopupMenuAction action) actionCallback}) {
+  var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
+  var messagesSkin = Provider.of<MessageSkinBloc>(context);
+
+
+  var child = Text(
+    nick,
+    style:
+        messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+  );
+
   return createPlatformPopupMenuButton(context,
       child: child,
-      actions:
-          buildUserNickPopupMenuActions(context, channelBloc, nick,
-              actionCallback));
+      actions: buildUserNickPopupMenuActions(
+          context: context, nick: nick, actionCallback: actionCallback));
 }
 
 showPopupMenuForUser(BuildContext context, RelativeRect position, String nick,
-        NetworkChannelBloc channelBloc) =>
+        ChannelBloc channelBloc) =>
     showPlatformAwarePopup(
-        context, position, buildUserNickPopupMenuActions(context, channelBloc,
-        nick,
-        null));
+        context,
+        position,
+        buildUserNickPopupMenuActions(
+            context: context, nick: nick, actionCallback: null));
 
 List<PlatformAwarePopupMenuAction> buildUserNickPopupMenuActions(
-    BuildContext context,
-    NetworkChannelBloc channelBloc,
-    String nick,
-    actionCallback(PlatformAwarePopupMenuAction action)) {
+    {@required BuildContext context,
+    @required String nick,
+    @required actionCallback(PlatformAwarePopupMenuAction action)}) {
   var appLocalizations = AppLocalizations.of(context);
+  ChannelBloc channelBloc = ChannelBloc.of(context);
   return <PlatformAwarePopupMenuAction>[
     PlatformAwarePopupMenuAction(
         text: appLocalizations.tr("chat.user.action.information"),

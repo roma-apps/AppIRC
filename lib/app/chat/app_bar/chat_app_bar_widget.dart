@@ -16,8 +16,9 @@ class ChatAppBarWidget extends StatelessWidget {
 
     if (subTitle != null && subTitle.isNotEmpty) {
       return Column(
-//        mainAxisAlignment: MainAxisAlignment.end,
-        mainAxisAlignment: isMaterial ? MainAxisAlignment.center : MainAxisAlignment.start,
+        //        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment:
+            isMaterial ? MainAxisAlignment.center : MainAxisAlignment.start,
         crossAxisAlignment:
             isMaterial ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: <Widget>[
@@ -37,11 +38,7 @@ Widget _buildSubTitle(BuildContext context, String subTitle) => Text(subTitle,
     overflow: TextOverflow.fade,
     softWrap: false,
     style: Provider.of<ChatAppBarSkinBloc>(context).subTitleTextStyle
-
-//    style: TextStyle(color: Colors.black)
     );
 
 Widget _buildTitle(BuildContext context, String title) => Text(title,
-
-//        style: TextStyle(color: Colors.black)
     style: Provider.of<ChatAppBarSkinBloc>(context).titleTextStyle);

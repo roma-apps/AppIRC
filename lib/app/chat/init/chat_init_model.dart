@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 
 enum ChatInitState { notStarted, inProgress, finished }
 

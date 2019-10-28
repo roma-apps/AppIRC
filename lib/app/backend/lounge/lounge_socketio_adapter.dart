@@ -1,5 +1,4 @@
-
-import 'package:flutter_appirc/app/chat/state/chat_connection_model.dart';
+import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/app/message/regular/messages_regular_model.dart';
+import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_model.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware.dart';
@@ -128,7 +128,7 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   TextStyle get defaultTextStyle => _themeData.textTheme.body1;
 
   @override
-  Color get disabledTextColor => Colors.grey;
+  Color get disabledColor => Colors.grey;
 }
 
 ThemeData _themeData = ThemeData(

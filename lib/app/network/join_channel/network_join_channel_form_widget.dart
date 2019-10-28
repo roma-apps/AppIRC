@@ -5,26 +5,27 @@ import 'package:flutter_appirc/app/network/join_channel/network_join_channel_for
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class NetworkChannelJoinFormWidget extends StatefulWidget {
+class NetworkJoinChannelFormWidget extends StatefulWidget {
   final String startChannelName;
   final String startPassword;
 
-  NetworkChannelJoinFormWidget(this.startChannelName, this.startPassword);
+  NetworkJoinChannelFormWidget.name({@required this.startChannelName, @required  this
+      .startPassword});
 
   @override
   State<StatefulWidget> createState() =>
-      NetworkChannelJoinFormWidgetState(startChannelName, startPassword);
+      NetworkJoinChannelFormWidgetState(startChannelName, startPassword);
 }
 
-class NetworkChannelJoinFormWidgetState
-    extends State<NetworkChannelJoinFormWidget> {
+class NetworkJoinChannelFormWidgetState
+    extends State<NetworkJoinChannelFormWidget> {
   final String startChannelName;
   final String startPassword;
 
   TextEditingController _channelController;
   TextEditingController _passwordController;
 
-  NetworkChannelJoinFormWidgetState(this.startChannelName, this.startPassword) {
+  NetworkJoinChannelFormWidgetState(this.startChannelName, this.startPassword) {
     _channelController = TextEditingController(text: startChannelName);
     _passwordController = TextEditingController(text: startPassword);
   }
@@ -38,8 +39,8 @@ class NetworkChannelJoinFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    NetworkChannelJoinFormBloc formBloc =
-        Provider.of<NetworkChannelJoinFormBloc>(context);
+    NetworkJoinChannelFormBloc formBloc =
+        Provider.of<NetworkJoinChannelFormBloc>(context);
 
     var appLocalizations = AppLocalizations.of(context);
     return Column(

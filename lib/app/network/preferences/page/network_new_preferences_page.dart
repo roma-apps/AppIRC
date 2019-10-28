@@ -1,18 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/chat/networks/chat_networks_list_bloc.dart';
-import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
+import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_preferences_page.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class NewChatNetworkPage extends ChatNetworkPreferencesPage {
+class NewNetworkPreferencesPage extends NetworkPreferencesPage {
   final VoidCallback outerCallback;
 
-  NewChatNetworkPage.name(
+  NewNetworkPreferencesPage.name(
       {@required BuildContext context,
-      @required ChatNetworkPreferences startValues,
+      @required NetworkPreferences startValues,
       @required bool serverPreferencesEnabled,
       @required bool serverPreferencesVisible,
       this.outerCallback})
@@ -29,9 +29,9 @@ class NewChatNetworkPage extends ChatNetworkPreferencesPage {
 
   @override
   successCallback(
-      BuildContext context, ChatNetworkPreferences preferences) async {
-    final ChatNetworksListBloc chatBloc =
-        Provider.of<ChatNetworksListBloc>(context);
+      BuildContext context, NetworkPreferences preferences) async {
+    final NetworkListBloc chatBloc =
+        Provider.of<NetworkListBloc>(context);
 
     var dialogResult = await doAsyncOperationWithDialog(
         context: context,

@@ -1,32 +1,32 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons, TextInputAction;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_form_bloc.dart';
+import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
 import 'package:flutter_appirc/form/field/boolean/form_boolean_field_widget.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-class ChatNetworkServerPreferencesFormWidget extends StatefulWidget {
-  final ChatNetworkServerPreferences startValues;
+class NetworkServerPreferencesFormWidget extends StatefulWidget {
+  final NetworkServerPreferences startValues;
 
-  ChatNetworkServerPreferencesFormWidget(this.startValues);
+  NetworkServerPreferencesFormWidget(this.startValues);
 
   @override
   State<StatefulWidget> createState() =>
-      ChatNetworkServerPreferencesFormWidgetState(startValues);
+      NetworkServerPreferencesFormWidgetState(startValues);
 }
 
-class ChatNetworkServerPreferencesFormWidgetState
-    extends State<ChatNetworkServerPreferencesFormWidget> {
-  final ChatNetworkServerPreferences startValues;
+class NetworkServerPreferencesFormWidgetState
+    extends State<NetworkServerPreferencesFormWidget> {
+  final NetworkServerPreferences startValues;
 
   TextEditingController _hostController;
   TextEditingController _portController;
   TextEditingController _nameController;
 
-  ChatNetworkServerPreferencesFormWidgetState(this.startValues) {
+  NetworkServerPreferencesFormWidgetState(this.startValues) {
     _hostController = TextEditingController(text: startValues.serverHost);
     _portController = TextEditingController(text: startValues.serverPort);
     _nameController = TextEditingController(text: startValues.name);

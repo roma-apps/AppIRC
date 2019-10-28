@@ -11,7 +11,7 @@ ChatPreferences _jsonConverter(Map<String, dynamic> json) =>
 
 class ChatPreferencesBloc extends JsonPreferencesBloc<ChatPreferences> {
   int _maxNetworkLocalId;
-  int _maxNetworkChannelLocalId;
+  int _maxChannelLocalId;
 
   int getNextNetworkLocalId() {
     if (_maxNetworkLocalId == null) {
@@ -24,17 +24,17 @@ class ChatPreferencesBloc extends JsonPreferencesBloc<ChatPreferences> {
     return ++_maxNetworkLocalId;
   }
 
-  int getNextNetworkChannelLocalId() {
-    if (_maxNetworkChannelLocalId == null) {
+  int getNextChannelLocalId() {
+    if (_maxChannelLocalId == null) {
       var preferences = getValue(defaultValue: _emptyPreferences);
       var localIds = <int>[];
       preferences.networks.forEach((network) =>
           network.channels.forEach((channel) => localIds.add(channel.localId)));
-      _maxNetworkChannelLocalId = 0;
+      _maxChannelLocalId = 0;
       localIds.forEach((localId) =>
-          _maxNetworkChannelLocalId = max(_maxNetworkChannelLocalId, localId));
+          _maxChannelLocalId = max(_maxChannelLocalId, localId));
     }
-    return ++_maxNetworkChannelLocalId;
+    return ++_maxChannelLocalId;
   }
 
   ChatPreferencesBloc(PreferencesService preferencesService)

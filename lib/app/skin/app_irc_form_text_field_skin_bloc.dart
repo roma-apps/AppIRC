@@ -16,11 +16,11 @@ class AppIRCFormTextFieldSkinBloc extends FormTextFieldSkinBloc {
   TextStyle disabledEditStyle;
 
   AppIRCFormTextFieldSkinBloc(this.theme) {
-    disabledLabelStyle = labelStyle.copyWith(color: theme.disabledTextColor);
+    disabledLabelStyle = labelStyle.copyWith(color: theme.disabledColor);
 
-    disabledHintStyle = hintStyle.copyWith(color: theme.disabledTextColor);
+    disabledHintStyle = hintStyle.copyWith(color: theme.disabledColor);
 
-    disabledEditStyle = editStyle.copyWith(color: theme.disabledTextColor);
+    disabledEditStyle = editStyle.copyWith(color: theme.disabledColor);
   }
 
   @override

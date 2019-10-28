@@ -6,9 +6,9 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_bloc.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_skin_bloc.dart';
-import 'package:flutter_appirc/app/chat/state/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_model.dart';
@@ -23,15 +23,15 @@ import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 
-class NetworkChannelNewMessageWidget extends StatefulWidget {
-  NetworkChannelNewMessageWidget();
+class ChannelNewMessageWidget extends StatefulWidget {
+  ChannelNewMessageWidget();
 
   @override
-  State<StatefulWidget> createState() => NetworkChannelNewMessageState();
+  State<StatefulWidget> createState() => ChannelNewMessageState();
 }
 
-class NetworkChannelNewMessageState
-    extends State<NetworkChannelNewMessageWidget> {
+class ChannelNewMessageState
+    extends State<ChannelNewMessageWidget> {
   @override
   Widget build(BuildContext context) {
     var children = <Widget>[
@@ -71,7 +71,7 @@ class NetworkChannelNewMessageState
   Widget _buildInputMessageField(BuildContext context) {
     var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
 
-    var channelBloc = NetworkChannelBloc.of(context);
+    var channelBloc = ChannelBloc.of(context);
     ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
 //    var appSkinTheme = AppSkinBloc.of(context).appSkinTheme;
 
@@ -154,7 +154,7 @@ class NetworkChannelNewMessageState
   Widget _buildUploadButton(
       BuildContext context, ChatUploadBloc chatUploadBloc) {
     ChatConnectionBloc chatConnectionBloc = Provider.of(context);
-    var channelBloc = NetworkChannelBloc.of(context);
+    var channelBloc = ChannelBloc.of(context);
 
     return StreamBuilder<bool>(
         stream: chatConnectionBloc.isConnectedStream,
@@ -265,13 +265,16 @@ class NetworkChannelNewMessageState
       File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
     var appLocalizations = AppLocalizations.of(context);
     try {
-      var asyncDialogResult =
-          await doAsyncOperationWithDialog(context:context, asyncCode: ()
-          async {
-        var uploadRequestResult = await chatUploadBloc.uploadFile(pickedFile);
+      var asyncDialogResult = await doAsyncOperationWithDialog(
+          context: context,
+          asyncCode: () async {
+            var uploadRequestResult =
+                await chatUploadBloc.uploadFile(pickedFile);
 
-        return uploadRequestResult;
-      }, cancellationValue: null, isDismissible: true);
+            return uploadRequestResult;
+          },
+          cancellationValue: null,
+          isDismissible: true);
 
       if (asyncDialogResult.isNotCanceled) {
         var uploadRequestResult = asyncDialogResult.result;
