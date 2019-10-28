@@ -30,8 +30,7 @@ class ChannelNewMessageWidget extends StatefulWidget {
   State<StatefulWidget> createState() => ChannelNewMessageState();
 }
 
-class ChannelNewMessageState
-    extends State<ChannelNewMessageWidget> {
+class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
   @override
   Widget build(BuildContext context) {
     var children = <Widget>[
@@ -181,7 +180,8 @@ class ChannelNewMessageState
           var pressed;
           if (connected) {
             pressed = () {
-              ChatInputMessageBloc inputMessageBloc = Provider.of(context);
+              ChatInputMessageBloc inputMessageBloc =
+                  ChannelBloc.of(context).inputMessageBloc;
               inputMessageBloc.sendMessage();
             };
           }

@@ -38,6 +38,7 @@ class MessageListBloc extends Providable {
 
   BehaviorSubject<MessageListSearchState> _searchStateSubject;
 
+
   Stream<MessageListSearchState> get searchStateStream =>
       _searchStateSubject.stream;
 
@@ -124,11 +125,12 @@ class MessageListBloc extends Providable {
         "messages ${messages.length}"
         "filteredMessages ${filteredMessages.length}");
 
-    _searchStateSubject.add(MessageListSearchState.name(
+    var searchState = MessageListSearchState.name(
         foundMessages: filteredMessages,
         searchTerm: searchTerm,
         selectedFoundMessage:
-            filteredMessages.isNotEmpty ? filteredMessages.first : null));
+            filteredMessages.isNotEmpty ? filteredMessages.first : null);
+    _searchStateSubject.add(searchState);
 
     if (isSearchTermChanged) {
       // redraw search highlighted words
@@ -156,10 +158,11 @@ class MessageListBloc extends Providable {
     _logger.d(() => "changeSelectedMessage "
         "index $newSelectedFoundMessageIndex "
         "foundMessage $foundMessage");
-    _searchStateSubject.add(MessageListSearchState.name(
+    var listSearchState = MessageListSearchState.name(
         foundMessages: state.foundMessages,
         searchTerm: state.searchTerm,
-        selectedFoundMessage: foundMessage));
+        selectedFoundMessage: foundMessage);
+    _searchStateSubject.add(listSearchState);
     _logger.d(() => "changeSelectedMessage after");
   }
 

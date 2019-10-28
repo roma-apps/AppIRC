@@ -1,11 +1,8 @@
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/autocomplete/autocomplete.dart';
 
 class NamesAutoCompleter extends AutoCompleter {
   static final int minimumCharsCountForAutoComplete = 2;
-
 
   ChannelBloc channelBloc;
 
@@ -17,10 +14,9 @@ class NamesAutoCompleter extends AutoCompleter {
     if (lastWord != null &&
         lastWord.length > minimumCharsCountForAutoComplete) {
       var users = await channelBloc.retrieveUsers();
-      return compute(
-          _calculateSuggestions,
-          NamesAutoCompleteRequest(
-              lastWord, users.map((user) => user.nick).toList()));
+
+      return _calculateSuggestions(NamesAutoCompleteRequest(
+          lastWord, users.map((user) => user.nick).toList()));
     } else {
       return [];
     }
@@ -38,9 +34,7 @@ class NamesAutoCompleter extends AutoCompleter {
   }
 
   @override
-  void dispose() {
-
-  }
+  void dispose() {}
 }
 
 class NamesAutoCompleteRequest {

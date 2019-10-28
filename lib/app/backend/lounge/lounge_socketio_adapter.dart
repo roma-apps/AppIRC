@@ -9,6 +9,8 @@ SocketIOCommand toSocketIOCommand(LoungeRequest request) {
   } else if (request is LoungeRawRequest) {
     return SocketIOCommand.name(
         eventName: request.eventName, parameters: [request.bodyAsString]);
+  } else if (request is LoungeEmptyRequest) {
+    return SocketIOCommand.name(eventName: request.eventName, parameters: []);
   } else {
     throw "Unsupported type $request";
   }

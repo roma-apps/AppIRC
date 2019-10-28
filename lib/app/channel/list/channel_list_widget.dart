@@ -32,6 +32,10 @@ class ChannelListWidget extends StatelessWidget {
     var channelsListBloc =
         networksListBloc.getChannelListBloc(_network);
 
+    if(channelsListBloc == null) {
+      return SizedBox.shrink();
+    }
+
     return StreamBuilder<List<Channel>>(
         stream: channelsListBloc.channelsStream,
         initialData: channelsListBloc.channels,

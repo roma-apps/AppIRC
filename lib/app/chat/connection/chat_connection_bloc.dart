@@ -3,12 +3,9 @@ import 'dart:async';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
 var _reconnectDuration = Duration(seconds: 5);
-
-MyLogger _logger = MyLogger(logTag: "chat_connection_bloc.dart", enabled: true);
 
 class ChatConnectionBloc extends Providable {
   final ChatBackendService backendService;

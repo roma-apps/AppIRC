@@ -308,6 +308,7 @@ class ChatPage extends StatelessWidget {
                             _logger.d(() =>
                                 "build for activeChannel ${channelBloc.channel.name}");
 
+
                             return Provider(
                                 providable:
                                     ChannelBlocProvider(channelBloc),

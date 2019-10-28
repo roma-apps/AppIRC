@@ -1,5 +1,3 @@
-
-
 import 'package:flutter_appirc/disposable/disposable.dart';
 
 final String splitSeparator = " ";
@@ -7,7 +5,6 @@ final String splitSeparator = " ";
 abstract class AutoCompleter extends Disposable {
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern);
 }
-
 
 String findLastWord(String pattern) {
   var lastIndexOfSeparator = pattern.lastIndexOf(splitSeparator);

@@ -22,15 +22,19 @@ import 'package:flutter_widgets/flutter_widgets.dart';
 var _logger = MyLogger(logTag: "message_list_widget.dart", enabled: true);
 
 class MessageListWidget extends StatefulWidget {
+
   MessageListWidget();
 
   @override
-  _MessageListWidgetState createState() => _MessageListWidgetState();
+  _MessageListWidgetState createState() =>
+      _MessageListWidgetState();
 }
 
 class _MessageListWidgetState extends State<MessageListWidget> {
-  final ItemPositionsListener _positionsListener = ItemPositionsListener
-      .create();
+
+
+  final ItemPositionsListener _positionsListener =
+      ItemPositionsListener.create();
 
   final ItemScrollController _scrollController = ItemScrollController();
 
@@ -52,30 +56,18 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
     _positionsListener.itemPositions.addListener(onVisiblePositionsChanged);
 
-    Timer.run(() {
-      // we need Timer.run to have valid context for Provider
-
-      MessageListBloc chatListMessagesBloc = Provider.of(context);
-      _subscribeForNewSearchPosition(chatListMessagesBloc);
-    });
   }
 
-  void _subscribeForNewSearchPosition(MessageListBloc messageListBloc) {
-    _logger.d(() => "_subscribeForNewSearchPosition $messageListBloc");
-
-    _positionSubscription =
-        messageListBloc.searchStateStream.listen((newState) {
-          _logger.d(() => "newSearchState $newState");
-              var message = newState.selectedFoundMessage;
-              if (message != null)
-          {
-            var indexToJump = _lastBuildFilteredMessages?.indexOf(message);
-            _logger.d(() => "_jumpToSavedIndex $message"
-                "indexToJump $indexToJump");
-            _scrollController.jumpTo(
-                index: indexToJump + _lastBuildMessagesStartIndex);
-          }
-        });
+  void _jumpTo(MessageListSearchState newState) {
+    _logger.d(() => "newSearchState $newState");
+    var message = newState.selectedFoundMessage;
+    if (message != null) {
+      var indexToJump = _lastBuildFilteredMessages?.indexOf(message);
+      _logger.d(() => "_jumpToSavedIndex $message"
+          "indexToJump $indexToJump");
+      _scrollController?.jumpTo(
+          index: indexToJump + _lastBuildMessagesStartIndex);
+    }
   }
 
   void onVisiblePositionsChanged() {
@@ -113,7 +105,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         ChannelBloc channelBloc = ChannelBloc.of(context);
 
         channelBloc.messagesBloc.onVisibleMessagesBounds(
-            MessageListVisibleBounds(min: _lastBuildFilteredMessages[minIndex],
+            MessageListVisibleBounds(
+                min: _lastBuildFilteredMessages[minIndex],
                 max: _lastBuildFilteredMessages[maxIndex]));
       }
     }
@@ -128,19 +121,20 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     return StreamBuilder<MessageListState>(
         stream: chatListMessagesBloc.listStateStream,
         initialData: chatListMessagesBloc.listState,
-        builder: (BuildContext context,
-            AsyncSnapshot<MessageListState> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<MessageListState> snapshot) {
           MessageListState chatMessageListState = snapshot.data;
           return _buildMessagesList(context, chatMessageListState);
         });
   }
 
-  Widget _buildMessagesList(BuildContext context,
-      MessageListState chatMessageListState) {
+  Widget _buildMessagesList(
+      BuildContext context, MessageListState chatMessageListState) {
     var originalMessages = chatMessageListState.messages;
 
-    var filteredMessages = originalMessages.where((message) =>
-        _isNeedPrintChatMessage(message)).toList();
+    var filteredMessages = originalMessages
+        .where((message) => _isNeedPrintChatMessage(message))
+        .toList();
 
     _logger.d(() => "_buildMessagesList "
         "originalMessages ${originalMessages.length} "
@@ -154,23 +148,40 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     }
   }
 
-  Widget _buildMessagesListWidget(BuildContext context,
+  Widget _buildMessagesListWidget(
+      BuildContext context,
       MessageListState chatMessageListState,
       List<ChatMessage> filteredMessages) {
     MessageListBloc chatListMessagesBloc = Provider.of(context);
-    var visibleMessagesBounds = chatListMessagesBloc.channelMessagesListBloc
-        .visibleMessagesBounds;
+    var visibleMessagesBounds =
+        chatListMessagesBloc.channelMessagesListBloc.visibleMessagesBounds;
 
     ChatMessage initScrollPositionMessage = _calculateInitScrollPositionMessage(
         context, visibleMessagesBounds, filteredMessages);
-    var listWidget = _buildListWidget(
-        context, chatMessageListState.messages, filteredMessages,
-        chatMessageListState.moreHistoryAvailable ?? false,
-        chatListMessagesBloc.searchState, initScrollPositionMessage);
-    return listWidget;
+
+
+    return StreamBuilder<MessageListSearchState>(
+      stream: chatListMessagesBloc.searchStateStream,
+      initialData: chatListMessagesBloc.searchState,
+      builder: (context, snapshot) {
+
+        var searchState = snapshot.data;
+
+        _jumpTo(searchState);
+        return _buildListWidget(
+            context,
+            chatMessageListState.messages,
+            filteredMessages,
+            chatMessageListState.moreHistoryAvailable ?? false,
+//            chatListMessagesBloc.searchState,
+            searchState,
+            initScrollPositionMessage);
+      }
+    );
   }
 
-  ChatMessage _calculateInitScrollPositionMessage(BuildContext context,
+  ChatMessage _calculateInitScrollPositionMessage(
+      BuildContext context,
       MessageListVisibleBounds visibleMessagesBounds,
       List<ChatMessage> filteredMessages) {
     ChatMessage initScrollPositionMessage;
@@ -179,8 +190,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       initScrollPositionMessage = visibleMessagesBounds.min;
     } else {
       ChannelBloc channelBloc = ChannelBloc.of(context);
-      var firstUnreadRemoteMessageId = channelBloc.channelState
-          .firstUnreadRemoteMessageId;
+      var firstUnreadRemoteMessageId =
+          channelBloc.channelState.firstUnreadRemoteMessageId;
       if (firstUnreadRemoteMessageId != null) {
         initScrollPositionMessage = filteredMessages.firstWhere((message) {
           if (message is RegularMessage) {
@@ -201,15 +212,18 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     return initScrollPositionMessage;
   }
 
-  Widget _buildListWidget(BuildContext context,
-      List<ChatMessage> originalMessages, List<ChatMessage> filteredMessages,
-      bool moreHistoryAvailable, MessageListSearchState searchState,
+  Widget _buildListWidget(
+      BuildContext context,
+      List<ChatMessage> originalMessages,
+      List<ChatMessage> filteredMessages,
+      bool moreHistoryAvailable,
+      MessageListSearchState searchState,
       ChatMessage messageForInitScrollPosition) {
     _lastBuildFilteredMessages = filteredMessages;
     var itemCount = filteredMessages.length;
 
-    int initialScrollIndex = filteredMessages.indexOf(
-        messageForInitScrollPosition);
+    int initialScrollIndex =
+        filteredMessages.indexOf(messageForInitScrollPosition);
 
     if (moreHistoryAvailable) {
       itemCount += 1;
@@ -268,8 +282,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           }
 
           var message = filteredMessages[index];
-          var inSearchResults = searchState?.isMessageInSearchResults(
-              message) ?? false;
+          var inSearchResults =
+              searchState?.isMessageInSearchResults(message) ?? false;
           return _buildListItem(
               context, message, inSearchResults, searchState?.searchTerm);
         });
@@ -277,11 +291,11 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
   Container _buildListItem(BuildContext context, ChatMessage message,
       bool inSearchResults, String searchTerm) {
-    Widget messageBody = _buildMessageBody(
-        context, message, inSearchResults, searchTerm);
+    Widget messageBody =
+        _buildMessageBody(context, message, inSearchResults, searchTerm);
 
-    var decoration = _createMessageDecoration(
-        context, message, inSearchResults);
+    var decoration =
+        _createMessageDecoration(context, message, inSearchResults);
 
     return Container(decoration: decoration, child: messageBody);
   }
@@ -310,11 +324,12 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     return messageBody;
   }
 
-  isNeedHighlight(RegularMessage message) => message.highlight == true ||
+  isNeedHighlight(RegularMessage message) =>
+      message.highlight == true ||
       message.regularMessageType == RegularMessageType.unknown;
 
-  _createMessageDecoration(BuildContext context, ChatMessage message,
-      bool isHighlightBySearch) {
+  _createMessageDecoration(
+      BuildContext context, ChatMessage message, bool isHighlightBySearch) {
     var decoration;
     bool isHighlightByServer;
 
@@ -336,38 +351,47 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   StreamBuilder<bool> _buildListViewEmptyWidget(BuildContext context) {
     TextSkinBloc textSkinBloc = Provider.of(context);
     var channelBloc = ChannelBloc.of(context);
-    return StreamBuilder<bool>(stream: channelBloc.channelConnectedStream,
+    return StreamBuilder<bool>(
+      stream: channelBloc.channelConnectedStream,
       initialData: channelBloc.channelConnected,
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
         var connected = snapshot.data;
 
         if (connected) {
-          return Center(child: Text(AppLocalizations.of(context).tr(
-              "chat.messages_list.empty.connected"),
-              style: textSkinBloc.defaultTextStyle));
+          return Center(
+              child: Text(
+                  AppLocalizations.of(context)
+                      .tr("chat.messages_list.empty.connected"),
+                  style: textSkinBloc.defaultTextStyle));
         } else {
-          return Center(child: Text(AppLocalizations.of(context).tr(
-              "chat.messages_list.empty.not_connected"),
-              style: textSkinBloc.defaultTextStyle));
+          return Center(
+              child: Text(
+                  AppLocalizations.of(context)
+                      .tr("chat.messages_list.empty.not_connected"),
+                  style: textSkinBloc.defaultTextStyle));
         }
-      },);
+      },
+    );
   }
 }
 
 Widget _buildLoadMoreButton(BuildContext context, List<ChatMessage> messages) =>
     createSkinnedPlatformButton(context, onPressed: () {
-      doAsyncOperationWithDialog(context: context, asyncCode: () async {
+      doAsyncOperationWithDialog(
+          context: context,
+          asyncCode: () async {
+            var oldestRegularMessage = messages?.firstWhere(
+                (message) => message.chatMessageType == ChatMessageType.regular,
+                orElse: null) as RegularMessage;
 
-        var oldestRegularMessage = messages?.firstWhere((message) =>
-        message.chatMessageType == ChatMessageType.regular, orElse: null) as
-        RegularMessage;
-
-        var channelBloc = ChannelBloc.of(context);
-        return await channelBloc.loadMoreHistory(oldestRegularMessage);
-      }, cancellationValue: null, isDismissible: true);
+            var channelBloc = ChannelBloc.of(context);
+            return await channelBloc.loadMoreHistory(oldestRegularMessage);
+          },
+          cancellationValue: null,
+          isDismissible: true);
     },
-        child: Text(AppLocalizations.of(context).tr(
-            "chat.messages_list.action.load_more")));
+        child: Text(AppLocalizations.of(context)
+            .tr("chat.messages_list.action.load_more")));
 
 _isNeedPrintChatMessage(ChatMessage message) {
   if (message is RegularMessage) {

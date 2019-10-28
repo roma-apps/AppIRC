@@ -123,6 +123,10 @@ class NetworkListWidget extends StatelessWidget {
 
     var networkBloc = NetworkBlocsBloc.of(context).getNetworkBloc(network);
 
+    if(networkBloc == null) {
+      return SizedBox.shrink();
+    }
+
     var channelBloc =
         ChannelBlocsBloc.of(context).getChannelBloc(channel);
 

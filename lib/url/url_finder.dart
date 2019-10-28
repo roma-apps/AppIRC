@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 final _regex = RegExp(
   r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z0-9]{2,6}\b"
   r"([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
@@ -7,7 +5,6 @@ final _regex = RegExp(
 
 Future<List<String>> findUrls(List<String> originalTexts) async {
   return _findUrls(originalTexts);
-//  return await compute(_findUrls, originalTexts);
 }
 
 List<String> _findUrls(List<String> originalTexts) {
