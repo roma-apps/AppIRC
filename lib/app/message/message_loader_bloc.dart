@@ -35,8 +35,8 @@ class MessageLoaderBloc extends Providable {
   Stream<List<ChatMessage>> get messagesStream => _messagesSubject.stream;
   List<ChatMessage> get messages => _messagesSubject?.value;
 
-  MessageLoaderBloc(this._backendService, this._db,
-      this._messagesSaverBloc, this._network, this._channel) {
+  MessageLoaderBloc(this._backendService, this._db, this._messagesSaverBloc,
+      this._network, this._channel) {
     addDisposable(subject: _messagesSubject);
     addDisposable(subject: _isInitFinishedSubject);
 
@@ -52,9 +52,9 @@ class MessageLoaderBloc extends Providable {
     var regularMessages = (await _db.regularMessagesDao
             .getChannelMessagesOrderByDate(_channel.remoteId))
         .map(regularMessageDBToChatMessage);
-    var specialMessages = (await _db.specialMessagesDao
-            .getChannelMessages(_channel.remoteId))
-        .map(specialMessageDBToChatMessage);
+    var specialMessages =
+        (await _db.specialMessagesDao.getChannelMessages(_channel.remoteId))
+            .map(specialMessageDBToChatMessage);
 
     messages.addAll(regularMessages);
     messages.addAll(specialMessages);
@@ -74,20 +74,6 @@ class MessageLoaderBloc extends Providable {
         "closed ${_messagesSubject.isClosed}");
 
     _messagesSubject.add(messages);
-  }
-
-  void _onSpecialMessagesChanged() {
-    SpecialMessage latestTextMessage = findLatestTextSpecialMessage();
-
-    if (latestTextMessage != null) {
-      removeMessage(latestTextMessage);
-    }
-  }
-
-  void removeMessage(ChatMessage messageToRemove) {
-    return messages.removeWhere((message) {
-      return message != messageToRemove;
-    });
   }
 
   ChatMessage findLatestTextSpecialMessage() {
@@ -113,24 +99,22 @@ class MessageLoaderBloc extends Providable {
     _logger.d(() => "init finish");
     _isInitFinishedSubject.add(true);
 
-
     // socket listener
     addDisposable(
-        disposable: _messagesSaverBloc
-            .listenForMessages(_network, _channel, (newMessage) {
+        disposable: _messagesSaverBloc.listenForMessages(_network, _channel,
+            (newMessage) {
       _addNewMessage(newMessage);
     }));
 
     addDisposable(
-        disposable: _backendService.listenForMessagePreviews(
-            _network, _channel, (previewForMessage) {
+        disposable: _backendService.listenForMessagePreviews(_network, _channel,
+            (previewForMessage) {
       _updatePreview(previewForMessage);
     }));
 
     addDisposable(
-        disposable: _backendService
-            .listenForMessagePreviewToggle(_network, _channel,
-                (ToggleMessagePreviewData togglePreview) async {
+        disposable: _backendService.listenForMessagePreviewToggle(
+            _network, _channel, (ToggleMessagePreviewData togglePreview) async {
       _onMessagesChanged();
     }));
 
@@ -157,7 +141,7 @@ class MessageLoaderBloc extends Providable {
   }
 
   void _updatePreview(MessagePreviewForRemoteMessageId previewForMessage) {
-      var oldMessage = messages.firstWhere((message) {
+    var oldMessage = messages.firstWhere((message) {
       if (message is RegularMessage) {
         var regularMessage = message;
 
@@ -193,9 +177,25 @@ class MessageLoaderBloc extends Providable {
     } else {
       messages.add(newMessage);
     }
+    _logger.d(() => "_addNewMessage $newMessage");
 
     if (newMessage.chatMessageType == ChatMessageType.special) {
-      _onSpecialMessagesChanged();
+      SpecialMessage latestTextMessage = findLatestTextSpecialMessage();
+
+      if (latestTextMessage != null) {
+        return messages.removeWhere((message) {
+          if (message.isSpecial) {
+            var specialMessage = message as SpecialMessage;
+            if (specialMessage.specialType == SpecialMessageType.text) {
+              return message != latestTextMessage;
+            } else {
+              return false;
+            }
+          } else {
+            return false;
+          }
+        });
+      }
     }
     _onMessagesChanged();
   }

@@ -24,13 +24,16 @@ class ChatConnectionBloc extends Providable {
   ChatConnectionBloc(this.backendService) {
     addDisposable(
         timer: Timer.periodic(_reconnectDuration, (_) => _reconnectIfNeeded()));
+    Timer.run(() {
+      _reconnectIfNeeded();
+    });
   }
 
   reconnect() => _reconnectIfNeeded();
 
   void _reconnectIfNeeded() async {
-    _logger.d(() => "_reconnectIfNeeded = $connectionState "
-        "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
+//    _logger.d(() => "_reconnectIfNeeded = $connectionState "
+//        "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
     if (connectionState == ChatConnectionState.disconnected) {
       var connectivityResult = await (Connectivity().checkConnectivity());
 

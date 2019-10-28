@@ -65,7 +65,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       BehaviorSubject(seedValue: ChatConnectionState.disconnected);
 
   Stream<ChatConnectionState> get connectionStateStream =>
-      _connectionStateSubject.stream;
+      _connectionStateSubject.stream.distinct();
 
   ChatConnectionState get connectionState => _connectionStateSubject.value;
 
@@ -85,8 +85,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
   // lounge don't response properly to edit request
   // ignore: close_sinks
-  BehaviorSubject<NetworkPreferences> _editNetworkRequests =
-      BehaviorSubject();
+  BehaviorSubject<NetworkPreferences> _editNetworkRequests = BehaviorSubject();
 
   @override
   bool get isReadyToConnect =>
@@ -161,6 +160,9 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     if (connectResult.config != null) {
       this._chatConfigSubject.add(connectResult.config);
       this.chatInit = connectResult.chatInit;
+
+      // socket io callback very slow
+      _connectionStateSubject.add(ChatConnectionState.connected);
     }
 
     _logger.d(() => "connectChat = $connectResult chatConfig = $chatConfig");
@@ -373,19 +375,16 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   Future<RequestResult<ChannelWithState>> joinChannel(
       Network network, ChannelPreferences preferences,
       {bool waitForResult = false}) async {
-    _logger.d(
-        () => "joinChannel $preferences waitForResult $waitForResult");
+    _logger.d(() => "joinChannel $preferences waitForResult $waitForResult");
 
     var request = ChatJoinChannelInputLoungeJsonRequest.name(
         preferences, network.lobbyChannel.remoteId);
 
     var result;
     Disposable channelListener;
-    channelListener =
-        listenForChannelJoin(network, (channelWithState) async {
+    channelListener = listenForChannelJoin(network, (channelWithState) async {
       var isForRequest = channelWithState.channel.name == preferences.name;
-      _logger.d(() =>
-          "joinChannel listenForChannelJoin $channelWithState "
+      _logger.d(() => "joinChannel listenForChannelJoin $channelWithState "
           "isForRequest= $isForRequest");
       if (isForRequest) {
         result = channelWithState;
@@ -407,12 +406,11 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       {bool waitForResult = false}) async {
     var request = InputLoungeJsonRequest.name(
         target: channel.remoteId, // private channel name is equal to nickname
-        content: JoinIRCCommand.name(channelName: nick).asRawString);
+        text: JoinIRCCommand.name(channelName: nick).asRawString);
 
     var result;
     Disposable channelListener;
-    channelListener =
-        listenForChannelJoin(network, (channelWithState) async {
+    channelListener = listenForChannelJoin(network, (channelWithState) async {
       result = channelWithState;
       channelListener.dispose();
     });
@@ -437,8 +435,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   }
 
   @override
-  Future<RequestResult<bool>> leaveChannel(
-      Network network, Channel channel,
+  Future<RequestResult<bool>> leaveChannel(Network network, Channel channel,
       {bool waitForResult = false}) async {
     if (waitForResult) {
       throw NotImplementedYetLoungeException();
@@ -448,8 +445,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   }
 
   @override
-  Disposable listenForMessages(Network network, Channel channel,
-      ChannelMessageListener listener) {
+  Disposable listenForMessages(
+      Network network, Channel channel, ChannelMessageListener listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
         createEventListenerDisposable(MsgLoungeResponseBody.eventName, (raw) {
@@ -515,8 +512,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   }
 
   @override
-  Disposable listenForChannelJoin(
-      Network network, ChannelListener listener) {
+  Disposable listenForChannelJoin(Network network, ChannelListener listener) {
     _logger.d(() => "listenForChannelJoin $network");
 
     var disposable = CompositeDisposable([]);
@@ -539,8 +535,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
               password: request.preferences.password);
           _pendingRequests.remove(request);
         } else {
-          preferences = ChannelPreferences.name(
-              name: parsed.chan.name, password: "");
+          preferences =
+              ChannelPreferences.name(name: parsed.chan.name, password: "");
         }
 
         var loungeChannel = parsed.chan;
@@ -725,8 +721,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
           MsgPreviewLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (parsed.chan == channel.remoteId) {
-        listener(
-            MessagePreviewForRemoteMessageId(parsed.id, toMessagePreview(parsed.preview)));
+        listener(MessagePreviewForRemoteMessageId(
+            parsed.id, toMessagePreview(parsed.preview)));
       }
     }));
 
@@ -736,8 +732,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   @override
   Disposable listenForNetworkEdit(
       Network network, NetworkConnectionListener listener) {
-    return StreamSubscriptionDisposable(_editNetworkRequests
-        .listen((NetworkPreferences networkPreferences) {
+    return StreamSubscriptionDisposable(
+        _editNetworkRequests.listen((NetworkPreferences networkPreferences) {
       if (network.connectionPreferences.localId == networkPreferences.localId) {
         listener(networkPreferences);
       }
@@ -750,8 +746,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       NetworkStateListener listener) {
     var disposable = CompositeDisposable([]);
 
-    disposable.add(StreamSubscriptionDisposable(_editNetworkRequests
-        .listen((NetworkPreferences networkPreferences) {
+    disposable.add(StreamSubscriptionDisposable(
+        _editNetworkRequests.listen((NetworkPreferences networkPreferences) {
       if (network.connectionPreferences.localId == networkPreferences.localId) {
         var currentState = currentStateExtractor();
         currentState.name = networkPreferences
@@ -862,8 +858,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   }
 
   @override
-  Disposable listenForChannelNames(Network network,
-      Channel channel, Function(List<ChannelUser>) listener) {
+  Disposable listenForChannelNames(
+      Network network, Channel channel, Function(List<ChannelUser>) listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(createEventListenerDisposable(
         (NamesLoungeResponseBody.eventName), (raw) {
@@ -906,8 +902,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     _socketIOService.dispose();
   }
 
-  void _sendInputRequest(
-      Network network, Channel channel, String message) {
+  void _sendInputRequest(Network network, Channel channel, String message) {
     if (_isCollapseClientSideCommand(message)) {
       _channelTogglePreviewSubject
           .add(ToggleChannelPreviewData(network, channel, false));
@@ -916,8 +911,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
           .add(ToggleChannelPreviewData(network, channel, true));
     } else {
       _sendRequest(
-          InputLoungeJsonRequest.name(
-              target: channel.remoteId, content: message),
+          InputLoungeJsonRequest.name(target: channel.remoteId, text: message),
           isNeedAddRequestToPending: false);
     }
   }
@@ -962,9 +956,11 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
       _logger.d(() => "loadMoreHistory $parsed for $channel");
 
-      toChatLoadMore(channel, parsed).then((chatLoadMore) {
-        callback(chatLoadMore);
-      });
+      if (parsed.chan == channel.remoteId) {
+        toChatLoadMore(channel, parsed).then((chatLoadMore) {
+          callback(chatLoadMore);
+        });
+      }
     }));
 
     return disposable;
@@ -1004,7 +1000,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
             target: channel.remoteId, lastId: lastMessageId),
         isNeedAddRequestToPending: false);
 
-    _doWaitForResult(() => chatLoadMore);
+    await _doWaitForResult(() => chatLoadMore);
 
     disposable.dispose();
 
@@ -1015,8 +1011,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   BehaviorSubject<ToggleMessagePreviewData> _messageTogglePreviewSubject =
       BehaviorSubject();
 
-  Disposable listenForMessagePreviewToggle(Network network,
-      Channel channel, Function(ToggleMessagePreviewData) callback) {
+  Disposable listenForMessagePreviewToggle(Network network, Channel channel,
+      Function(ToggleMessagePreviewData) callback) {
     return StreamSubscriptionDisposable(_messageTogglePreviewSubject.stream
         .listen((ToggleMessagePreviewData toggle) {
       if (toggle.channel == channel) {
@@ -1029,8 +1025,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   BehaviorSubject<ToggleChannelPreviewData> _channelTogglePreviewSubject =
       BehaviorSubject();
 
-  Disposable listenForChannelPreviewToggle(Network network,
-      Channel channel, Function(ToggleChannelPreviewData) callback) {
+  Disposable listenForChannelPreviewToggle(Network network, Channel channel,
+      Function(ToggleChannelPreviewData) callback) {
     return StreamSubscriptionDisposable(_channelTogglePreviewSubject.stream
         .listen((ToggleChannelPreviewData toggle) {
       if (toggle.channel == channel) {

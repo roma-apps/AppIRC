@@ -226,11 +226,11 @@
               "label": "Topic",
               "hint": "Hey there!"
             }
+          },
+          "action": {
+            "change": "Change",
+            "cancel": "Cancel"
           }
-        },
-        "action": {
-          "change": "Change",
-          "cancel": "Cancel"
         }
       },
       "action": {

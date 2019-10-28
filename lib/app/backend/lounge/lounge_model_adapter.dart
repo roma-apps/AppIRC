@@ -66,8 +66,8 @@ ChatConfig toChatConfig(
         fileUploadMaxSizeInBytes: loungeConfig.fileUploadMaxFileSize,
         commands: commands);
 
-Future<ChatMessage> toChatMessage(Channel channel,
-    MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
+Future<ChatMessage> toChatMessage(
+    Channel channel, MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
   var regularMessageType = detectRegularMessageType(msgLoungeResponseBody.type);
 
   if (regularMessageType == RegularMessageType.whoIs) {
@@ -113,8 +113,8 @@ Future<ChatMessage> toChatMessage(Channel channel,
   }
 }
 
-Future<SpecialMessage> toWhoIsSpecialMessage(Channel channel,
-    MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
+Future<SpecialMessage> toWhoIsSpecialMessage(
+    Channel channel, MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
   var whoIsSpecialBody = toWhoIsSpecialMessageBody(msgLoungeResponseBody.whois);
 
   var linksInMessage = await findUrls([
@@ -165,12 +165,13 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
   for (var item in iterable) {
     var loungeChannelItem =
         ChannelListItemSpecialMessageLoungeResponseBodyPart.fromJson(item);
-    var channelInfoSpecialMessageBody =
-        ChannelInfoSpecialMessageBody(loungeChannelItem.channel,
-            loungeChannelItem.topic, loungeChannelItem.num_users);
+    var channelInfoSpecialMessageBody = ChannelInfoSpecialMessageBody(
+        loungeChannelItem.channel,
+        loungeChannelItem.topic,
+        loungeChannelItem.num_users);
 
-    var linksInMessage =
-        await findUrls([channelInfoSpecialMessageBody.topic]);
+    var linksInMessage = await findUrls([channelInfoSpecialMessageBody.topic]);
+//    var linksInMessage = <String>[];
     specialMessages.add(SpecialMessage.name(
         data: channelInfoSpecialMessageBody,
         channelRemoteId: channel.remoteId,
@@ -178,6 +179,8 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
         date: DateTime.now(),
         linksInMessage: linksInMessage));
   }
+
+  _logger.d(() => "toChannelsListSpecialMessages ${specialMessages.length}");
 
   return specialMessages;
 }
@@ -266,10 +269,9 @@ ChannelState toChannelState(
     ChannelLoungeResponseBodyPart loungeChannel, ChannelType type) {
   // Private and special messages are always connected, but lounge sometimes
   // don't provide connected state for them
-  var isConnected =
-      type == ChannelType.query || type == ChannelType.special
-          ? true
-          : loungeChannel.state == ChannelStateLoungeConstants.connected;
+  var isConnected = type == ChannelType.query || type == ChannelType.special
+      ? true
+      : loungeChannel.state == ChannelStateLoungeConstants.connected;
   return ChannelState.name(
       topic: loungeChannel.topic,
       firstUnreadRemoteMessageId: loungeChannel.firstUnread,
@@ -288,8 +290,8 @@ NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
         nick: nick,
         name: name);
 
-Future<MessageListLoadMore> toChatLoadMore(Channel channel,
-    MoreLoungeResponseBody moreLoungeResponseBody) async {
+Future<MessageListLoadMore> toChatLoadMore(
+    Channel channel, MoreLoungeResponseBody moreLoungeResponseBody) async {
   var messages = <ChatMessage>[];
 
   for (var loungeMessage in moreLoungeResponseBody.messages) {
@@ -495,12 +497,13 @@ Future<NetworkWithState> toNetworkWithState(
   var nick = loungeNetwork.nick;
   NetworkConnectionPreferences connectionPreferences =
       NetworkConnectionPreferences(
-          serverPreferences: NetworkServerPreferences(
-              name: loungeNetwork.name,
-              serverHost: loungeNetwork.host,
-              serverPort: loungeNetwork.port.toString(),
-              useTls: loungeNetwork.tls,
-              useOnlyTrustedCertificates: loungeNetwork.rejectUnauthorized),
+          serverPreferences:
+              NetworkServerPreferences(
+                  name: loungeNetwork.name,
+                  serverHost: loungeNetwork.host,
+                  serverPort: loungeNetwork.port.toString(),
+                  useTls: loungeNetwork.tls,
+                  useOnlyTrustedCertificates: loungeNetwork.rejectUnauthorized),
           userPreferences: NetworkUserPreferences(
               nickname: nick,
               password: null,

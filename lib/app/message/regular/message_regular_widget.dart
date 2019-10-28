@@ -74,12 +74,15 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message,
 
   if (message.text != null) {
     var text = message.text;
-    var spanBuilders = [];
+    var spanBuilders = <SpanHighlighter>[];
 
-    spanBuilders.addAll(message.linksInText
-        .map((link) => buildLinkHighlighter(context: context, link: link)));
-    spanBuilders.addAll(message.nicknames.map((nickname) =>
-        buildNicknameSpanHighlighter(context: context, nickname: nickname)));
+    spanBuilders.addAll(message.linksInText?.map(
+            (link) => buildLinkHighlighter(context: context, link: link)) ??
+        []);
+    spanBuilders.addAll(message.nicknames?.map((nickname) =>
+            buildNicknameSpanHighlighter(
+                context: context, nickname: nickname)) ??
+        []);
     if (isHighlightedBySearch) {
       spanBuilders.add(
           buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
@@ -101,10 +104,9 @@ Widget _buildMessageBody(BuildContext context, RegularMessage message,
   );
 }
 
-Widget _buildMessageTitle(BuildContext context, ChannelBloc channelBloc,
-    RegularMessage message) {
+Widget _buildMessageTitle(
+    BuildContext context, ChannelBloc channelBloc, RegularMessage message) {
   var iconData = _calculateTitleIconDataForMessage(message);
-  var icon = Icon(iconData);
 
   var startPart;
 
@@ -120,6 +122,8 @@ Widget _buildMessageTitle(BuildContext context, ChannelBloc channelBloc,
   var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
   var color =
       messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
+
+  var icon = Icon(iconData, color: color);
 
   var messageTitleDate =
       buildMessageTitleDate(context: context, message: message, color: color);
@@ -138,8 +142,8 @@ Widget _buildMessageTitle(BuildContext context, ChannelBloc channelBloc,
   return buildMessageTitle(startPart, endPart);
 }
 
-Widget _buildMessageTitleNick(BuildContext context,
-    ChannelBloc channelBloc, RegularMessage message) {
+Widget _buildMessageTitleNick(
+    BuildContext context, ChannelBloc channelBloc, RegularMessage message) {
   var nick = message.fromNick;
 
   return buildUserNickWithPopupMenu(
@@ -231,11 +235,9 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
   }
 }
 
-
-
-bool _isHaveLongText(RegularMessage message) =>
-    message.text != null ? message.text.length >
-        _longMessageTextMinimumLength : false;
+bool _isHaveLongText(RegularMessage message) => message.text != null
+    ? message.text.length > _longMessageTextMinimumLength
+    : false;
 
 IconData _calculateTitleIconDataForMessage(RegularMessage message) {
   IconData icon;

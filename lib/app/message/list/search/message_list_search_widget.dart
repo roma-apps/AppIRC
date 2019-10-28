@@ -17,19 +17,19 @@ class MessageListSearchWidget extends StatefulWidget {
 }
 
 class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
-  TextEditingController searchController;
+  TextEditingController _searchController;
 
   MessageListSearchWidgetState();
 
   @override
   void initState() {
     super.initState();
-    searchController = TextEditingController();
+    _searchController = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
-    ChannelBloc channelBloc = Provider.of(context);
+    ChannelBloc channelBloc = ChannelBloc.of(context);
 
     return StreamBuilder(
       stream: channelBloc.messagesBloc.searchEnabledStream,
@@ -66,7 +66,7 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
 
   StreamBuilder<MessageListSearchState> _buildSearchTextField(
       BuildContext context) {
-    ChannelBloc channelBloc = Provider.of(context);
+    ChannelBloc channelBloc = ChannelBloc.of(context);
     MessageListBloc chatMessagesListBloc = Provider.of(context);
 
     return StreamBuilder<MessageListSearchState>(
@@ -82,7 +82,7 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
             child: buildFormTextField(
                 context: context,
                 bloc: channelBloc.messagesBloc.searchFieldBloc,
-                controller: searchController,
+                controller: _searchController,
                 label: labelText,
                 hint: AppLocalizations.of(context)
                     .tr("chat.messages_list.search.field"
@@ -117,7 +117,7 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
   }
 
   PlatformIconButton _buildHideSearchButton(BuildContext context) {
-    ChannelBloc channelBloc = Provider.of(context);
+    ChannelBloc channelBloc = ChannelBloc.of(context);
     MessageListSearchSkinBloc messagesListSearchSkinBloc = Provider.of(context);
 
     Color disabledColor = messagesListSearchSkinBloc.disabledColor;

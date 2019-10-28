@@ -55,6 +55,8 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
   final bool serverPreferencesEnabled;
   final bool serverPreferencesVisible;
 
+  ValidatorFunction _networkValidator;
+
   NetworkPreferencesPageState(
       this.titleText,
       this.startValues,
@@ -63,24 +65,26 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
       this.isNeedShowCommands,
       this.serverPreferencesEnabled,
       this.serverPreferencesVisible,
-      this.buttonText);
+      this.buttonText) {
+    networkPreferencesFormBloc = NetworkPreferencesFormBloc.name(
+        preferences: startValues,
+        isNeedShowChannels: isNeedShowChannels,
+        isNeedShowCommands: isNeedShowCommands,
+        serverPreferencesEnabled: serverPreferencesEnabled,
+        serverPreferencesVisible: serverPreferencesVisible,
+        networkValidator: CustomValidator((value) {
+          return _networkValidator ?? value ?? false;
+        }));
+  }
 
   @override
   void initState() {
     super.initState();
+
     new Future.delayed(Duration.zero, () {
       // we need valid context
       final NetworkListBloc chatBloc = Provider.of<NetworkListBloc>(context);
-      CustomValidator<String> networkValidator =
-          buildNetworkValidator(chatBloc);
-
-      networkPreferencesFormBloc = NetworkPreferencesFormBloc.name(
-          preferences: startValues,
-          isNeedShowChannels: isNeedShowChannels,
-          isNeedShowCommands: isNeedShowCommands,
-          serverPreferencesEnabled: serverPreferencesEnabled,
-          serverPreferencesVisible: serverPreferencesVisible,
-          networkValidator: networkValidator);
+      _networkValidator = buildNetworkValidator(chatBloc).validator;
     });
   }
 

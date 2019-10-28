@@ -6,7 +6,8 @@ final _regex = RegExp(
 );
 
 Future<List<String>> findUrls(List<String> originalTexts) async {
-  return await compute(_findUrls, originalTexts);
+  return _findUrls(originalTexts);
+//  return await compute(_findUrls, originalTexts);
 }
 
 List<String> _findUrls(List<String> originalTexts) {

@@ -41,7 +41,10 @@ Widget buildSpecialMessageWidget(BuildContext context,
       break;
     case SpecialMessageType.text:
       var textSpecialMessage = specialMessage.data as TextSpecialMessageBody;
-      return Text(textSpecialMessage.message);
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(textSpecialMessage.message),
+      );
   }
   throw Exception("Invalid message type $specialMessage");
 }
@@ -115,7 +118,7 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
         ],
       ));
   return buildMessageWidget(context:context, title:title, body:body,
-      color: null);
+      color: color);
 }
 
 Widget _buildWhoIsRow(String label, String value) {
@@ -141,7 +144,7 @@ Widget _buildUsersCount(BuildContext context,
     ChannelInfoSpecialMessageBody channelInfoItem) {
   return Text(AppLocalizations.of(context).tr(
       "chat"
-      ".message_special.channels_list.users",
+      ".message.special.channels_list.users",
       args: [channelInfoItem.usersCount.toString()]));
 }
 
@@ -168,7 +171,7 @@ Widget _buildTopic(BuildContext context, String topic, List<String> linksInText,
   MessagesSpecialSkinBloc messagesSpecialSkinBloc =
       Provider.of<MessagesSpecialSkinBloc>(context);
 
-  var spanBuilders = [];
+  var spanBuilders = <SpanHighlighter>[];
   spanBuilders.addAll(linksInText.map(
       (link) => buildLinkHighlighter(context: context, link: link)));
   if (includedInSearch) {

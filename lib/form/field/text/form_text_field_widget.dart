@@ -37,6 +37,8 @@ buildFormTextField(
     controller: controller,
     label: label,
     hint: hint,
+    onChanged: bloc.onNewValue,
+    focusNode: bloc.focusNode,
     keyboardType: keyboardType,
     formatters: formatters,
     maxLength: maxLength,
@@ -91,9 +93,10 @@ buildFormTextRow(
   if (bloc.visible) {
     FormTextFieldSkinBloc formTextFieldSkinBloc = Provider.of(context);
 
-    PlatformTextField platformTextField = buildPlatformTextField(
+    PlatformTextField platformTextField = buildFormTextField(
       context: context,
       controller: controller,
+      bloc: bloc,
       label: label,
       hint: hint,
       keyboardType: keyboardType,
@@ -109,9 +112,6 @@ buildFormTextRow(
       expands: expands,
       onEditingComplete: onEditingComplete,
       onSubmitted: onSubmitted,
-      labelStyle: null,
-      hintStyle: null,
-      editStyle: null,
     );
     return Column(
       children: <Widget>[

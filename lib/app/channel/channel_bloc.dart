@@ -155,10 +155,9 @@ class ChannelBloc extends DisposableOwner implements MoreHistoryOwner {
   }
 
   Future<RequestResult<MessageListLoadMore>> loadMoreHistory(
-      RegularMessage oldestMessage) async {
-    return _backendService.loadMoreHistory(
-        network, channel, oldestMessage.messageRemoteId);
-  }
+      RegularMessage oldestMessage) async => await _backendService
+      .loadMoreHistory(
+        network, channel, oldestMessage?.messageRemoteId);
 
   Future<RequestResult<ToggleMessagePreviewData>> togglePreview(
       RegularMessage message, MessagePreview preview) {

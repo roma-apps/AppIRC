@@ -31,6 +31,12 @@ class SpecialMessage extends ChatMessage {
   @override
   bool isContainsText(String searchTerm, {@required bool ignoreCase}) =>
       data.isContainsText(searchTerm, ignoreCase: ignoreCase);
+  @override
+  String toString() {
+    return 'SpecialMessage{data: $data, specialType: $specialType}';
+  }
+
+
 }
 
 enum SpecialMessageType { whoIs, channelsListItem, text }

@@ -65,10 +65,6 @@ class MessageSaverBloc
       await _updatePreview(previewForMessage);
     }));
 
-    channelDisposable.add(_backendService
-        .listenForMessagePreviews(network, channel, (previewForMessage) async {
-      await _updatePreview(previewForMessage);
-    }));
 
     channelDisposable.add(_backendService.listenForMessagePreviewToggle(
         network, channel, (ToggleMessagePreviewData togglePreview) async {

@@ -48,8 +48,7 @@ class NetworkPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    NetworkPreferencesFormBloc formBloc =
-        Provider.of<NetworkPreferencesFormBloc>(context);
+    NetworkPreferencesFormBloc formBloc = Provider.of(context);
 
     var appLocalizations = AppLocalizations.of(context);
     return Padding(

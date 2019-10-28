@@ -73,7 +73,7 @@ class CommandsLoungeResponseBody {
   CommandsLoungeResponseBody.fromRaw(dynamic raw) {
     var iterable = (raw as Iterable);
 
-    var commands = List<String>();
+    commands = List<String>();
 
     iterable.forEach((obj) {
       commands.add(obj.toString());

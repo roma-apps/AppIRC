@@ -10,7 +10,7 @@ InputLoungeJsonRequest _$InputLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return InputLoungeJsonRequest(
     json['target'] as int,
-    json['content'] as String,
+    json['text'] as String,
   );
 }
 
@@ -18,7 +18,7 @@ Map<String, dynamic> _$InputLoungeJsonRequestToJson(
         InputLoungeJsonRequest instance) =>
     <String, dynamic>{
       'target': instance.target,
-      'content': instance.content,
+      'text': instance.text,
     };
 
 MoreLoungeJsonRequest _$MoreLoungeJsonRequestFromJson(

@@ -58,7 +58,7 @@ class MessageListBloc extends Providable {
         .moreHistoryAvailableStream
         .listen((moreHistoryAvailable) {
       _onMessagesChanged(_messageLoaderBloc.messages,
-          _moreHistoryOwner.moreHistoryAvailable);
+          _moreHistoryOwner.moreHistoryAvailable ?? false);
     }));
 
     addDisposable(streamSubscription:
@@ -154,12 +154,13 @@ class MessageListBloc extends Providable {
     var foundMessage = state.foundMessages[newSelectedFoundMessageIndex];
 
     _logger.d(() => "changeSelectedMessage "
-        "index $newSelectedFoundMessageIndex"
+        "index $newSelectedFoundMessageIndex "
         "foundMessage $foundMessage");
     _searchStateSubject.add(MessageListSearchState.name(
         foundMessages: state.foundMessages,
         searchTerm: state.searchTerm,
         selectedFoundMessage: foundMessage));
+    _logger.d(() => "changeSelectedMessage after");
   }
 
   void goToNextFoundMessage() {

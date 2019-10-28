@@ -47,7 +47,7 @@ class QuitIRCCommand extends IRCCommand {
 
 class CloseIRCCommand extends IRCCommand {
   @override
-  String get asRawString => "/list";
+  String get asRawString => "/leave";
 }
 
 class BanListIRCCommand extends IRCCommand {

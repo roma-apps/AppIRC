@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart' show CupertinoNavigationBar;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show AppBar, Colors, Drawer, Icons, ScaffoldState;
 import 'package:flutter/widgets.dart';
@@ -296,7 +297,7 @@ class ChatPage extends StatelessWidget {
                         builder: (context, snapshot) {
                           var initFinished = snapshot.data;
                           var length = messagesLoaderBloc.messages?.length;
-                          _logger.d(() => "initFinished $initFinished"
+                          _logger.d(() => "initFinished $initFinished "
                               "messages $length");
                           if (initFinished && length != null) {
                             var chatListMessagesBloc = MessageListBloc(
@@ -399,7 +400,17 @@ class ChatPage extends StatelessWidget {
           if (currentInitState == ChatInitState.finished) {
             return _buildConnectedAlreadyInitWidget(context);
           } else {
-            return _buildConnectedNoInitWidget();
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _buildConnectedNoInitWidget(),
+                ),
+                _buildLoadingMessagesWidget(context)
+              ],
+            );
           }
         });
   }
@@ -412,7 +423,7 @@ class ChatPage extends StatelessWidget {
     var startValues =
         backendService.chatConfig.createDefaultNetworkPreferences();
     NetworkListBloc networkListBloc = Provider.of(context);
-    return Provider(
+    return Provider<NetworkPreferencesFormBloc>(
       providable: NetworkPreferencesFormBloc.name(
           preferences: startValues,
           isNeedShowChannels: true,

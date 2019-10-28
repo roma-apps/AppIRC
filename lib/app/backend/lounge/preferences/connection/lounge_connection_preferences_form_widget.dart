@@ -33,6 +33,25 @@ class LoungeConnectionPreferencesFormWidgetState
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(Duration.zero, () {
+      var loungePreferencesFormBloc =
+          Provider.of<LoungeConnectionPreferencesFormBloc>(context);
+
+      // todo: remove. Need only for test
+      loungePreferencesFormBloc.hostFieldBloc.valueStream
+          .distinct()
+          .listen((String newHost) {
+        if (_hostController.text != newHost) {
+          _hostController.text = newHost;
+        }
+      });
+    });
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _hostController.dispose();
@@ -43,11 +62,6 @@ class LoungeConnectionPreferencesFormWidgetState
     var loungePreferencesFormBloc =
         Provider.of<LoungeConnectionPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
-
-    // temp hack to fill data by test buttons
-    // it also cause strange cursors bugs on Android
-    // TODO: remove hack
-    _hostController.text = _startPreferences.host;
 
     _logger.d(() => "build");
     return Column(

@@ -79,11 +79,11 @@ class InputLoungeJsonRequest extends LoungeJsonRequest {
   String get eventName => RequestLoungeEventNames.input;
 
   final int target;
-  final String content;
+  final String text;
 
-  InputLoungeJsonRequest(this.target, this.content);
+  InputLoungeJsonRequest(this.target, this.text);
 
-  InputLoungeJsonRequest.name({@required this.target, @required this.content});
+  InputLoungeJsonRequest.name({@required this.target, @required this.text});
 
   factory InputLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
       _$InputLoungeJsonRequestFromJson(json);
@@ -93,7 +93,7 @@ class InputLoungeJsonRequest extends LoungeJsonRequest {
 
   @override
   String toString() {
-    return 'InputLoungeJsonRequest{target: $target, content: $content}';
+    return 'InputLoungeJsonRequest{target: $target, content: $text}';
   }
 }
 
