@@ -63,14 +63,30 @@ class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
   String get eventName => RequestLoungeEventNames.open;
 }
 
-class PushFCMTokenLoungeRawRequest extends LoungeRawRequest<String> {
-  PushFCMTokenLoungeRawRequest(String body) : super(body);
+@JsonSerializable()
+class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
+  final String token;
+  PushFCMTokenLoungeJsonRequest(this.token) : super();
 
-  PushFCMTokenLoungeRawRequest.name({@required String deviceFCMToken})
-      : super(deviceFCMToken);
+  PushFCMTokenLoungeJsonRequest.name({@required this.token})
+      : super();
+
 
   @override
   String get eventName => RequestLoungeEventNames.pushFCMToken;
+
+
+  factory PushFCMTokenLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$PushFCMTokenLoungeJsonRequestFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$PushFCMTokenLoungeJsonRequestToJson(this);
+  @override
+  String toString() {
+    return 'PushFCMTokenLoungeJsonRequest{token: $token}';
+  }
+
+
 }
 
 @JsonSerializable()
@@ -155,28 +171,6 @@ class MsgPreviewToggleLoungeJsonRequest extends LoungeJsonRequest {
       _$MsgPreviewToggleLoungeJsonRequestFromJson(json);
 }
 
-@JsonSerializable()
-class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
-  @override
-  String get eventName => RequestLoungeEventNames.pushFCMToken;
-
-  final String token;
-
-  PushFCMTokenLoungeJsonRequest(this.token);
-
-  PushFCMTokenLoungeJsonRequest.name({@required this.token});
-
-  @override
-  Map<String, dynamic> toJson() => _$PushFCMTokenLoungeJsonRequestToJson(this);
-
-  factory PushFCMTokenLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
-      _$PushFCMTokenLoungeJsonRequestFromJson(json);
-
-  @override
-  String toString() {
-    return 'PushFCMTokenLoungeJsonRequest{token: $token}';
-  }
-}
 
 @JsonSerializable()
 class NamesLoungeJsonRequest extends LoungeJsonRequest {

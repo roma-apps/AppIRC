@@ -806,7 +806,9 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   @override
   Future<RequestResult<bool>> sendDevicePushFCMTokenToServer(String newToken,
       {bool waitForResult = false}) async {
-    _sendRequest(PushFCMTokenLoungeRawRequest.name(deviceFCMToken: newToken),
+    _logger.d(() => "sendDevicePushFCMTokenToServer $newToken");
+
+    _sendRequest(PushFCMTokenLoungeJsonRequest.name(token: newToken),
         isNeedAddRequestToPending: false);
 
     return RequestResult.name(isSentSuccessfully: true, result: null);
@@ -885,6 +887,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     _logger.d(() => "_sendCommand $request");
     var socketIOCommand = toSocketIOCommand(request);
+    _logger.d(() => "socketIOCommand $socketIOCommand");
     return await _socketIOService.emit(socketIOCommand);
   }
 

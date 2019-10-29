@@ -28,6 +28,7 @@ class PushesService extends Providable {
   }
 
   configure() async {
+    _logger.d(() => "configure");
     addDisposable(streamSubscription: _fcm.onTokenRefresh.listen((newToken) {
       _onNewToken(newToken);
     }));

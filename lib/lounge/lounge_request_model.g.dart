@@ -6,6 +6,19 @@ part of 'lounge_request_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+PushFCMTokenLoungeJsonRequest _$PushFCMTokenLoungeJsonRequestFromJson(
+    Map<String, dynamic> json) {
+  return PushFCMTokenLoungeJsonRequest(
+    json['token'] as String,
+  );
+}
+
+Map<String, dynamic> _$PushFCMTokenLoungeJsonRequestToJson(
+        PushFCMTokenLoungeJsonRequest instance) =>
+    <String, dynamic>{
+      'token': instance.token,
+    };
+
 InputLoungeJsonRequest _$InputLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return InputLoungeJsonRequest(
@@ -53,19 +66,6 @@ Map<String, dynamic> _$MsgPreviewToggleLoungeJsonRequestToJson(
       'msgId': instance.msgId,
       'link': instance.link,
       'shown': instance.shown,
-    };
-
-PushFCMTokenLoungeJsonRequest _$PushFCMTokenLoungeJsonRequestFromJson(
-    Map<String, dynamic> json) {
-  return PushFCMTokenLoungeJsonRequest(
-    json['token'] as String,
-  );
-}
-
-Map<String, dynamic> _$PushFCMTokenLoungeJsonRequestToJson(
-        PushFCMTokenLoungeJsonRequest instance) =>
-    <String, dynamic>{
-      'token': instance.token,
     };
 
 NamesLoungeJsonRequest _$NamesLoungeJsonRequestFromJson(

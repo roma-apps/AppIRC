@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
+import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
+import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -16,6 +18,7 @@ final String _iosPushMessageDataKey = "data";
 class ChatPushesService extends Providable {
   final PushesService _pushesService;
   final ChatBackendService _backendService;
+  final ChatInitBloc _chatInitBloc;
 
   Stream<ChatPushMessage> get chatPushMessageStream =>
       _pushesService.messageStream.map((pushMessage) {
@@ -67,10 +70,22 @@ class ChatPushesService extends Providable {
   Map<String, dynamic> _remapForJson(raw) => (raw as Map)
       ?.map((key, value) => MapEntry<String, dynamic>(key.toString(), value));
 
-  ChatPushesService(this._pushesService, this._backendService) {
+  ChatPushesService(
+      this._pushesService, this._backendService, this._chatInitBloc) {
+    addDisposable(
+        streamSubscription: _chatInitBloc.stateStream.listen((newState) {
+      if (newState == ChatInitState.finished) {
+        var token = _pushesService.token;
+        if (token != null) {
+          _backendService.sendDevicePushFCMTokenToServer(token);
+        }
+      }
+    }));
+
     addDisposable(streamSubscription:
         _backendService.connectionStateStream.listen((connectionState) {
       var token = _pushesService.token;
+
       if (token != null && connectionState == ChatConnectionState.connected) {
         _backendService.sendDevicePushFCMTokenToServer(token);
       }
