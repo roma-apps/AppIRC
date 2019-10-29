@@ -173,8 +173,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
             chatMessageListState.messages,
             filteredMessages,
             chatMessageListState.moreHistoryAvailable ?? false,
-//            chatListMessagesBloc.searchState,
-            searchState,
+            chatListMessagesBloc.searchState,
+//            searchState,
             initScrollPositionMessage);
       }
     );
