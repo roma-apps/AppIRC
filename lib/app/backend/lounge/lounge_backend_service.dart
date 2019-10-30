@@ -460,10 +460,10 @@ class LoungeBackendService extends Providable implements ChatBackendService {
             // lounge send whois message as regular
             // but actually lounge client display it as special
             _toWhoIsSpecialMessage(data).then((message) {
-              listener(message);
+              listener(MessagesForChannel(channel, <ChatMessage>[message]));
             });
           } else {
-            listener(message);
+            listener(MessagesForChannel(channel, <ChatMessage>[message]));
           }
         });
       }
@@ -476,17 +476,13 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
       if (channel.remoteId == data.chan) {
         toSpecialMessages(channel, data).then((specialMessages) {
-          specialMessages.forEach((specialMessage) {
-            listener(specialMessage);
-          });
+          listener(MessagesForChannel(channel, specialMessages));
         });
       }
     }));
 
     disposable.add(listenForLoadMore(network, channel, (loadMoreResponse) {
-      loadMoreResponse.messages.forEach((message) {
-        listener(message);
-      });
+      listener(MessagesForChannel(channel, loadMoreResponse.messages));
     }));
 
     return disposable;

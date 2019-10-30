@@ -27,12 +27,15 @@ class MessageLoaderBloc extends Providable {
   // ignore: close_sinks
   BehaviorSubject<bool> _isInitFinishedSubject =
       BehaviorSubject(seedValue: false);
+
   Stream<bool> get isInitFinishedStream => _isInitFinishedSubject.stream;
+
   bool get isInitFinished => _isInitFinishedSubject.value;
 
   BehaviorSubject<List<ChatMessage>> _messagesSubject;
 
   Stream<List<ChatMessage>> get messagesStream => _messagesSubject.stream;
+
   List<ChatMessage> get messages => _messagesSubject?.value;
 
   MessageLoaderBloc(this._backendService, this._db, this._messagesSaverBloc,
@@ -102,8 +105,8 @@ class MessageLoaderBloc extends Providable {
     // socket listener
     addDisposable(
         disposable: _messagesSaverBloc.listenForMessages(_network, _channel,
-            (newMessage) {
-      _addNewMessage(newMessage);
+            (messagesForChannel) {
+      _addNewMessages(messagesForChannel);
     }));
 
     addDisposable(
@@ -161,55 +164,68 @@ class MessageLoaderBloc extends Providable {
     _onMessagesChanged();
   }
 
-  void _addNewMessage(ChatMessage newMessage) {
-
+  void _addNewMessages(MessagesForChannel messagesForChannel) {
     var messages = this.messages;
-    var lastMessage = messages.last;
-    if(lastMessage is RegularMessage && newMessage is RegularMessage) {
-      if(lastMessage.messageRemoteId == newMessage.messageRemoteId) {
-        // TODO: hack for bug in lounge
-        // sometimes lounge emit last message twice
-        _logger.w(() => "_addNewMessage dublicated message not added "
-            "$newMessage");
-        return;
+
+    var newMessages = messagesForChannel.messages;
+
+    var isSingleMessage = newMessages.length == 1;
+    var firstMessage = newMessages.first;
+    if (isSingleMessage) {
+      var lastMessage = messages.last;
+      if (lastMessage is RegularMessage && firstMessage is RegularMessage) {
+        if (lastMessage.messageRemoteId == firstMessage.messageRemoteId) {
+          // TODO: hack for bug in lounge
+          // sometimes lounge emit last message twice
+          _logger.w(() => "_addNewMessage dublicated message not added "
+              "$firstMessage");
+          return;
+        }
       }
     }
 
     if (messages.isNotEmpty) {
-      if (messages.last.date.isBefore(newMessage.date)) {
+      if (messages.last.date.isBefore(firstMessage.date)) {
         // if new message
-        messages.add(newMessage);
-      } else if (messages.first.date.isAfter(newMessage.date)) {
+        messages.addAll(newMessages);
+      } else if (messages.first.date.isAfter(firstMessage.date)) {
         // if message from history
-        messages.insert(0, newMessage);
+        messages.insertAll(0, newMessages);
       } else {
         // strange case, new message somewhere inside existing messages
-        messages.add(newMessage);
+        messages.addAll(newMessages);
         _resort(messages);
       }
     } else {
-      messages.add(newMessage);
+      messages.addAll(newMessages);
     }
-    _logger.d(() => "_addNewMessage $newMessage");
+    _logger.d(() => "_addNewMessages $newMessages");
 
-    if (newMessage.chatMessageType == ChatMessageType.special) {
-      SpecialMessage latestTextMessage = findLatestTextSpecialMessage();
+    // lounge emit a lot of "loading..." messages
+    // replace old messages with new one
+    if (isSingleMessage) {
+      if (firstMessage is SpecialMessage) {
+        if (firstMessage.specialType == SpecialMessageType.text) {
+          SpecialMessage latestTextMessage = findLatestTextSpecialMessage();
 
-      if (latestTextMessage != null) {
-        return messages.removeWhere((message) {
-          if (message.isSpecial) {
-            var specialMessage = message as SpecialMessage;
-            if (specialMessage.specialType == SpecialMessageType.text) {
-              return message != latestTextMessage;
-            } else {
-              return false;
-            }
-          } else {
-            return false;
+          if (latestTextMessage != null) {
+            return messages.removeWhere((message) {
+              if (message.isSpecial) {
+                var specialMessage = message as SpecialMessage;
+                if (specialMessage.specialType == SpecialMessageType.text) {
+                  return message != latestTextMessage;
+                } else {
+                  return false;
+                }
+              } else {
+                return false;
+              }
+            });
           }
-        });
+        }
       }
     }
+
     _onMessagesChanged();
   }
 }

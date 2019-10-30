@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 
 abstract class ChatMessage {
   int messageLocalId;
@@ -79,4 +80,19 @@ class MessageListLoadMore {
 
   MessageListLoadMore.name(
       {@required this.messages, @required this.moreHistoryAvailable});
+}
+
+
+class MessagesForChannel {
+  Channel channel;
+  List<ChatMessage> messages;
+
+  MessagesForChannel(this.channel, this.messages);
+
+  @override
+  String toString() {
+    return 'MessagesForChannel{channel: $channel, messages: $messages}';
+  }
+
+
 }

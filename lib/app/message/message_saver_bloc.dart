@@ -31,14 +31,15 @@ class MessageSaverBloc
   }
 
   // ignore: close_sinks
-  BehaviorSubject<ChatMessage> _realtimeMessagesSubject = BehaviorSubject();
+  BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
+  BehaviorSubject();
 
   Disposable listenForMessages(Network network, Channel channel,
       ChannelMessageListener listener) {
     return StreamSubscriptionDisposable(
-        _realtimeMessagesSubject.stream.listen((newMessage) {
-          if (newMessage.channelRemoteId == channel.remoteId) {
-            listener(newMessage);
+        _realtimeMessagesSubject.stream.listen((messagesForChannel) {
+          if (messagesForChannel.channel.remoteId == channel.remoteId) {
+            listener(messagesForChannel);
           }
         }));
   }
@@ -51,13 +52,15 @@ class MessageSaverBloc
 
     _logger.d(() => "listen for mesasges from channel $channel");
 
-    channelWithState.initMessages?.forEach(_onNewMessage);
+    _onNewMessages(MessagesForChannel(channel, channelWithState.initMessages));
+
 
     var channelDisposable = CompositeDisposable([]);
 
     channelDisposable
-        .add(_backendService.listenForMessages(network, channel, (newMessage) {
-      _onNewMessage(newMessage);
+        .add(_backendService.listenForMessages(network, channel,
+            (messagesForChannel) {
+      _onNewMessages(messagesForChannel);
     }));
 
     channelDisposable.add(_backendService
@@ -110,24 +113,32 @@ class MessageSaverBloc
     _db.regularMessagesDao.updateRegularMessage(newMessageDB);
   }
 
-  void _onNewMessage(ChatMessage newMessage) async {
-    _logger.d(() => "onNewMessage $newMessage");
-    var chatMessageType = newMessage.chatMessageType;
+  void _onNewMessages(MessagesForChannel messagesForChannel) async {
+    _logger.d(() => "_onNewMessages $messagesForChannel");
 
-    int id;
-    switch (chatMessageType) {
-      case ChatMessageType.special:
-        var specialMessageDB = toSpecialMessageDB(newMessage);
-        id = await _db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
-        break;
-      case ChatMessageType.regular:
-        var regularMessageDB = toRegularMessageDB(newMessage);
-        id = await _db.regularMessagesDao.insertRegularMessage(regularMessageDB);
-        break;
-    }
 
-    newMessage.messageLocalId = id;
-    _realtimeMessagesSubject.add(newMessage);
+    var newMessages = messagesForChannel.messages;
+
+    for(var newMessage in newMessages) {
+      var chatMessageType = newMessage.chatMessageType;
+
+      int id;
+      switch (chatMessageType) {
+        case ChatMessageType.special:
+          var specialMessageDB = toSpecialMessageDB(newMessage);
+          id = await _db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
+          break;
+        case ChatMessageType.regular:
+          var regularMessageDB = toRegularMessageDB(newMessage);
+          id = await _db.regularMessagesDao.insertRegularMessage(regularMessageDB);
+          break;
+      }
+
+      newMessage.messageLocalId = id;
+    };
+
+
+    _realtimeMessagesSubject.add(messagesForChannel);
   }
 
 

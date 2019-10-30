@@ -23,7 +23,7 @@ typedef NetworkConnectionListener(NetworkPreferences networkPreferences);
 typedef NetworkStateListener(NetworkState networkState);
 typedef ChannelListener(ChannelWithState channel);
 typedef ChannelStateListener(ChannelState channelState);
-typedef ChannelMessageListener(ChatMessage message);
+typedef ChannelMessageListener(MessagesForChannel messagesForChannel);
 typedef ChannelMessagePreviewListener(
     MessagePreviewForRemoteMessageId previewForMessage);
 
