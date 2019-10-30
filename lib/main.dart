@@ -29,6 +29,7 @@ import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
+import 'package:flutter_appirc/app/message/preview/message_preview_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/special/message_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
@@ -43,6 +44,7 @@ import 'package:flutter_appirc/app/skin/app_irc_form_text_field_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_title_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_list_search_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_message_preview_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_special_skin_bloc.dart';
@@ -374,51 +376,55 @@ class AppIRCState extends State<AppIRC> {
                                             AppIRCMessageRegularSkinBloc(
                                                 appSkinTheme),
                                         child:
-                                            Provider<MessagesSpecialSkinBloc>(
+                                            Provider<MessageSpecialSkinBloc>(
                                           providable:
                                               AppIRCMessageSpecialSkinBloc(
                                                   appSkinTheme),
-                                          child: Provider<NetworkListSkinBloc>(
+                                          child: Provider<MessagePreviewSkinBloc>(
                                             providable:
-                                                AppIRCNetworkListSkinBloc(
-                                                    appSkinTheme),
-                                            child: Provider<PopupMenuSkinBloc>(
+                                            AppIRCMessagePreviewSkinBloc(),
+                                            child: Provider<NetworkListSkinBloc>(
                                               providable:
-                                                  AppIRCPopupMenuSkinBloc(
+                                                  AppIRCNetworkListSkinBloc(
                                                       appSkinTheme),
-                                              child: Provider<TextSkinBloc>(
-                                                providable: AppIRCTextSkinBloc(
-                                                    appSkinTheme),
-                                                child: Provider<ButtonSkinBloc>(
-                                                  providable:
-                                                      AppIRCButtonSkinBloc(
-                                                          appSkinTheme),
-                                                  child: Provider(
+                                              child: Provider<PopupMenuSkinBloc>(
+                                                providable:
+                                                    AppIRCPopupMenuSkinBloc(
+                                                        appSkinTheme),
+                                                child: Provider<TextSkinBloc>(
+                                                  providable: AppIRCTextSkinBloc(
+                                                      appSkinTheme),
+                                                  child: Provider<ButtonSkinBloc>(
                                                     providable:
-                                                        ColoredNicknamesBloc(
-                                                            appSkinTheme
-                                                                .coloredNicknamesData),
-                                                    child: PlatformApp(
-                                                        title: appTitle,
-                                                        localizationsDelegates: [
-                                                          //app-specific localization
-                                                          EasylocaLizationDelegate(
-                                                              locale:
-                                                                  data.locale,
-                                                              path:
-                                                                  relativePathToLangsFolder),
-                                                        ],
-                                                        supportedLocales:
-                                                            supportedLocales,
-                                                        locale:
-                                                            data.savedLocale,
-                                                        android: (_) => MaterialAppData(
-                                                            theme: appSkinTheme
-                                                                .androidThemeDataCreator()),
-                                                        ios: (_) => CupertinoAppData(
-                                                            theme: appSkinTheme
-                                                                .iosThemeDataCreator()),
-                                                        home: child),
+                                                        AppIRCButtonSkinBloc(
+                                                            appSkinTheme),
+                                                    child: Provider(
+                                                      providable:
+                                                          ColoredNicknamesBloc(
+                                                              appSkinTheme
+                                                                  .coloredNicknamesData),
+                                                      child: PlatformApp(
+                                                          title: appTitle,
+                                                          localizationsDelegates: [
+                                                            //app-specific localization
+                                                            EasylocaLizationDelegate(
+                                                                locale:
+                                                                    data.locale,
+                                                                path:
+                                                                    relativePathToLangsFolder),
+                                                          ],
+                                                          supportedLocales:
+                                                              supportedLocales,
+                                                          locale:
+                                                              data.savedLocale,
+                                                          android: (_) => MaterialAppData(
+                                                              theme: appSkinTheme
+                                                                  .androidThemeDataCreator()),
+                                                          ios: (_) => CupertinoAppData(
+                                                              theme: appSkinTheme
+                                                                  .iosThemeDataCreator()),
+                                                          home: child),
+                                                    ),
                                                   ),
                                                 ),
                                               ),

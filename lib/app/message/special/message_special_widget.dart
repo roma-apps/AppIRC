@@ -103,7 +103,7 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
 //      _buildWhoIsRow("Logon", whoIsBody.logon),
     ],
   );
-  MessagesSpecialSkinBloc messagesSpecialSkinBloc = Provider.of(context);
+  MessageSpecialSkinBloc messagesSpecialSkinBloc = Provider.of(context);
   var color = messagesSpecialSkinBloc.specialMessageColor;
   var nick = whoIsBody.nick;
 
@@ -168,8 +168,8 @@ Widget _buildChannelName(BuildContext context,
 
 Widget _buildTopic(BuildContext context, String topic, List<String> linksInText,
     bool includedInSearch, String searchTerm) {
-  MessagesSpecialSkinBloc messagesSpecialSkinBloc =
-      Provider.of<MessagesSpecialSkinBloc>(context);
+  MessageSpecialSkinBloc messagesSpecialSkinBloc =
+      Provider.of<MessageSpecialSkinBloc>(context);
 
   var spanBuilders = <SpanHighlighter>[];
   spanBuilders.addAll(linksInText.map(

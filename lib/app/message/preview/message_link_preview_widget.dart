@@ -6,8 +6,14 @@ import 'message_image_preview_widget.dart';
 Widget buildMessageLinkPreview(
     {@required BuildContext context, @required MessagePreview preview}) {
   var rows = <Widget>[
-    Text(preview.head),
-    Text(preview.body),
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal:8.0),
+      child: Text(preview.head, style: TextStyle(fontWeight: FontWeight.bold),),
+    ),
+    Padding(
+      padding: const EdgeInsets.symmetric(vertical:8.0),
+      child: Text(preview.body),
+    ),
   ];
 
   if (preview.thumb != null) {

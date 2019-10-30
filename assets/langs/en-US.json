@@ -301,6 +301,7 @@
         }
       },
       "preview": {
+        "title": "Preview",
         "loading": "Loading..."
       }
     },
