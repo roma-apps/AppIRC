@@ -11,7 +11,7 @@ description: App IRC Flutter Client
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.10+10
+version: 1.0.11+11
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -33,7 +33,7 @@ dependencies:
   json_annotation: ^3.0.0
   # logging wrapper for Android/iOS
   logger: ^0.7.0+2
-  # Reactive progreamming
+  # Reactive programming
   rxdart: ^0.18.1
 
   # file picker UI for upload
@@ -78,7 +78,7 @@ dependencies:
   # video/audio player for preview render
   chewie: ^0.9.8+1
   chewie_audio: ^1.0.0+1
-  # requried by chewie
+  # required by chewie
   video_player: ^0.10.2+3
 
 dev_dependencies:
