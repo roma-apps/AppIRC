@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show SelectableText;
 import 'package:flutter/painting.dart';
@@ -42,9 +44,17 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
     TextStyle defaultTextStyle, List<SpanHighlighter> wordSpanBuilders) {
   var builderToRegExpMatches = Map<SpanHighlighter, Iterable<RegExpMatch>>();
   var totalMatch = 0;
+  int minimumSpanMatchIndex;
   wordSpanBuilders.forEach((spanBuilder) {
     Iterable<RegExpMatch> allMatches = spanBuilder.findAllMatches(text);
     builderToRegExpMatches[spanBuilder] = allMatches;
+    allMatches.forEach((match) {
+      if (minimumSpanMatchIndex != null) {
+        minimumSpanMatchIndex = min(minimumSpanMatchIndex, match.start);
+      } else {
+        minimumSpanMatchIndex = match.start;
+      }
+    });
     totalMatch += allMatches.length;
   });
 
@@ -52,43 +62,32 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
 
   if (totalMatch > 0) {
     int lastSpanMatchEndIndex = 0;
-    RegExpMatch currentSpanMatch;
     SpanHighlighter currentSpanBuilder;
-    for (var index = 0; index < text.length; index++) {
-      if (currentSpanMatch != null && index < currentSpanMatch.end) {
-        continue;
-      }
+    for (var index = minimumSpanMatchIndex; index < text.length; index++) {
 
-      if (currentSpanMatch != null && index == currentSpanMatch.end) {
-        spans.add(currentSpanBuilder.createTextSpan(
-            text.substring(currentSpanMatch.start, currentSpanMatch.end)));
-        lastSpanMatchEndIndex = currentSpanMatch.end;
-        currentSpanMatch = null;
-        continue;
-      }
 
       builderToRegExpMatches.forEach((builder, matches) {
         matches.forEach((match) {
           if (match.start == index) {
             currentSpanBuilder = builder;
-            currentSpanMatch = match;
 
             if (lastSpanMatchEndIndex != index) {
               spans.add(
                   TextSpan(text: text.substring(lastSpanMatchEndIndex, index)));
             }
+
+            spans.add(currentSpanBuilder.createTextSpan(
+                text.substring(match.start, match.end)));
+            lastSpanMatchEndIndex = match.end;
+            index = match.end;
           }
         });
       });
     }
-    if (currentSpanMatch != null) {
-      spans.add(currentSpanBuilder.createTextSpan(
-          text.substring(currentSpanMatch.start, currentSpanMatch.end)));
-    } else {
-      if (lastSpanMatchEndIndex < text.length) {
-        spans.add(
-            TextSpan(text: text.substring(lastSpanMatchEndIndex, text.length)));
-      }
+
+    if (lastSpanMatchEndIndex < text.length) {
+      spans.add(
+          TextSpan(text: text.substring(lastSpanMatchEndIndex, text.length)));
     }
 
     if (isMaterial) {
