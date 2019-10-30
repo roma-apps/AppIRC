@@ -44,6 +44,7 @@ class MessagePreviewTypeLoungeResponse {
   static const String image = "image";
   static const String audio = "audio";
   static const String video = "video";
+  static const String error = "error";
 }
 
 abstract class LoungeResponseBody extends LoungeResponseBodyPart {}

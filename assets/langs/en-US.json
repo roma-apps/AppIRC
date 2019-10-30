@@ -302,7 +302,10 @@
       },
       "preview": {
         "title": "Preview",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "error": {
+          "server": "Server failed to fetch preview metadata"
+        }
       }
     },
     "new_message": {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/preview/message_audio_preview_widget.dart';
+import 'package:flutter_appirc/app/message/preview/message_error_preview_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_image_preview_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_link_preview_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_loading_preview_widget.dart';
@@ -83,6 +84,10 @@ Widget _buildPreviewBody(BuildContext context, MessagePreview preview) {
     case MessagePreviewType.video:
       previewBody =
           buildMessageVideoPreview(context: context, preview: preview);
+      break;
+    case MessagePreviewType.error:
+      previewBody =
+          buildMessageErrorPreview(context: context, preview: preview);
       break;
   }
 

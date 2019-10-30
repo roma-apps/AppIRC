@@ -458,6 +458,9 @@ MessagePreviewType detectMessagePreviewType(String type) {
     case MessagePreviewTypeLoungeResponse.video:
       return MessagePreviewType.video;
       break;
+    case MessagePreviewTypeLoungeResponse.error:
+      return MessagePreviewType.error;
+      break;
   }
 
   throw Exception("Invalid MessagePreviewType type $type");

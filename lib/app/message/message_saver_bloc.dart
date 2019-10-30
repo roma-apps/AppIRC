@@ -135,7 +135,7 @@ class MessageSaverBloc
       }
 
       newMessage.messageLocalId = id;
-    };
+    }
 
 
     _realtimeMessagesSubject.add(messagesForChannel);
