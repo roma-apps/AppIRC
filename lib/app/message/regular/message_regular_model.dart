@@ -84,6 +84,10 @@ class RegularMessage extends ChatMessage {
         ' fromNick: $fromNick,'
         ' nicknames: $nicknames,'
         ' linksInText: $linksInText,'
+        ' messageLocalId: $messageLocalId,'
+        ' messageRemoteId: $messageRemoteId,'
+        ' channelRemoteId: $channelRemoteId,'
+        ' channelLocalId: $channelLocalId,'
         ' fromMode: $fromMode, newNick: $newNick}';
   }
 

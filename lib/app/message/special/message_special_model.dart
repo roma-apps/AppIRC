@@ -33,7 +33,12 @@ class SpecialMessage extends ChatMessage {
       data.isContainsText(searchTerm, ignoreCase: ignoreCase);
   @override
   String toString() {
-    return 'SpecialMessage{data: $data, specialType: $specialType}';
+    return 'SpecialMessage{data: $data,'
+        ' specialType: $specialType'
+        ' messageLocalId: $messageLocalId,'
+        ' channelRemoteId: $channelRemoteId,'
+        ' channelLocalId: $channelLocalId,'
+        '}';
   }
 
 
