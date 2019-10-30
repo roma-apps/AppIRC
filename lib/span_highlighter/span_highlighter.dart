@@ -4,8 +4,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show SelectableText;
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 import 'package:flutter_appirc/span_highlighter/span_highlighter_model.dart';
+
+MyLogger _logger = MyLogger(logTag: "span_highlighter.dart", enabled: true);
 
 class SpanHighlighter {
   final String highlightString;
@@ -43,51 +46,66 @@ class SpanHighlighter {
 Widget buildWordSpannedRichText(BuildContext context, String text,
     TextStyle defaultTextStyle, List<SpanHighlighter> wordSpanBuilders) {
   var builderToRegExpMatches = Map<SpanHighlighter, Iterable<RegExpMatch>>();
-  var totalMatch = 0;
-  int minimumSpanMatchIndex;
+
+  Map<int, List<SpanHighlightMatch>> spanHighlightsStartToList = Map();
+
   wordSpanBuilders.forEach((spanBuilder) {
     Iterable<RegExpMatch> allMatches = spanBuilder.findAllMatches(text);
     builderToRegExpMatches[spanBuilder] = allMatches;
     allMatches.forEach((match) {
-      if (minimumSpanMatchIndex != null) {
-        minimumSpanMatchIndex = min(minimumSpanMatchIndex, match.start);
-      } else {
-        minimumSpanMatchIndex = match.start;
+      var start = match.start;
+      if (!spanHighlightsStartToList.containsKey(start)) {
+        spanHighlightsStartToList[start] = <SpanHighlightMatch>[];
       }
+
+      spanHighlightsStartToList[start]
+          .add(SpanHighlightMatch(match.start, match.end, spanBuilder));
     });
-    totalMatch += allMatches.length;
   });
 
-  var spans = <TextSpan>[];
+  if (spanHighlightsStartToList.length > 0) {
+    var spans = <TextSpan>[];
 
-  if (totalMatch > 0) {
-    int lastSpanMatchEndIndex = 0;
-    SpanHighlighter currentSpanBuilder;
-    for (var index = minimumSpanMatchIndex; index < text.length; index++) {
+    var sortedIndexes = spanHighlightsStartToList.keys.toList();
+    sortedIndexes.sort();
 
+    var lastSpanIndex = 0;
 
-      builderToRegExpMatches.forEach((builder, matches) {
-        matches.forEach((match) {
-          if (match.start == index) {
-            currentSpanBuilder = builder;
+    for (var i = 0; i < sortedIndexes.length; i++) {
+      var startIndex = sortedIndexes[i];
 
-            if (lastSpanMatchEndIndex != index) {
-              spans.add(
-                  TextSpan(text: text.substring(lastSpanMatchEndIndex, index)));
-            }
+      if(startIndex < lastSpanIndex) {
+        continue;
+        //skin spans inside other spans
+      }
 
-            spans.add(currentSpanBuilder.createTextSpan(
-                text.substring(match.start, match.end)));
-            lastSpanMatchEndIndex = match.end;
-            index = match.end;
-          }
-        });
-      });
+      var matchList = spanHighlightsStartToList[startIndex];
+
+      matchList.sort((a, b) => max(a.length, b.length));
+      // find biggest span for current start index
+      var maxLengthMatch = matchList.first;
+
+      _logger.d(() => "startIndex $startIndex "
+          " matchList : ${matchList.length} "
+          "maxLengthMatch $maxLengthMatch");
+      if(lastSpanIndex != startIndex) {
+        // add non-highlighted text between highlighted spans
+        spans.add(
+            TextSpan(text: text.substring(lastSpanIndex, startIndex)));
+      }
+
+      lastSpanIndex = maxLengthMatch.end;
+
+      var spanHighlighter = maxLengthMatch.highlighter;
+      // highlighted spans
+      spans.add(spanHighlighter
+          .createTextSpan(text.substring(startIndex, lastSpanIndex)));
     }
 
-    if (lastSpanMatchEndIndex < text.length) {
+    // add last non-highlighted text part
+    if(lastSpanIndex < text.length) {
       spans.add(
-          TextSpan(text: text.substring(lastSpanMatchEndIndex, text.length)));
+          TextSpan(text: text.substring(lastSpanIndex, text.length)));
     }
 
     if (isMaterial) {
