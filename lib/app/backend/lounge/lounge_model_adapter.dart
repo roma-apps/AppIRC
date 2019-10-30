@@ -418,17 +418,28 @@ WhoIsSpecialMessageBody toWhoIsSpecialMessageBody(
         actualIp: loungeWhoIs.actual_ip);
 
 MessagePreview toMessagePreview(
-        MsgPreviewLoungeResponseBodyPart loungePreview) =>
-    MessagePreview.name(
+        MsgPreviewLoungeResponseBodyPart loungePreview) {
+  var thumb = loungePreview.thumb;
+
+  // Sometimes lounge server prefetch remote image and fails
+  // it should return full path to image in own server
+  // however it returns relative path on the server
+  // in this case we replace prefetched image with remote image
+  // todo: hack for bug in lounge
+  if(thumb?.startsWith("storage") == true) {
+    thumb = loungePreview.link;
+  }
+  return MessagePreview.name(
         head: loungePreview.head,
         body: loungePreview.body,
         canDisplay: loungePreview.canDisplay,
         shown: loungePreview.shown,
         link: loungePreview.link,
-        thumb: loungePreview.thumb,
+        thumb: thumb,
         type: detectMessagePreviewType(loungePreview.type),
         media: loungePreview.media,
         mediaType: loungePreview.mediaType);
+}
 
 MessagePreviewType detectMessagePreviewType(String type) {
   switch (type) {
