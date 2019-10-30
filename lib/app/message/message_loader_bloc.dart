@@ -162,6 +162,19 @@ class MessageLoaderBloc extends Providable {
   }
 
   void _addNewMessage(ChatMessage newMessage) {
+
+    var messages = this.messages;
+    var lastMessage = messages.last;
+    if(lastMessage is RegularMessage && newMessage is RegularMessage) {
+      if(lastMessage.messageRemoteId == newMessage.messageRemoteId) {
+        // TODO: hack for bug in lounge
+        // sometimes lounge emit last message twice
+        _logger.w(() => "_addNewMessage dublicated message not added "
+            "$newMessage");
+        return;
+      }
+    }
+
     if (messages.isNotEmpty) {
       if (messages.last.date.isBefore(newMessage.date)) {
         // if new message
