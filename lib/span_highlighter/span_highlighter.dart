@@ -109,12 +109,26 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
     }
 
     if (isMaterial) {
-      return SelectableText.rich(
-        TextSpan(
+
+
+
+      // todo: enabled text selection for Materials spans
+      // Currently SelectableText ignore spans with gesture detection
+      // So we disable selection when something highlighted
+//      return SelectableText.rich(
+//        TextSpan(
+//          style: defaultTextStyle,
+//          children: spans,
+//        ),
+//      );
+
+      return RichText(
+        text: TextSpan(
           style: defaultTextStyle,
           children: spans,
         ),
       );
+
     } else {
       // TODO: enable text selection for cupertino when it will be available
       return RichText(
