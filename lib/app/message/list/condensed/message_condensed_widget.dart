@@ -40,11 +40,17 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Padding(
+          Flexible(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: _buildCondensedTitleMessage(
+                      context, condensedMessageListItem),
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: _buildCondensedTitleButton(
                   context, condensedMessageListItem)),
-          _buildCondensedTitleButton(context, condensedMessageListItem),
         ]);
   }
 
@@ -65,7 +71,7 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     );
   }
 
-  _buildCondensedTitleMessage(
+  Widget _buildCondensedTitleMessage(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
     Map<RegularMessageType, List<ChatMessage>> groupedByType = Map();
 
@@ -87,10 +93,10 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
             context, regularType, groupedByType[regularType].length))
         .join(AppLocalizations.of(context)
             .tr("chat.message.condensed.join_separator"));
-    return Text(textString);
+    return Text(textString, softWrap: true);
   }
 
-  _buildCondensedTitleButton(
+  Widget _buildCondensedTitleButton(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
     return PlatformIconButton(
       icon: Icon(widget._expanded ? Icons.arrow_drop_down : Icons.arrow_right),
