@@ -73,7 +73,7 @@ dependencies:
   streaming_shared_preferences: ^1.0.1
 
   # send message autocomplete
-  flutter_typeahead: ^1.6.1
+  flutter_typeahead: ^1.7.0
 
   # video/audio player for preview render
   chewie: ^0.9.8+1

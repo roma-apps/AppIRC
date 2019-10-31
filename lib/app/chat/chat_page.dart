@@ -1,6 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart' show CupertinoNavigationBar;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show AppBar, Colors, Drawer, Icons, ScaffoldState;
 import 'package:flutter/widgets.dart';
@@ -31,6 +29,8 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_form_
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/logger/logger.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware.dart'
+    as platform_aware;
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
@@ -40,7 +40,12 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 var _logger = MyLogger(logTag: "chat_page.dart", enabled: true);
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
+  @override
+  _ChatPageState createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -54,36 +59,50 @@ class ChatPage extends StatelessWidget {
         builder: (context, asyncSnapshot) {
           AppIRCSkinTheme currentSkin = asyncSnapshot.data;
 
-          return PlatformScaffold(
-              //            key: _scaffoldKey,
-//            widgetKey: _scaffoldKey,
-              android: (context) => MaterialScaffoldData(
-                  widgetKey: _scaffoldKey,
-                  appBar: AppBar(
-                    title: _buildAppBarChild(context),
-                    leading: buildLeading(context, () {
-                      _scaffoldKey.currentState.openDrawer();
-                    }),
-                    actions: <Widget>[
-                      _buildTrailing(context),
-                    ],
-                    backgroundColor: currentSkin.appBarColor,
-                  ),
-                  drawer: Drawer(child: ChatDrawerWidget()),
-                  body: _buildBody(context)),
-              ios: (context) => CupertinoPageScaffoldData(
-                  resizeToAvoidBottomInset: true,
-                  body: _buildBody(context),
-                  navigationBar: CupertinoNavigationBar(
-                    leading: buildLeading(context, () {
-                      Navigator.push(
-                          context,
-                          platformPageRoute(
-                              builder: (context) => ChatDrawerPage()));
-                    }),
-                    trailing: _buildTrailing(context),
-                    middle: _buildAppBarChild(context),
-                  )));
+          // TODO: remove hack and report bug to library
+          // it is for very strange bug in
+          // PlatformScaffold from PlatformAware library
+          // and any TextField with software keyboard popup
+          // Bug occurs when PlatformScaffold with ios key is used
+          // In this case textfield loose focus on keyboard shown
+          // so keyboard disappears once after appearing
+          // So I decided to separate platform Scaffolds via if-else
+          // PlatformScaffold without custom ios key works good on iOS
+          // and keyboard appears as excepted
+          if (platform_aware.isMaterial) {
+            return PlatformScaffold(
+                android: (context) => MaterialScaffoldData(
+                    widgetKey: _scaffoldKey,
+                    appBar: AppBar(
+                      title: _buildAppBarChild(context),
+                      leading: buildLeading(context, () {
+                        _scaffoldKey.currentState.openDrawer();
+                      }),
+                      actions: <Widget>[
+                        _buildTrailing(context),
+                      ],
+                      backgroundColor: currentSkin.appBarColor,
+                    ),
+                    drawer: Drawer(child: ChatDrawerWidget()),
+                    body: _buildBody(context)));
+          } else if (platform_aware.isCupertino) {
+            return PlatformScaffold(
+                iosContentBottomPadding: true,
+                iosContentPadding: false,
+                appBar: PlatformAppBar(
+                  leading: buildLeading(context, () {
+                    Navigator.push(
+                        context,
+                        platformPageRoute(
+                            builder: (context) => ChatDrawerPage()));
+                  }),
+                  trailingActions: [_buildTrailing(context)],
+                  title: _buildAppBarChild(context),
+                ),
+                body: _buildBody(context));
+          } else {
+            throw "NotSupportedPlatform";
+          }
         });
   }
 
@@ -92,7 +111,8 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildMenuIcon(BuildContext context, Function() onPressed) {
-    ChannelListUnreadCountBloc chatUnreadBloc = Provider.of<ChannelListUnreadCountBloc>(context);
+    ChannelListUnreadCountBloc chatUnreadBloc =
+        Provider.of<ChannelListUnreadCountBloc>(context);
 
     return StreamBuilder<int>(
         stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
@@ -155,8 +175,8 @@ class ChatPage extends StatelessWidget {
 
     return StreamBuilder<Channel>(
       stream: activeChannelBloc.activeChannelStream,
-      builder: (BuildContext context,
-          AsyncSnapshot<Channel> activeChannelSnapshot) {
+      builder:
+          (BuildContext context, AsyncSnapshot<Channel> activeChannelSnapshot) {
         var channel = activeChannelSnapshot.data;
         if (channel == null) {
           return SizedBox.shrink();
@@ -168,8 +188,8 @@ class ChatPage extends StatelessWidget {
           var networkBloc =
               NetworkBlocsBloc.of(context).getNetworkBloc(network);
 
-          var channelBloc = ChannelBlocsBloc.of(context)
-              .getChannelBloc(channel);
+          var channelBloc =
+              ChannelBlocsBloc.of(context).getChannelBloc(channel);
 
           List<Widget> items = [
             buildChannelPopupMenuButton(
@@ -202,8 +222,8 @@ class ChatPage extends StatelessWidget {
 
     return StreamBuilder<Channel>(
       stream: activeChannelBloc.activeChannelStream,
-      builder: (BuildContext context,
-          AsyncSnapshot<Channel> activeChannelSnapshot) {
+      builder:
+          (BuildContext context, AsyncSnapshot<Channel> activeChannelSnapshot) {
         var channel = activeChannelSnapshot.data;
         if (channel == null) {
           return StreamBuilder<ChatConnectionState>(
@@ -235,8 +255,8 @@ class ChatPage extends StatelessWidget {
                 return ChatAppBarWidget(title, content);
               });
         } else {
-          var channelBloc = ChannelBlocsBloc.of(context)
-              .getChannelBloc(channel);
+          var channelBloc =
+              ChannelBlocsBloc.of(context).getChannelBloc(channel);
           return Provider(
               providable: ChannelBlocProvider(channelBloc),
               child: ChannelTopicTitleAppBarWidget());
@@ -249,12 +269,14 @@ class ChatPage extends StatelessWidget {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var networkListBloc = Provider.of<NetworkListBloc>(context);
 
+    _logger.d(() => "_buildBody");
     return SafeArea(
         child: StreamBuilder<Channel>(
             stream: activeChannelBloc.activeChannelStream,
-            builder:
-                (BuildContext context, AsyncSnapshot<Channel> snapshot) {
+            builder: (BuildContext context, AsyncSnapshot<Channel> snapshot) {
               var activeChannel = snapshot.data;
+
+              _logger.d(() => "activeChannel stream");
               if (activeChannel == null) {
                 return StreamBuilder<bool>(
                   stream: networkListBloc.isNetworksEmptyStream,
@@ -288,7 +310,7 @@ class ChatPage extends StatelessWidget {
                       Provider.of<MessageSaverBloc>(context),
                       channelBloc.network,
                       channelBloc.channel);
-
+                  _logger.d(() => "before stream");
                   return Provider(
                     providable: messagesLoaderBloc,
                     child: StreamBuilder(
@@ -308,10 +330,8 @@ class ChatPage extends StatelessWidget {
                             _logger.d(() =>
                                 "build for activeChannel ${channelBloc.channel.name}");
 
-
                             return Provider(
-                                providable:
-                                    ChannelBlocProvider(channelBloc),
+                                providable: ChannelBlocProvider(channelBloc),
                                 child: Provider(
                                   providable: chatListMessagesBloc,
                                   child: ChannelWidget(),

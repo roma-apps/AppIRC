@@ -15,7 +15,8 @@ class ChatInputMessageBloc extends Providable {
   final ChatConfig chatConfig;
   final ChannelBloc channelBloc;
 
-  var messageController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
   List<AutoCompleter> autoCompleters;
 
