@@ -394,19 +394,25 @@ MsgLoungeResponseBodyPart _$MsgLoungeResponseBodyPartFromJson(
   return MsgLoungeResponseBodyPart(
     json['from'] == null
         ? null
-        : MsgFromLoungeResponseBodyPart.fromJson(
+        : MsgUserLoungeResponseBodyPart.fromJson(
             json['from'] as Map<String, dynamic>),
+    json['target'] == null
+        ? null
+        : MsgUserLoungeResponseBodyPart.fromJson(
+            json['target'] as Map<String, dynamic>),
     json['command'] as String,
     json['type'] as String,
     json['time'] as String,
     json['new_nick'] as String,
+    json['new_host'] as String,
+    json['new_ident'] as String,
     json['text'] as String,
+    json['ctcpMessage'] as String,
     json['hostmask'] as String,
     json['self'] as bool,
     json['highlight'] as bool,
     json['showInActive'] as bool,
     (json['users'] as List)?.map((e) => e as String)?.toList(),
-    json['ctcpMessage'] as String,
     (json['previews'] as List)
         ?.map((e) => e == null
             ? null
@@ -426,10 +432,13 @@ Map<String, dynamic> _$MsgLoungeResponseBodyPartToJson(
         MsgLoungeResponseBodyPart instance) =>
     <String, dynamic>{
       'from': instance.from,
+      'target': instance.target,
       'command': instance.command,
       'type': instance.type,
       'time': instance.time,
       'new_nick': instance.new_nick,
+      'new_host': instance.new_host,
+      'new_ident': instance.new_ident,
       'text': instance.text,
       'ctcpMessage': instance.ctcpMessage,
       'hostmask': instance.hostmask,
@@ -484,17 +493,17 @@ Map<String, dynamic> _$WhoIsLoungeResponseBodyPartToJson(
       'server_info': instance.server_info,
     };
 
-MsgFromLoungeResponseBodyPart _$MsgFromLoungeResponseBodyPartFromJson(
+MsgUserLoungeResponseBodyPart _$MsgUserLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
-  return MsgFromLoungeResponseBodyPart(
+  return MsgUserLoungeResponseBodyPart(
     json['id'] as int,
     json['mode'] as String,
     json['nick'] as String,
   );
 }
 
-Map<String, dynamic> _$MsgFromLoungeResponseBodyPartToJson(
-        MsgFromLoungeResponseBodyPart instance) =>
+Map<String, dynamic> _$MsgUserLoungeResponseBodyPartToJson(
+        MsgUserLoungeResponseBodyPart instance) =>
     <String, dynamic>{
       'id': instance.id,
       'mode': instance.mode,

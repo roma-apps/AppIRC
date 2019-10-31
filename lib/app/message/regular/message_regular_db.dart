@@ -232,6 +232,15 @@ RegularMessageType regularMessageTypeIdToType(int id) {
     case 21:
       return RegularMessageType.kick;
       break;
+    case 22:
+      return RegularMessageType.action;
+      break;
+    case 23:
+      return RegularMessageType.invite;
+      break;
+    case 24:
+      return RegularMessageType.ctcp;
+      break;
   }
 
   throw Exception("Invalid RegularMessageType id $id");
@@ -301,6 +310,15 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
       break;
     case RegularMessageType.kick:
       return 21;
+      break;
+    case RegularMessageType.action:
+      return 22;
+      break;
+    case RegularMessageType.invite:
+      return 23;
+      break;
+    case RegularMessageType.ctcp:
+      return 24;
       break;
   }
   throw Exception("Invalid RegularMessageType = $type");

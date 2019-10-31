@@ -340,7 +340,10 @@
           "channel_mode": "Channel mode: {}",
           "ctcp_request": "CTCP request",
           "chghost": "changed host",
-          "kick": "kick"
+          "kick": "kick",
+          "action": "action",
+          "invite": "invite",
+          "ctcp": "CTCP"
         }
       },
       "preview": {

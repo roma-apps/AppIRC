@@ -74,9 +74,26 @@ Future<ChatMessage> toChatMessage(
   if (regularMessageType == RegularMessageType.whoIs) {
     return await toWhoIsSpecialMessage(channel, msgLoungeResponseBody);
   } else {
-    var isCTCP = regularMessageType == RegularMessageType.ctcpRequest;
-    var text =
-        isCTCP ? msgLoungeResponseBody.ctcpMessage : msgLoungeResponseBody.text;
+    var isCTCP = regularMessageType == RegularMessageType.ctcpRequest ||
+        regularMessageType == RegularMessageType.ctcp;
+
+    var text;
+    if (isCTCP) {
+      text = msgLoungeResponseBody.ctcpMessage;
+    } else {
+      // todo: add special fields to RegularChatMessage
+      if (regularMessageType == RegularMessageType.chghost) {
+        text =
+            "${msgLoungeResponseBody.new_ident}@${msgLoungeResponseBody.new_host}";
+      } else {
+        if (regularMessageType == RegularMessageType.kick) {
+          text = "${msgLoungeResponseBody?.target?.nick}: "
+              "${msgLoungeResponseBody.text}";
+        } else {
+          text = msgLoungeResponseBody.text;
+        }
+      }
+    }
 
     var linksInMessage = await findUrls([text, msgLoungeResponseBody.command]);
 
@@ -419,7 +436,7 @@ WhoIsSpecialMessageBody toWhoIsSpecialMessageBody(
         actualIp: loungeWhoIs.actual_ip);
 
 MessagePreview toMessagePreview(
-        MsgPreviewLoungeResponseBodyPart loungePreview) {
+    MsgPreviewLoungeResponseBodyPart loungePreview) {
   var thumb = loungePreview.thumb;
 
   // Sometimes lounge server prefetch remote image and fails
@@ -427,19 +444,19 @@ MessagePreview toMessagePreview(
   // however it returns relative path on the server
   // in this case we replace prefetched image with remote image
   // todo: hack for bug in lounge
-  if(thumb?.startsWith("storage") == true) {
+  if (thumb?.startsWith("storage") == true) {
     thumb = loungePreview.link;
   }
   return MessagePreview.name(
-        head: loungePreview.head,
-        body: loungePreview.body,
-        canDisplay: loungePreview.canDisplay,
-        shown: loungePreview.shown,
-        link: loungePreview.link,
-        thumb: thumb,
-        type: detectMessagePreviewType(loungePreview.type),
-        media: loungePreview.media,
-        mediaType: loungePreview.mediaType);
+      head: loungePreview.head,
+      body: loungePreview.body,
+      canDisplay: loungePreview.canDisplay,
+      shown: loungePreview.shown,
+      link: loungePreview.link,
+      thumb: thumb,
+      type: detectMessagePreviewType(loungePreview.type),
+      media: loungePreview.media,
+      mediaType: loungePreview.mediaType);
 }
 
 MessagePreviewType detectMessagePreviewType(String type) {

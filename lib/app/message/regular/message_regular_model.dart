@@ -126,6 +126,9 @@ enum RegularMessageType {
   part,
   nick,
   ctcpRequest,
-  chghost, // TODO: handle additional message info in body from lounge
-  kick // TODO: handle additional message info in body from lounge
+  action,
+  invite,
+  ctcp,
+  chghost,
+  kick
 }

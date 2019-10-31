@@ -231,6 +231,15 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
     case RegularMessageType.kick:
       str = appLocalizations.tr("chat.message.regular.sub_message.kick");
       break;
+    case RegularMessageType.action:
+      str = appLocalizations.tr("chat.message.regular.sub_message.action");
+      break;
+    case RegularMessageType.invite:
+      str = appLocalizations.tr("chat.message.regular.sub_message.invite");
+      break;
+    case RegularMessageType.ctcp:
+      str = appLocalizations.tr("chat.message.regular.sub_message.ctcp");
+      break;
   }
 
   if (str != null) {
@@ -310,6 +319,15 @@ IconData _calculateTitleIconDataForMessage(RegularMessage message) {
       icon = Icons.info;
       break;
     case RegularMessageType.kick:
+      icon = Icons.info;
+      break;
+    case RegularMessageType.action:
+      icon = Icons.info;
+      break;
+    case RegularMessageType.invite:
+      icon = Icons.info;
+      break;
+    case RegularMessageType.ctcp:
       icon = Icons.info;
       break;
   }

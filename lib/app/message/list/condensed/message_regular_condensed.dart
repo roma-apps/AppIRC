@@ -69,6 +69,15 @@ bool isPossibleToCondenseMessage(ChatMessage message) {
       case RegularMessageType.kick:
         return true;
         break;
+      case RegularMessageType.action:
+        return false;
+        break;
+      case RegularMessageType.invite:
+        return false;
+        break;
+      case RegularMessageType.ctcp:
+        return false;
+        break;
     }
     return false;
   } else {

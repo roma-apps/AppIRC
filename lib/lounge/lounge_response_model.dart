@@ -560,13 +560,18 @@ class NickLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
-  final MsgFromLoungeResponseBodyPart from;
+  final MsgUserLoungeResponseBodyPart from;
+  final MsgUserLoungeResponseBodyPart target;
   final String command;
   final String type;
   final String time;
 
   // ignore: non_constant_identifier_names
   final String new_nick;
+  // ignore: non_constant_identifier_names
+  final String new_host;
+  // ignore: non_constant_identifier_names
+  final String new_ident;
   final String text;
   final String ctcpMessage;
   final String hostmask;
@@ -579,33 +584,22 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final int id;
   final WhoIsLoungeResponseBodyPart whois;
 
-  MsgLoungeResponseBodyPart(
-      this.from,
-      this.command,
-      this.type,
-      this.time,
-      this.new_nick,
-      this.text,
-      this.hostmask,
-      this.self,
-      this.highlight,
-      this.showInActive,
-      this.users,
-      this.ctcpMessage,
-      this.previews,
-      this.params,
-      this.id,
+
+  MsgLoungeResponseBodyPart(this.from, this.target, this.command, this.type,
+      this.time, this.new_nick, this.new_host, this.new_ident, this.text,
+      this.ctcpMessage, this.hostmask, this.self, this.highlight,
+      this.showInActive, this.users, this.previews, this.params, this.id,
       this.whois);
 
   @override
   String toString() {
-    return 'MsgLoungeResponseBodyPart{from: $from, command: $command,'
-        ' type: $type, time: $time, new_nick: $new_nick, '
-        'text: $text, hostmask: $hostmask, self: $self, '
-        'highlight: $highlight, showInActive: $showInActive, '
-        'users: $users, previews: $previews, params: $params, '
-        'ctcpMessage: $ctcpMessage '
-        'id: $id, whois: $whois}';
+    return 'MsgLoungeResponseBodyPart{from: $from, target: $target, command: '
+        '$command, type: '
+        '$type, time: $time, new_nick: $new_nick, new_host: $new_host,'
+        ' new_ident: $new_ident, text: $text, ctcpMessage: $ctcpMessage,'
+        ' hostmask: $hostmask, self: $self, highlight: $highlight,'
+        ' showInActive: $showInActive, users: $users, previews: $previews,'
+        ' params: $params, id: $id, whois: $whois}';
   }
 
   factory MsgLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
@@ -678,22 +672,22 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 }
 
 @JsonSerializable()
-class MsgFromLoungeResponseBodyPart extends LoungeResponseBodyPart {
+class MsgUserLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final int id;
   final String mode;
   final String nick;
 
-  MsgFromLoungeResponseBodyPart(this.id, this.mode, this.nick);
+  MsgUserLoungeResponseBodyPart(this.id, this.mode, this.nick);
 
   @override
   String toString() {
     return 'MsgFromLoungeResponseBodyPart{id: $id, mode: $mode, nick: $nick}';
   }
 
-  factory MsgFromLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
-      _$MsgFromLoungeResponseBodyPartFromJson(json);
+  factory MsgUserLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
+      _$MsgUserLoungeResponseBodyPartFromJson(json);
 
-  Map<String, dynamic> toJson() => _$MsgFromLoungeResponseBodyPartToJson(this);
+  Map<String, dynamic> toJson() => _$MsgUserLoungeResponseBodyPartToJson(this);
 }
 
 @JsonSerializable()
