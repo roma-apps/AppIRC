@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
+import 'package:flutter_appirc/app/message/list/condensed/message_condensed_widget.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
@@ -14,8 +15,6 @@ import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
-
-import 'condensed/message_condensed_widget.dart';
 
 var _logger = MyLogger(logTag: "message_list_widget.dart", enabled: true);
 
@@ -252,7 +251,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
             }
           }
 
-          if (index >= items.length) {
+          if (index >= items.length || index < 0) {
             return null;
           }
 
