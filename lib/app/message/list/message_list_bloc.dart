@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_appirc/app/channel/messages/channel_message_list_bloc.dart';
+import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
+import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
 import 'package:flutter_appirc/app/message/message_loader_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
+import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
+import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
@@ -38,12 +42,10 @@ class MessageListBloc extends Providable {
 
   BehaviorSubject<MessageListSearchState> _searchStateSubject;
 
-
   Stream<MessageListSearchState> get searchStateStream =>
       _searchStateSubject.stream;
 
   MessageListSearchState get searchState => _searchStateSubject.value;
-
 
   MessageListBloc(this._channelMessagesListBloc, this._messageLoaderBloc,
       this._moreHistoryOwner) {
@@ -51,21 +53,21 @@ class MessageListBloc extends Providable {
 
     addDisposable(streamSubscription:
         _messageLoaderBloc.messagesStream.listen((newMessages) {
-      _onMessagesChanged(newMessages,
-          _moreHistoryOwner.moreHistoryAvailable ?? false);
+      _onMessagesChanged(
+          newMessages, _moreHistoryOwner.moreHistoryAvailable ?? false);
     }));
 
     addDisposable(streamSubscription: _moreHistoryOwner
         .moreHistoryAvailableStream
         .listen((moreHistoryAvailable) {
-      _onMessagesChanged(_messageLoaderBloc.messages,
+      _updateMessageListItems(listState.items,
           _moreHistoryOwner.moreHistoryAvailable ?? false);
     }));
 
     addDisposable(streamSubscription:
         channelMessagesListBloc.isNeedSearchStream.listen((isNeedSearch) {
       if (isNeedSearch) {
-        _search(_messageLoaderBloc.messages,
+        _search(listState.items,
             channelMessagesListBloc.searchFieldBloc.value, true);
       } else {
         _searchStateSubject.add(MessageListSearchState.empty);
@@ -80,22 +82,24 @@ class MessageListBloc extends Providable {
   void init() {
     var messages = _messageLoaderBloc.messages;
 
+    var messageListItems = _convertMessagesToMessageListItems(messages);
+
     _logger.d(() => "init messages ${messages.length}");
     MessageListState initListState = MessageListState.name(
-        messages: messages,
-        moreHistoryAvailable:
-            _moreHistoryOwner.moreHistoryAvailable);
+        items: messageListItems,
+        moreHistoryAvailable: _moreHistoryOwner.moreHistoryAvailable);
     MessageListSearchState initSearchState;
 
     if (channelMessagesListBloc.isNeedSearch) {
       var searchTerm = channelMessagesListBloc.searchFieldBloc.value;
-      var filteredMessages = filterMessages(messages, searchTerm);
+      List<MessageListItem> filteredItems = _filterItems(messageListItems,
+          searchTerm);
 
       initSearchState = MessageListSearchState.name(
-          foundMessages: filteredMessages,
+          foundItems: filteredItems,
           searchTerm: searchTerm,
-          selectedFoundMessage:
-              filteredMessages.isNotEmpty ? filteredMessages[0] : null);
+          selectedFoundItem:
+          filteredItems.isNotEmpty ? filteredItems[0] : null);
     } else {
       initSearchState = MessageListSearchState.empty;
     }
@@ -108,28 +112,37 @@ class MessageListBloc extends Providable {
       List<ChatMessage> newMessages, bool moreHistoryAvailable) {
     _logger.d(() => "newMessages = ${newMessages.length} "
         "moreHistoryAvailable = $moreHistoryAvailable");
+
+
+    var messageListItems = _convertMessagesToMessageListItems(newMessages);
+
+    _updateMessageListItems(messageListItems, moreHistoryAvailable);
+  }
+
+  void _updateMessageListItems(List<MessageListItem> messageListItems, bool moreHistoryAvailable) {
+
     _listStateSubject.add(MessageListState.name(
-        messages: newMessages, moreHistoryAvailable: moreHistoryAvailable));
+        items: messageListItems, moreHistoryAvailable: moreHistoryAvailable));
     if (channelMessagesListBloc.isNeedSearch) {
       _search(
-          newMessages, channelMessagesListBloc.searchFieldBloc.value, false);
+          messageListItems, channelMessagesListBloc.searchFieldBloc.value, false);
     }
   }
 
   void _search(
-      List<ChatMessage> messages, String searchTerm, bool isSearchTermChanged) {
-    var filteredMessages = filterMessages(messages, searchTerm);
+      List<MessageListItem> messageListItems, String searchTerm, bool isSearchTermChanged) {
+    List<MessageListItem> filteredItems = _filterItems(messageListItems, searchTerm);
 
     _logger.d(() => "_search $searchTerm "
         "isNeedChangeSelectedFoundMessage $isSearchTermChanged"
-        "messages ${messages.length}"
-        "filteredMessages ${filteredMessages.length}");
+        "filteredItems ${filteredItems.length}"
+    );
 
     var searchState = MessageListSearchState.name(
-        foundMessages: filteredMessages,
+        foundItems: filteredItems,
         searchTerm: searchTerm,
-        selectedFoundMessage:
-            filteredMessages.isNotEmpty ? filteredMessages.first : null);
+        selectedFoundItem:
+        filteredItems.isNotEmpty ? filteredItems.first : null);
     _searchStateSubject.add(searchState);
 
     if (isSearchTermChanged) {
@@ -139,29 +152,28 @@ class MessageListBloc extends Providable {
   }
 
   void updateMessagesList() {
-    _onMessagesChanged(listState.messages, listState.moreHistoryAvailable);
+    _updateMessageListItems(listState.items, listState.moreHistoryAvailable);
   }
 
-
-  List<ChatMessage> filterMessages(
-      List<ChatMessage> messages, String searchTerm) {
-    return messages
+  List<MessageListItem> _filterItems(
+      List<MessageListItem> messageListItems, String searchTerm) {
+    return messageListItems
         .where(
-            (message) => message.isContainsText(searchTerm, ignoreCase: true))
+            (item) => item.isContainsText(searchTerm, ignoreCase: true))
         .toList();
   }
 
   void changeSelectedMessage(int newSelectedFoundMessageIndex) {
     var state = searchState;
-    var foundMessage = state.foundMessages[newSelectedFoundMessageIndex];
+    var foundMessage = state.foundItems[newSelectedFoundMessageIndex];
 
     _logger.d(() => "changeSelectedMessage "
         "index $newSelectedFoundMessageIndex "
         "foundMessage $foundMessage");
     var listSearchState = MessageListSearchState.name(
-        foundMessages: state.foundMessages,
+        foundItems: state.foundItems,
         searchTerm: state.searchTerm,
-        selectedFoundMessage: foundMessage);
+        selectedFoundItem: foundMessage);
     _searchStateSubject.add(listSearchState);
     _logger.d(() => "changeSelectedMessage after");
   }
@@ -173,4 +185,36 @@ class MessageListBloc extends Providable {
   void goToPreviousFoundMessage() {
     changeSelectedMessage(searchState.selectedFoundMessageIndex - 1);
   }
+}
+
+List<MessageListItem> _convertMessagesToMessageListItems(
+    List<ChatMessage> messages) {
+  var items = <MessageListItem>[];
+
+  List<ChatMessage> readyToCondenseMessages = [];
+  messages.forEach((message) {
+    if (message is RegularMessage) {
+      var isPossibleToCondense = isPossibleToCondenseMessage(message);
+
+      if (isPossibleToCondense) {
+        readyToCondenseMessages.add(message);
+      } else {
+        if (readyToCondenseMessages.isNotEmpty) {
+          items.add(CondensedMessageListItem(readyToCondenseMessages));
+          readyToCondenseMessages = [];
+        }
+        items.add(SimpleMessageListItem(message));
+      }
+    } else if (message is SpecialMessage) {
+      items.add(SimpleMessageListItem(message));
+    } else {
+      throw "Invalid message type";
+    }
+  });
+
+  if (readyToCondenseMessages.isNotEmpty) {
+    items.add(CondensedMessageListItem(readyToCondenseMessages));
+  }
+
+  return items;
 }

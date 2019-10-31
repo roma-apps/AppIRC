@@ -18,20 +18,19 @@ abstract class RegularMessageDao {
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
   Future<List<RegularMessageDB>> getChannelMessages(int channelRemoteId);
 
-  @Query(
-      'SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
-          ':channelRemoteId ORDER BY dateMicrosecondsSinceEpoch ASC')
-  Future<List<RegularMessageDB>> getChannelMessagesOrderByDate(int
-  channelRemoteId);
+  @Query('SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
+      ':channelRemoteId ORDER BY dateMicrosecondsSinceEpoch ASC')
+  Future<List<RegularMessageDB>> getChannelMessagesOrderByDate(
+      intchannelRemoteId);
 
   @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
   Stream<List<RegularMessageDB>> getChannelMessagesStream(int channelRemoteId);
 
-  @Query(
-      'SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
-          ':channelRemoteId ORDER BY dateMicrosecondsSinceEpoch ASC')
-  Stream<List<RegularMessageDB>> getChannelMessagesOrderByDateStream(int channelRemoteId);
+  @Query('SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
+      ':channelRemoteId ORDER BY dateMicrosecondsSinceEpoch ASC')
+  Stream<List<RegularMessageDB>> getChannelMessagesOrderByDateStream(
+      int channelRemoteId);
 
   @insert
   Future<int> insertRegularMessage(RegularMessageDB regularMessage);
@@ -87,7 +86,6 @@ class RegularMessageDB implements ChatMessageDB {
 
   static bool isHighlight(RegularMessageDB message) =>
       message.highlight != null ? message.highlight != 0 : null;
-
 
   final String previewsJsonEncoded;
   final String linksJsonEncoded;
@@ -145,7 +143,6 @@ class RegularMessageDB implements ChatMessageDB {
       this.highlight,
       this.previewsJsonEncoded,
       this.linksJsonEncoded,
-
       this.dateMicrosecondsSinceEpoch,
       this.fromRemoteId,
       this.fromNick,
@@ -229,6 +226,12 @@ RegularMessageType regularMessageTypeIdToType(int id) {
     case 19:
       return RegularMessageType.ctcpRequest;
       break;
+    case 20:
+      return RegularMessageType.chghost;
+      break;
+    case 21:
+      return RegularMessageType.kick;
+      break;
   }
 
   throw Exception("Invalid RegularMessageType id $id");
@@ -293,6 +296,12 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
     case RegularMessageType.ctcpRequest:
       return 19;
       break;
+    case RegularMessageType.chghost:
+      return 20;
+      break;
+    case RegularMessageType.kick:
+      return 21;
+      break;
   }
   throw Exception("Invalid RegularMessageType = $type");
 }
@@ -327,39 +336,41 @@ RegularMessageDB toRegularMessageDB(
         newNick: regularMessage.newNick,
         channelRemoteId: regularMessage.channelRemoteId);
 
-RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
-    RegularMessage.name(
-
-        messageDB.channelRemoteId,
-        messageLocalId: messageDB.localId,
-        messageRemoteId: messageDB.messageRemoteId,
-        command: messageDB.command,
-        hostMask: messageDB.hostMask,
-        text: messageDB.text,
-        params: messageDB.paramsJsonEncoded != null
-            ? _convertParams(messageDB)
-            : null,
-        regularMessageType:
-            regularMessageTypeIdToType(messageDB.regularMessageTypeId),
-        self:
-            messageDB.self != null ? messageDB.self == 0 ? false : true : null,
-        highlight: messageDB.highlight != null
-            ? messageDB.highlight == 0 ? false : true
-            : null,
-        previews: messageDB.previewsJsonEncoded != null
-            ? _convertPreviews(messageDB)
-            : null,
-        linksInText: messageDB.linksJsonEncoded != null
-        ? convertLinks(messageDB) : null,
-        date: DateTime.fromMicrosecondsSinceEpoch(
-            messageDB.dateMicrosecondsSinceEpoch),
-        fromRemoteId: messageDB.fromRemoteId,
-        fromNick: messageDB.fromNick,
-        fromMode: messageDB.fromMode,
-        newNick: messageDB.newNick,
-        nicknames: messageDB.nicknamesJsonEncoded != null
-            ? _convertNicknames(messageDB)
-            : null);
+RegularMessage
+    regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
+        RegularMessage
+            .name(messageDB.channelRemoteId,
+                messageLocalId: messageDB.localId,
+                messageRemoteId: messageDB.messageRemoteId,
+                command: messageDB.command,
+                hostMask: messageDB.hostMask,
+                text: messageDB.text,
+                params: messageDB.paramsJsonEncoded != null
+                    ? _convertParams(messageDB)
+                    : null,
+                regularMessageType:
+                    regularMessageTypeIdToType(messageDB.regularMessageTypeId),
+                self: messageDB.self != null
+                    ? messageDB.self == 0 ? false : true
+                    : null,
+                highlight: messageDB.highlight != null
+                    ? messageDB.highlight == 0 ? false : true
+                    : null,
+                previews: messageDB.previewsJsonEncoded != null
+                    ? _convertPreviews(messageDB)
+                    : null,
+                linksInText: messageDB.linksJsonEncoded != null
+                    ? convertLinks(messageDB)
+                    : null,
+                date: DateTime.fromMicrosecondsSinceEpoch(
+                    messageDB.dateMicrosecondsSinceEpoch),
+                fromRemoteId: messageDB.fromRemoteId,
+                fromNick: messageDB.fromNick,
+                fromMode: messageDB.fromMode,
+                newNick: messageDB.newNick,
+                nicknames: messageDB.nicknamesJsonEncoded != null
+                    ? _convertNicknames(messageDB)
+                    : null);
 
 List<String> _convertNicknames(RegularMessageDB messageDB) {
   var decoded = json.decode(messageDB.nicknamesJsonEncoded);
@@ -391,4 +402,3 @@ List<MessagePreview> _convertPreviews(RegularMessageDB messageDB) {
 
   return list.map((listItem) => MessagePreview.fromJson(listItem)).toList();
 }
-

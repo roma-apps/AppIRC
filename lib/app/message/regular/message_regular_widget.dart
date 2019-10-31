@@ -225,6 +225,12 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
       str =
           appLocalizations.tr("chat.message.regular.sub_message.ctcp_request");
       break;
+    case RegularMessageType.chghost:
+      str = appLocalizations.tr("chat.message.regular.sub_message.chghost");
+      break;
+    case RegularMessageType.kick:
+      str = appLocalizations.tr("chat.message.regular.sub_message.kick");
+      break;
   }
 
   if (str != null) {
@@ -298,6 +304,12 @@ IconData _calculateTitleIconDataForMessage(RegularMessage message) {
       icon = Icons.accessibility_new;
       break;
     case RegularMessageType.ctcpRequest:
+      icon = Icons.info;
+      break;
+    case RegularMessageType.chghost:
+      icon = Icons.info;
+      break;
+    case RegularMessageType.kick:
       icon = Icons.info;
       break;
   }

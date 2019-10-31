@@ -121,6 +121,12 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
       case RegularMessageType.ctcpRequest:
         color = Colors.lightBlue;
         break;
+      case RegularMessageType.chghost:
+        color = Colors.lightBlue;
+        break;
+      case RegularMessageType.kick:
+        color = Colors.red;
+        break;
     }
     return color;
   }

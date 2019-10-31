@@ -54,34 +54,6 @@ bool isContainsSearchTerm(String text, String searchTerm, {bool ignoreCase}) {
 enum ChatMessageType { special, regular }
 
 
-class MessageListState {
-  final List<ChatMessage> messages;
-  final bool moreHistoryAvailable;
-
-  MessageListState.name(
-      {@required this.messages, @required this.moreHistoryAvailable});
-
-  static get empty =>
-      MessageListState.name(messages: [], moreHistoryAvailable: false);
-
-  @override
-  String toString() {
-    return 'ChatMessagesListState{messages: $messages,'
-        ' moreHistoryAvailable: $moreHistoryAvailable}';
-  }
-}
-
-
-
-class MessageListLoadMore {
-  List<ChatMessage> messages;
-  bool moreHistoryAvailable;
-  MessageListLoadMore(this.messages, this.moreHistoryAvailable);
-
-  MessageListLoadMore.name(
-      {@required this.messages, @required this.moreHistoryAvailable});
-}
-
 
 class MessagesForChannel {
   Channel channel;

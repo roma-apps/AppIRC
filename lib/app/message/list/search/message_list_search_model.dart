@@ -1,14 +1,13 @@
-
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/message/message_model.dart';
+import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 
 class MessageListSearchState {
-  final List<ChatMessage> foundMessages;
+  final List<MessageListItem> foundItems;
   final String searchTerm;
-  final ChatMessage selectedFoundMessage;
+  final MessageListItem selectedFoundItem;
 
   get maxPossibleSelectedFoundPosition =>
-      foundMessages?.isNotEmpty == true ? foundMessages.length : null;
+      foundItems?.isNotEmpty == true ? foundItems.length : null;
 
   get selectedFoundMessagePosition {
     var index = selectedFoundMessageIndex;
@@ -16,31 +15,30 @@ class MessageListSearchState {
   }
 
   int get selectedFoundMessageIndex =>
-      foundMessages?.indexOf(selectedFoundMessage) ?? -1;
+      foundItems?.indexOf(selectedFoundItem) ?? -1;
 
   bool get isCanMoveNext {
     var index = selectedFoundMessageIndex;
-    return index >= 0 && index < foundMessages.length - 1;
+    return index >= 0 && index < foundItems.length - 1;
   }
 
   bool get isCanMovePrevious => selectedFoundMessageIndex > 0;
 
   MessageListSearchState.name(
-      {@required this.foundMessages,
-        @required this.searchTerm,
-        @required this.selectedFoundMessage});
+      {@required this.foundItems,
+      @required this.searchTerm,
+      @required this.selectedFoundItem});
 
   static get empty => MessageListSearchState.name(
-      foundMessages: [], searchTerm: null, selectedFoundMessage: null);
+      foundItems: [], searchTerm: null, selectedFoundItem: null);
 
   @override
   String toString() {
-    return 'MessageListSearchState{foundMessages: $foundMessages,'
+    return 'MessageListSearchState{foundItems: $foundItems,'
         ' searchTerm: $searchTerm,'
-        ' selectedFoundMessageIndex: $selectedFoundMessageIndex}';
+        ' selectedFoundItem: $selectedFoundMessageIndex}';
   }
 
-  bool isMessageInSearchResults(ChatMessage message) =>
-      foundMessages?.contains(message) ?? false;
+  bool isMessageInSearchResults(MessageListItem item) =>
+      foundItems?.contains(item) ?? false;
 }
-

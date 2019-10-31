@@ -94,7 +94,7 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
       BuildContext context, MessageListSearchState searchState) {
     String labelText;
     if (searchState.searchTerm?.isNotEmpty == true) {
-      if (searchState.foundMessages.isEmpty) {
+      if (searchState.foundItems.isEmpty) {
         labelText = AppLocalizations.of(context)
             .tr("chat.messages_list.search.field.filter"
                 ".label.nothing_found");

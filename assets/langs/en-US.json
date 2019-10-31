@@ -263,6 +263,9 @@
       "loading": "Loading messages..."
     },
     "message": {
+      "condensed": {
+        "join_separator": ", "
+      },
       "special": {
         "channels_list": {
           "users": "{} users"
@@ -280,6 +283,44 @@
         }
       },
       "regular": {
+        "condensed": {
+          "away": {
+            "one": "{} user have gone away",
+            "other": "{} users has gone away"
+          },
+          "back": {
+            "one": "{} user have come back",
+            "other": "{} users has come back"
+          },
+          "chghost": {
+            "one": "{} users have changed hostname",
+            "other": "{} users have changed hostname"
+          },
+          "join": {
+            "one": "{} user has joined",
+            "other": "{} users have joined"
+          },
+          "part": {
+            "one": "{} user has left",
+            "other": "{} users have left"
+          },
+          "quit": {
+            "one": "{} user was quit",
+            "other": "{} users were quit"
+          },
+          "nick": {
+            "one": "{} user has changed nick",
+            "other": "{} users have changed nick"
+          },
+          "kick": {
+            "one": "{} user was kicked",
+            "other": "{} users were kicked"
+          },
+          "mode": {
+            "one": "{} mode was set",
+            "other": "{} modes were set"
+          }
+        },
         "sub_message": {
           "mode_short": "mode {}",
           "mode_long": "mode",
@@ -297,7 +338,9 @@
           "part": "part",
           "nick": "change nick to {}",
           "channel_mode": "Channel mode: {}",
-          "ctcp_request": "CTCP request"
+          "ctcp_request": "CTCP request",
+          "chghost": "changed host",
+          "kick": "kick"
         }
       },
       "preview": {

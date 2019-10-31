@@ -71,4 +71,5 @@ const _$MessagePreviewTypeEnumMap = {
   MessagePreviewType.loading: 'loading',
   MessagePreviewType.audio: 'audio',
   MessagePreviewType.video: 'video',
+  MessagePreviewType.error: 'error',
 };
