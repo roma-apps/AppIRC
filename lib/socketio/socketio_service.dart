@@ -190,7 +190,7 @@ class SocketIOService extends Providable {
     return SocketOptions(
         //Socket IO server URI
         host, //Enable or disable platform channel logging
-        enableLogging: _logger.enabled,
+        enableLogging: _logger.globalAndLoggerEnabled,
         transports: [
           Transports.WEB_SOCKET,
           Transports.POLLING

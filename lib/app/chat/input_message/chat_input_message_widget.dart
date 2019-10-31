@@ -36,7 +36,6 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
     var children = <Widget>[
       Flexible(
           child: Container(
-        //              decoration: BoxDecoration(border: Border.all(color: inputMessageSkinBloc.inputMessageCursorColor)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: _buildInputMessageField(context),
@@ -101,6 +100,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
               inputMessageBloc.sendMessage();
             };
           }
+//          return TextField();
           return createPlatformTypeAhead(
             context,
             keepSuggestionsOnSuggestionSelected: true,
@@ -129,6 +129,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
                       autofocus: false,
                       textInputAction: inputAction,
                       onSubmitted: submitted,
+                      focusNode: inputMessageBloc.focusNode,
                       controller: inputMessageBloc.messageController,
                       style: textSkinBloc.defaultItalicTextStyle,
                       decoration: InputDecoration(
@@ -143,6 +144,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
                       controller: inputMessageBloc.messageController,
                       textInputAction: inputAction,
                       onSubmitted: submitted,
+                      focusNode: inputMessageBloc.focusNode,
                       style: textSkinBloc.defaultItalicTextStyle,
                       placeholder: hintText));
             },
