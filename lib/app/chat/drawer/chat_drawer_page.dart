@@ -18,7 +18,7 @@ class ChatDrawerPageState extends State<ChatDrawerPage> {
   @override
   Widget build(BuildContext context) => PlatformScaffold(
       appBar: PlatformAppBar(
-        title: Text(AppLocalizations.of(context).tr('settings.title')),
+        title: Text(AppLocalizations.of(context).tr('chat.settings.title')),
       ),
       body: SafeArea(
           child: Padding(
