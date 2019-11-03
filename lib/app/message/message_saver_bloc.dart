@@ -17,8 +17,7 @@ import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "message_saver_bloc.dart", enabled: true);
 
-class MessageSaverBloc
-    extends ChannelListListenerBloc {
+class MessageSaverBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
   final ChatDatabase _db;
 
@@ -32,34 +31,31 @@ class MessageSaverBloc
 
   // ignore: close_sinks
   BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
-  BehaviorSubject();
+      BehaviorSubject();
 
-  Disposable listenForMessages(Network network, Channel channel,
-      ChannelMessageListener listener) {
+  Disposable listenForMessages(
+      Network network, Channel channel, ChannelMessageListener listener) {
     return StreamSubscriptionDisposable(
         _realtimeMessagesSubject.stream.listen((messagesForChannel) {
-          if (messagesForChannel.channel.remoteId == channel.remoteId) {
-            listener(messagesForChannel);
-          }
-        }));
+      if (messagesForChannel.channel.remoteId == channel.remoteId) {
+        listener(messagesForChannel);
+      }
+    }));
   }
 
-
   @override
-  void onChannelJoined(
-      Network network, ChannelWithState channelWithState) {
+  void onChannelJoined(Network network, ChannelWithState channelWithState) {
     Channel channel = channelWithState.channel;
 
     _logger.d(() => "listen for mesasges from channel $channel");
 
-    _onNewMessages(MessagesForChannel(channel, channelWithState.initMessages));
-
+    _onNewMessages(MessagesForChannel.name(
+        channel: channel, messages: channelWithState.initMessages));
 
     var channelDisposable = CompositeDisposable([]);
 
-    channelDisposable
-        .add(_backendService.listenForMessages(network, channel,
-            (messagesForChannel) {
+    channelDisposable.add(_backendService.listenForMessages(network, channel,
+        (messagesForChannel) {
       _onNewMessages(messagesForChannel);
     }));
 
@@ -67,7 +63,6 @@ class MessageSaverBloc
         .listenForMessagePreviews(network, channel, (previewForMessage) async {
       await _updatePreview(previewForMessage);
     }));
-
 
     channelDisposable.add(_backendService.listenForMessagePreviewToggle(
         network, channel, (ToggleMessagePreviewData togglePreview) async {
@@ -81,7 +76,7 @@ class MessageSaverBloc
   }
 
   Future _togglePreview(ToggleMessagePreviewData togglePreview) async {
-      var previewForMessage = MessagePreviewForRemoteMessageId(
+    var previewForMessage = MessagePreviewForRemoteMessageId(
         togglePreview.message.messageRemoteId, togglePreview.preview);
 
     var oldMessageDB = await _db.regularMessagesDao
@@ -100,7 +95,8 @@ class MessageSaverBloc
     _db.regularMessagesDao.updateRegularMessage(newMessageDB);
   }
 
-  Future _updatePreview(MessagePreviewForRemoteMessageId previewForMessage) async {
+  Future _updatePreview(
+      MessagePreviewForRemoteMessageId previewForMessage) async {
     var oldMessageDB = await _db.regularMessagesDao
         .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
@@ -116,31 +112,30 @@ class MessageSaverBloc
   void _onNewMessages(MessagesForChannel messagesForChannel) async {
     _logger.d(() => "_onNewMessages $messagesForChannel");
 
-
     var newMessages = messagesForChannel.messages;
 
-    for(var newMessage in newMessages) {
+    for (var newMessage in newMessages) {
       var chatMessageType = newMessage.chatMessageType;
 
       int id;
       switch (chatMessageType) {
         case ChatMessageType.special:
           var specialMessageDB = toSpecialMessageDB(newMessage);
-          id = await _db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
+          id = await _db.specialMessagesDao
+              .insertSpecialMessage(specialMessageDB);
           break;
         case ChatMessageType.regular:
           var regularMessageDB = toRegularMessageDB(newMessage);
-          id = await _db.regularMessagesDao.insertRegularMessage(regularMessageDB);
+          id = await _db.regularMessagesDao
+              .insertRegularMessage(regularMessageDB);
           break;
       }
 
       newMessage.messageLocalId = id;
     }
 
-
     _realtimeMessagesSubject.add(messagesForChannel);
   }
-
 
   @override
   void onChannelLeaved(Network network, Channel channel) {
@@ -151,8 +146,8 @@ class MessageSaverBloc
   }
 }
 
-void updatePreview(
-    RegularMessage oldMessage, MessagePreviewForRemoteMessageId previewForMessage) {
+void updatePreview(RegularMessage oldMessage,
+    MessagePreviewForRemoteMessageId previewForMessage) {
   if (oldMessage.previews == null) {
     oldMessage.previews = [];
   }

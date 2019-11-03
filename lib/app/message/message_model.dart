@@ -12,8 +12,6 @@ abstract class ChatMessage {
   final DateTime date;
   final List<String> linksInText;
 
-
-
   ChatMessage(
       this.chatMessageType, this.channelRemoteId, this.date, this.linksInText,
       {this.messageLocalId});
@@ -36,10 +34,10 @@ abstract class ChatMessage {
 }
 
 bool isContainsSearchTerm(String text, String searchTerm, {bool ignoreCase}) {
-  if(text == null) {
+  if (text == null) {
     return false;
   }
-  if(ignoreCase == true) {
+  if (ignoreCase == true) {
     return text.toLowerCase().contains(searchTerm.toLowerCase());
   } else {
     return text.contains(searchTerm);
@@ -48,20 +46,21 @@ bool isContainsSearchTerm(String text, String searchTerm, {bool ignoreCase}) {
 
 enum ChatMessageType { special, regular }
 
-
-
 class MessagesForChannel {
-  Channel channel;
-  List<ChatMessage> messages;
+  final Channel channel;
+  final List<ChatMessage> messages;
+  final bool isContainsTextSpecialMessage;
 
-  MessagesForChannel(this.channel, this.messages);
+  MessagesForChannel.name(
+      {@required this.channel,
+      @required this.messages,
+      this.isContainsTextSpecialMessage = false});
 
   @override
   String toString() {
-    return 'MessagesForChannel{channel: $channel, messages: $messages}';
+    return 'MessagesForChannel{channel: $channel, messages: $messages, '
+        'isContainsTextSpecialMessage: $isContainsTextSpecialMessage}';
   }
-
-
 }
 
 bool isToday(DateTime date) {

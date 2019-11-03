@@ -57,7 +57,9 @@ class MessageLoaderBloc extends Providable {
         .map(regularMessageDBToChatMessage);
     var specialMessages =
         (await _db.specialMessagesDao.getChannelMessages(_channel.remoteId))
-            .map(specialMessageDBToChatMessage);
+            .map(specialMessageDBToChatMessage).toList();
+
+    _removeUnnecessarySpecialLoadingMessages(specialMessages);
 
     messages.addAll(regularMessages);
     messages.addAll(specialMessages);
@@ -79,19 +81,32 @@ class MessageLoaderBloc extends Providable {
     _messagesSubject.add(messages);
   }
 
-  ChatMessage findLatestTextSpecialMessage() {
+  _removeUnnecessarySpecialLoadingMessages(List<ChatMessage> messages) {
+    var lastTextSpecialMessage = findLatestTextSpecialMessage(messages);
+
+    if (lastTextSpecialMessage != null) {
+      messages.removeWhere((message) =>
+          _isTextSpecialMessage(message) && message != lastTextSpecialMessage);
+    }
+  }
+
+  ChatMessage findLatestTextSpecialMessage(List<ChatMessage> messages) {
     return messages.lastWhere((message) {
-      if (message.isSpecial) {
-        var specialMessage = message as SpecialMessage;
-        if (specialMessage.specialType == SpecialMessageType.text) {
-          return true;
-        } else {
-          return false;
-        }
+      return _isTextSpecialMessage(message);
+    }, orElse: () => null);
+  }
+
+  bool _isTextSpecialMessage(ChatMessage message) {
+    if (message.isSpecial) {
+      var specialMessage = message as SpecialMessage;
+      if (specialMessage.specialType == SpecialMessageType.text) {
+        return true;
       } else {
         return false;
       }
-    }, orElse: () => null);
+    } else {
+      return false;
+    }
   }
 
   _loadStartMessagesFromDatabase() async {
@@ -169,8 +184,7 @@ class MessageLoaderBloc extends Providable {
 
     var newMessages = messagesForChannel.messages;
 
-
-    if(newMessages?.isNotEmpty != true) {
+    if (newMessages?.isNotEmpty != true) {
       // empty or null
       // maybe during loading history
       return;
@@ -209,29 +223,8 @@ class MessageLoaderBloc extends Providable {
     }
     _logger.d(() => "_addNewMessages $newMessages");
 
-    // lounge emit a lot of "loading..." messages
-    // replace old messages with new one
-    if (isSingleMessage) {
-      if (firstMessage is SpecialMessage) {
-        if (firstMessage.specialType == SpecialMessageType.text) {
-          SpecialMessage latestTextMessage = findLatestTextSpecialMessage();
-
-          if (latestTextMessage != null) {
-            return messages.removeWhere((message) {
-              if (message.isSpecial) {
-                var specialMessage = message as SpecialMessage;
-                if (specialMessage.specialType == SpecialMessageType.text) {
-                  return message != latestTextMessage;
-                } else {
-                  return false;
-                }
-              } else {
-                return false;
-              }
-            });
-          }
-        }
-      }
+    if(messagesForChannel.isContainsTextSpecialMessage) {
+      _removeUnnecessarySpecialLoadingMessages(messages);
     }
 
     _onMessagesChanged();
