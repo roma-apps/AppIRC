@@ -194,8 +194,8 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
     theme = MaterialBasedCupertinoThemeData(
         materialTheme: androidAppSkinTheme.theme);
 
-    textBoldSmallStyle = textTheme.navTitleTextStyle.copyWith(fontSize: 12);
-    textRegularSmallStyle = textTheme.textStyle.copyWith(fontSize: 12);
+    textBoldSmallStyle = textTheme.navTitleTextStyle.copyWith(fontSize: 14);
+    textRegularSmallStyle = textTheme.textStyle.copyWith(fontSize: 14);
     textInputDecorationErrorStyle =
         textTheme.textStyle.copyWith(color: Colors.red);
   }

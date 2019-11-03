@@ -11,10 +11,8 @@ import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
-import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
@@ -71,7 +69,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           "_lastBuildMessagesStartIndex $_lastBuildMessagesStartIndex");
 
       if (visiblePositions.isNotEmpty) {
-
         // context always valid, because this function used only when widget is
         // visible
         ChannelBloc channelBloc = ChannelBloc.of(context);
@@ -89,7 +86,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           }
         });
 
-        if(minIndex == 0 && _lastBuildMessagesStartIndex > 0) {
+        if (minIndex == 0 && _lastBuildMessagesStartIndex > 0) {
           MessageListLoadMoreBloc loadMoreBloc = Provider.of(context);
 
           var oldestRegularItem = _lastBuildItems
@@ -111,7 +108,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         if (maxIndex >= _lastBuildItems.length) {
           maxIndex = _lastBuildItems.length - 1;
         }
-
 
         channelBloc.messagesBloc.onVisibleMessagesBounds(
             MessageListVisibleBounds(
@@ -171,7 +167,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           return _buildListWidget(
               context,
               chatMessageListState.items,
-              chatMessageListState.moreHistoryAvailable ?? false,
+//              chatMessageListState.moreHistoryAvailable ?? false,
+              true,
               chatListMessagesBloc.searchState,
               initScrollPositionItem);
         });
@@ -200,6 +197,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       }
       _logger.d(() => "_buildMessagesList "
           "visibleMessagesBounds $visibleMessagesBounds "
+          "firstUnreadRemoteMessageId $firstUnreadRemoteMessageId "
+          "index ${items?.indexOf(initScrollPositionItem)} "
           "initScrollPositionItem $initScrollPositionItem ");
     }
     return initScrollPositionItem;
@@ -224,11 +223,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       _lastBuildMessagesStartIndex = 0;
     }
 
-    if (initialScrollIndex == 1 && moreHistoryAvailable) {
-      // hack to display load more button
-      // when list want to display first message
-      initialScrollIndex = 0;
-    }
 
     _logger.d(() => "_buildListWidget "
         "itemCount $itemCount "
@@ -238,13 +232,13 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
     double initialAlignment = 0.0;
 
-    var lastIndex = itemCount - 1;
-    if (initialScrollIndex == lastIndex && initialScrollIndex != 0) {
-      // hack to display last message at the bottom
-      // when list want to display last message
-      initialScrollIndex += 1;
-      initialAlignment = 1.0;
-    }
+//    var lastIndex = itemCount - 1;
+//    if (initialScrollIndex == lastIndex && initialScrollIndex != 0) {
+//      // hack to display last message at the bottom
+//      // when list want to display last message
+//      initialScrollIndex += 1;
+//      initialAlignment = 1.0;
+//    }
 
     return ScrollablePositionedList.builder(
         initialScrollIndex: initialScrollIndex,

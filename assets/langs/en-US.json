@@ -254,8 +254,10 @@
           }
         }
       },
-      "action": {
-        "load_more": "Load more..."
+      "load_more": {
+        "loading": "Loading older messages...",
+        "available": "Older messages available. Scroll to load...",
+        "not_available": "Older messages not available"
       },
       "empty": {
         "connected": "This channel doesn't have any messages yet",
