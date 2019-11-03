@@ -13,47 +13,11 @@ import 'package:intl/intl.dart';
 var todayDateFormatter = new DateFormat().add_Hm();
 var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
 
-//Widget buildMessageMainPartWidget(
-//    {@required BuildContext context,
-//    @required DateTime date,
-//    @required IconData iconData,
-//    @required Color color,
-//    @required String nick,
-//    @required String title,
-//    @required List<InlineSpan> bodySpans}) {
-//  var spans = <InlineSpan>[];
-//  spans.add(
-//      buildMessageDateTextSpan(context: context, date: date, color: color));
-//
-//  if (iconData != null) {
-//    spans.add(buildMessageIconWidgetSpan(iconData: iconData, color: color));
-//  }
-//
-//  if (nick?.isNotEmpty == true) {
-//    spans.add(
-//        buildHighlightedNicknameButtonWidgetSpan(context: context, nick: nick));
-//  }
-//
-//  if (title?.isNotEmpty == true) {
-//    spans.add(buildMessageTitleTextSpan(
-//        context: context, title: title, color: color));
-//  }
-//
-//  if (bodySpans?.isNotEmpty == true) {
-//    spans.addAll(bodySpans);
-//  }
-//  return RichText(
-//    text: TextSpan(
-//      children: spans,
-//    ),
-//  );
-//}
-
 WidgetSpan buildHighlightedNicknameButtonWidgetSpan(
     {@required BuildContext context, @required String nick}) {
   return WidgetSpan(
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: buildUserNickWithPopupMenu(
           context: context, nick: nick, actionCallback: null),
     ),

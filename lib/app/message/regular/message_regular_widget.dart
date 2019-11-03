@@ -28,8 +28,10 @@ Widget buildRegularMessageWidget(
   spans.add(buildMessageDateTextSpan(
       context: context, date: message.date, color: color));
 
-  spans.add(buildMessageIconWidgetSpan(
-      iconData: _getMessageIcon(message), color: color));
+  var messageIcon = _getMessageIcon(message);
+  if (messageIcon != null) {
+    spans.add(buildMessageIconWidgetSpan(iconData: messageIcon, color: color));
+  }
 
   if (message.fromNick?.isNotEmpty == true) {
     spans.add(buildHighlightedNicknameButtonWidgetSpan(
@@ -264,7 +266,8 @@ IconData _getMessageIcon(RegularMessage message) {
       icon = Icons.help;
       break;
     case RegularMessageType.message:
-      icon = Icons.message;
+      // nothing. We don't need icon for simple message
+      icon = null;
       break;
     case RegularMessageType.join:
       icon = Icons.arrow_forward;
