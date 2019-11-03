@@ -58,7 +58,7 @@ class MessageListBloc extends Providable {
     }));
 
     addDisposable(streamSubscription: _moreHistoryOwner
-        .moreHistoryAvailableStream.distinct()
+        .moreHistoryAvailableStream
         .listen((moreHistoryAvailable) {
       _updateMessageListItems(listState.items,
           _moreHistoryOwner.moreHistoryAvailable ?? false);

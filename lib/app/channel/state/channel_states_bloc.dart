@@ -62,8 +62,6 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
       state.unreadCount = 0;
     }
 
-    state.moreHistoryAvailable = true;
-
     // ignore: close_sinks
     var stateSubject = _getStateSubjectForChannel(network, channel);
     // sometimes subject already disposed and removed

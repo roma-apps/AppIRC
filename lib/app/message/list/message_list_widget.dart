@@ -5,8 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_widget.dart';
-import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_bloc.dart';
-import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_widget.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
@@ -71,11 +69,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           "_lastBuildMessagesStartIndex $_lastBuildMessagesStartIndex");
 
       if (visiblePositions.isNotEmpty) {
-
-        // context always valid, because this function used only when widget is
-        // visible
-        ChannelBloc channelBloc = ChannelBloc.of(context);
-
         var minIndex = visiblePositions.first.index;
         var maxIndex = visiblePositions.first.index;
 
@@ -88,19 +81,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
             maxIndex = position.index;
           }
         });
-
-        if(minIndex == 0 && _lastBuildMessagesStartIndex > 0) {
-          MessageListLoadMoreBloc loadMoreBloc = Provider.of(context);
-
-          var oldestRegularItem = _lastBuildItems
-              ?.firstWhere((item) => item.isHaveRegularMessage, orElse: null);
-
-          var oldestRegularMessage = oldestRegularItem.oldestRegularMessage;
-
-          loadMoreBloc.sendLoadMoreRequest(oldestRegularMessage);
-          _logger.d(() => "onNeedLoadMore");
-        }
-
         minIndex -= _lastBuildMessagesStartIndex;
         maxIndex -= _lastBuildMessagesStartIndex;
 
@@ -112,6 +92,9 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           maxIndex = _lastBuildItems.length - 1;
         }
 
+        // context always valid, because this function used only when widget is
+        // visible
+        ChannelBloc channelBloc = ChannelBloc.of(context);
 
         channelBloc.messagesBloc.onVisibleMessagesBounds(
             MessageListVisibleBounds(
@@ -261,7 +244,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
               // return the header
               // we should pass non-filtered list to extract non-filtered
               // oldest message
-              return _buildLoadMore(context, items);
+              return _buildLoadMoreButton(context, items);
             } else {
               // move start index
               index -= 1;
@@ -307,26 +290,25 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   }
 }
 
-Widget _buildLoadMore(BuildContext context, List<MessageListItem> items) {
-  return MessageListLoadMoreWidget();
-//  return createSkinnedPlatformButton(context, onPressed: () {
-//    doAsyncOperationWithDialog(
-//        context: context,
-//        asyncCode: () async {
-//          var oldestRegularItem = items
-//              ?.firstWhere((item) => item.isHaveRegularMessage, orElse: null);
-//
-//          var oldestRegularMessage = oldestRegularItem.oldestRegularMessage;
-//
-//          var channelBloc = ChannelBloc.of(context);
-//          return await channelBloc.loadMoreHistory(oldestRegularMessage);
-//        },
-//        cancellationValue: null,
-//        isDismissible: true);
-//  },
-//      child: Text(AppLocalizations.of(context)
-//          .tr("chat.messages_list.action.load_more")));
-}
+Widget _buildLoadMoreButton(
+        BuildContext context, List<MessageListItem> items) =>
+    createSkinnedPlatformButton(context, onPressed: () {
+      doAsyncOperationWithDialog(
+          context: context,
+          asyncCode: () async {
+            var oldestRegularItem = items
+                ?.firstWhere((item) => item.isHaveRegularMessage, orElse: null);
+
+            var oldestRegularMessage = oldestRegularItem.oldestRegularMessage;
+
+            var channelBloc = ChannelBloc.of(context);
+            return await channelBloc.loadMoreHistory(oldestRegularMessage);
+          },
+          cancellationValue: null,
+          isDismissible: true);
+    },
+        child: Text(AppLocalizations.of(context)
+            .tr("chat.messages_list.action.load_more")));
 
 Widget _buildListItem(BuildContext context, MessageListItem item,
     bool inSearchResults, String searchTerm) {

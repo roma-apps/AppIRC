@@ -29,7 +29,6 @@ import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
-import 'package:flutter_appirc/async/async_loading_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware.dart'
     as platform_aware;
@@ -349,20 +348,35 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildLoadingMessagesWidget(BuildContext context) {
-    return buildLoadingWidget(
+    return _buildLoadingWidget(
         context, AppLocalizations.of(context).tr("chat.messages_list.loading"));
   }
 
   Widget _buildInitMessagesWidget(BuildContext context) {
-    return buildLoadingWidget(
+    return _buildLoadingWidget(
         context, AppLocalizations.of(context).tr("chat.state.init"));
   }
 
-  Widget _buildConnectingWidget(BuildContext context) => buildLoadingWidget(
+  Widget _buildConnectingWidget(BuildContext context) => _buildLoadingWidget(
       context,
       AppLocalizations.of(context)
           .tr("chat.state.connection.status.connecting"));
 
+  Widget _buildLoadingWidget(BuildContext context, String message) {
+    TextSkinBloc textSkinBloc = Provider.of(context);
+    return Center(
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(message, style: textSkinBloc.defaultTextStyle),
+            ),
+            CircularProgressIndicator()
+          ]),
+    );
+  }
 
   Widget _buildConnectToNetworkWidget(BuildContext context) {
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
