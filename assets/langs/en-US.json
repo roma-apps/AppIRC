@@ -259,7 +259,7 @@
       },
       "empty": {
         "connected": "This channel doesn't have any messages yet",
-        "not_connected": "Not connected to the server"
+        "not_connected": "Server not connected to channel on remote IRC server. Try /connect to connect again"
       },
       "loading": "Loading messages..."
     },

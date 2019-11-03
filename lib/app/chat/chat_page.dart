@@ -357,7 +357,13 @@ class _ChatPageState extends State<ChatPage> {
         context, AppLocalizations.of(context).tr("chat.state.init"));
   }
 
+  Widget _buildConnectingWidget(BuildContext context) => _buildLoadingWidget(
+      context,
+      AppLocalizations.of(context)
+          .tr("chat.state.connection.status.connecting"));
+
   Widget _buildLoadingWidget(BuildContext context, String message) {
+    TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -365,7 +371,7 @@ class _ChatPageState extends State<ChatPage> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(message),
+              child: Text(message, style: textSkinBloc.defaultTextStyle),
             ),
             CircularProgressIndicator()
           ]),
@@ -418,15 +424,6 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
-  }
-
-  Widget _buildConnectingWidget(BuildContext context) {
-    TextSkinBloc textSkinBloc = Provider.of(context);
-    return Center(
-        child: Text(
-            AppLocalizations.of(context)
-                .tr("chat.state.connection.status.connecting"),
-            style: textSkinBloc.defaultTextStyle));
   }
 
   Widget _buildConnectedWidget(BuildContext context) {
