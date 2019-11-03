@@ -155,6 +155,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     assert(_loungePreferences != LoungeConnectionPreferences.empty);
     _logger.d(() => "connectChat _loungePreferences $_loungePreferences");
 
+    _connectionStateSubject.add(ChatConnectionState.connecting);
+
     ConnectResult connectResult =
         await _connect(_loungePreferences, _socketIOService);
 
@@ -164,6 +166,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
       // socket io callback very slow
       _connectionStateSubject.add(ChatConnectionState.connected);
+    } else {
+      _connectionStateSubject.add(ChatConnectionState.disconnected);
     }
 
     _logger.d(() => "connectChat = $connectResult chatConfig = $chatConfig");
