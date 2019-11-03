@@ -8,7 +8,7 @@ SocketIOCommand toSocketIOCommand(LoungeRequest request) {
         eventName: request.eventName, parameters: [request.toJson()]);
   } else if (request is LoungeRawRequest) {
     return SocketIOCommand.name(
-        eventName: request.eventName, parameters: [request.bodyAsString]);
+        eventName: request.eventName, parameters: [request.body]);
   } else if (request is LoungeEmptyRequest) {
     return SocketIOCommand.name(eventName: request.eventName, parameters: []);
   } else {

@@ -49,8 +49,6 @@ abstract class LoungeRawRequest<T> extends LoungeRequest {
   LoungeRawRequest(this.body) : super();
 
   LoungeRawRequest.name({@required this.body});
-
-  String get bodyAsString => body.toString();
 }
 
 class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
