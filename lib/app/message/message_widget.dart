@@ -52,7 +52,10 @@ TextSpan buildMessageDateTextSpan(
   }
 
   var dateTextSpan = TextSpan(
-    text: dateString,
+    // add additional space as right margin
+    // hack, but using additional space is better for performance
+    // than additional empty span for space
+    text: "$dateString ",
     style: messagesSkin.createDateTextStyle(color),
   );
   return dateTextSpan;
