@@ -28,7 +28,7 @@ bool isPossibleToCondenseMessage(ChatMessage message) {
         return true;
         break;
       case RegularMessageType.mode:
-        return false;
+        return true;
         break;
       case RegularMessageType.motd:
         return false;
@@ -49,7 +49,7 @@ bool isPossibleToCondenseMessage(ChatMessage message) {
         return false;
         break;
       case RegularMessageType.modeChannel:
-        return false;
+        return true;
         break;
       case RegularMessageType.quit:
         return true;
@@ -92,14 +92,18 @@ String getCondensedStringForRegularMessageTypeAndCount(
     case RegularMessageType.join:
       return _plural(context, _localizationIdPrefix + ".join", count);
       break;
-
+    case RegularMessageType.mode:
+      return _plural(context, _localizationIdPrefix + ".mode", count);
+      break;
+    case RegularMessageType.modeChannel:
+      return _plural(context, _localizationIdPrefix + ".mode_channel", count);
+      break;
     case RegularMessageType.away:
       return _plural(context, _localizationIdPrefix + ".away", count);
       break;
     case RegularMessageType.back:
       return _plural(context, _localizationIdPrefix + ".back", count);
       break;
-
     case RegularMessageType.quit:
       return _plural(context, _localizationIdPrefix + ".quit", count);
       break;

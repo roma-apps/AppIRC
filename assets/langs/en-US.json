@@ -319,6 +319,10 @@
           "mode": {
             "one": "{} mode was set",
             "other": "{} modes were set"
+          },
+          "mode_channel": {
+            "one": "{} channel mode was set",
+            "other": "{} channel modes were set"
           }
         },
         "sub_message": {
