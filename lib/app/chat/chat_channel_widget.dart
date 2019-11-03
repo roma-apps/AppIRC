@@ -23,7 +23,10 @@ class _ChannelWidgetState extends State<ChannelWidget> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           MessageListSearchWidget(),
-          Expanded(child: MessageListWidget()),
+          Expanded(child: Padding(
+            padding: const EdgeInsets.symmetric(vertical:4.0, horizontal: 2.0),
+            child: MessageListWidget(),
+          )),
           ChannelNewMessageWidget()
         ]);
   }

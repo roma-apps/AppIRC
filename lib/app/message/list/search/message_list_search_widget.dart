@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
@@ -18,6 +20,7 @@ class MessageListSearchWidget extends StatefulWidget {
 
 class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
   TextEditingController _searchController;
+  FocusNode _focusNode;
 
   MessageListSearchWidgetState();
 
@@ -25,6 +28,8 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+
+
   }
 
   @override
@@ -68,6 +73,12 @@ class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
       BuildContext context) {
     ChannelBloc channelBloc = ChannelBloc.of(context);
     MessageListBloc chatMessagesListBloc = Provider.of(context);
+
+    // todo: rework focus node
+    Timer.run(() {
+      FocusScope.of(context).requestFocus(channelBloc.messagesBloc
+          .searchFieldBloc.focusNode);
+    });
 
     return StreamBuilder<MessageListSearchState>(
         stream: chatMessagesListBloc.searchStateStream,
