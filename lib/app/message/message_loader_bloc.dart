@@ -44,7 +44,7 @@ class MessageLoaderBloc extends Providable {
     addDisposable(subject: _isInitFinishedSubject);
 
     Timer.run(() async {
-      _loadStartMessagesFromDatabase();
+      _loadStartMessagesFromDatabaseAndSubscribe();
     });
   }
 
@@ -109,7 +109,7 @@ class MessageLoaderBloc extends Providable {
     }
   }
 
-  _loadStartMessagesFromDatabase() async {
+  _loadStartMessagesFromDatabaseAndSubscribe() async {
     _logger.d(() => "init start $disposed");
 
     _messagesSubject = new BehaviorSubject<List<ChatMessage>>(
@@ -179,7 +179,18 @@ class MessageLoaderBloc extends Providable {
     _onMessagesChanged();
   }
 
+  MessagesForChannel _lastHandledMessages;
+
   void _addNewMessages(MessagesForChannel messagesForChannel) {
+
+
+    if(_lastHandledMessages == messagesForChannel) {
+      return;
+    }
+
+    var isFirstHandle = _lastHandledMessages == null;
+    _lastHandledMessages = messagesForChannel;
+
     var messages = this.messages;
 
     var newMessages = messagesForChannel.messages;
@@ -189,22 +200,7 @@ class MessageLoaderBloc extends Providable {
       // maybe during loading history
       return;
     }
-
-    var isSingleMessage = newMessages.length == 1;
-
     var firstMessage = newMessages.first;
-    if (isSingleMessage) {
-      var lastMessage = messages.last;
-      if (lastMessage is RegularMessage && firstMessage is RegularMessage) {
-        if (lastMessage.messageRemoteId == firstMessage.messageRemoteId) {
-          // TODO: hack for bug in lounge
-          // sometimes lounge emit last message twice
-          _logger.w(() => "_addNewMessage dublicated message not added "
-              "$firstMessage");
-          return;
-        }
-      }
-    }
 
     if (messages.isNotEmpty) {
       if (messages.last.date.isBefore(firstMessage.date)) {
@@ -227,6 +223,21 @@ class MessageLoaderBloc extends Providable {
       _removeUnnecessarySpecialLoadingMessages(messages);
     }
 
+    if(isFirstHandle) {
+      // sometimes loader receives already display messages during first handle
+      // TODO: remove hack. Already handled messages should not be emitted
+      _removeDuplicates(messages);
+    }
+
     _onMessagesChanged();
+  }
+
+  void _removeDuplicates(List<ChatMessage> messages) {
+    final seen = Set<ChatMessage>();
+    final uniqueMessages = messages.where((message) => seen.add(message))
+        .toList();
+
+    messages.clear();
+    messages.addAll(uniqueMessages);
   }
 }
