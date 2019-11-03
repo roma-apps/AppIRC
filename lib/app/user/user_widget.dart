@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
@@ -15,14 +16,16 @@ Widget buildUserNickWithPopupMenu(
   var messagesSkin = Provider.of<MessageSkinBloc>(context);
 
 
-  var child = Text(
+  Widget child = Text(
     nick,
+
     style:
-        messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+    messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
   );
 
   return createPlatformPopupMenuButton(context,
       child: child,
+      isNeedPadding: false,
       actions: buildUserNickPopupMenuActions(
           context: context, nick: nick, actionCallback: actionCallback));
 }

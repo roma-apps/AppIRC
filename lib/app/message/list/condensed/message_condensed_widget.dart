@@ -1,12 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
+import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_appirc/provider/provider.dart';
 
 class CondensedMessageWidget extends StatefulWidget {
   final CondensedMessageListItem _condensedMessageListItem;
@@ -26,10 +28,12 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget._expanded) {
-      return Column(children: <Widget>[
-        _buildCondensedTitle(context, widget._condensedMessageListItem),
-        _buildCondensedBody(context, widget._condensedMessageListItem),
-      ]);
+      return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _buildCondensedTitle(context, widget._condensedMessageListItem),
+            _buildCondensedBody(context, widget._condensedMessageListItem),
+          ]);
     } else {
       return _buildCondensedTitle(context, widget._condensedMessageListItem);
     }
@@ -37,26 +41,24 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
 
   Widget _buildCondensedTitle(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _buildCondensedTitleMessage(
-                      context, condensedMessageListItem),
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _buildCondensedTitleButton(
-                  context, condensedMessageListItem)),
-        ]);
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <
+        Widget>[
+      Flexible(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: _buildCondensedTitleMessage(context, condensedMessageListItem),
+        ),
+      ),
+      Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: _buildCondensedTitleButton(context, condensedMessageListItem)),
+    ]);
   }
 
   Widget _buildCondensedBody(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: condensedMessageListItem.messages.map((message) {
         var searchTerm = widget._searchTerm;
         bool inSearchResults;
@@ -93,18 +95,35 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
             context, regularType, groupedByType[regularType].length))
         .join(AppLocalizations.of(context)
             .tr("chat.message.condensed.join_separator"));
-    return Text(textString, softWrap: true);
+
+    var messagesSkin = Provider.of<MessageSkinBloc>(context);
+    return GestureDetector(
+        onTap: () {
+          _toggleCondensed();
+        },
+        child: Text(
+          textString,
+          softWrap: true,
+          style: messagesSkin.regularMessageBodyTextStyle,
+        ));
   }
 
   Widget _buildCondensedTitleButton(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
-    return PlatformIconButton(
-      icon: Icon(widget._expanded ? Icons.arrow_drop_down : Icons.arrow_right),
-      onPressed: () {
-        condensedMessageListItem.isCondensed =
-            !condensedMessageListItem.isCondensed;
-        setState(() {});
-      },
-    );
+    var messagesSkin = Provider.of<MessageSkinBloc>(context);
+    return GestureDetector(
+        onTap: () {
+          _toggleCondensed();
+        },
+        child:
+            Icon(widget._expanded ? Icons.arrow_drop_down : Icons
+                .arrow_right, color: messagesSkin.regularMessageBodyTextStyle
+                  .color,));
+  }
+
+  void _toggleCondensed() {
+    widget._condensedMessageListItem.isCondensed =
+        !widget._condensedMessageListItem.isCondensed;
+    setState(() {});
   }
 }

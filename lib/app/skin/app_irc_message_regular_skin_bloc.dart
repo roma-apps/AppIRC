@@ -45,9 +45,6 @@ class AppIRCMessageRegularSkinBloc extends MessageRegularSkinBloc {
 
   AppIRCMessageRegularSkinBloc(this.theme);
 
-  TextStyle get regularMessageBodyTextStyle =>
-      theme.platformSkinTheme.textRegularSmallStyle;
-
 
   Color findTitleColorDataForMessage(RegularMessageType messageType) =>
       theme.findMessageColorByType(messageType);

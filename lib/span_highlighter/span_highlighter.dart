@@ -74,7 +74,7 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
     for (var i = 0; i < sortedIndexes.length; i++) {
       var startIndex = sortedIndexes[i];
 
-      if(startIndex < lastSpanIndex) {
+      if (startIndex < lastSpanIndex) {
         continue;
         //skin spans inside other spans
       }
@@ -88,10 +88,9 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
       _logger.d(() => "startIndex $startIndex "
           " matchList : ${matchList.length} "
           "maxLengthMatch $maxLengthMatch");
-      if(lastSpanIndex != startIndex) {
+      if (lastSpanIndex != startIndex) {
         // add non-highlighted text between highlighted spans
-        spans.add(
-            TextSpan(text: text.substring(lastSpanIndex, startIndex)));
+        spans.add(TextSpan(text: text.substring(lastSpanIndex, startIndex)));
       }
 
       lastSpanIndex = maxLengthMatch.end;
@@ -103,15 +102,11 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
     }
 
     // add last non-highlighted text part
-    if(lastSpanIndex < text.length) {
-      spans.add(
-          TextSpan(text: text.substring(lastSpanIndex, text.length)));
+    if (lastSpanIndex < text.length) {
+      spans.add(TextSpan(text: text.substring(lastSpanIndex, text.length)));
     }
 
     if (isMaterial) {
-
-
-
       // todo: enabled text selection for Materials spans
       // Currently SelectableText ignore spans with gesture detection
       // So we disable selection when something highlighted
@@ -128,7 +123,6 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
           children: spans,
         ),
       );
-
     } else {
       // TODO: enable text selection for cupertino when it will be available
       return RichText(
@@ -146,6 +140,79 @@ Widget buildWordSpannedRichText(BuildContext context, String text,
       // TODO: enable text selection for cupertino when it will be available
       return Text(text, style: defaultTextStyle);
     }
+  }
+}
+
+List<TextSpan> createSpans(BuildContext context, String text,
+    TextStyle defaultTextStyle, List<SpanHighlighter> wordSpanBuilders) {
+  var builderToRegExpMatches = Map<SpanHighlighter, Iterable<RegExpMatch>>();
+
+  Map<int, List<SpanHighlightMatch>> spanHighlightsStartToList = Map();
+
+  wordSpanBuilders.forEach((spanBuilder) {
+    Iterable<RegExpMatch> allMatches = spanBuilder.findAllMatches(text);
+    builderToRegExpMatches[spanBuilder] = allMatches;
+    allMatches.forEach((match) {
+      var start = match.start;
+      if (!spanHighlightsStartToList.containsKey(start)) {
+        spanHighlightsStartToList[start] = <SpanHighlightMatch>[];
+      }
+
+      spanHighlightsStartToList[start]
+          .add(SpanHighlightMatch(match.start, match.end, spanBuilder));
+    });
+  });
+
+  if (spanHighlightsStartToList.length > 0) {
+    var spans = <TextSpan>[];
+
+    var sortedIndexes = spanHighlightsStartToList.keys.toList();
+    sortedIndexes.sort();
+
+    var lastSpanIndex = 0;
+
+    for (var i = 0; i < sortedIndexes.length; i++) {
+      var startIndex = sortedIndexes[i];
+
+      if (startIndex < lastSpanIndex) {
+        continue;
+        //skin spans inside other spans
+      }
+
+      var matchList = spanHighlightsStartToList[startIndex];
+
+      matchList.sort((a, b) => max(a.length, b.length));
+      // find biggest span for current start index
+      var maxLengthMatch = matchList.first;
+
+      _logger.d(() => "startIndex $startIndex "
+          " matchList : ${matchList.length} "
+          "maxLengthMatch $maxLengthMatch");
+      if (lastSpanIndex != startIndex) {
+        // add non-highlighted text between highlighted spans
+        spans.add(TextSpan(
+            text: text.substring(lastSpanIndex, startIndex),
+            style: defaultTextStyle));
+      }
+
+      lastSpanIndex = maxLengthMatch.end;
+
+      var spanHighlighter = maxLengthMatch.highlighter;
+      // highlighted spans
+      spans.add(spanHighlighter
+          .createTextSpan(text.substring(startIndex, lastSpanIndex)));
+    }
+
+    // add last non-highlighted text part
+    if (lastSpanIndex < text.length) {
+      spans.add(TextSpan(
+          text: text.substring(lastSpanIndex, text.length),
+          style: defaultTextStyle));
+    }
+    return spans;
+  } else {
+    return [TextSpan(text: text, style: defaultTextStyle)];
+//    spans.add(TextSpan(text: text.substring(lastSpanIndex, text.length)));
   }
 }
 

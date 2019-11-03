@@ -375,26 +375,30 @@ class AppIRCState extends State<AppIRC> {
                                         providable:
                                             AppIRCMessageRegularSkinBloc(
                                                 appSkinTheme),
-                                        child:
-                                            Provider<MessageSpecialSkinBloc>(
+                                        child: Provider<MessageSpecialSkinBloc>(
                                           providable:
                                               AppIRCMessageSpecialSkinBloc(
                                                   appSkinTheme),
-                                          child: Provider<MessagePreviewSkinBloc>(
+                                          child:
+                                              Provider<MessagePreviewSkinBloc>(
                                             providable:
-                                            AppIRCMessagePreviewSkinBloc(),
-                                            child: Provider<NetworkListSkinBloc>(
+                                                AppIRCMessagePreviewSkinBloc(),
+                                            child:
+                                                Provider<NetworkListSkinBloc>(
                                               providable:
                                                   AppIRCNetworkListSkinBloc(
                                                       appSkinTheme),
-                                              child: Provider<PopupMenuSkinBloc>(
+                                              child:
+                                                  Provider<PopupMenuSkinBloc>(
                                                 providable:
                                                     AppIRCPopupMenuSkinBloc(
                                                         appSkinTheme),
                                                 child: Provider<TextSkinBloc>(
-                                                  providable: AppIRCTextSkinBloc(
-                                                      appSkinTheme),
-                                                  child: Provider<ButtonSkinBloc>(
+                                                  providable:
+                                                      AppIRCTextSkinBloc(
+                                                          appSkinTheme),
+                                                  child:
+                                                      Provider<ButtonSkinBloc>(
                                                     providable:
                                                         AppIRCButtonSkinBloc(
                                                             appSkinTheme),
@@ -417,9 +421,10 @@ class AppIRCState extends State<AppIRC> {
                                                               supportedLocales,
                                                           locale:
                                                               data.savedLocale,
-                                                          android: (_) => MaterialAppData(
-                                                              theme: appSkinTheme
-                                                                  .androidThemeDataCreator()),
+                                                          android: (_) =>
+                                                              MaterialAppData(
+                                                                  theme: appSkinTheme
+                                                                      .androidThemeDataCreator()),
                                                           ios: (_) => CupertinoAppData(
                                                               theme: appSkinTheme
                                                                   .iosThemeDataCreator()),

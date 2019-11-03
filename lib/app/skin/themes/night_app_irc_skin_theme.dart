@@ -50,7 +50,7 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   Color get highlightSearchBackgroundColor => _themeData.primaryColorDark;
 
   @override
-  Color get highlightServerBackgroundColor => _themeData.primaryColorLight;
+  Color get highlightServerBackgroundColor => Colors.black26;
 
   NightAppSkinTheme()
       : super(ID, ColoredNicknamesData(Colors.primaries), () => _themeData, () {

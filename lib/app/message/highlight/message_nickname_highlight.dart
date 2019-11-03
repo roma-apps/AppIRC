@@ -19,7 +19,7 @@ SpanHighlighter buildNicknameSpanHighlighter(
         var local = screenPosition.global;
         RelativeRect position =
             RelativeRect.fromLTRB(local.dx, local.dy, local.dx, local.dy);
-        ChannelBloc channelBloc = Provider.of(context);
+        ChannelBloc channelBloc = ChannelBloc.of(context);
         String nick = word;
         showPopupMenuForUser(context, position, nick, channelBloc);
       });

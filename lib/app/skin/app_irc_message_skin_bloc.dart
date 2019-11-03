@@ -6,6 +6,9 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 class AppIRCMessageSkinBloc extends MessageSkinBloc {
   final AppIRCSkinTheme theme;
 
+  TextStyle get regularMessageBodyTextStyle =>
+      theme.platformSkinTheme.textRegularSmallStyle;
+
   @override
   TextStyle messageHighlightTextStyle;
 
@@ -32,28 +35,21 @@ class AppIRCMessageSkinBloc extends MessageSkinBloc {
     return _subTitleColorToTextStyle[color];
   }
 
-
   TextStyle _getNicknameTextStyleForColor(Color color) {
     if (!_nicknameColorToTextStyle.containsKey(color)) {
-      _nicknameColorToTextStyle[color] =
-          theme.platformSkinTheme.textRegularSmallStyle.copyWith(color: color);
+      _nicknameColorToTextStyle[color] = theme
+          .platformSkinTheme.textRegularSmallStyle
+          .copyWith(color: color, fontWeight: FontWeight.bold);
     }
     return _nicknameColorToTextStyle[color];
   }
-
 
   AppIRCMessageSkinBloc(this.theme) {
     messageHighlightTextStyle = regularMessageBodyTextStyle.copyWith(
         backgroundColor: highlightServerBackgroundColor);
     linkTextStyle =
         regularMessageBodyTextStyle.copyWith(color: theme.linkColor);
-
-
   }
-
-  TextStyle get regularMessageBodyTextStyle =>
-      theme.platformSkinTheme.textRegularSmallStyle;
-
 
 
   Color findTitleColorDataForMessage(RegularMessageType messageType) =>

@@ -169,7 +169,15 @@ class MessageLoaderBloc extends Providable {
 
     var newMessages = messagesForChannel.messages;
 
+
+    if(newMessages?.isNotEmpty != true) {
+      // empty or null
+      // maybe during loading history
+      return;
+    }
+
     var isSingleMessage = newMessages.length == 1;
+
     var firstMessage = newMessages.first;
     if (isSingleMessage) {
       var lastMessage = messages.last;

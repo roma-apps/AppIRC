@@ -22,20 +22,26 @@ class PlatformAwarePopupMenuAction {
 Widget createPlatformPopupMenuButton(BuildContext context,
     {@required Widget child,
     @required List<PlatformAwarePopupMenuAction> actions,
-    bool enabled = true}) {
+    bool enabled = true,
+    bool isNeedPadding = true}) {
   switch (detectCurrentUIPlatform()) {
     case UIPlatform.material:
-      return _buildMaterialPopupButton(child, actions, enabled);
+      return _buildMaterialPopupButton(child, actions, enabled, isNeedPadding);
       break;
     case UIPlatform.cupertino:
-      return _buildCupertinoPopupButton(context, child, actions, enabled);
+      return _buildCupertinoPopupButton(
+          context, child, actions, enabled, isNeedPadding);
       break;
   }
   throw Exception("invalid platform");
 }
 
-Widget _buildCupertinoPopupButton(BuildContext context, Widget child,
-    List<PlatformAwarePopupMenuAction> actions, bool enabled) {
+Widget _buildCupertinoPopupButton(
+    BuildContext context,
+    Widget child,
+    List<PlatformAwarePopupMenuAction> actions,
+    bool enabled,
+    bool isNeedPadding) {
   var onPressed;
 
   if (enabled) {
@@ -48,10 +54,20 @@ Widget _buildCupertinoPopupButton(BuildContext context, Widget child,
     return PlatformIconButton(icon: child, onPressed: onPressed);
   } else {
     var childWithPadding = Padding(
-      padding: const EdgeInsets.all(4.0),
+      padding:
+          isNeedPadding ? const EdgeInsets.all(4.0) : const EdgeInsets.all(0.0),
       child: child,
     );
-    return PlatformButton(onPressed: onPressed, child: childWithPadding);
+
+    return GestureDetector(
+      onTap: onPressed,
+      child: childWithPadding,
+    );
+    return PlatformButton(
+      onPressed: onPressed,
+      child: childWithPadding,
+      ios: (_) => CupertinoButtonData(padding: const EdgeInsets.all(0.0)),
+    );
   }
 }
 
@@ -99,7 +115,10 @@ showCupertinoPopup(
 }
 
 Widget _buildMaterialPopupButton(
-    Widget child, List<PlatformAwarePopupMenuAction> actions, bool enabled) {
+    Widget child,
+    List<PlatformAwarePopupMenuAction> actions,
+    bool enabled,
+    bool isNeedPadding) {
   _logger.d(() => "_buildMaterialPopupButton $enabled");
 
   if (child is Icon && !enabled) {
@@ -111,7 +130,9 @@ Widget _buildMaterialPopupButton(
     return PopupMenuButton(
       enabled: enabled,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: isNeedPadding
+            ? const EdgeInsets.symmetric(horizontal: 8.0)
+            : const EdgeInsets.all(0),
         child: child,
       ),
       itemBuilder: (_) => _convertToMaterialActions(actions),

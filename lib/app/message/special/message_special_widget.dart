@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart';
@@ -107,18 +108,28 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
   var color = messagesSpecialSkinBloc.specialMessageColor;
   var nick = whoIsBody.nick;
 
-  Widget title = buildMessageTitle(
-      buildUserNickWithPopupMenu(
-          context: context, nick: nick, actionCallback: null),
-      Row(
-        children: <Widget>[
-          buildMessageTitleDate(
-              context: context, message: message, color: color),
-          Icon(Icons.account_box, color: color)
-        ],
-      ));
-  return buildMessageWidget(context:context, title:title, body:body,
-      color: color);
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      buildMessage(context, message.date, Icons.account_box, color, nick,
+          null, null),
+      body
+    ],
+  );
+
+//
+//  Widget title = buildMessageTitle(
+//      buildUserNickWithPopupMenu(
+//          context: context, nick: nick, actionCallback: null),
+//      Row(
+//        children: <Widget>[
+//          buildMessageTitleDate(
+//              context: context, message: message, color: color),
+//          Icon(Icons.account_box, color: color)
+//        ],
+//      ));
+//  return buildMessageWidget(context:context, title:title, body:body,
+//      color: color);
 }
 
 Widget _buildWhoIsRow(String label, String value) {

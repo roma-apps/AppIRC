@@ -4,6 +4,7 @@ import 'package:flutter_appirc/skin/skin_bloc.dart';
 
 abstract class MessageSkinBloc extends SkinBloc {
 
+  TextStyle get regularMessageBodyTextStyle;
 
   Color get highlightSearchBackgroundColor;
 

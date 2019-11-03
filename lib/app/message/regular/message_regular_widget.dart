@@ -5,6 +5,7 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_nickname_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_search_highlight.dart';
+import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_widget.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
@@ -18,129 +19,198 @@ final int _longMessageTextMinimumLength = 10;
 Widget buildRegularMessage(BuildContext context, RegularMessage message,
     bool isHighlightedBySearch, String searchTerm) {
   var channelBloc = ChannelBloc.of(context);
-
-  var body =
-      _buildMessageBody(context, message, isHighlightedBySearch, searchTerm);
-
-  var title = _buildMessageTitle(context, channelBloc, message);
+//
+//  var body =
+//      _buildMessageBody(context, message, isHighlightedBySearch, searchTerm);
+//
+//  var title = _buildMessageTitle(context, channelBloc, message);
 
   var subMessage = _buildTitleSubMessage(context, message);
 
-  if (subMessage != null) {
-    body = Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[subMessage, body]);
-  }
+//  if (subMessage != null) {
+//    body = Column(
+//        mainAxisAlignment: MainAxisAlignment.start,
+//        crossAxisAlignment: CrossAxisAlignment.start,
+//        children: <Widget>[subMessage, body]);
+//  }
 
-  var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
+  var messagesSkin = Provider.of<MessageSkinBloc>(context);
+  var messagesRegularSkin = Provider.of<MessageRegularSkinBloc>(context);
 
   var color =
-      messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
+      messagesRegularSkin.findTitleColorDataForMessage(message.regularMessageType);
 
-  return buildMessageWidget(
-      context: context, title: title, body: body, color: color);
-}
-
-Widget _buildMessageBody(BuildContext context, RegularMessage message,
-    bool isHighlightedBySearch, String searchTerm) {
   var regularMessageType = message.regularMessageType;
 
+  var isNeedBodySpans = true;
   if (regularMessageType == RegularMessageType.away ||
       regularMessageType == RegularMessageType.join ||
       regularMessageType == RegularMessageType.topicSetBy ||
       regularMessageType == RegularMessageType.motd ||
       regularMessageType == RegularMessageType.modeChannel ||
       regularMessageType == RegularMessageType.back) {
-    return SizedBox.shrink();
+    isNeedBodySpans = false;
   }
   if (regularMessageType == RegularMessageType.mode) {
     if (!_isHaveLongText(message)) {
-      return SizedBox.shrink();
+      isNeedBodySpans = false;
     }
   }
 
-  var messagesRegularSkin = Provider.of<MessageRegularSkinBloc>(context);
+  var children = <InlineSpan>[];
 
-  var children = <Widget>[];
+  if(isNeedBodySpans) {
 
-  var params = message.params;
+    var params = message.params;
 
-  if (params != null) {
-    var paramsTextWidget = Text("${params.join(", ")}",
-        style: messagesRegularSkin.regularMessageBodyTextStyle);
-    children.add(paramsTextWidget);
-  }
-
-  if (message.text != null) {
-    var text = message.text;
-    var spanBuilders = <SpanHighlighter>[];
-
-    spanBuilders.addAll(message.linksInText?.map(
-            (link) => buildLinkHighlighter(context: context, link: link)) ??
-        []);
-    spanBuilders.addAll(message.nicknames?.map((nickname) =>
-            buildNicknameSpanHighlighter(
-                context: context, nickname: nickname)) ??
-        []);
-    if (isHighlightedBySearch) {
-      spanBuilders.add(
-          buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
+    if (params != null) {
+//    var paramsTextWidget = Text("${params.join(", ")}",
+//        style: messagesRegularSkin.regularMessageBodyTextStyle);
+      children.add(TextSpan(
+          text: "${params.join(", ")}",
+          style: messagesSkin.regularMessageBodyTextStyle));
     }
-    var highlightedTextWidget = buildWordSpannedRichText(context, text,
-        messagesRegularSkin.regularMessageBodyTextStyle, spanBuilders);
-    children.add(highlightedTextWidget);
+
+    if (message.text != null) {
+      var text = message.text;
+      var spanBuilders = <SpanHighlighter>[];
+
+      spanBuilders.addAll(message.linksInText?.map(
+              (link) => buildLinkHighlighter(context: context, link: link)) ??
+          []);
+      spanBuilders.addAll(message.nicknames?.map((nickname) =>
+          buildNicknameSpanHighlighter(
+              context: context, nickname: nickname)) ??
+          []);
+      if (isHighlightedBySearch) {
+        spanBuilders.add(
+            buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
+      }
+      children.addAll(createSpans(context, text,
+          messagesSkin.regularMessageBodyTextStyle, spanBuilders));
+    }
   }
 
-  if (message.previews != null) {
+//
+
+
+  var bodyChildren = <Widget>[
+      buildMessage(context, message.date, Icons.account_box, color,
+          message.fromNick, subMessage, children),
+    ];
+
+    if (message.previews?.isNotEmpty == true) {
     message.previews.forEach(
-        (preview) => children.add(buildPreview(context, message, preview)));
+        (preview) => bodyChildren.add(buildPreview(context, message, preview)));
   }
-
   return Column(
-    mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.start,
-    children: children,
+    children: bodyChildren,
   );
+
+//  return buildMessageWidget(
+//      context: context, title: title, body: body, color: color);
 }
-
-Widget _buildMessageTitle(
-    BuildContext context, ChannelBloc channelBloc, RegularMessage message) {
-  var iconData = _calculateTitleIconDataForMessage(message);
-
-  var startPart;
-
-  if (message.isHaveFromNick) {
-    var messageTitleNick =
-        _buildMessageTitleNick(context, channelBloc, message);
-    startPart = messageTitleNick;
-  } else {
-    startPart = SizedBox.shrink();
-  }
-
-  var endPart;
-  var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
-  var color =
-      messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
-
-  var icon = Icon(iconData, color: color);
-
-  var messageTitleDate =
-      buildMessageTitleDate(context: context, message: message, color: color);
-  if (icon != null) {
-    endPart = Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        messageTitleDate,
-        icon,
-      ],
-    );
-  } else {
-    endPart = messageTitleDate;
-  }
-
-  return buildMessageTitle(startPart, endPart);
-}
+//
+//Widget _buildMessageBody(BuildContext context, RegularMessage message,
+//    bool isHighlightedBySearch, String searchTerm) {
+//  var regularMessageType = message.regularMessageType;
+//
+//  if (regularMessageType == RegularMessageType.away ||
+//      regularMessageType == RegularMessageType.join ||
+//      regularMessageType == RegularMessageType.topicSetBy ||
+//      regularMessageType == RegularMessageType.motd ||
+//      regularMessageType == RegularMessageType.modeChannel ||
+//      regularMessageType == RegularMessageType.back) {
+//    return SizedBox.shrink();
+//  }
+//  if (regularMessageType == RegularMessageType.mode) {
+//    if (!_isHaveLongText(message)) {
+//      return SizedBox.shrink();
+//    }
+//  }
+//
+//  var messagesRegularSkin = Provider.of<MessageRegularSkinBloc>(context);
+//
+//  var children = <Widget>[];
+//
+//  var params = message.params;
+//
+//  if (params != null) {
+//    var paramsTextWidget = Text("${params.join(", ")}",
+//        style: messagesRegularSkin.regularMessageBodyTextStyle);
+//    children.add(paramsTextWidget);
+//  }
+//
+//  if (message.text != null) {
+//    var text = message.text;
+//    var spanBuilders = <SpanHighlighter>[];
+//
+//    spanBuilders.addAll(message.linksInText?.map(
+//            (link) => buildLinkHighlighter(context: context, link: link)) ??
+//        []);
+//    spanBuilders.addAll(message.nicknames?.map((nickname) =>
+//            buildNicknameSpanHighlighter(
+//                context: context, nickname: nickname)) ??
+//        []);
+//    if (isHighlightedBySearch) {
+//      spanBuilders.add(
+//          buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
+//    }
+//    var highlightedTextWidget = buildWordSpannedRichText(context, text,
+//        messagesRegularSkin.regularMessageBodyTextStyle, spanBuilders);
+//    children.add(highlightedTextWidget);
+//  }
+//
+//  if (message.previews != null) {
+//    message.previews.forEach(
+//        (preview) => children.add(buildPreview(context, message, preview)));
+//  }
+//
+//  return Column(
+//    mainAxisAlignment: MainAxisAlignment.start,
+//    crossAxisAlignment: CrossAxisAlignment.start,
+//    children: children,
+//  );
+//}
+//
+//Widget _buildMessageTitle(
+//    BuildContext context, ChannelBloc channelBloc, RegularMessage message) {
+//  var iconData = _calculateTitleIconDataForMessage(message);
+//
+//  var startPart;
+//
+//  if (message.isHaveFromNick) {
+//    var messageTitleNick =
+//        _buildMessageTitleNick(context, channelBloc, message);
+//    startPart = messageTitleNick;
+//  } else {
+//    startPart = SizedBox.shrink();
+//  }
+//
+//  var endPart;
+//  var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
+//  var color =
+//      messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
+//
+//  var icon = Icon(iconData, color: color);
+//
+//  var messageTitleDate =
+//      buildMessageTitleDate(context: context, message: message, color: color);
+//  if (icon != null) {
+//    endPart = Row(
+//      mainAxisAlignment: MainAxisAlignment.end,
+//      children: [
+//        messageTitleDate,
+//        icon,
+//      ],
+//    );
+//  } else {
+//    endPart = messageTitleDate;
+//  }
+//
+//  return buildMessageTitle(startPart, endPart);
+//}
 
 Widget _buildMessageTitleNick(
     BuildContext context, ChannelBloc channelBloc, RegularMessage message) {
@@ -150,8 +220,8 @@ Widget _buildMessageTitleNick(
       context: context, nick: nick, actionCallback: null);
 }
 
-Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
-  var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
+String _buildTitleSubMessage(BuildContext context, RegularMessage message) {
+//  var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
 
   var regularMessageType = message.regularMessageType;
   var appLocalizations = AppLocalizations.of(context);
@@ -241,13 +311,14 @@ Widget _buildTitleSubMessage(BuildContext context, RegularMessage message) {
       str = appLocalizations.tr("chat.message.regular.sub_message.ctcp");
       break;
   }
+  return str;
 
-  if (str != null) {
-    return Text(str,
-        style: messagesSkin.getTextStyleDataForMessage(regularMessageType));
-  } else {
-    return null;
-  }
+//  if (str != null) {
+//    return Text(str,
+//        style: messagesSkin.getTextStyleDataForMessage(regularMessageType));
+//  } else {
+//    return null;
+//  }
 }
 
 bool _isHaveLongText(RegularMessage message) => message.text != null

@@ -12,12 +12,7 @@ abstract class ChatMessage {
   final DateTime date;
   final List<String> linksInText;
 
-  bool get isMessageDateToday {
-    var now = DateTime.now();
-    var todayStart = now.subtract(
-        Duration(hours: now.hour, minutes: now.minute, seconds: now.second));
-    return todayStart.isBefore(date);
-  }
+
 
   ChatMessage(
       this.chatMessageType, this.channelRemoteId, this.date, this.linksInText,
@@ -67,4 +62,11 @@ class MessagesForChannel {
   }
 
 
+}
+
+bool isToday(DateTime date) {
+  var now = DateTime.now();
+  var todayStart = now.subtract(
+      Duration(hours: now.hour, minutes: now.minute, seconds: now.second));
+  return todayStart.isBefore(date);
 }
