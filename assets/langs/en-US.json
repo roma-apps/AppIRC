@@ -182,7 +182,8 @@
           "reconnect": "Reconnect"
         }
       },
-      "active_channel_not_selected": "Active channel not selected"
+      "active_channel_not_selected": "Active channel not selected",
+      "init": "Loading metadata from the server"
     },
     "network": {
       "join_channel": {

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart'
     show AppBar, Colors, Drawer, Icons, ScaffoldState;
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
@@ -337,8 +338,7 @@ class _ChatPageState extends State<ChatPage> {
                                   child: ChannelWidget(),
                                 ));
                           } else {
-                            return Center(
-                                child: _buildLoadingMessagesWidget(context));
+                            return _buildLoadingMessagesWidget(context);
                           }
                         }),
                   );
@@ -347,8 +347,30 @@ class _ChatPageState extends State<ChatPage> {
             }));
   }
 
-  Text _buildLoadingMessagesWidget(BuildContext context) =>
-      Text(AppLocalizations.of(context).tr("chat.messages_list.loading"));
+  Widget _buildLoadingMessagesWidget(BuildContext context) {
+    return _buildLoadingWidget(
+        context, AppLocalizations.of(context).tr("chat.messages_list.loading"));
+  }
+
+  Widget _buildInitMessagesWidget(BuildContext context) {
+    return _buildLoadingWidget(
+        context, AppLocalizations.of(context).tr("chat.state.init"));
+  }
+
+  Widget _buildLoadingWidget(BuildContext context, String message) {
+    return Center(
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(message),
+            ),
+            CircularProgressIndicator()
+          ]),
+    );
+  }
 
   Widget _buildConnectToNetworkWidget(BuildContext context) {
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
@@ -419,27 +441,14 @@ class _ChatPageState extends State<ChatPage> {
           var currentInitState = snapshot.data;
           _logger.d(() => "currentInitState $currentInitState");
           if (currentInitState == ChatInitState.finished) {
-            return _buildConnectedAlreadyInitWidget(context);
+            return _buildConnectedInitFinishedWidget(context);
           } else {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _buildConnectedNoInitWidget(),
-                ),
-                _buildLoadingMessagesWidget(context)
-              ],
-            );
+            return _buildInitMessagesWidget(context);
           }
         });
   }
 
-  Widget _buildConnectedNoInitWidget() =>
-      Center(child: PlatformCircularProgressIndicator());
-
-  Widget _buildConnectedAlreadyInitWidget(BuildContext context) {
+  Widget _buildConnectedInitFinishedWidget(BuildContext context) {
     ChatBackendService backendService = Provider.of(context);
     var startValues =
         backendService.chatConfig.createDefaultNetworkPreferences();
