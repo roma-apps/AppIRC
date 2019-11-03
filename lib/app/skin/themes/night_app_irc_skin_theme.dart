@@ -52,6 +52,10 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   @override
   Color get highlightServerBackgroundColor => Colors.black26;
 
+
+  @override
+  Color get textHighlightBackgroundColor => _themeData.highlightColor;
+
   NightAppSkinTheme()
       : super(ID, ColoredNicknamesData(Colors.primaries), () => _themeData, () {
           var materialBasedCupertinoThemeData =

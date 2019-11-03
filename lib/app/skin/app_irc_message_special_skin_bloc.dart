@@ -4,10 +4,10 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_appirc/app/message/special/message_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 
-class AppIRCMessageSpecialSkinBloc extends MessageSpecialSkinBloc {
+class AppIRCSpecialMessageSkinBloc extends SpecialMessageSkinBloc {
   final AppIRCSkinTheme theme;
 
-  AppIRCMessageSpecialSkinBloc(this.theme);
+  AppIRCSpecialMessageSkinBloc(this.theme);
 
   @override
   TextStyle get defaultTextStyle => theme.platformSkinTheme.textRegularSmallStyle;

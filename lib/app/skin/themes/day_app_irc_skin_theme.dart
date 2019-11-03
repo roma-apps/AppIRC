@@ -137,6 +137,9 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
   Color get highlightServerBackgroundColor => _themeData.highlightColor;
 
   @override
+  Color get textHighlightBackgroundColor => _themeData.highlightColor;
+
+  @override
   Color get searchBackgroundColor => _themeData.primaryColorDark;
 
   @override

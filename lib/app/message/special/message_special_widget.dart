@@ -1,57 +1,109 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_search_highlight.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
+import 'package:flutter_appirc/app/message/regular/message_regular_widget.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
-import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/span_highlighter/span_highlighter.dart';
+import 'package:flutter_appirc/span_builder/span_builder.dart';
 
-Widget buildSpecialMessageWidget(BuildContext context,
-    SpecialMessage specialMessage, bool includedInSearch, String searchTerm) {
-  switch (specialMessage.specialType) {
-    case SpecialMessageType.whoIs:
-      return _buildWhoIsMessage(context, specialMessage);
-      break;
-    case SpecialMessageType.channelsListItem:
-      var channelInfoItem =
-          specialMessage.data as ChannelInfoSpecialMessageBody;
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                _buildChannelName(context, channelInfoItem),
-                _buildUsersCount(context, channelInfoItem),
-              ],
-            ),
-            _buildTopic(context, channelInfoItem.topic,
-                specialMessage.linksInText, includedInSearch, searchTerm),
-          ],
-        ),
-      );
-      break;
-    case SpecialMessageType.text:
-      var textSpecialMessage = specialMessage.data as TextSpecialMessageBody;
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(textSpecialMessage.message),
-      );
+Widget _buildSpecialMessageHeaderWidget(
+    {@required BuildContext context,
+    @required DateTime date,
+    @required String fromNick,
+    @required IconData iconData,
+    @required Color color}) {
+  var spans = <InlineSpan>[];
+  spans.add(
+      buildMessageDateTextSpan(context: context, date: date, color: color));
+
+  spans.add(buildMessageIconWidgetSpan(iconData: iconData, color: color));
+
+  if (fromNick?.isNotEmpty == true) {
+    spans.add(buildHighlightedNicknameButtonWidgetSpan(
+        context: context, nick: fromNick));
   }
-  throw Exception("Invalid message type $specialMessage");
+
+  return buildMessageRichText(spans);
 }
 
-Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
-  WhoIsSpecialMessageBody whoIsBody = message.data as WhoIsSpecialMessageBody;
+Widget buildSpecialMessageWidget(
+    {@required BuildContext context,
+    @required SpecialMessage message,
+    @required bool includedInSearch,
+    @required String searchTerm}) {
+  switch (message.specialType) {
+    case SpecialMessageType.whoIs:
+      WhoIsSpecialMessageBody whoIsBody =
+          message.data as WhoIsSpecialMessageBody;
+      return _buildWhoIsSpecialMessageWidget(
+          context: context, whoIsBody: whoIsBody, message: message);
+      break;
+    case SpecialMessageType.channelsListItem:
+      var channelInfoItem = message.data as ChannelInfoSpecialMessageBody;
+      return _buildChannelInfoSpecialMessageWidget(
+          context: context,
+          channelInfoItem: channelInfoItem,
+          linksInText: message.linksInText,
+          includedInSearch: includedInSearch,
+          searchTerm: searchTerm);
+      break;
+    case SpecialMessageType.text:
+      var textSpecialMessage = message.data as TextSpecialMessageBody;
+      return _buildTextSpecialMessageWidget(
+          textSpecialMessage: textSpecialMessage);
+  }
+  throw Exception("Invalid message type $message");
+}
+
+Padding _buildTextSpecialMessageWidget(
+    {@required TextSpecialMessageBody textSpecialMessage}) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Text(textSpecialMessage.message),
+  );
+}
+
+Padding _buildChannelInfoSpecialMessageWidget(
+    {@required BuildContext context,
+    @required ChannelInfoSpecialMessageBody channelInfoItem,
+    @required List<String> linksInText,
+    @required bool includedInSearch,
+    @required String searchTerm}) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            _buildChannelInfoName(
+                context: context, channelName: channelInfoItem.name),
+            _buildChannelInfoUsersCount(
+                context: context, usersCount: channelInfoItem.usersCount),
+          ],
+        ),
+        _buildChannelInfoTopic(
+            context: context,
+            topic: channelInfoItem.topic,
+            linksInText: linksInText,
+            includedInSearch: includedInSearch,
+            searchTerm: searchTerm),
+      ],
+    ),
+  );
+}
+
+Widget _buildWhoIsSpecialMessageWidget(
+    {@required BuildContext context,
+    @required SpecialMessage message,
+    @required WhoIsSpecialMessageBody whoIsBody}) {
   String actualHostNameValue;
 
   if (whoIsBody.actualIp != null || whoIsBody.actualHostname != null) {
@@ -101,35 +153,22 @@ Widget _buildWhoIsMessage(BuildContext context, SpecialMessage message) {
       _buildWhoIsRow(
           appLocalizations.tr("chat.message.special.who_is.idle_since"),
           regularDateFormatter.format(whoIsBody.idleTime)),
-//      _buildWhoIsRow("Logon", whoIsBody.logon),
     ],
   );
-  MessageSpecialSkinBloc messagesSpecialSkinBloc = Provider.of(context);
-  var color = messagesSpecialSkinBloc.specialMessageColor;
-  var nick = whoIsBody.nick;
+  SpecialMessageSkinBloc messagesSpecialSkinBloc = Provider.of(context);
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      buildMessage(context, message.date, Icons.account_box, color, nick,
-          null, null),
+      _buildSpecialMessageHeaderWidget(
+          context: context,
+          date: message.date,
+          fromNick: whoIsBody.nick,
+          color: messagesSpecialSkinBloc.specialMessageColor,
+          iconData: Icons.account_box),
       body
     ],
   );
-
-//
-//  Widget title = buildMessageTitle(
-//      buildUserNickWithPopupMenu(
-//          context: context, nick: nick, actionCallback: null),
-//      Row(
-//        children: <Widget>[
-//          buildMessageTitleDate(
-//              context: context, message: message, color: color),
-//          Icon(Icons.account_box, color: color)
-//        ],
-//      ));
-//  return buildMessageWidget(context:context, title:title, body:body,
-//      color: color);
 }
 
 Widget _buildWhoIsRow(String label, String value) {
@@ -143,7 +182,7 @@ Widget _buildWhoIsRow(String label, String value) {
               padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
               child: Text(label),
             ),
-            Flexible(child: Text(value))
+            Flexible(child: Text(value, softWrap: true,))
           ]),
     );
   } else {
@@ -151,25 +190,24 @@ Widget _buildWhoIsRow(String label, String value) {
   }
 }
 
-Widget _buildUsersCount(BuildContext context,
-    ChannelInfoSpecialMessageBody channelInfoItem) {
+Widget _buildChannelInfoUsersCount(
+    {@required BuildContext context, @required int usersCount}) {
   return Text(AppLocalizations.of(context).tr(
       "chat"
       ".message.special.channels_list.users",
-      args: [channelInfoItem.usersCount.toString()]));
+      args: [usersCount.toString()]));
 }
 
-Widget _buildChannelName(BuildContext context,
-    ChannelInfoSpecialMessageBody channelInfoItem) {
-  var channelName = channelInfoItem.name;
+Widget _buildChannelInfoName(
+    {@required BuildContext context, @required String channelName}) {
   var password = ""; // channels list contains only channels without password
   MessageSkinBloc messagesSkinBloc = Provider.of(context);
   return GestureDetector(
       onTap: () {
         NetworkBloc networkBloc = NetworkBloc.of(context);
 
-        networkBloc.joinChannel(ChannelPreferences.name(
-            name: channelName, password: password));
+        networkBloc.joinChannel(
+            ChannelPreferences.name(name: channelName, password: password));
       },
       child: Text(
         channelName,
@@ -177,21 +215,26 @@ Widget _buildChannelName(BuildContext context,
       ));
 }
 
-Widget _buildTopic(BuildContext context, String topic, List<String> linksInText,
-    bool includedInSearch, String searchTerm) {
-  MessageSpecialSkinBloc messagesSpecialSkinBloc =
-      Provider.of<MessageSpecialSkinBloc>(context);
+Widget _buildChannelInfoTopic(
+    {@required BuildContext context,
+    @required String topic,
+    @required List<String> linksInText,
+    @required bool includedInSearch,
+    @required String searchTerm}) {
+  MessageSkinBloc messageSkinBloc = Provider.of(context);
 
-  var spanBuilders = <SpanHighlighter>[];
-  spanBuilders.addAll(linksInText.map(
-      (link) => buildLinkHighlighter(context: context, link: link)));
+  var spanBuilders = <SpanBuilder>[];
+  spanBuilders.addAll(linksInText
+      .map((link) => buildLinkHighlighter(context: context, link: link)));
   if (includedInSearch) {
-    spanBuilders.add(buildSearchSpanHighlighter(
-        context: context, searchTerm: searchTerm));
+    spanBuilders.add(
+        buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
   }
+  var spans = createSpans(
+      context: context,
+      text: topic,
+      defaultTextStyle: messageSkinBloc.messageBodyTextStyle,
+      spanBuilders: spanBuilders);
   return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: buildWordSpannedRichText(
-        context, topic, messagesSpecialSkinBloc.defaultTextStyle, spanBuilders),
-  );
+      padding: const EdgeInsets.all(8.0), child: buildMessageRichText(spans));
 }

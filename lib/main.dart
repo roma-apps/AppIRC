@@ -371,13 +371,13 @@ class AppIRCState extends State<AppIRC> {
                                       providable:
                                           AppIRCMessageListSearchSkinBloc(
                                               appSkinTheme),
-                                      child: Provider<MessageRegularSkinBloc>(
+                                      child: Provider<RegularMessageSkinBloc>(
                                         providable:
-                                            AppIRCMessageRegularSkinBloc(
+                                            AppIRCRegularMessageSkinBloc(
                                                 appSkinTheme),
-                                        child: Provider<MessageSpecialSkinBloc>(
+                                        child: Provider<SpecialMessageSkinBloc>(
                                           providable:
-                                              AppIRCMessageSpecialSkinBloc(
+                                              AppIRCSpecialMessageSkinBloc(
                                                   appSkinTheme),
                                           child:
                                               Provider<MessagePreviewSkinBloc>(

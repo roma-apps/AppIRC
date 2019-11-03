@@ -17,6 +17,7 @@ class CondensedMessageWidget extends StatefulWidget {
 
   bool get _expanded =>
       !_condensedMessageListItem.isCondensed || _inSearchResults;
+
   CondensedMessageWidget(
       this._condensedMessageListItem, this._inSearchResults, this._searchTerm);
 
@@ -68,7 +69,11 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
         } else {
           inSearchResults = false;
         }
-        return buildMessageItem(context, message, inSearchResults, searchTerm);
+        return buildDecoratedMessageWidget(
+            context: context,
+            message: message,
+            inSearchResults: inSearchResults,
+            searchTerm: searchTerm);
       }).toList(),
     );
   }
@@ -104,7 +109,7 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
         child: Text(
           textString,
           softWrap: true,
-          style: messagesSkin.regularMessageBodyTextStyle,
+          style: messagesSkin.messageBodyTextStyle,
         ));
   }
 
@@ -115,10 +120,10 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
         onTap: () {
           _toggleCondensed();
         },
-        child:
-            Icon(widget._expanded ? Icons.arrow_drop_down : Icons
-                .arrow_right, color: messagesSkin.regularMessageBodyTextStyle
-                  .color,));
+        child: Icon(
+          widget._expanded ? Icons.arrow_drop_down : Icons.arrow_right,
+          color: messagesSkin.messageBodyTextStyle.color,
+        ));
   }
 
   void _toggleCondensed() {

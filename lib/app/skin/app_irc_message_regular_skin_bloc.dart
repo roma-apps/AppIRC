@@ -3,7 +3,7 @@ import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 
-class AppIRCMessageRegularSkinBloc extends MessageRegularSkinBloc {
+class AppIRCRegularMessageSkinBloc extends RegularMessageSkinBloc {
   final AppIRCSkinTheme theme;
 
 
@@ -43,10 +43,10 @@ class AppIRCMessageRegularSkinBloc extends MessageRegularSkinBloc {
   }
 
 
-  AppIRCMessageRegularSkinBloc(this.theme);
+  AppIRCRegularMessageSkinBloc(this.theme);
 
 
-  Color findTitleColorDataForMessage(RegularMessageType messageType) =>
+  Color getColorForMessageType(RegularMessageType messageType) =>
       theme.findMessageColorByType(messageType);
 
 

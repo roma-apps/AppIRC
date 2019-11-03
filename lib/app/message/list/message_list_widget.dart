@@ -313,7 +313,11 @@ Widget _buildLoadMoreButton(
 Widget _buildListItem(BuildContext context, MessageListItem item,
     bool inSearchResults, String searchTerm) {
   if (item is SimpleMessageListItem) {
-    return buildMessageItem(context, item.message, inSearchResults, searchTerm);
+    return buildDecoratedMessageWidget(
+        context: context,
+        message: item.message,
+        inSearchResults: inSearchResults,
+        searchTerm: searchTerm);
   } else if (item is CondensedMessageListItem) {
     return CondensedMessageWidget(item, inSearchResults, searchTerm);
   } else {

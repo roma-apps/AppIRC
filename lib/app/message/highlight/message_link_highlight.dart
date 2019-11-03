@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/span_highlighter/span_highlighter.dart';
+import 'package:flutter_appirc/span_builder/span_builder.dart';
 import 'package:flutter_appirc/url/url_launcher.dart';
 
 final String _mailToPrefix = "mailto:";
@@ -16,10 +16,10 @@ _openEmail(String word) {
 
 bool _isEmail(String word) => word.contains("@");
 
-SpanHighlighter buildLinkHighlighter(
+SpanBuilder buildLinkHighlighter(
     {@required BuildContext context, @required String link}) {
   MessageSkinBloc messagesSkinBloc = Provider.of(context);
-  return SpanHighlighter.name(
+  return SpanBuilder.name(
       highlightString: link,
       highlightTextStyle: messagesSkinBloc.linkTextStyle,
       tapCallback: (word, screenPosition) {

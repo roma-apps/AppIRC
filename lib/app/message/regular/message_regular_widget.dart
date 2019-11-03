@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_nickname_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_search_highlight.dart';
@@ -10,322 +9,243 @@ import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_widget.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_skin_bloc.dart';
-import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/span_highlighter/span_highlighter.dart';
+import 'package:flutter_appirc/span_builder/span_builder.dart';
 
 final int _longMessageTextMinimumLength = 10;
+final String _paramsMessageBodyTextSeparator = ", ";
 
-Widget buildRegularMessage(BuildContext context, RegularMessage message,
-    bool isHighlightedBySearch, String searchTerm) {
-  var channelBloc = ChannelBloc.of(context);
-//
-//  var body =
-//      _buildMessageBody(context, message, isHighlightedBySearch, searchTerm);
-//
-//  var title = _buildMessageTitle(context, channelBloc, message);
-
-  var subMessage = _buildTitleSubMessage(context, message);
-
-//  if (subMessage != null) {
-//    body = Column(
-//        mainAxisAlignment: MainAxisAlignment.start,
-//        crossAxisAlignment: CrossAxisAlignment.start,
-//        children: <Widget>[subMessage, body]);
-//  }
-
-  var messagesSkin = Provider.of<MessageSkinBloc>(context);
-  var messagesRegularSkin = Provider.of<MessageRegularSkinBloc>(context);
-
+Widget buildRegularMessageWidget(
+    {@required BuildContext context,
+    @required RegularMessage message,
+    @required bool isHighlightedBySearch,
+    @required String searchTerm}) {
+  RegularMessageSkinBloc regularMessageSkinBloc = Provider.of(context);
   var color =
-      messagesRegularSkin.findTitleColorDataForMessage(message.regularMessageType);
+      regularMessageSkinBloc.getColorForMessageType(message.regularMessageType);
 
+  var spans = <InlineSpan>[];
+  spans.add(buildMessageDateTextSpan(
+      context: context, date: message.date, color: color));
+
+  spans.add(buildMessageIconWidgetSpan(
+      iconData: _getMessageIcon(message), color: color));
+
+  if (message.fromNick?.isNotEmpty == true) {
+    spans.add(buildHighlightedNicknameButtonWidgetSpan(
+        context: context, nick: message.fromNick));
+  }
+
+  var title = _getMessageTitleString(context, message);
+
+  if (title?.isNotEmpty == true) {
+    spans.add(buildMessageTitleTextSpan(
+        context: context, title: title, color: color));
+  }
+
+  var isNeedDisplayText = true;
+  isNeedDisplayText = _calculateIsNeedToDisplayMessageText(message);
+
+  if (isNeedDisplayText) {
+    spans.addAll(createMessageTextSpans(
+        context: context,
+        message: message,
+        isHighlightedBySearch: isHighlightedBySearch,
+        searchTerm: searchTerm));
+  }
+
+  if (message.previews?.isNotEmpty == true) {
+    var children = <Widget>[buildMessageRichText(spans)];
+    message.previews.forEach(
+        (preview) => children.add(buildPreview(context, message, preview)));
+    return Column(children: children);
+  } else {
+    return buildMessageRichText(spans);
+  }
+}
+
+TextSpan buildMessageTitleTextSpan(
+    {@required BuildContext context,
+    @required String title,
+    @required Color color}) {
+  var messagesSkin = Provider.of<MessageSkinBloc>(context);
+  return TextSpan(
+    text: "$title ",
+    style: messagesSkin.createMessageSubTitleTextStyle(color),
+  );
+}
+
+RichText buildMessageRichText(List<InlineSpan> spans) {
+  return RichText(
+    text: TextSpan(
+      children: spans,
+    ),
+  );
+}
+
+List<InlineSpan> createMessageTextSpans(
+    {@required BuildContext context,
+    @required RegularMessage message,
+    @required bool isHighlightedBySearch,
+    @required String searchTerm}) {
+  var messagesSkin = Provider.of<MessageSkinBloc>(context);
+  var spans = <InlineSpan>[];
+  var params = message.params;
+
+  if (params != null) {
+    spans.add(TextSpan(
+        text: "${params.join(_paramsMessageBodyTextSeparator)}",
+        style: messagesSkin.messageBodyTextStyle));
+  }
+
+  if (message.text != null) {
+    var text = message.text;
+    var spanBuilders = <SpanBuilder>[];
+
+    spanBuilders.addAll(message.linksInText?.map(
+            (link) => buildLinkHighlighter(context: context, link: link)) ??
+        []);
+    spanBuilders.addAll(message.nicknames?.map((nickname) =>
+            buildNicknameSpanHighlighter(
+                context: context, nickname: nickname)) ??
+        []);
+    if (isHighlightedBySearch) {
+      spanBuilders.add(
+          buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
+    }
+    spans.addAll(createSpans(
+        context: context,
+        text: text,
+        defaultTextStyle: messagesSkin.messageBodyTextStyle,
+        spanBuilders: spanBuilders));
+  }
+
+  return spans;
+}
+
+bool _calculateIsNeedToDisplayMessageText(RegularMessage message) {
+  var isNeedDisplay = true;
   var regularMessageType = message.regularMessageType;
-
-  var isNeedBodySpans = true;
   if (regularMessageType == RegularMessageType.away ||
       regularMessageType == RegularMessageType.join ||
       regularMessageType == RegularMessageType.topicSetBy ||
       regularMessageType == RegularMessageType.motd ||
       regularMessageType == RegularMessageType.modeChannel ||
       regularMessageType == RegularMessageType.back) {
-    isNeedBodySpans = false;
+    isNeedDisplay = false;
   }
   if (regularMessageType == RegularMessageType.mode) {
     if (!_isHaveLongText(message)) {
-      isNeedBodySpans = false;
+      isNeedDisplay = false;
     }
   }
-
-  var children = <InlineSpan>[];
-
-  if(isNeedBodySpans) {
-
-    var params = message.params;
-
-    if (params != null) {
-//    var paramsTextWidget = Text("${params.join(", ")}",
-//        style: messagesRegularSkin.regularMessageBodyTextStyle);
-      children.add(TextSpan(
-          text: "${params.join(", ")}",
-          style: messagesSkin.regularMessageBodyTextStyle));
-    }
-
-    if (message.text != null) {
-      var text = message.text;
-      var spanBuilders = <SpanHighlighter>[];
-
-      spanBuilders.addAll(message.linksInText?.map(
-              (link) => buildLinkHighlighter(context: context, link: link)) ??
-          []);
-      spanBuilders.addAll(message.nicknames?.map((nickname) =>
-          buildNicknameSpanHighlighter(
-              context: context, nickname: nickname)) ??
-          []);
-      if (isHighlightedBySearch) {
-        spanBuilders.add(
-            buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
-      }
-      children.addAll(createSpans(context, text,
-          messagesSkin.regularMessageBodyTextStyle, spanBuilders));
-    }
-  }
-
-//
-
-
-  var bodyChildren = <Widget>[
-      buildMessage(context, message.date, Icons.account_box, color,
-          message.fromNick, subMessage, children),
-    ];
-
-    if (message.previews?.isNotEmpty == true) {
-    message.previews.forEach(
-        (preview) => bodyChildren.add(buildPreview(context, message, preview)));
-  }
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: bodyChildren,
-  );
-
-//  return buildMessageWidget(
-//      context: context, title: title, body: body, color: color);
-}
-//
-//Widget _buildMessageBody(BuildContext context, RegularMessage message,
-//    bool isHighlightedBySearch, String searchTerm) {
-//  var regularMessageType = message.regularMessageType;
-//
-//  if (regularMessageType == RegularMessageType.away ||
-//      regularMessageType == RegularMessageType.join ||
-//      regularMessageType == RegularMessageType.topicSetBy ||
-//      regularMessageType == RegularMessageType.motd ||
-//      regularMessageType == RegularMessageType.modeChannel ||
-//      regularMessageType == RegularMessageType.back) {
-//    return SizedBox.shrink();
-//  }
-//  if (regularMessageType == RegularMessageType.mode) {
-//    if (!_isHaveLongText(message)) {
-//      return SizedBox.shrink();
-//    }
-//  }
-//
-//  var messagesRegularSkin = Provider.of<MessageRegularSkinBloc>(context);
-//
-//  var children = <Widget>[];
-//
-//  var params = message.params;
-//
-//  if (params != null) {
-//    var paramsTextWidget = Text("${params.join(", ")}",
-//        style: messagesRegularSkin.regularMessageBodyTextStyle);
-//    children.add(paramsTextWidget);
-//  }
-//
-//  if (message.text != null) {
-//    var text = message.text;
-//    var spanBuilders = <SpanHighlighter>[];
-//
-//    spanBuilders.addAll(message.linksInText?.map(
-//            (link) => buildLinkHighlighter(context: context, link: link)) ??
-//        []);
-//    spanBuilders.addAll(message.nicknames?.map((nickname) =>
-//            buildNicknameSpanHighlighter(
-//                context: context, nickname: nickname)) ??
-//        []);
-//    if (isHighlightedBySearch) {
-//      spanBuilders.add(
-//          buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
-//    }
-//    var highlightedTextWidget = buildWordSpannedRichText(context, text,
-//        messagesRegularSkin.regularMessageBodyTextStyle, spanBuilders);
-//    children.add(highlightedTextWidget);
-//  }
-//
-//  if (message.previews != null) {
-//    message.previews.forEach(
-//        (preview) => children.add(buildPreview(context, message, preview)));
-//  }
-//
-//  return Column(
-//    mainAxisAlignment: MainAxisAlignment.start,
-//    crossAxisAlignment: CrossAxisAlignment.start,
-//    children: children,
-//  );
-//}
-//
-//Widget _buildMessageTitle(
-//    BuildContext context, ChannelBloc channelBloc, RegularMessage message) {
-//  var iconData = _calculateTitleIconDataForMessage(message);
-//
-//  var startPart;
-//
-//  if (message.isHaveFromNick) {
-//    var messageTitleNick =
-//        _buildMessageTitleNick(context, channelBloc, message);
-//    startPart = messageTitleNick;
-//  } else {
-//    startPart = SizedBox.shrink();
-//  }
-//
-//  var endPart;
-//  var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
-//  var color =
-//      messagesSkin.findTitleColorDataForMessage(message.regularMessageType);
-//
-//  var icon = Icon(iconData, color: color);
-//
-//  var messageTitleDate =
-//      buildMessageTitleDate(context: context, message: message, color: color);
-//  if (icon != null) {
-//    endPart = Row(
-//      mainAxisAlignment: MainAxisAlignment.end,
-//      children: [
-//        messageTitleDate,
-//        icon,
-//      ],
-//    );
-//  } else {
-//    endPart = messageTitleDate;
-//  }
-//
-//  return buildMessageTitle(startPart, endPart);
-//}
-
-Widget _buildMessageTitleNick(
-    BuildContext context, ChannelBloc channelBloc, RegularMessage message) {
-  var nick = message.fromNick;
-
-  return buildUserNickWithPopupMenu(
-      context: context, nick: nick, actionCallback: null);
+  return isNeedDisplay;
 }
 
-String _buildTitleSubMessage(BuildContext context, RegularMessage message) {
-//  var messagesSkin = Provider.of<MessageRegularSkinBloc>(context);
+isHighlightedByServer(RegularMessage message) =>
+    message.highlight == true ||
+    message.regularMessageType == RegularMessageType.unknown;
 
+String _getMessageTitleString(BuildContext context, RegularMessage message) {
   var regularMessageType = message.regularMessageType;
   var appLocalizations = AppLocalizations.of(context);
-  String str;
+  String title;
   switch (regularMessageType) {
     case RegularMessageType.topicSetBy:
-      str =
+      title =
           appLocalizations.tr("chat.message.regular.sub_message.topic_set_by");
       break;
     case RegularMessageType.topic:
-      str = appLocalizations.tr("chat.message.regular.sub_message.topic");
+      title = appLocalizations.tr("chat.message.regular.sub_message.topic");
       break;
     case RegularMessageType.whoIs:
-      str = appLocalizations.tr("chat.message.regular.sub_message.who_is");
+      title = appLocalizations.tr("chat.message.regular.sub_message.who_is");
       break;
     case RegularMessageType.unhandled:
-      str = null;
+      title = null;
       break;
     case RegularMessageType.unknown:
-      str = appLocalizations.tr("chat.message.regular.sub_message.unknown");
+      title = appLocalizations.tr("chat.message.regular.sub_message.unknown");
       break;
     case RegularMessageType.message:
-      str = null;
+      title = null;
       break;
     case RegularMessageType.join:
-      str = appLocalizations.tr("chat.message.regular.sub_message.join");
+      title = appLocalizations.tr("chat.message.regular.sub_message.join");
       break;
     case RegularMessageType.mode:
       if (_isHaveLongText(message)) {
-        str = appLocalizations.tr("chat.message.regular.sub_message.mode_long");
+        title =
+            appLocalizations.tr("chat.message.regular.sub_message.mode_long");
       } else {
-        str = appLocalizations.tr("chat.message.regular.sub_message.mode_short",
+        title = appLocalizations.tr(
+            "chat.message.regular.sub_message.mode_short",
             args: [message.text]);
       }
 
       break;
     case RegularMessageType.motd:
-      str = appLocalizations
+      title = appLocalizations
           .tr("chat.message.regular.sub_message.motd", args: [message.text]);
       break;
     case RegularMessageType.notice:
-      str = appLocalizations.tr("chat.message.regular.sub_message.notice");
+      title = appLocalizations.tr("chat.message.regular.sub_message.notice");
       break;
     case RegularMessageType.error:
-      str = appLocalizations.tr("chat.message.regular.sub_message.error");
+      title = appLocalizations.tr("chat.message.regular.sub_message.error");
       break;
     case RegularMessageType.away:
-      str = appLocalizations.tr("chat.message.regular.sub_message.away");
+      title = appLocalizations.tr("chat.message.regular.sub_message.away");
       break;
     case RegularMessageType.back:
-      str = appLocalizations.tr("chat.message.regular.sub_message.back");
+      title = appLocalizations.tr("chat.message.regular.sub_message.back");
       break;
     case RegularMessageType.modeChannel:
-      str = appLocalizations.tr("chat.message.regular.sub_message.channel_mode",
+      title = appLocalizations.tr(
+          "chat.message.regular.sub_message.channel_mode",
           args: [message.text]);
       break;
     case RegularMessageType.quit:
-      str = appLocalizations.tr("chat.message.regular.sub_message.quit");
+      title = appLocalizations.tr("chat.message.regular.sub_message.quit");
       break;
     case RegularMessageType.raw:
-      str = null;
+      title = null;
       break;
     case RegularMessageType.part:
-      str = appLocalizations.tr("chat.message.regular.sub_message.part");
+      title = appLocalizations.tr("chat.message.regular.sub_message.part");
       break;
     case RegularMessageType.nick:
-      str = appLocalizations
+      title = appLocalizations
           .tr("chat.message.regular.sub_message.nick", args: [message.newNick]);
       break;
     case RegularMessageType.ctcpRequest:
-      str =
+      title =
           appLocalizations.tr("chat.message.regular.sub_message.ctcp_request");
       break;
     case RegularMessageType.chghost:
-      str = appLocalizations.tr("chat.message.regular.sub_message.chghost");
+      title = appLocalizations.tr("chat.message.regular.sub_message.chghost");
       break;
     case RegularMessageType.kick:
-      str = appLocalizations.tr("chat.message.regular.sub_message.kick");
+      title = appLocalizations.tr("chat.message.regular.sub_message.kick");
       break;
     case RegularMessageType.action:
-      str = appLocalizations.tr("chat.message.regular.sub_message.action");
+      title = appLocalizations.tr("chat.message.regular.sub_message.action");
       break;
     case RegularMessageType.invite:
-      str = appLocalizations.tr("chat.message.regular.sub_message.invite");
+      title = appLocalizations.tr("chat.message.regular.sub_message.invite");
       break;
     case RegularMessageType.ctcp:
-      str = appLocalizations.tr("chat.message.regular.sub_message.ctcp");
+      title = appLocalizations.tr("chat.message.regular.sub_message.ctcp");
       break;
   }
-  return str;
-
-//  if (str != null) {
-//    return Text(str,
-//        style: messagesSkin.getTextStyleDataForMessage(regularMessageType));
-//  } else {
-//    return null;
-//  }
+  return title;
 }
 
 bool _isHaveLongText(RegularMessage message) => message.text != null
     ? message.text.length > _longMessageTextMinimumLength
     : false;
 
-IconData _calculateTitleIconDataForMessage(RegularMessage message) {
+IconData _getMessageIcon(RegularMessage message) {
   IconData icon;
   switch (message.regularMessageType) {
     case RegularMessageType.topicSetBy:

@@ -63,11 +63,6 @@ Widget _buildCupertinoPopupButton(
       onTap: onPressed,
       child: childWithPadding,
     );
-    return PlatformButton(
-      onPressed: onPressed,
-      child: childWithPadding,
-      ios: (_) => CupertinoButtonData(padding: const EdgeInsets.all(0.0)),
-    );
   }
 }
 
