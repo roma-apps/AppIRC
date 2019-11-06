@@ -24,6 +24,19 @@ class SimpleMessageListItem extends MessageListItem {
   final ChatMessage message;
   SimpleMessageListItem(this.message);
 
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is SimpleMessageListItem && runtimeType == other.runtimeType &&
+              message == other.message;
+  @override
+  int get hashCode => message.hashCode;
+  @override
+  String toString() {
+    return 'SimpleMessageListItem{message: $message}';
+  }
+
   @override
   bool isContainsMessageWithRemoteId(int firstUnreadRemoteMessageId) {
     return isHaveMessageRemoteId(this.message, firstUnreadRemoteMessageId);
@@ -37,6 +50,7 @@ class SimpleMessageListItem extends MessageListItem {
   bool isContainsText(String searchTerm, {bool ignoreCase}) =>
       message.isContainsText(searchTerm, ignoreCase: ignoreCase);
 }
+
 
 abstract class MessageListItem {
   bool get isHaveRegularMessage => oldestRegularMessage != null;
@@ -74,8 +88,8 @@ class MessageListLoadMore {
       {@required this.messages, @required this.moreHistoryAvailable});
 }
 
-bool isHaveMessageRemoteId(ChatMessage message,
-    int firstUnreadRemoteMessageId) {
+bool isHaveMessageRemoteId(
+    ChatMessage message, int firstUnreadRemoteMessageId) {
   if (message is RegularMessage) {
     return message.messageRemoteId == firstUnreadRemoteMessageId;
   } else {

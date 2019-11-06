@@ -12,6 +12,10 @@ import 'package:flutter_appirc/app/message/special/message_special_skin_bloc.dar
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/span_builder/span_builder.dart';
+import 'package:intl/intl.dart';
+
+var _regularDateFormatter = new DateFormat().add_yMd().add_Hm();
+
 
 Widget _buildSpecialMessageHeaderWidget(
     {@required BuildContext context,
@@ -149,10 +153,10 @@ Widget _buildWhoIsSpecialMessageWidget(
           whoIsBody.account),
       _buildWhoIsRow(
           appLocalizations.tr("chat.message.special.who_is.connected_at"),
-          regularDateFormatter.format(whoIsBody.logonTime)),
+          _regularDateFormatter.format(whoIsBody.logonTime)),
       _buildWhoIsRow(
           appLocalizations.tr("chat.message.special.who_is.idle_since"),
-          regularDateFormatter.format(whoIsBody.idleTime)),
+          _regularDateFormatter.format(whoIsBody.idleTime)),
     ],
   );
   SpecialMessageSkinBloc messagesSpecialSkinBloc = Provider.of(context);

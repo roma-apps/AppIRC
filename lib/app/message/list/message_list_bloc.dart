@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_appirc/app/channel/messages/channel_message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
+import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
 import 'package:flutter_appirc/app/message/message_loader_bloc.dart';
@@ -191,8 +192,20 @@ List<MessageListItem> _convertMessagesToMessageListItems(
     List<ChatMessage> messages) {
   var items = <MessageListItem>[];
 
+  DateTime lastMessageDate;
   List<ChatMessage> readyToCondenseMessages = [];
   messages.forEach((message) {
+
+    var currentMessageDate = message.date;
+
+    if(lastMessageDate?.day != currentMessageDate.day) {
+      items.add(DaysDateSeparatorMessageListItem(currentMessageDate));
+      if (readyToCondenseMessages.isNotEmpty) {
+        items.add(CondensedMessageListItem(readyToCondenseMessages));
+        readyToCondenseMessages = [];
+      }
+    }
+    lastMessageDate = currentMessageDate;
     if (message is RegularMessage) {
       var isPossibleToCondense = isPossibleToCondenseMessage(message);
 

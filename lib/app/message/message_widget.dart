@@ -10,8 +10,7 @@ import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:intl/intl.dart';
 
-var todayDateFormatter = new DateFormat().add_Hm();
-var regularDateFormatter = new DateFormat().add_yMd().add_Hm();
+var _timeFormatter = new DateFormat().add_Hm();
 
 WidgetSpan buildHighlightedNicknameButtonWidgetSpan(
     {@required BuildContext context, @required String nick}) {
@@ -43,13 +42,7 @@ TextSpan buildMessageDateTextSpan(
     @required DateTime date,
     @required Color color}) {
   var messagesSkin = Provider.of<MessageSkinBloc>(context);
-  var dateString;
-
-  if (isToday(date)) {
-    dateString = todayDateFormatter.format(date);
-  } else {
-    dateString = regularDateFormatter.format(date);
-  }
+  var dateString = _timeFormatter.format(date);
 
   var dateTextSpan = TextSpan(
     // add additional space as right margin

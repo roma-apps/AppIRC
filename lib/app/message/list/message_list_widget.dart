@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_widget.dart';
+import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_model.dart';
+import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_widget.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
@@ -92,6 +94,10 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           maxIndex = _lastBuildItems.length - 1;
         }
 
+        _logger.d(() => "minIndex $minIndex"
+            "maxIndex $maxIndex"
+            "_lastBuildItems.length ${_lastBuildItems.length}");
+
         // context always valid, because this function used only when widget is
         // visible
         ChannelBloc channelBloc = ChannelBloc.of(context);
@@ -125,7 +131,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     var items = chatMessageListState.items;
 
     _logger.d(() => "_buildMessagesList "
-        "items ${items.length} ");
+        "items ${items.length} "
+    );
 
     if (items == null || items.isEmpty) {
       return _buildListViewEmptyWidget(context);
@@ -193,11 +200,14 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       List<MessageListItem> items,
       bool moreHistoryAvailable,
       MessageListSearchState searchState,
-      MessageListItem messageForInitScrollPosition) {
+      MessageListItem messageForInitScrollItem) {
     _lastBuildItems = items;
     var itemCount = items.length;
 
-    int initialScrollIndex = items.indexOf(messageForInitScrollPosition);
+
+    int initialScrollIndex = items.indexWhere((item) => item ==
+        messageForInitScrollItem);
+
 
     if (moreHistoryAvailable) {
       itemCount += 1;
@@ -236,8 +246,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         itemCount: itemCount,
         initialAlignment: initialAlignment,
         itemBuilder: (BuildContext context, int index) {
-          _logger.d(() => "itemBuilder $index items "
-              "${items.length}");
+//          _logger.d(() => "itemBuilder $index items "
+//              "${items.length}");
 
           if (moreHistoryAvailable) {
             if (index == 0) {
@@ -296,8 +306,9 @@ Widget _buildLoadMoreButton(
       doAsyncOperationWithDialog(
           context: context,
           asyncCode: () async {
-            var oldestRegularItem = items
-                ?.firstWhere((item) => item.isHaveRegularMessage, orElse: null);
+            var oldestRegularItem = items?.firstWhere(
+                (item) => item.isHaveRegularMessage,
+                orElse: () => null);
 
             var oldestRegularMessage = oldestRegularItem.oldestRegularMessage;
 
@@ -320,6 +331,8 @@ Widget _buildListItem(BuildContext context, MessageListItem item,
         searchTerm: searchTerm);
   } else if (item is CondensedMessageListItem) {
     return CondensedMessageWidget(item, inSearchResults, searchTerm);
+  } else if (item is DaysDateSeparatorMessageListItem) {
+    return DaysDateSeparatorMessageListItemWidget(item);
   } else {
     throw "Invalid message list item type $item";
   }
