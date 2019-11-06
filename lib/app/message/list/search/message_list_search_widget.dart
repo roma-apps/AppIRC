@@ -20,7 +20,6 @@ class MessageListSearchWidget extends StatefulWidget {
 
 class MessageListSearchWidgetState extends State<MessageListSearchWidget> {
   TextEditingController _searchController;
-  FocusNode _focusNode;
 
   MessageListSearchWidgetState();
 

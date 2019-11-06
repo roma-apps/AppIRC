@@ -38,6 +38,7 @@ class SimpleMessageListItem extends MessageListItem {
       message.isContainsText(searchTerm, ignoreCase: ignoreCase);
 }
 
+
 abstract class MessageListItem {
   bool get isHaveRegularMessage => oldestRegularMessage != null;
 
@@ -74,8 +75,8 @@ class MessageListLoadMore {
       {@required this.messages, @required this.moreHistoryAvailable});
 }
 
-bool isHaveMessageRemoteId(ChatMessage message,
-    int firstUnreadRemoteMessageId) {
+bool isHaveMessageRemoteId(
+    ChatMessage message, int firstUnreadRemoteMessageId) {
   if (message is RegularMessage) {
     return message.messageRemoteId == firstUnreadRemoteMessageId;
   } else {
