@@ -5,6 +5,20 @@ class DaysDateSeparatorMessageListItem extends MessageListItem {
   final DateTime dayFirstDate;
   DaysDateSeparatorMessageListItem(this.dayFirstDate);
 
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is DaysDateSeparatorMessageListItem &&
+          runtimeType == other.runtimeType &&
+          dayFirstDate == other.dayFirstDate;
+  @override
+  int get hashCode => dayFirstDate.hashCode;
+
+  @override
+  String toString() {
+    return 'DaysDateSeparatorMessageListItem{dayFirstDate: $dayFirstDate}';
+  }
+
   @override
   RegularMessage get oldestRegularMessage => null;
 

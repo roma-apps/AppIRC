@@ -94,6 +94,10 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           maxIndex = _lastBuildItems.length - 1;
         }
 
+        _logger.d(() => "minIndex $minIndex"
+            "maxIndex $maxIndex"
+            "_lastBuildItems.length ${_lastBuildItems.length}");
+
         // context always valid, because this function used only when widget is
         // visible
         ChannelBloc channelBloc = ChannelBloc.of(context);
@@ -127,7 +131,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     var items = chatMessageListState.items;
 
     _logger.d(() => "_buildMessagesList "
-        "items ${items.length} ");
+        "items ${items.length} "
+    );
 
     if (items == null || items.isEmpty) {
       return _buildListViewEmptyWidget(context);
@@ -195,11 +200,14 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       List<MessageListItem> items,
       bool moreHistoryAvailable,
       MessageListSearchState searchState,
-      MessageListItem messageForInitScrollPosition) {
+      MessageListItem messageForInitScrollItem) {
     _lastBuildItems = items;
     var itemCount = items.length;
 
-    int initialScrollIndex = items.indexOf(messageForInitScrollPosition);
+
+    int initialScrollIndex = items.indexWhere((item) => item ==
+        messageForInitScrollItem);
+
 
     if (moreHistoryAvailable) {
       itemCount += 1;
@@ -238,8 +246,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         itemCount: itemCount,
         initialAlignment: initialAlignment,
         itemBuilder: (BuildContext context, int index) {
-          _logger.d(() => "itemBuilder $index items "
-              "${items.length}");
+//          _logger.d(() => "itemBuilder $index items "
+//              "${items.length}");
 
           if (moreHistoryAvailable) {
             if (index == 0) {

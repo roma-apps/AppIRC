@@ -24,6 +24,19 @@ class SimpleMessageListItem extends MessageListItem {
   final ChatMessage message;
   SimpleMessageListItem(this.message);
 
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is SimpleMessageListItem && runtimeType == other.runtimeType &&
+              message == other.message;
+  @override
+  int get hashCode => message.hashCode;
+  @override
+  String toString() {
+    return 'SimpleMessageListItem{message: $message}';
+  }
+
   @override
   bool isContainsMessageWithRemoteId(int firstUnreadRemoteMessageId) {
     return isHaveMessageRemoteId(this.message, firstUnreadRemoteMessageId);

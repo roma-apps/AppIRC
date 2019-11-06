@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
@@ -8,6 +9,21 @@ class CondensedMessageListItem extends MessageListItem {
   CondensedMessageListItem(this.messages);
 
   bool isCondensed = true;
+
+  @override
+  String toString() {
+    return 'CondensedMessageListItem{messages: $messages,'
+        ' isCondensed: $isCondensed}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CondensedMessageListItem &&
+          runtimeType == other.runtimeType &&
+          listEquals(messages, other.messages);
+  @override
+  int get hashCode => messages.hashCode;
 
   @override
   bool isContainsMessageWithRemoteId(int firstUnreadRemoteMessageId) {
