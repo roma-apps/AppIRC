@@ -24,12 +24,12 @@ class SimpleMessageListItem extends MessageListItem {
   final ChatMessage message;
   SimpleMessageListItem(this.message);
 
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is SimpleMessageListItem && runtimeType == other.runtimeType &&
-              message == other.message;
+      other is SimpleMessageListItem &&
+          runtimeType == other.runtimeType &&
+          message == other.message;
   @override
   int get hashCode => message.hashCode;
   @override
@@ -51,7 +51,6 @@ class SimpleMessageListItem extends MessageListItem {
       message.isContainsText(searchTerm, ignoreCase: ignoreCase);
 }
 
-
 abstract class MessageListItem {
   bool get isHaveRegularMessage => oldestRegularMessage != null;
 
@@ -65,17 +64,22 @@ abstract class MessageListItem {
 class MessageListState {
   final List<MessageListItem> items;
   final bool moreHistoryAvailable;
+  final MessageListUpdateType updateType;
 
   MessageListState.name(
-      {@required this.items, @required this.moreHistoryAvailable});
+      {@required this.items,
+      @required this.moreHistoryAvailable,
+      @required this.updateType});
 
-  static get empty =>
-      MessageListState.name(items: [], moreHistoryAvailable: false);
-
+  static get empty => MessageListState.name(
+      items: [],
+      moreHistoryAvailable: false,
+      updateType: MessageListUpdateType.notUpdated);
   @override
   String toString() {
-    return 'ChatMessagesListState{items: $items,'
-        ' moreHistoryAvailable: $moreHistoryAvailable}';
+    return 'MessageListState{items: $items,'
+        ' moreHistoryAvailable: $moreHistoryAvailable,'
+        ' position: $updateType}';
   }
 }
 

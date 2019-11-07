@@ -49,6 +49,8 @@ class MessageSaverBloc extends ChannelListListenerBloc {
 
     _logger.d(() => "listen for mesasges from channel $channel");
 
+    _logger.d(() => "onChannelJoined _onNewMessages "
+        "${channelWithState.initMessages.length}");
     _onNewMessages(MessagesForChannel.name(
         channel: channel, messages: channelWithState.initMessages));
 
@@ -56,6 +58,8 @@ class MessageSaverBloc extends ChannelListListenerBloc {
 
     channelDisposable.add(_backendService.listenForMessages(network, channel,
         (messagesForChannel) {
+          _logger.d(() => "onChannelJoined listenForMessages "
+              "${messagesForChannel.messages.length}");
       _onNewMessages(messagesForChannel);
     }));
 

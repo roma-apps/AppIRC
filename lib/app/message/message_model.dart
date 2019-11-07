@@ -62,3 +62,20 @@ class MessagesForChannel {
         'isContainsTextSpecialMessage: $isContainsTextSpecialMessage}';
   }
 }
+
+class MessagesList {
+  List<ChatMessage> allMessages;
+  List<ChatMessage> lastAddedMessages;
+  MessageListUpdateType messageListUpdateType;
+
+  MessagesList.name({@required this.allMessages, @required this.lastAddedMessages,
+    @required this.messageListUpdateType});
+
+
+}
+
+enum MessageListUpdateType {
+  loadedFromLocalDatabase, replacedByBackend, newMessagesFromBackend,
+historyFromBackend,
+  notUpdated
+}

@@ -57,16 +57,20 @@ class MessageListBloc extends Providable {
     init();
 
     addDisposable(streamSubscription:
-        _messageLoaderBloc.messagesStream.listen((newMessages) {
+        _messageLoaderBloc.messagesListStream.listen((messageList) {
       _onMessagesChanged(
-          newMessages, _moreHistoryOwner.moreHistoryAvailable ?? false);
+          messageList.allMessages,
+          _moreHistoryOwner.moreHistoryAvailable ?? false,
+          messageList.messageListUpdateType);
     }));
 
     addDisposable(streamSubscription: _moreHistoryOwner
         .moreHistoryAvailableStream
         .listen((moreHistoryAvailable) {
       _updateMessageListItems(
-          listState.items, _moreHistoryOwner.moreHistoryAvailable ?? false);
+          listState.items,
+          _moreHistoryOwner.moreHistoryAvailable ?? false,
+          MessageListUpdateType.notUpdated);
     }));
 
     addDisposable(streamSubscription:
@@ -85,14 +89,15 @@ class MessageListBloc extends Providable {
   }
 
   void init() {
-    var messages = _messageLoaderBloc.messages;
-
+    var messagesList = _messageLoaderBloc.messagesList;
+    var messages = messagesList.allMessages;
     var messageListItems = _convertMessagesToMessageListItems(messages);
 
-    _logger.d(() => "init messages ${messages.length}");
     MessageListState initListState = MessageListState.name(
         items: messageListItems,
-        moreHistoryAvailable: _moreHistoryOwner.moreHistoryAvailable);
+        moreHistoryAvailable: _moreHistoryOwner.moreHistoryAvailable,
+        updateType: MessageListUpdateType.loadedFromLocalDatabase);
+    _logger.d(() => "init messages $initListState");
     MessageListSearchState initSearchState;
 
     if (channelMessagesListBloc.isNeedSearch) {
@@ -114,19 +119,28 @@ class MessageListBloc extends Providable {
   }
 
   void _onMessagesChanged(
-      List<ChatMessage> newMessages, bool moreHistoryAvailable) {
+      List<ChatMessage> newMessages,
+      bool moreHistoryAvailable,
+      MessageListUpdateType lastAddedPosition) {
     _logger.d(() => "newMessages = ${newMessages.length} "
         "moreHistoryAvailable = $moreHistoryAvailable");
 
     var messageListItems = _convertMessagesToMessageListItems(newMessages);
 
-    _updateMessageListItems(messageListItems, moreHistoryAvailable);
+    _updateMessageListItems(
+        messageListItems, moreHistoryAvailable, lastAddedPosition);
   }
 
   void _updateMessageListItems(
-      List<MessageListItem> messageListItems, bool moreHistoryAvailable) {
-    _listStateSubject.add(MessageListState.name(
-        items: messageListItems, moreHistoryAvailable: moreHistoryAvailable));
+      List<MessageListItem> messageListItems,
+      bool moreHistoryAvailable,
+      MessageListUpdateType lastAddedPosition) {
+    var messageListState = MessageListState.name(
+        items: messageListItems,
+        moreHistoryAvailable: moreHistoryAvailable,
+        updateType: lastAddedPosition);
+    _logger.d(() => "_updateMessageListItems $messageListState");
+    _listStateSubject.add(messageListState);
     if (channelMessagesListBloc.isNeedSearch) {
       _search(messageListItems, channelMessagesListBloc.searchFieldBloc.value,
           false);
@@ -156,7 +170,8 @@ class MessageListBloc extends Providable {
   }
 
   void updateMessagesList() {
-    _updateMessageListItems(listState.items, listState.moreHistoryAvailable);
+    _updateMessageListItems(listState.items, listState.moreHistoryAvailable,
+        MessageListUpdateType.notUpdated);
   }
 
   List<MessageListItem> _filterItems(

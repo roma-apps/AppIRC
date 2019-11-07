@@ -32,15 +32,15 @@ class MessageLoaderBloc extends Providable {
 
   bool get isInitFinished => _isInitFinishedSubject.value;
 
-  BehaviorSubject<List<ChatMessage>> _messagesSubject;
+  BehaviorSubject<MessagesList> _messagesListSubject;
 
-  Stream<List<ChatMessage>> get messagesStream => _messagesSubject.stream;
+  Stream<MessagesList> get messagesListStream => _messagesListSubject.stream;
 
-  List<ChatMessage> get messages => _messagesSubject?.value;
+  MessagesList get messagesList => _messagesListSubject?.value;
 
   MessageLoaderBloc(this._backendService, this._db, this._messagesSaverBloc,
       this._network, this._channel) {
-    addDisposable(subject: _messagesSubject);
+    addDisposable(subject: _messagesListSubject);
     addDisposable(subject: _isInitFinishedSubject);
 
     Timer.run(() async {
@@ -57,7 +57,8 @@ class MessageLoaderBloc extends Providable {
         .map(regularMessageDBToChatMessage);
     var specialMessages =
         (await _db.specialMessagesDao.getChannelMessages(_channel.remoteId))
-            .map(specialMessageDBToChatMessage).toList();
+            .map(specialMessageDBToChatMessage)
+            .toList();
 
     _removeUnnecessarySpecialLoadingMessages(specialMessages);
 
@@ -74,11 +75,15 @@ class MessageLoaderBloc extends Providable {
     });
   }
 
-  void _onMessagesChanged() {
-    _logger.d(() => "_onMessagesChanged ${messages.length}"
-        "closed ${_messagesSubject.isClosed}");
-
-    _messagesSubject.add(messages);
+  void _onMessagesChanged(
+      List<ChatMessage> allMessages,
+      List<ChatMessage> newMessages,
+      MessageListUpdateType newMessagesPosition) {
+    var messagesList = MessagesList.name(
+        allMessages: allMessages,
+        lastAddedMessages: newMessages,
+        messageListUpdateType: newMessagesPosition);
+    _messagesListSubject.add(messagesList);
   }
 
   _removeUnnecessarySpecialLoadingMessages(List<ChatMessage> messages) {
@@ -112,8 +117,13 @@ class MessageLoaderBloc extends Providable {
   _loadStartMessagesFromDatabaseAndSubscribe() async {
     _logger.d(() => "init start $disposed");
 
-    _messagesSubject = new BehaviorSubject<List<ChatMessage>>(
-        seedValue: await loadInitMessages());
+    var initMessages = await loadInitMessages();
+    _messagesListSubject = new BehaviorSubject<MessagesList>(
+        seedValue: MessagesList.name(
+            allMessages: initMessages,
+            lastAddedMessages: initMessages,
+            messageListUpdateType:
+                MessageListUpdateType.loadedFromLocalDatabase));
     _logger.d(() => "init finish");
     _isInitFinishedSubject.add(true);
 
@@ -133,7 +143,8 @@ class MessageLoaderBloc extends Providable {
     addDisposable(
         disposable: _backendService.listenForMessagePreviewToggle(
             _network, _channel, (ToggleMessagePreviewData togglePreview) async {
-      _onMessagesChanged();
+      _onMessagesChanged(
+          messagesList.allMessages, [], MessageListUpdateType.notUpdated);
     }));
 
     addDisposable(
@@ -144,7 +155,7 @@ class MessageLoaderBloc extends Providable {
   }
 
   void _toggleMessages(ToggleChannelPreviewData channelToggle) {
-    messages.forEach((message) {
+    messagesList.allMessages.forEach((message) {
       if (message is RegularMessage) {
         if (message.previews != null) {
           message.previews.forEach((preview) {
@@ -159,7 +170,7 @@ class MessageLoaderBloc extends Providable {
   }
 
   void _updatePreview(MessagePreviewForRemoteMessageId previewForMessage) {
-    var oldMessage = messages.firstWhere((message) {
+    var oldMessage = messagesList.allMessages.firstWhere((message) {
       if (message is RegularMessage) {
         var regularMessage = message;
 
@@ -176,22 +187,21 @@ class MessageLoaderBloc extends Providable {
 
     updatePreview(oldMessage, previewForMessage);
 
-    _onMessagesChanged();
+    _onMessagesChanged(
+        messagesList.allMessages, [], MessageListUpdateType.notUpdated);
   }
 
   MessagesForChannel _lastHandledMessages;
 
   void _addNewMessages(MessagesForChannel messagesForChannel) {
-
-
-    if(_lastHandledMessages == messagesForChannel) {
+    if (_lastHandledMessages == messagesForChannel) {
       return;
     }
 
     var isFirstHandle = _lastHandledMessages == null;
     _lastHandledMessages = messagesForChannel;
 
-    var messages = this.messages;
+    var messages = this.messagesList.allMessages;
 
     var newMessages = messagesForChannel.messages;
 
@@ -202,42 +212,54 @@ class MessageLoaderBloc extends Providable {
     }
     var firstMessage = newMessages.first;
 
+    MessageListUpdateType messageListUpdateType;
+
+    var replaced = false;
+    if (isFirstHandle) {
+      // sometimes loader receives already display messages during first handle
+      // TODO: remove hack. Already handled messages should not be emitted
+      if (messages.isNotEmpty) {
+        var firstMessage = messages.first;
+        if (firstMessage == newMessages.first) {
+          messages.remove(firstMessage);
+          replaced = true;
+        }
+      }
+    }
+
     if (messages.isNotEmpty) {
-      if (messages.last.date.isBefore(firstMessage.date)) {
+      var lastDate = messages.last.date;
+      var firstMessageDate = firstMessage.date;
+      if (lastDate.isBefore(firstMessageDate) ||
+          lastDate.millisecondsSinceEpoch ==
+              firstMessageDate.millisecondsSinceEpoch) {
         // if new message
         messages.addAll(newMessages);
-      } else if (messages.first.date.isAfter(firstMessage.date)) {
+        messageListUpdateType = MessageListUpdateType.newMessagesFromBackend;
+      } else if (messages.first.date.isAfter(firstMessageDate)) {
         // if message from history
+        messageListUpdateType = MessageListUpdateType.historyFromBackend;
         messages.insertAll(0, newMessages);
       } else {
         // strange case, new message somewhere inside existing messages
+        messageListUpdateType = MessageListUpdateType.newMessagesFromBackend;
         messages.addAll(newMessages);
         _resort(messages);
       }
     } else {
+      if (replaced) {
+        messageListUpdateType = MessageListUpdateType.replacedByBackend;
+      } else {
+        messageListUpdateType = MessageListUpdateType.loadedFromLocalDatabase;
+      }
       messages.addAll(newMessages);
     }
     _logger.d(() => "_addNewMessages $newMessages");
 
-    if(messagesForChannel.isContainsTextSpecialMessage) {
+    if (messagesForChannel.isContainsTextSpecialMessage) {
       _removeUnnecessarySpecialLoadingMessages(messages);
     }
 
-    if(isFirstHandle) {
-      // sometimes loader receives already display messages during first handle
-      // TODO: remove hack. Already handled messages should not be emitted
-      _removeDuplicates(messages);
-    }
-
-    _onMessagesChanged();
-  }
-
-  void _removeDuplicates(List<ChatMessage> messages) {
-    final seen = Set<ChatMessage>();
-    final uniqueMessages = messages.where((message) => seen.add(message))
-        .toList();
-
-    messages.clear();
-    messages.addAll(uniqueMessages);
+    _onMessagesChanged(messages, newMessages, messageListUpdateType);
   }
 }

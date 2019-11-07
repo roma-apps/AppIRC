@@ -320,7 +320,8 @@ class _ChatPageState extends State<ChatPage> {
                         initialData: false,
                         builder: (context, snapshot) {
                           var initFinished = snapshot.data;
-                          var length = messagesLoaderBloc.messages?.length;
+                          var length = messagesLoaderBloc
+                              .messagesList?.allMessages?.length;
                           _logger.d(() => "initFinished $initFinished "
                               "messages $length");
                           if (initFinished && length != null) {

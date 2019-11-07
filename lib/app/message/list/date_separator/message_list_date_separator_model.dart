@@ -3,14 +3,18 @@ import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 
 class DaysDateSeparatorMessageListItem extends MessageListItem {
   final DateTime dayFirstDate;
-  DaysDateSeparatorMessageListItem(this.dayFirstDate);
-
+  DateTime _dayStartDate;
+  DaysDateSeparatorMessageListItem(this.dayFirstDate) {
+    _dayStartDate =
+        DateTime(dayFirstDate.year, dayFirstDate.month, dayFirstDate.day);
+  }
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is DaysDateSeparatorMessageListItem &&
+      identical(this, other) ||
+      other is DaysDateSeparatorMessageListItem &&
           runtimeType == other.runtimeType &&
-          dayFirstDate == other.dayFirstDate;
+          _dayStartDate == other._dayStartDate;
   @override
   int get hashCode => dayFirstDate.hashCode;
 

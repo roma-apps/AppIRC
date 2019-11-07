@@ -10,6 +10,7 @@ import 'package:flutter_appirc/app/message/list/date_separator/message_list_date
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -52,18 +53,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     _positionsListener.itemPositions.addListener(onVisiblePositionsChanged);
   }
 
-  void _jumpTo(MessageListSearchState newState) {
-    _logger.d(() => "newSearchState $newState");
-    var message = newState.selectedFoundItem;
-    if (message != null) {
-      var indexToJump = _lastBuildItems?.indexOf(message);
-      _logger.d(() => "_jumpToSavedIndex $message"
-          "indexToJump $indexToJump");
-      _scrollController?.jumpTo(
-          index: indexToJump + _lastBuildMessagesStartIndex);
-    }
-  }
-
   void onVisiblePositionsChanged() {
     if (_lastBuildItems != null) {
       var visiblePositions = _positionsListener.itemPositions.value;
@@ -94,8 +83,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           maxIndex = _lastBuildItems.length - 1;
         }
 
-        _logger.d(() => "minIndex $minIndex"
-            "maxIndex $maxIndex"
+        _logger.d(() => "minIndex $minIndex "
+            "maxIndex $maxIndex "
             "_lastBuildItems.length ${_lastBuildItems.length}");
 
         // context always valid, because this function used only when widget is
@@ -150,15 +139,41 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         _calculateInitScrollPositionMessage(
             context, visibleMessagesBounds, chatMessageListState.items);
 
+    if (chatMessageListState.updateType ==
+        MessageListUpdateType.historyFromBackend) {
+      Timer.run(() {
+        _jumpToMessage(chatMessageListState.items, initScrollPositionItem,
+            alignment: 0.1);
+      });
+    }
+    if (chatMessageListState.updateType == MessageListUpdateType.replacedByBackend) {
+      Timer.run(() {
+        _jumpToMessage(
+            chatMessageListState.items, chatMessageListState.items.last,
+            alignment: 0.9);
+      });
+    }
+
+    if (chatMessageListState.updateType == MessageListUpdateType.loadedFromLocalDatabase) {
+      Timer.run(() {
+        _jumpToMessage(
+            chatMessageListState.items, initScrollPositionItem,
+            alignment: 0);
+      });
+    }
+
     return StreamBuilder<MessageListSearchState>(
         stream: chatListMessagesBloc.searchStateStream,
         initialData: chatListMessagesBloc.searchState,
         builder: (context, snapshot) {
           var searchState = snapshot.data;
 
-          Timer.run(() {
-            _jumpTo(searchState);
-          });
+          if (searchState.selectedFoundItem != null) {
+            Timer.run(() {
+              var selectedFoundItem = searchState.selectedFoundItem;
+              _jumpToMessage(chatMessageListState.items, selectedFoundItem);
+            });
+          }
           return _buildListWidget(
               context,
               chatMessageListState.items,
@@ -166,6 +181,17 @@ class _MessageListWidgetState extends State<MessageListWidget> {
               chatListMessagesBloc.searchState,
               initScrollPositionItem);
         });
+  }
+
+  void _jumpToMessage(
+      List<MessageListItem> items, MessageListItem selectedFoundItem,
+      {double alignment = 0}) {
+    var indexToJump =
+        items?.indexWhere((listItem) => listItem == selectedFoundItem);
+    _logger.d(() => "_jumpToMessage $selectedFoundItem"
+        "indexToJump $indexToJump");
+    _scrollController?.jumpTo(
+        index: indexToJump + _lastBuildMessagesStartIndex, alignment: alignment);
   }
 
   MessageListItem _calculateInitScrollPositionMessage(
