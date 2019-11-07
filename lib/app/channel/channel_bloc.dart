@@ -98,12 +98,16 @@ class ChannelBloc extends DisposableOwner implements MoreHistoryOwner {
   Stream<bool> get channelConnectedStream =>
       _channelStateStream.map((state) => state?.connected).distinct();
 
+  // Lounge bug?
+  // Sometimes lounge moreHistory is null but actually history exist
   bool get moreHistoryAvailable =>
-      channelState?.moreHistoryAvailable;
+      channelState?.moreHistoryAvailable ?? true;
 
+  // Lounge bug?
+  // Sometimes lounge moreHistory is null but actually history exist
   Stream<bool> get moreHistoryAvailableStream =>
       _channelStateStream
-          .map((state) => state?.moreHistoryAvailable)
+          .map((state) => state?.moreHistoryAvailable ?? true)
           .distinct();
 
   int get channelUnreadCount => channelState.unreadCount;
