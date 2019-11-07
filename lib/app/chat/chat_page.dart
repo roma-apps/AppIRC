@@ -21,6 +21,7 @@ import 'package:flutter_appirc/app/chat/drawer/chat_drawer_page.dart';
 import 'package:flutter_appirc/app/chat/drawer/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
+import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_loader_bloc.dart';
 import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
@@ -326,7 +327,8 @@ class _ChatPageState extends State<ChatPage> {
                             var chatListMessagesBloc = MessageListBloc(
                                 channelBloc.messagesBloc,
                                 messagesLoaderBloc,
-                                channelBloc);
+                                channelBloc,
+                                Provider.of<MessageCondensedBloc>(context));
 
                             _logger.d(() =>
                                 "build for activeChannel ${channelBloc.channel.name}");

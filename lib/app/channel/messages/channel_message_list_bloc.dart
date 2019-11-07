@@ -1,3 +1,4 @@
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -7,6 +8,8 @@ import 'package:rxdart/rxdart.dart';
 var _logger = MyLogger(logTag: "channel_message_list_bloc.dart", enabled: true);
 
 class ChannelMessageListBloc extends Providable {
+
+  final Channel channel;
   // ignore: close_sinks
   BehaviorSubject<bool> _searchEnabledSubject =
       BehaviorSubject(seedValue: false);
@@ -28,7 +31,7 @@ class ChannelMessageListBloc extends Providable {
       });
 
   FormValueFieldBloc<String> searchFieldBloc = FormValueFieldBloc("");
-  ChannelMessageListBloc() {
+  ChannelMessageListBloc(this.channel) {
     addDisposable(
         streamSubscription: _searchEnabledSubject.stream.listen((enabled) {
       if (!enabled) {

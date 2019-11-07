@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
@@ -16,7 +18,7 @@ class CondensedMessageWidget extends StatefulWidget {
   final String _searchTerm;
 
   bool get _expanded =>
-      !_condensedMessageListItem.isCondensed || _inSearchResults;
+      _condensedMessageListItem.isCondensed == false || _inSearchResults;
 
   CondensedMessageWidget(
       this._condensedMessageListItem, this._inSearchResults, this._searchTerm);
@@ -104,7 +106,7 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     var messagesSkin = Provider.of<MessageSkinBloc>(context);
     return GestureDetector(
         onTap: () {
-          _toggleCondensed();
+          _toggleCondensed(context);
         },
         child: Text(
           textString,
@@ -118,7 +120,7 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     var messagesSkin = Provider.of<MessageSkinBloc>(context);
     return GestureDetector(
         onTap: () {
-          _toggleCondensed();
+          _toggleCondensed(context);
         },
         child: Icon(
           widget._expanded ? Icons.arrow_drop_down : Icons.arrow_right,
@@ -126,9 +128,16 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
         ));
   }
 
-  void _toggleCondensed() {
-    widget._condensedMessageListItem.isCondensed =
-        !widget._condensedMessageListItem.isCondensed;
+  void _toggleCondensed(BuildContext context) {
+    var messageListItem = widget._condensedMessageListItem;
+    messageListItem.isCondensed =
+        !messageListItem.isCondensed;
+
+    ChannelBloc channelBloc = ChannelBloc.of(context);
+    MessageCondensedBloc condensedBloc = Provider.of(context);
+
+    condensedBloc.onCondensedStateChanged(channelBloc.channel, messageListItem);
+
     setState(() {});
   }
 }

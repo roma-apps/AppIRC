@@ -40,7 +40,7 @@ class ChannelBloc extends DisposableOwner implements MoreHistoryOwner {
     _usersSubject =
         BehaviorSubject(seedValue: channelWithState.initUsers ?? []);
 
-    _messagesBloc = ChannelMessageListBloc();
+    _messagesBloc = ChannelMessageListBloc(channel);
     addDisposable(disposable: _messagesBloc);
 
     addDisposable(subject: _usersSubject);

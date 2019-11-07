@@ -14,10 +14,14 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'condensed/message_condensed_bloc.dart';
+
 var _logger = MyLogger(logTag: "message_list_bloc.dart", enabled: true);
 
 class MessageListBloc extends Providable {
   final ChannelMessageListBloc _channelMessagesListBloc;
+  final MessageCondensedBloc _messageCondensedBloc;
+
   ChannelMessageListBloc get channelMessagesListBloc =>
       _channelMessagesListBloc;
   final MessageLoaderBloc _messageLoaderBloc;
@@ -49,7 +53,7 @@ class MessageListBloc extends Providable {
   MessageListSearchState get searchState => _searchStateSubject.value;
 
   MessageListBloc(this._channelMessagesListBloc, this._messageLoaderBloc,
-      this._moreHistoryOwner) {
+      this._moreHistoryOwner, this._messageCondensedBloc) {
     init();
 
     addDisposable(streamSubscription:
@@ -61,15 +65,15 @@ class MessageListBloc extends Providable {
     addDisposable(streamSubscription: _moreHistoryOwner
         .moreHistoryAvailableStream
         .listen((moreHistoryAvailable) {
-      _updateMessageListItems(listState.items,
-          _moreHistoryOwner.moreHistoryAvailable ?? false);
+      _updateMessageListItems(
+          listState.items, _moreHistoryOwner.moreHistoryAvailable ?? false);
     }));
 
     addDisposable(streamSubscription:
         channelMessagesListBloc.isNeedSearchStream.listen((isNeedSearch) {
       if (isNeedSearch) {
-        _search(listState.items,
-            channelMessagesListBloc.searchFieldBloc.value, true);
+        _search(listState.items, channelMessagesListBloc.searchFieldBloc.value,
+            true);
       } else {
         _searchStateSubject.add(MessageListSearchState.empty);
         updateMessagesList();
@@ -93,14 +97,14 @@ class MessageListBloc extends Providable {
 
     if (channelMessagesListBloc.isNeedSearch) {
       var searchTerm = channelMessagesListBloc.searchFieldBloc.value;
-      List<MessageListItem> filteredItems = _filterItems(messageListItems,
-          searchTerm);
+      List<MessageListItem> filteredItems =
+          _filterItems(messageListItems, searchTerm);
 
       initSearchState = MessageListSearchState.name(
           foundItems: filteredItems,
           searchTerm: searchTerm,
           selectedFoundItem:
-          filteredItems.isNotEmpty ? filteredItems[0] : null);
+              filteredItems.isNotEmpty ? filteredItems[0] : null);
     } else {
       initSearchState = MessageListSearchState.empty;
     }
@@ -114,36 +118,35 @@ class MessageListBloc extends Providable {
     _logger.d(() => "newMessages = ${newMessages.length} "
         "moreHistoryAvailable = $moreHistoryAvailable");
 
-
     var messageListItems = _convertMessagesToMessageListItems(newMessages);
 
     _updateMessageListItems(messageListItems, moreHistoryAvailable);
   }
 
-  void _updateMessageListItems(List<MessageListItem> messageListItems, bool moreHistoryAvailable) {
-
+  void _updateMessageListItems(
+      List<MessageListItem> messageListItems, bool moreHistoryAvailable) {
     _listStateSubject.add(MessageListState.name(
         items: messageListItems, moreHistoryAvailable: moreHistoryAvailable));
     if (channelMessagesListBloc.isNeedSearch) {
-      _search(
-          messageListItems, channelMessagesListBloc.searchFieldBloc.value, false);
+      _search(messageListItems, channelMessagesListBloc.searchFieldBloc.value,
+          false);
     }
   }
 
-  void _search(
-      List<MessageListItem> messageListItems, String searchTerm, bool isSearchTermChanged) {
-    List<MessageListItem> filteredItems = _filterItems(messageListItems, searchTerm);
+  void _search(List<MessageListItem> messageListItems, String searchTerm,
+      bool isSearchTermChanged) {
+    List<MessageListItem> filteredItems =
+        _filterItems(messageListItems, searchTerm);
 
     _logger.d(() => "_search $searchTerm "
         "isNeedChangeSelectedFoundMessage $isSearchTermChanged"
-        "filteredItems ${filteredItems.length}"
-    );
+        "filteredItems ${filteredItems.length}");
 
     var searchState = MessageListSearchState.name(
         foundItems: filteredItems,
         searchTerm: searchTerm,
         selectedFoundItem:
-        filteredItems.isNotEmpty ? filteredItems.first : null);
+            filteredItems.isNotEmpty ? filteredItems.first : null);
     _searchStateSubject.add(searchState);
 
     if (isSearchTermChanged) {
@@ -159,8 +162,7 @@ class MessageListBloc extends Providable {
   List<MessageListItem> _filterItems(
       List<MessageListItem> messageListItems, String searchTerm) {
     return messageListItems
-        .where(
-            (item) => item.isContainsText(searchTerm, ignoreCase: true))
+        .where((item) => item.isContainsText(searchTerm, ignoreCase: true))
         .toList();
   }
 
@@ -186,48 +188,62 @@ class MessageListBloc extends Providable {
   void goToPreviousFoundMessage() {
     changeSelectedMessage(searchState.selectedFoundMessageIndex - 1);
   }
-}
 
-List<MessageListItem> _convertMessagesToMessageListItems(
-    List<ChatMessage> messages) {
-  var items = <MessageListItem>[];
+  void _addCondensedItem(
+      List<MessageListItem> items, List<ChatMessage> readyToCondenseMessages) {
+    if (readyToCondenseMessages.length > 1) {
+      var condensedMessageListItem =
+          CondensedMessageListItem(readyToCondenseMessages);
 
-  DateTime lastMessageDate;
-  List<ChatMessage> readyToCondenseMessages = [];
-  messages.forEach((message) {
+      _messageCondensedBloc.restoreCondensedState(
+          channelMessagesListBloc.channel, condensedMessageListItem);
 
-    var currentMessageDate = message.date;
-
-    if(lastMessageDate?.day != currentMessageDate.day) {
-      if (readyToCondenseMessages.isNotEmpty) {
-        items.add(CondensedMessageListItem(readyToCondenseMessages));
-        readyToCondenseMessages = [];
-      }
-      items.add(DaysDateSeparatorMessageListItem(currentMessageDate));
-    }
-    lastMessageDate = currentMessageDate;
-    if (message is RegularMessage) {
-      var isPossibleToCondense = isPossibleToCondenseMessage(message);
-
-      if (isPossibleToCondense) {
-        readyToCondenseMessages.add(message);
-      } else {
-        if (readyToCondenseMessages.isNotEmpty) {
-          items.add(CondensedMessageListItem(readyToCondenseMessages));
-          readyToCondenseMessages = [];
-        }
-        items.add(SimpleMessageListItem(message));
-      }
-    } else if (message is SpecialMessage) {
-      items.add(SimpleMessageListItem(message));
+      items.add(condensedMessageListItem);
     } else {
-      throw "Invalid message type";
+      items.add(SimpleMessageListItem(readyToCondenseMessages.first));
     }
-  });
-
-  if (readyToCondenseMessages.isNotEmpty) {
-    items.add(CondensedMessageListItem(readyToCondenseMessages));
   }
 
-  return items;
+  List<MessageListItem> _convertMessagesToMessageListItems(
+      List<ChatMessage> messages) {
+    var items = <MessageListItem>[];
+
+    DateTime lastMessageDate;
+    List<ChatMessage> readyToCondenseMessages = [];
+    messages.forEach((message) {
+      var currentMessageDate = message.date;
+
+      if (lastMessageDate?.day != currentMessageDate.day) {
+        if (readyToCondenseMessages.isNotEmpty) {
+          _addCondensedItem(items, readyToCondenseMessages);
+          readyToCondenseMessages = [];
+        }
+        items.add(DaysDateSeparatorMessageListItem(currentMessageDate));
+      }
+      lastMessageDate = currentMessageDate;
+      if (message is RegularMessage) {
+        var isPossibleToCondense = isPossibleToCondenseMessage(message);
+
+        if (isPossibleToCondense) {
+          readyToCondenseMessages.add(message);
+        } else {
+          if (readyToCondenseMessages.isNotEmpty) {
+            _addCondensedItem(items, readyToCondenseMessages);
+            readyToCondenseMessages = [];
+          }
+          items.add(SimpleMessageListItem(message));
+        }
+      } else if (message is SpecialMessage) {
+        items.add(SimpleMessageListItem(message));
+      } else {
+        throw "Invalid message type";
+      }
+    });
+
+    if (readyToCondenseMessages.isNotEmpty) {
+      _addCondensedItem(items, readyToCondenseMessages);
+    }
+
+    return items;
+  }
 }
