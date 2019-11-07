@@ -38,14 +38,14 @@ class AppIRCMessageSkinBloc extends MessageSkinBloc {
   TextStyle _getNicknameTextStyleForColor(Color color) {
     if (!_nicknameColorToTextStyle.containsKey(color)) {
       _nicknameColorToTextStyle[color] = messageBodyTextStyle.copyWith(
-          color: color, fontWeight: FontWeight.bold);
+           color: color, fontWeight: FontWeight.bold);
     }
     return _nicknameColorToTextStyle[color];
   }
 
   AppIRCMessageSkinBloc(this.theme) {
     messageBodyTextStyle = theme.platformSkinTheme.textRegularSmallStyle
-        .copyWith(fontFamily: "CourierNew", height: 1.15);
+        .copyWith(fontFamily: "CourierNew");
 
     messageHighlightTextStyle = messageBodyTextStyle.copyWith(
         backgroundColor: textHighlightBackgroundColor);

@@ -48,7 +48,7 @@ TextSpan buildMessageDateTextSpan(
     // add additional space as right margin
     // hack, but using additional space is better for performance
     // than additional empty span for space
-    text: "$dateString ",
+    text: "$dateString",
     style: messagesSkin.createDateTextStyle(color),
   );
   return dateTextSpan;

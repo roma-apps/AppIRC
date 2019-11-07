@@ -131,8 +131,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     var items = chatMessageListState.items;
 
     _logger.d(() => "_buildMessagesList "
-        "items ${items.length} "
-    );
+        "items ${items.length} ");
 
     if (items == null || items.isEmpty) {
       return _buildListViewEmptyWidget(context);
@@ -157,7 +156,9 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         builder: (context, snapshot) {
           var searchState = snapshot.data;
 
-          _jumpTo(searchState);
+          Timer.run(() {
+            _jumpTo(searchState);
+          });
           return _buildListWidget(
               context,
               chatMessageListState.items,
@@ -204,10 +205,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     _lastBuildItems = items;
     var itemCount = items.length;
 
-
-    int initialScrollIndex = items.indexWhere((item) => item ==
-        messageForInitScrollItem);
-
+    int initialScrollIndex =
+        items.indexWhere((item) => item == messageForInitScrollItem);
 
     if (moreHistoryAvailable) {
       itemCount += 1;
