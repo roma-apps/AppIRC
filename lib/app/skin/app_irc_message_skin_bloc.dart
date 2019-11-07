@@ -6,8 +6,8 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 class AppIRCMessageSkinBloc extends MessageSkinBloc {
   final AppIRCSkinTheme theme;
 
-  TextStyle get messageBodyTextStyle =>
-      theme.platformSkinTheme.textRegularSmallStyle;
+  @override
+  TextStyle messageBodyTextStyle;
 
   @override
   TextStyle messageHighlightTextStyle;
@@ -30,35 +30,32 @@ class AppIRCMessageSkinBloc extends MessageSkinBloc {
   TextStyle _getSubTitleTextStyleForColor(Color color) {
     if (!_subTitleColorToTextStyle.containsKey(color)) {
       _subTitleColorToTextStyle[color] =
-          theme.platformSkinTheme.textRegularSmallStyle.copyWith(color: color);
+          messageBodyTextStyle.copyWith(color: color);
     }
     return _subTitleColorToTextStyle[color];
   }
 
   TextStyle _getNicknameTextStyleForColor(Color color) {
     if (!_nicknameColorToTextStyle.containsKey(color)) {
-      _nicknameColorToTextStyle[color] = theme
-          .platformSkinTheme.textRegularSmallStyle
-          .copyWith(color: color, fontWeight: FontWeight.bold);
+      _nicknameColorToTextStyle[color] = messageBodyTextStyle.copyWith(
+          color: color, fontWeight: FontWeight.bold);
     }
     return _nicknameColorToTextStyle[color];
   }
 
   AppIRCMessageSkinBloc(this.theme) {
+    messageBodyTextStyle = theme.platformSkinTheme.textRegularSmallStyle
+        .copyWith(fontFamily: "CourierNew", height: 1.15);
+
     messageHighlightTextStyle = messageBodyTextStyle.copyWith(
         backgroundColor: textHighlightBackgroundColor);
-    linkTextStyle =
-        messageBodyTextStyle.copyWith(color: theme.linkColor);
+    linkTextStyle = messageBodyTextStyle.copyWith(color: theme.linkColor);
   }
-
 
   Color findTitleColorDataForMessage(RegularMessageType messageType) =>
       theme.findMessageColorByType(messageType);
 
-
-
-  Color get textHighlightBackgroundColor =>
-      theme.textHighlightBackgroundColor;
+  Color get textHighlightBackgroundColor => theme.textHighlightBackgroundColor;
 
   @override
   Color get highlightSearchBackgroundColor =>

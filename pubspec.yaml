@@ -106,7 +106,12 @@ flutter:
 
   assets:
     - assets/langs/en-US.json
-
+  fonts:
+    - family: CourierNew
+      fonts:
+        - asset: fonts/courier_new_regular.ttf
+        - asset: fonts/courier_new_bold.ttf
+          weight: 700
   # To add assets to your application, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg
