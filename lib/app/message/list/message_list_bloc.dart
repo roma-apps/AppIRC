@@ -199,11 +199,11 @@ List<MessageListItem> _convertMessagesToMessageListItems(
     var currentMessageDate = message.date;
 
     if(lastMessageDate?.day != currentMessageDate.day) {
-      items.add(DaysDateSeparatorMessageListItem(currentMessageDate));
       if (readyToCondenseMessages.isNotEmpty) {
         items.add(CondensedMessageListItem(readyToCondenseMessages));
         readyToCondenseMessages = [];
       }
+      items.add(DaysDateSeparatorMessageListItem(currentMessageDate));
     }
     lastMessageDate = currentMessageDate;
     if (message is RegularMessage) {
