@@ -1,4 +1,4 @@
-package social.pleroma.appirc
+package com.vm.appirc
 
 import io.flutter.app.FlutterApplication
 import android.content.Context

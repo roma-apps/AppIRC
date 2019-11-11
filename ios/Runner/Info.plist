@@ -13,17 +13,47 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>flutter_appirc</string>
+	<string>com.vm.appirc</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>irc</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Used to pick audio from library for upload</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Used to pick photo from camera for upload</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Your location is required for picking image from camera</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location is required for picking image from camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Used to pick photo from camera for upload</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Used to pick photo from camera or library for upload</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -48,34 +78,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	  <key>CFBundleURLTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleTypeRole</key>
-      <string>Editor</string>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>irc</string>
-      </array>
-    </dict>
-  </array>
-  <key>NSAppTransportSecurity</key>
-	<dict>
-	  <key>NSAllowsArbitraryLoads</key>
-	  <true/>
-	</dict>
-<key>NSCameraUsageDescription</key>
-	<string>Used to pick photo from camera for upload</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Used to pick photo from camera for upload</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Used to pick photo from camera or library for upload</string>
-<key>NSAppleMusicUsageDescription</key>
-<string>Used to pick audio from library for upload</string>
-<key>ITSAppUsesNonExemptEncryption</key><false/>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Your location is required for picking image from camera</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Your location is required for picking image from camera</string>
 </dict>
 </plist>

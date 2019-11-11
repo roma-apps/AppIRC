@@ -1,4 +1,4 @@
-package social.pleroma.appirc
+package com.vm.appirc
 
 import android.os.Bundle
 
