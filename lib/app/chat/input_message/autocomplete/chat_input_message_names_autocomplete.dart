@@ -1,8 +1,9 @@
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/autocomplete/autocomplete.dart';
 
+final _nicknamePrefix = "@";
+
 class NamesAutoCompleter extends AutoCompleter {
-  static final int minimumCharsCountForAutoComplete = 2;
 
   ChannelBloc channelBloc;
 
@@ -11,12 +12,18 @@ class NamesAutoCompleter extends AutoCompleter {
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern) async {
     String lastWord = findLastWord(pattern);
 
-    if (lastWord != null &&
-        lastWord.length > minimumCharsCountForAutoComplete) {
-      var users = await channelBloc.retrieveUsers();
+    if (lastWord != null) {
+      if (lastWord.startsWith(_nicknamePrefix)) {
+        var users = await channelBloc.retrieveUsers();
 
-      return _calculateSuggestions(NamesAutoCompleteRequest(
-          lastWord, users.map((user) => user.nick).toList()));
+        var lastWordWithoutPrefix =
+            lastWord.substring(_nicknamePrefix.length);
+
+        return _calculateSuggestions(NamesAutoCompleteRequest(
+            lastWordWithoutPrefix, users.map((user) => user.nick).toList()));
+      } else {
+        return [];
+      }
     } else {
       return [];
     }
@@ -30,7 +37,7 @@ class NamesAutoCompleter extends AutoCompleter {
       return nickLowerCase.startsWith(lastWordLowerCase) &&
           lastWordLowerCase != nickLowerCase; // don't show autocomplete
       // when nick fully entered
-    }).toList();
+    }).map((nick) => "$_nicknamePrefix$nick").toList();
   }
 
   @override
