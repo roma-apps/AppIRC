@@ -131,7 +131,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
                       onSubmitted: submitted,
                       focusNode: inputMessageBloc.focusNode,
                       controller: inputMessageBloc.messageController,
-                      style: textSkinBloc.defaultItalicTextStyle,
+                      style: inputMessageSkinBloc.inputMessageHintTextStyle,
                       decoration: InputDecoration(
                           hintText: hintText,
                           hintStyle:
@@ -145,7 +145,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
                       textInputAction: inputAction,
                       onSubmitted: submitted,
                       focusNode: inputMessageBloc.focusNode,
-                      style: textSkinBloc.defaultItalicTextStyle,
+                      style: inputMessageSkinBloc.inputMessageHintTextStyle,
                       placeholder: hintText));
             },
           );
