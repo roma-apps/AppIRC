@@ -76,6 +76,7 @@ import 'package:rxdart/rxdart.dart';
 import 'app/skin/app_irc_channel_list_skin_bloc.dart';
 import 'app/skin/app_irc_chat_input_message_skin_bloc.dart';
 import 'app/skin/themes/day_app_irc_skin_theme.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 var _logger = MyLogger(logTag: "main.dart", enabled: true);
 
@@ -84,6 +85,16 @@ final String relativePathToLangsFolder = 'assets/langs';
 final List<Locale> supportedLocales = [Locale('en', 'US')];
 
 Future main() async {
+
+  // Set `enableInDevMode` to true to see reports while in debug mode
+  // This is only to be used for confirming that reports are being
+  // submitted as expected. It is not intended to be used for everyday
+  // development.
+
+  // Pass all uncaught errors from the framework to Crashlytics.
+  FlutterError.onError = Crashlytics.instance.recordFlutterError;
+
+
 //  changeToCupertinoPlatformAware();
 
   var preferencesService = PreferencesService();
