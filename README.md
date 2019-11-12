@@ -1,8 +1,8 @@
 # AppIRC
 
-Flutter (iOS/Android) mobile client for [TheLounge](https://thelounge.chat/). TheLounge is self-hosted IRC proxy and Web client.
+Flutter (iOS/Android) mobile client for [TheLounge](https://thelounge.chat/). TheLounge is self-hosted IRC proxy and Web client:
 
-* `Private` and `public` thelounge server supprot
+* `Private` and `public` thelounge server support
 * Works on `iOS 11+` `Android 5.0+`
 * Native UI widgets for Android and iOS
 * Push notifications support
@@ -21,28 +21,20 @@ TheLougne support web push notifications, which works (with some limitations) on
 AppIRC support native push notifications on iOS and Android via FCM.
 FCM push notifications works only with **private** TheLounge mode with additional server code modifications (see below).
 
-App uses FCM config files: `android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist`. If you want build app from source, you should generate this files in your Firebase account.
+# Build from source
 
+- You should add android sign key info at `android/key.properties`
+Example
 
-## Releases
+```
+storePassword=pass
+keyPassword=pass
+keyAlias=alias
+storeFile=/path_to_key/key.jks
+```
 
-- [Latest Android release](https://www.dropbox.com/s/olgntomlqohnkvg/appirc_1_0_13_app-release.apk?dl=0)
-- Please PM me if you want to test iOS version for TestFlight invite.
+- If you want to use push notifications feature you should add FCM config files: `android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist` from your FCM account. Lounge instance should use `serverKey` from same account. Also, it is required to setup iOS APN key in this Firebase account to enabled pushes on iOS.
 
-
-## Lounge Test server with push notifications support
-
-URL: [http://167.71.55.184:9000](http://167.71.55.184:9000)
-
-Push notifications works only with private TheLounge mode, but TheLougne don't support registration from Web or via API (registration works only via command line on server side). So, you should use existing test server credentials:
-
-* User: `test1` Password `test1`
-* User: `test2` Password `test2`
-* User: `test3` Password `test3`
-* User: `test4` Password `test4`
-* User: `test5` Password `test5`
-
-**Currently test server support only one device per user**, so if push notifications stops working for you (somebody login with same login-password pair) you can login with different credentials.
 
 ## Lounge FCM notifications fork
 
@@ -61,7 +53,7 @@ TheLounge fork with push notifications support - [https://github.com/xal/theloun
 		// FCM token to send pushes
 		// Disabled by default
 		// shoud be like serverToken: "AAAALxJhc0Q:APA91bFVC5YwqyFMcXW0ow.........."
-		// Applen APNs keys should be added to related FCM project to enabled pushes on iOS
+		// Apple APNs keys should be added to related FCM project to enabled pushes on iOS
 		// More about FCM and how to get key - https://firebase.google.com/docs/cloud-messaging/
 		serverToken: "",
 	},
@@ -78,4 +70,3 @@ TheLounge fork with push notifications support - [https://github.com/xal/theloun
 
 ```
 
-PM me if you need test FCM key, which used on test server.
