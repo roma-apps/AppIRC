@@ -55,7 +55,7 @@ dependencies:
   connectivity: ^0.4.4
 
   # FCM for push notifications
-  firebase_messaging: 5.1.5
+  firebase_messaging: 5.1.8
 
   # handle click on irc:// links
   uni_links: ^0.2.0
