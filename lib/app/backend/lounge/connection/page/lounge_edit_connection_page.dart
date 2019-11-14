@@ -1,18 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_connection_page.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/page/lounge_preferences_page.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 MyLogger _logger =
-    MyLogger(logTag: "lounge_edit_preferences_page.dart", enabled: true);
+    MyLogger(logTag: "lounge_edit_connection_page.dart", enabled: true);
 
-class EditLoungePreferencesPage extends LoungePreferencesPage {
-  EditLoungePreferencesPage(LoungePreferences startPreferences)
-      : super(startPreferences);
+class EditLoungeConnectionPage extends LoungeConnectionPage {
+  EditLoungeConnectionPage() : super();
 
   @override
   onSuccessTestConnectionWithGivenPreferences(

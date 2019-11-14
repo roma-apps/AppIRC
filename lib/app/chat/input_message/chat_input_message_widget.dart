@@ -17,7 +17,6 @@ import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.d
 import 'package:flutter_appirc/platform_aware/platform_aware_type_ahead_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/popup_menu_skin_bloc.dart';
-import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -71,10 +70,8 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
 
     var channelBloc = ChannelBloc.of(context);
     ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
-//    var appSkinTheme = AppSkinBloc.of(context).appSkinTheme;
 
     PopupMenuSkinBloc popupMenuSkinBloc = Provider.of(context);
-    TextSkinBloc textSkinBloc = Provider.of(context);
 
     var popupBackgroundColor = popupMenuSkinBloc.backgroundColor;
     var hintText = AppLocalizations.of(context)

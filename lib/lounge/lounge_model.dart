@@ -55,20 +55,20 @@ class MessageTypeLoungeConstants {
 }
 
 @JsonSerializable()
-class LoungeConnectionPreferences extends JsonPreferences {
+class LoungeHostPreferences extends JsonPreferences {
   String host;
 
-  LoungeConnectionPreferences(this.host);
+  LoungeHostPreferences(this.host);
 
-  LoungeConnectionPreferences.name({@required this.host});
+  LoungeHostPreferences.name({@required this.host});
 
-  static LoungeConnectionPreferences empty =
-      LoungeConnectionPreferences.name(host: null);
+  static LoungeHostPreferences empty =
+      LoungeHostPreferences.name(host: null);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is LoungeConnectionPreferences &&
+      other is LoungeHostPreferences &&
           runtimeType == other.runtimeType &&
           host == other.host;
 
@@ -77,14 +77,14 @@ class LoungeConnectionPreferences extends JsonPreferences {
 
   @override
   String toString() {
-    return 'LoungeConnectionPreferences{host: $host}';
+    return 'LoungeHostPreferences{host: $host}';
   }
 
   @override
-  Map<String, dynamic> toJson() => _$LoungeConnectionPreferencesToJson(this);
+  Map<String, dynamic> toJson() => _$LoungeHostPreferencesToJson(this);
 
-  factory LoungeConnectionPreferences.fromJson(Map<String, dynamic> json) =>
-      _$LoungeConnectionPreferencesFromJson(json);
+  factory LoungeHostPreferences.fromJson(Map<String, dynamic> json) =>
+      _$LoungeHostPreferencesFromJson(json);
 }
 
 @JsonSerializable()
@@ -114,7 +114,7 @@ class LoungeAuthPreferences extends JsonPreferences {
 
 @JsonSerializable()
 class LoungePreferences extends JsonPreferences {
-  LoungeConnectionPreferences connectionPreferences;
+  LoungeHostPreferences hostPreferences;
   LoungeAuthPreferences authPreferences;
 
   @override
@@ -122,19 +122,19 @@ class LoungePreferences extends JsonPreferences {
       identical(this, other) ||
       other is LoungePreferences &&
           runtimeType == other.runtimeType &&
-          connectionPreferences == other.connectionPreferences &&
+          hostPreferences == other.hostPreferences &&
           authPreferences == other.authPreferences;
 
   @override
-  int get hashCode => connectionPreferences.hashCode ^ authPreferences.hashCode;
+  int get hashCode => hostPreferences.hashCode ^ authPreferences.hashCode;
 
-  LoungePreferences(this.connectionPreferences, {this.authPreferences});
+  LoungePreferences(this.hostPreferences, {this.authPreferences});
 
   LoungePreferences.name(
-      {@required this.connectionPreferences, @required this.authPreferences});
+      {@required this.hostPreferences, @required this.authPreferences});
 
   static LoungePreferences empty = LoungePreferences.name(
-      connectionPreferences: null, authPreferences: null);
+      hostPreferences: null, authPreferences: null);
 
   @override
   Map<String, dynamic> toJson() => _$LoungePreferencesToJson(this);
@@ -144,7 +144,7 @@ class LoungePreferences extends JsonPreferences {
 
   @override
   String toString() {
-    return 'LoungePreferences{connectionPreferences: $connectionPreferences,'
+    return 'LoungePreferences{connectionPreferences: $hostPreferences,'
         ' authPreferences: $authPreferences}';
   }
 }

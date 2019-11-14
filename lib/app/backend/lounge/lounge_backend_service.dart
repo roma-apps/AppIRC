@@ -93,7 +93,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       _socketIOService != null &&
       connectionState == ChatConnectionState.disconnected &&
       _loungePreferences != null &&
-      _loungePreferences != LoungeConnectionPreferences.empty;
+      _loungePreferences != LoungeHostPreferences.empty;
 
   // Lounge API don't return all information required by the app
   // So, in some cases we should store original request to use it in response
@@ -114,7 +114,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   Future init() async {
     _logger.d(() => "init started");
 
-    var host = _loungePreferences.connectionPreferences.host;
+    var host = _loungePreferences.hostPreferences.host;
     _socketIOService = SocketIOService(socketIOManager, host);
 
     await _socketIOService.init();
@@ -129,40 +129,21 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     _logger.d(() => "init finished");
   }
 
-  Future<RequestResult<ConnectResult>> tryConnectWithDifferentPreferences(
-      LoungePreferences preferences) async {
-    SocketIOService socketIOService;
-
-    ConnectResult connectResult;
-    try {
-      socketIOService = SocketIOService(
-          socketIOManager, preferences.connectionPreferences.host);
-      await socketIOService.init();
-      connectResult = await _connect(preferences, socketIOService);
-    } catch (e) {
-      _logger.d(() => "error during tryConnectWithDifferentPreferences = $e");
-    } finally {
-      if (socketIOService != null && chatConfig != null) {
-        socketIOService.disconnect();
-      }
-    }
-
-    return RequestResult(true, connectResult);
-  }
-
   @override
-  Future<RequestResult<ConnectResult>> connectChat() async {
-    assert(_loungePreferences != LoungeConnectionPreferences.empty);
+  Future<RequestResult<ChatLoginResult>> connectChat() async {
+    assert(_loungePreferences != LoungeHostPreferences.empty);
     _logger.d(() => "connectChat _loungePreferences $_loungePreferences");
 
     _connectionStateSubject.add(ChatConnectionState.connecting);
 
-    ConnectResult connectResult =
-        await _connect(_loungePreferences, _socketIOService);
+    RequestResult<ChatLoginResult> requestResult =
+        await _connectAndLogin(_loungePreferences, _socketIOService);
 
-    if (connectResult.config != null) {
-      this._chatConfigSubject.add(connectResult.config);
-      this.chatInit = connectResult.chatInit;
+    ChatLoginResult loginResult = requestResult.result;
+
+    if (loginResult.config != null) {
+      this._chatConfigSubject.add(loginResult.config);
+      this.chatInit = loginResult.chatInit;
 
       // socket io callback very slow
       _connectionStateSubject.add(ChatConnectionState.connected);
@@ -170,9 +151,9 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       _connectionStateSubject.add(ChatConnectionState.disconnected);
     }
 
-    _logger.d(() => "connectChat = $connectResult chatConfig = $chatConfig");
+    _logger.d(() => "connectChat loginResult = $loginResult");
 
-    return RequestResult(true, connectResult);
+    return requestResult;
   }
 
   Disposable listenForConfiguration(
@@ -196,7 +177,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       throw NotImplementedYetLoungeException();
     }
     disconnect();
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -208,7 +189,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     }
     _sendInputRequest(
         network, channel, TopicIRCCommand.name(newTopic: newTopic).asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -236,7 +217,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     _sendRequest(request, isNeedAddRequestToPending: false);
 
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -247,7 +228,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     }
     _sendInputRequest(
         network, network.lobbyChannel, ConnectIRCCommand().asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -258,7 +239,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     }
     _sendInputRequest(
         network, network.lobbyChannel, DisconnectIRCCommand().asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -272,7 +253,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     var request = NamesLoungeJsonRequest.name(target: channel.remoteId);
     _sendRequest(request, isNeedAddRequestToPending: false);
 
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -284,7 +265,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     }
     _sendInputRequest(
         network, channel, WhoIsIRCCommand.name(userNick: userNick).asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -349,31 +330,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     if (waitForResult) {
       return await _doWaitForResult<NetworkWithState>(() => result);
     } else {
-      return RequestResult.name(isSentSuccessfully: true, result: null);
+      return RequestResult.notWaitForResponse();
     }
-  }
-
-  Future<RequestResult<T>> _doWaitForResult<T>(
-      T Function() resultExtractor) async {
-    RequestResult<T> result;
-
-    Future.delayed(_timeoutForRequestsWithResponse, () {
-      if (result == null) {
-        _logger.d(() => "_doWaitForResult timeout");
-        result = RequestResult(true, null);
-      }
-    });
-
-    while (result == null) {
-      await Future.delayed(_timeBetweenCheckResultForRequestsWithResponse);
-      T extracted = resultExtractor();
-      if (extracted != null) {
-        _logger.d(() => "_doWaitForResult extracted = $extracted");
-        result = RequestResult(true, extracted);
-      }
-    }
-
-    return result;
   }
 
   @override
@@ -401,7 +359,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     if (waitForResult) {
       return await _doWaitForResult<ChannelWithState>(() => result);
     } else {
-      return RequestResult.name(isSentSuccessfully: true, result: null);
+      return RequestResult.notWaitForResponse();
     }
   }
 
@@ -424,7 +382,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     if (waitForResult) {
       return await _doWaitForResult<ChannelWithState>(() => result);
     } else {
-      return RequestResult.name(isSentSuccessfully: true, result: null);
+      return RequestResult.notWaitForResponse();
     }
   }
 
@@ -436,7 +394,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     }
     _sendInputRequest(
         network, network.lobbyChannel, QuitIRCCommand().asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -446,7 +404,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       throw NotImplementedYetLoungeException();
     }
     _sendInputRequest(network, channel, CloseIRCCommand().asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -807,7 +765,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     _sendRequest(
         ChannelOpenedLoungeRawRequest.name(channelRemoteId: channel.remoteId),
         isNeedAddRequestToPending: false);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -818,7 +776,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     _sendRequest(PushFCMTokenLoungeJsonRequest.name(token: newToken),
         isNeedAddRequestToPending: false);
 
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -830,7 +788,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     }
     _sendInputRequest(
         network, network.lobbyChannel, ChannelsListIRCCommand().asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -841,7 +799,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       throw NotImplementedYetLoungeException();
     }
     _sendInputRequest(network, channel, BanListIRCCommand().asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -852,7 +810,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     }
     _sendInputRequest(
         network, network.lobbyChannel, IgnoreListIRCCommand().asRawString);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -863,7 +821,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       throw NotImplementedYetLoungeException();
     }
     _sendInputRequest(network, channel, rawMessage);
-    return RequestResult.name(isSentSuccessfully: true, result: null);
+    return RequestResult.notWaitForResponse();
   }
 
   @override
@@ -948,12 +906,11 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     disposable.dispose();
 
-    String loungeUrl = _loungePreferences.connectionPreferences.host;
+    String loungeUrl = _loungePreferences.hostPreferences.host;
     var uploadedFileRemoteURL = await uploadFileToLounge(
         loungeUrl, file, uploadFileToken, chatConfig.fileUploadMaxSizeInBytes);
 
-    return RequestResult.name(
-        isSentSuccessfully: true, result: uploadedFileRemoteURL);
+    return RequestResult.withResponse(uploadedFileRemoteURL);
   }
 
   Disposable listenForLoadMore(Network network, Channel channel,
@@ -1014,7 +971,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     disposable.dispose();
 
-    return RequestResult.name(isSentSuccessfully: true, result: chatLoadMore);
+    return RequestResult.withResponse(chatLoadMore);
   }
 
   // ignore: close_sinks
@@ -1067,7 +1024,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
         network, channel, message, preview, shownInverted);
 
     _messageTogglePreviewSubject.add(chatTogglePreview);
-    return RequestResult(true, chatTogglePreview);
+    return RequestResult.withResponse(chatTogglePreview);
   }
 
   void signOut() {
@@ -1091,14 +1048,34 @@ Disposable _listenForConfiguration(SocketIOService _socketIOService,
   return disposable;
 }
 
-Disposable _listenForAuth(
-    SocketIOService _socketIOService, Function(bool success) listener) {
+Disposable _listenForAuth(SocketIOService _socketIOService,
+    Function(LoungeHostInformation auth) listener) {
   var disposable = CompositeDisposable([]);
   disposable.add(_createEventListenerDisposable(
       _socketIOService, (AuthLoungeResponseBody.eventName), (raw) {
     _logger.d(() => "_listenForAuth = $raw}");
     var parsed = AuthLoungeResponseBody.fromJson(_preProcessRawData(raw));
-    listener(parsed.success);
+    _logger.d(() => "AuthLoungeResponseBody = $parsed}");
+
+    var hostInformation = LoungeHostInformation.connectedToPrivate(
+        authResponse: parsed.success, registrationSupported: parsed.signUp);
+    listener(hostInformation);
+  }));
+
+  return disposable;
+}
+
+Disposable _listenForRegistration(SocketIOService _socketIOService,
+    Function(ChatRegistrationResult registrationResult) listener) {
+  _logger
+      .d(() => "_listenForRegistration ${RegistrationResponseBody.eventName}");
+  var disposable = CompositeDisposable([]);
+  disposable.add(_createEventListenerDisposable(
+      _socketIOService, RegistrationResponseBody.eventName, (raw) {
+    _logger.d(() => "_listenForRegistration raw = $raw}");
+    var parsed = RegistrationResponseBody.fromJson(_preProcessRawData(raw));
+    _logger.d(() => "RegistrationResponseBody = $parsed}");
+    listener(toChatRegistrationResult(parsed));
   }));
 
   return disposable;
@@ -1168,41 +1145,106 @@ dynamic _preProcessRawData(raw, {bool isJsonData = true}) {
   return newRaw;
 }
 
-Future<ConnectResult> _connect(
-    LoungePreferences preferences, SocketIOService socketIOService) async {
-  _logger.d(() => "start connect to $preferences "
+Future<RequestResult<ChatLoginResult>> tryLoginToLounge(
+    SocketIOManager socketIOManager, LoungePreferences preferences) async {
+  SocketIOService socketIOService;
+
+  RequestResult<ChatLoginResult> requestResult;
+
+  try {
+    socketIOService =
+        SocketIOService(socketIOManager, preferences.hostPreferences.host);
+    await socketIOService.init();
+    requestResult = await _connectAndLogin(preferences, socketIOService);
+  } catch (e) {
+    _logger.d(() => "error during tryLoginToLounge = $e");
+  } finally {
+    try {
+      if (socketIOService != null) {
+        socketIOService.dispose();
+      }
+    } on Exception {}
+  }
+
+  return requestResult;
+}
+
+Future<RequestResult<ChatRegistrationResult>> registerOnLounge(
+    SocketIOManager socketIOManager, LoungePreferences preferences) async {
+  SocketIOService socketIOService;
+
+  RequestResult<ChatRegistrationResult> requestResult;
+
+  try {
+    socketIOService =
+        SocketIOService(socketIOManager, preferences.hostPreferences.host);
+    _logger.d(() => "registerOnLounge before init");
+    await socketIOService.init();
+    _logger.d(() => "registerOnLounge before _register");
+    requestResult = await _register(preferences, socketIOService);
+  } catch (e) {
+    _logger.d(() => "error during tryLoginToLounge = $e");
+  } finally {
+    try {
+      if (socketIOService != null) {
+        socketIOService.dispose();
+      }
+    } on Exception {}
+  }
+
+  return requestResult;
+}
+
+Future<RequestResult<LoungeHostInformation>> retrieveLoungeHostInformation(
+    SocketIOManager socketIOManager,
+    LoungeHostPreferences hostPreferences) async {
+  SocketIOService socketIOService;
+
+  LoungeHostInformation result;
+  try {
+    socketIOService = SocketIOService(socketIOManager, hostPreferences.host);
+    await socketIOService.init();
+    result = await _retrieveHostInformation(socketIOService, hostPreferences);
+  } catch (e) {
+    _logger.d(() => "error during tryConnectWithDifferentPreferences = $e");
+  } finally {
+    try {
+      if (socketIOService != null) {
+        socketIOService.dispose();
+      }
+    } on Exception {}
+  }
+
+  return RequestResult.withResponse(result);
+}
+
+Future<LoungeHostInformation> _retrieveHostInformation(
+    SocketIOService socketIOService,
+    LoungeHostPreferences hostPreferences) async {
+  String host = hostPreferences.host;
+  _logger.d(() => "_retrieveHostInformation $host "
       "URI = ${socketIOService.uri}");
 
-  ConnectResult result = ConnectResult();
+  LoungeHostInformation result;
 
   var disposable = CompositeDisposable([]);
 
-  ConfigurationLoungeResponseBody loungeConfig;
-  List<String> loungeCommands;
-  bool authorizedReceived = false;
-  bool authResponse;
+  disposable.add(_listenForAuth(socketIOService, (auth) {
+    result = auth;
+  }));
 
-  disposable.add(_listenForConfiguration(
-      socketIOService, (result) => loungeConfig = result));
-  disposable.add(
-      _listenForAuthorized(socketIOService, () => authorizedReceived = true));
-  disposable.add(
-      _listenForAuth(socketIOService, (success) => authResponse = success));
-  disposable.add(_listenForInit(
-      socketIOService, (initResponse) => result.chatInit = initResponse));
-  disposable.add(
-      _listenForCommands(socketIOService, (result) => loungeCommands = result));
+  disposable.add(_listenForAuthorized(socketIOService,
+      () => result = LoungeHostInformation.connectedToPublic()));
 
   Future.delayed(_connectTimeout, () {
-    if (result.config != null || result.isFailAuthResponseReceived) {
-      result.isTimeout = true;
+    if (result == null) {
+      result = LoungeHostInformation.notConnected();
     }
   });
 
   var connectErrorListener = (data) {
-    _logger.d(() => "_connect connectErrorListener = $data");
-    result.isSocketConnected = false;
-    result.error = data;
+    _logger.d(() => "_retrieveHostInformation connectErrorListener = $data");
+    result = LoungeHostInformation.notConnected();
   };
 
   socketIOService.onConnectError(connectErrorListener);
@@ -1210,18 +1252,117 @@ Future<ConnectResult> _connect(
     socketIOService.offConnectError(connectErrorListener);
   }));
 
-  result.isSocketConnected = true;
+  await socketIOService.connect();
+
+  _logger.d(() => "_retrieveHostInformation socketConnected");
+
+  do {
+    await Future.delayed(_timeBetweenCheckingConnectionResponse);
+  } while (result == null);
+
+  _logger.d(() => "_retrieveHostInformation result = $result");
+
+  return result;
+}
+
+Future<RequestResult<ChatRegistrationResult>> _register(
+    LoungePreferences preferences, SocketIOService socketIOService) async {
+  var authPreferences = preferences.authPreferences;
+  var registrationCommand = toSocketIOCommand(
+      RegistrationLoungeJsonRequest.name(
+          user: authPreferences.username, password: authPreferences.password));
+  _logger.d(() => "_register $registrationCommand");
+
+  var disposable = CompositeDisposable([]);
+
+  _logger.d(() => "register eventName ${registrationCommand.eventName}");
+
+  ChatRegistrationResult registrationResult;
 
   await socketIOService.connect();
 
-  _logger.d(() => "_connect socketConnected = ${result.isSocketConnected}");
+  disposable.add(_listenForRegistration(socketIOService, (result) {
+    registrationResult = result;
+  }));
+
+  socketIOService.emit(registrationCommand);
+
+  var requestResult = await _doWaitForResult(() => registrationResult);
+
+  disposable.dispose();
+
+  _logger.d(() => "_register $requestResult");
+
+  return requestResult;
+}
+
+Future<RequestResult<ChatLoginResult>> _connectAndLogin(
+    LoungePreferences preferences, SocketIOService socketIOService) async {
+  _logger.d(() => "start connect to $preferences "
+      "URI = ${socketIOService.uri}");
+
+  ChatLoginResult result = ChatLoginResult();
+  result.isAuthUsed = false;
+  result.success = false;
+
+  var disposable = CompositeDisposable([]);
+
+  ConfigurationLoungeResponseBody loungeConfig;
+  List<String> loungeCommands;
+  bool authorizedReceived = false;
+  LoungeHostInformation authResponse;
+
+  disposable.add(_listenForConfiguration(
+      socketIOService, (result) => loungeConfig = result));
+  disposable.add(_listenForAuthorized(socketIOService, () {
+    authorizedReceived = true;
+    result.success = true;
+  }));
+  disposable.add(_listenForAuth(socketIOService, (auth) {
+    authResponse = auth;
+    result.isAuthUsed = true;
+  }));
+  disposable.add(_listenForInit(
+      socketIOService, (initResponse) => result.chatInit = initResponse));
+  disposable.add(
+      _listenForCommands(socketIOService, (result) => loungeCommands = result));
+
+  bool isFailAuthResponseReceived = false;
+  bool isTimeout = false;
+  bool isSocketConnected = false;
+  bool isPrivateModeResponseReceived = false;
+  bool isAuthRequestSent = false;
+  dynamic error;
+
+  Future.delayed(_connectTimeout, () {
+    if (result.config != null || isFailAuthResponseReceived) {
+      isTimeout = true;
+    }
+  });
+
+  var connectErrorListener = (data) {
+    _logger.d(() => "_connect connectErrorListener = $data");
+    isSocketConnected = false;
+    error = data;
+  };
+
+  socketIOService.onConnectError(connectErrorListener);
+  disposable.add(CustomDisposable(() {
+    socketIOService.offConnectError(connectErrorListener);
+  }));
+
+  isSocketConnected = true;
+
+  await socketIOService.connect();
+
+  _logger.d(() => "_connect socketConnected = $isSocketConnected");
   var authPreferences = preferences.authPreferences;
 
   bool authPreferencesExist =
       authPreferences != null && authPreferences != LoungeAuthPreferences.empty;
   bool authorizedResponseReceived = false;
 
-  if (result.isSocketConnected) {
+  if (isSocketConnected) {
     bool isNeedWait;
     do {
       await Future.delayed(_timeBetweenCheckingConnectionResponse);
@@ -1230,40 +1371,39 @@ Future<ConnectResult> _connect(
           loungeConfig != null &&
           result.chatInit != null &&
           authorizedReceived != false);
-      result.isPrivateModeResponseReceived =
-          authResponse != null || result.isAuthRequestSent;
+      isPrivateModeResponseReceived = authResponse != null || isAuthRequestSent;
 
-      if (result.isPrivateModeResponseReceived &&
-          !result.isAuthRequestSent &&
+      if (isPrivateModeResponseReceived &&
+          !isAuthRequestSent &&
           authPreferencesExist) {
         var authRequest = AuthLoungeJsonRequestBody.name(
             user: authPreferences.username, password: authPreferences.password);
 
         authResponse = null;
         socketIOService.emit(toSocketIOCommand(authRequest));
-        result.isAuthRequestSent = true;
+        isAuthRequestSent = true;
         _logger.d(() => "_connect send auth = $authRequest");
       }
 
-      result.isFailAuthResponseReceived =
-          authResponse != null ? authResponse == false : false;
+      isFailAuthResponseReceived =
+          authResponse != null ? authResponse.authResponse == false : false;
 
-      isNeedWait = !result.isTimeout;
-      isNeedWait &= !result.isFailAuthResponseReceived;
-      isNeedWait &= result.error == null;
+      isNeedWait = !isTimeout;
+      isNeedWait &= !isFailAuthResponseReceived;
+      isNeedWait &= error == null;
       isNeedWait &= !authorizedResponseReceived;
       // private mode but login/password not specified
-      isNeedWait &= !result.isPrivateModeResponseReceived ||
-          (result.isPrivateModeResponseReceived && result.isAuthRequestSent);
+      isNeedWait &= !isPrivateModeResponseReceived ||
+          (isPrivateModeResponseReceived && isAuthRequestSent);
     } while (isNeedWait);
   }
 
   _logger.d(() => "_connect end wait "
       "authorizedResponseReceived = $authorizedResponseReceived "
-      ".isTimeout = ${result.isTimeout} "
-      ".isPrivateModeResponseReceived = ${result.isPrivateModeResponseReceived} "
-      ".isAuthRequestSent = ${result.isAuthRequestSent} "
-      ".error = ${result.error}");
+      ".isTimeout = $isTimeout "
+      ".isPrivateModeResponseReceived = $isPrivateModeResponseReceived "
+      ".isAuthRequestSent = $isAuthRequestSent "
+      ".error = $error");
 
   disposable.dispose();
 
@@ -1275,19 +1415,32 @@ Future<ConnectResult> _connect(
       " commandsReceived = $commandsReceived "
       "authorizedReceived = $authorizedReceived");
 
+  if (isTimeout) {
+    return RequestResult.timeout();
+  }
+
+  if (error != null) {
+    return RequestResult.error(error);
+  }
+
   if (authorizedResponseReceived) {
     result.config = toChatConfig(loungeConfig, loungeCommands);
+    return RequestResult.withResponse(result);
   } else {
     if (authorizedReceived ||
         configReceived ||
         commandsReceived ||
         chatInitReceived) {
-      throw InvalidConnectionResponseException(preferences, authorizedReceived,
-          configReceived, commandsReceived, chatInitReceived);
+      return RequestResult.error(InvalidResponseException(
+          preferences,
+          authorizedReceived,
+          configReceived,
+          commandsReceived,
+          chatInitReceived));
+    } else {
+      return RequestResult.withResponse(result);
     }
   }
-
-  return result;
 }
 
 ChatJoinChannelInputLoungeJsonRequest _findJoinChannelOriginalRequest(
@@ -1325,4 +1478,27 @@ ChatNetworkNewLoungeJsonRequest _findOriginalJoinNetworkRequest(
       return false;
     }
   }, orElse: () => null);
+}
+
+Future<RequestResult<T>> _doWaitForResult<T>(
+    T Function() resultExtractor) async {
+  RequestResult<T> result;
+
+  Future.delayed(_timeoutForRequestsWithResponse, () {
+    if (result == null) {
+      _logger.d(() => "_doWaitForResult timeout");
+      result = RequestResult.timeout();
+    }
+  });
+
+  while (result == null) {
+    await Future.delayed(_timeBetweenCheckResultForRequestsWithResponse);
+    T extracted = resultExtractor();
+    if (extracted != null) {
+      _logger.d(() => "_doWaitForResult extracted = $extracted");
+      result = RequestResult.withResponse(extracted);
+    }
+  }
+
+  return result;
 }

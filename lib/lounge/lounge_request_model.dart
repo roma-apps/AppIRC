@@ -20,6 +20,8 @@ class RequestLoungeEventNames {
   static const String pushFCMToken = "push:fcmToken";
   static const String pushRegister = "push:register";
   static const String pushUnregister = "push:unregister";
+
+  static const String signUp = "sign-up";
 }
 
 abstract class LoungeRequest {
@@ -46,6 +48,7 @@ abstract class LoungeJsonRequest extends LoungeRequest {
 
 abstract class LoungeRawRequest<T> extends LoungeRequest {
   final T body;
+
   LoungeRawRequest(this.body) : super();
 
   LoungeRawRequest.name({@required this.body});
@@ -64,27 +67,24 @@ class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
 @JsonSerializable()
 class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
   final String token;
+
   PushFCMTokenLoungeJsonRequest(this.token) : super();
 
-  PushFCMTokenLoungeJsonRequest.name({@required this.token})
-      : super();
-
+  PushFCMTokenLoungeJsonRequest.name({@required this.token}) : super();
 
   @override
   String get eventName => RequestLoungeEventNames.pushFCMToken;
-
 
   factory PushFCMTokenLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
       _$PushFCMTokenLoungeJsonRequestFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$PushFCMTokenLoungeJsonRequestToJson(this);
+
   @override
   String toString() {
     return 'PushFCMTokenLoungeJsonRequest{token: $token}';
   }
-
-
 }
 
 @JsonSerializable()
@@ -169,7 +169,6 @@ class MsgPreviewToggleLoungeJsonRequest extends LoungeJsonRequest {
       _$MsgPreviewToggleLoungeJsonRequestFromJson(json);
 }
 
-
 @JsonSerializable()
 class NamesLoungeJsonRequest extends LoungeJsonRequest {
   @override
@@ -191,6 +190,24 @@ class NamesLoungeJsonRequest extends LoungeJsonRequest {
 
   factory NamesLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
       _$NamesLoungeJsonRequestFromJson(json);
+}
+
+@JsonSerializable()
+class RegistrationLoungeJsonRequest extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.signUp;
+  final String user;
+  final String password;
+
+  RegistrationLoungeJsonRequest(this.user, this.password);
+
+  RegistrationLoungeJsonRequest.name({@required this.user, @required this.password});
+
+  @override
+  Map<String, dynamic> toJson() => _$RegistrationLoungeJsonRequestToJson(this);
+
+  factory RegistrationLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$RegistrationLoungeJsonRequestFromJson(json);
 }
 
 @JsonSerializable()

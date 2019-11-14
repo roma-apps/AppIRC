@@ -47,7 +47,7 @@ abstract class ChatBackendService implements Providable {
 
   bool get isReadyToConnect;
 
-  Future<RequestResult<ConnectResult>> connectChat();
+  Future<RequestResult<ChatLoginResult>> connectChat();
 
   Future<RequestResult<bool>> disconnectChat({bool waitForResult: false});
 

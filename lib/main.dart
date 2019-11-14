@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_new_connection_page.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/page/lounge_new_preferences_page.dart';
 import 'package:flutter_appirc/app/channel/channel_blocs_bloc.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/channel/list/unread_count/channel_list_unread_count_bloc.dart';
@@ -39,7 +41,9 @@ import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/state/network_states_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_app_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_button_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_channel_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_chat_app_bar_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_chat_input_message_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_boolean_field_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_text_field_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_title_skin_bloc.dart';
@@ -53,6 +57,7 @@ import 'package:flutter_appirc/app/skin/app_irc_network_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_popup_menu_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_text_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
+import 'package:flutter_appirc/app/skin/themes/day_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
@@ -73,11 +78,6 @@ import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'app/skin/app_irc_channel_list_skin_bloc.dart';
-import 'app/skin/app_irc_chat_input_message_skin_bloc.dart';
-import 'app/skin/themes/day_app_irc_skin_theme.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-
 var _logger = MyLogger(logTag: "main.dart", enabled: true);
 
 final String appTitle = "AppIRC";
@@ -85,15 +85,7 @@ final String relativePathToLangsFolder = 'assets/langs';
 final List<Locale> supportedLocales = [Locale('en', 'US')];
 
 Future main() async {
-
-  // Set `enableInDevMode` to true to see reports while in debug mode
-  // This is only to be used for confirming that reports are being
-  // submitted as expected. It is not intended to be used for everyday
-  // development.
-
-  // Pass all uncaught errors from the framework to Crashlytics.
-  FlutterError.onError = Crashlytics.instance.recordFlutterError;
-
+  initCrashlytics();
 
 //  changeToCupertinoPlatformAware();
 
@@ -112,6 +104,11 @@ Future main() async {
         child: Provider(providable: preferencesService, child: AppIRC()),
         providable: loungePreferencesBloc),
   )));
+}
+
+void initCrashlytics() {
+  // Pass all uncaught errors from the framework to Crashlytics.
+  FlutterError.onError = Crashlytics.instance.recordFlutterError;
 }
 
 class AppIRC extends StatefulWidget {
@@ -148,10 +145,10 @@ class AppIRCState extends State<AppIRC> {
       return _buildApp(SplashPage());
     } else {
       if (_loungePreferences == null) {
-        return _buildAppForStartLoungePreferences();
+        return _buildAppForStartLoungePreferences(context);
       } else {
         if (_loungeBackendService == null) {
-          return _buildAppForStartLoungePreferences();
+          return _buildAppForStartLoungePreferences(context);
         } else {
           return _createdWidget;
         }
@@ -327,8 +324,15 @@ class AppIRCState extends State<AppIRC> {
     );
   }
 
-  Widget _buildAppForStartLoungePreferences() => _buildApp(
-      NewLoungePreferencesPage(createDefaultLoungePreferences(context)));
+  Widget _buildAppForStartLoungePreferences(BuildContext context) {
+    var settings = createDefaultLoungePreferences(context);
+    return Provider(
+        providable: LoungeConnectionBloc(
+            Provider.of<SocketIOManagerProvider>(context).manager,
+            settings.hostPreferences,
+            settings.authPreferences),
+        child: _buildApp(NewLoungeConnectionPage()));
+  }
 
   Widget _buildApp(Widget child, {bool isPreferencesReady = true}) {
     var preferencesService = Provider.of<PreferencesService>(context);

@@ -36,6 +36,8 @@ class LoungeResponseEventNames {
   static const String syncSort = "sync_sort";
   static const String more = "more";
   static const String msgPreviewToggle = "msg:preview:toggle";
+
+  static const String signedUp = "signed-up";
 }
 
 class MessagePreviewTypeLoungeResponse {
@@ -355,12 +357,19 @@ class AuthLoungeResponseBody extends LoungeResponseBody {
 
   final bool success;
   final int serverHash;
+  // TODO: remove todo when will be in master branch
+  // only available in custom the lounge version
+  // https://github.com/xal/thelounge/tree/xal/sign_up
+  final bool signUp;
 
-  AuthLoungeResponseBody(this.serverHash, this.success);
+
+  AuthLoungeResponseBody(this.success, this.serverHash, this.signUp);
+
 
   @override
   String toString() {
-    return 'AuthLoungeResponseBody{success: $success, serverHash: $serverHash}';
+    return 'AuthLoungeResponseBody{success: $success, '
+        'serverHash: $serverHash, signUp: $signUp}';
   }
 
   factory AuthLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -368,6 +377,34 @@ class AuthLoungeResponseBody extends LoungeResponseBody {
 
   Map<String, dynamic> toJson() => _$AuthLoungeResponseBodyToJson(this);
 }
+
+
+@JsonSerializable()
+class RegistrationResponseBody extends LoungeResponseBody {
+
+  static const errorTypeInvalid = "invalid";
+  static const errorTypeAlreadyExist= "already_exist";
+
+  static get eventName => LoungeResponseEventNames.signedUp;
+
+  final bool success;
+  final String errorType;
+
+
+  RegistrationResponseBody(this.success, this.errorType);
+
+
+  @override
+  String toString() {
+    return 'RegistrationResponseBody{success: $success, errorType: $errorType}';
+  }
+
+  factory RegistrationResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$RegistrationResponseBodyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RegistrationResponseBodyToJson(this);
+}
+
 
 @JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {

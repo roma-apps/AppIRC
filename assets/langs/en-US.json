@@ -25,9 +25,26 @@
     }
   },
   "lounge": {
+    "dialog": {
+      "timeout": {
+        "title": "Response timeout",
+        "content": "Check your network connection"
+      },
+      "connection_error": {
+        "title": "Connection error",
+        "content": {
+          "no_exception": "Can't connect to host",
+          "with_exception": "Can't connect to host. Error: {}"
+        }
+      },
+      "invalid_response_error": {
+        "title": "Invalid server response",
+        "content": "Correct response not received. Maybe remote server have unsupported Lounge version."
+      }
+    },
     "preferences": {
       "title": "Lounge preferences",
-      "connection": {
+      "host": {
         "title": "Connection",
         "field": {
           "host": {
@@ -35,26 +52,8 @@
             "hint": "https://demo.thelounge.chat"
           }
         },
-        "dialog": {
-          "connection_error": {
-            "title": "Connection error",
-            "content": {
-              "no_exception": "Can't connect to host",
-              "with_exception": "Can't connect to host. Error: {}"
-            }
-          },
-          "invalid_response_error": {
-            "title": "Invalid server response",
-            "content": "Connected to host but correct response not received. Maybe remote server have unsupported Lounge version."
-          },
-          "auth_fail": {
-            "title": "Auth failed",
-            "content": "Invalid username or password"
-          },
-          "timeout": {
-            "title": "Response timeout",
-            "content": "Check your network connection"
-          }
+        "action": {
+          "connect": "Connect"
         }
       },
       "auth": {
@@ -70,17 +69,52 @@
           }
         }
       },
-      "new": {
-        "title": "New Lounge connection",
+      "action": {
+        "switch_to_sign_in": "Switch to Sign In",
+        "switch_to_sign_up": "Switch to Sign Up"
+      },
+      "login": {
+        "title": "Sign in",
+        "dialog": {
+          "login_fail": {
+            "title": "Auth failed",
+            "content": "Invalid username or password"
+          }
+        },
         "action": {
-          "connect": "Connect"
+          "login": "Login"
         }
+      },
+      "registration": {
+        "title": "Sign up",
+        "dialog": {
+          "error_invalid": {
+            "title": "Sign Up failed",
+            "content": "Invalid username or password"
+          },
+          "error_already_exist": {
+            "title": "Sign Up failed",
+            "content": "User already exist"
+          },
+          "error_unknown": {
+            "title": "Sign Up failed",
+            "content": "Unknown error"
+          },
+
+          "success": {
+            "title": "Success Sign Up",
+            "content": "You can sign in now"
+          }
+        },
+        "action": {
+          "register": "Register"
+        }
+      },
+      "new": {
+        "title": "New Lounge connection"
       },
       "edit": {
         "title": "Edit lounge connection",
-        "action": {
-          "change": "Save"
-        },
         "dialog": {
           "confirm": {
             "title": "Are you sure?",

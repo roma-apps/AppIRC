@@ -1,3 +1,4 @@
+import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
@@ -556,4 +557,31 @@ Future<NetworkWithState> toNetworkWithState(
   var networkWithState =
       NetworkWithState(network, networkState, channelsWithState);
   return networkWithState;
+}
+
+
+ChatRegistrationResult toChatRegistrationResult(RegistrationResponseBody parsed) {
+  if(parsed.success) {
+    return ChatRegistrationResult.success();
+  } else {
+
+    return ChatRegistrationResult.fail(toChatRegistrationErrorType(parsed
+        .errorType));
+  }
+
+}
+
+RegistrationErrorType toChatRegistrationErrorType(String errorType) {
+
+  switch(errorType) {
+    case RegistrationResponseBody.errorTypeInvalid:
+      return RegistrationErrorType.invalid;
+      break;
+    case RegistrationResponseBody.errorTypeAlreadyExist:
+      return RegistrationErrorType.alreadyExist;
+      break;
+    default:
+      return RegistrationErrorType.unknown;
+      break;
+  }
 }

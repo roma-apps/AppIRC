@@ -6,29 +6,28 @@ import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_p
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 
 class LoungeAuthPreferencesFormWidget extends StatefulWidget {
-  final LoungeAuthPreferences _startPreferences;
+  final String titleText;
+  final LoungeAuthPreferencesFormBloc formBloc;
 
-  LoungeAuthPreferencesFormWidget(this._startPreferences);
+  LoungeAuthPreferencesFormWidget(this.titleText, this.formBloc);
 
   @override
   State<StatefulWidget> createState() =>
-      LoungeAuthPreferencesFormWidgetState(_startPreferences);
+      LoungeAuthPreferencesFormWidgetState(formBloc.extractData());
 }
 
 class LoungeAuthPreferencesFormWidgetState
     extends State<LoungeAuthPreferencesFormWidget> {
-  final LoungeAuthPreferences _startPreferences;
   TextEditingController _usernameController;
   TextEditingController _passwordController;
 
-  LoungeAuthPreferencesFormWidgetState(this._startPreferences) {
+  LoungeAuthPreferencesFormWidgetState(LoungeAuthPreferences startPreferences) {
     _usernameController =
-        TextEditingController(text: _startPreferences?.username);
+        TextEditingController(text: startPreferences?.username);
     _passwordController =
-        TextEditingController(text: _startPreferences?.password);
+        TextEditingController(text: startPreferences?.password);
   }
 
   @override
@@ -40,17 +39,15 @@ class LoungeAuthPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var formBloc = Provider.of<LoungeAuthPreferencesFormBloc>(context);
     var appLocalizations = AppLocalizations.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         buildFormTitle(
-            context: context,
-            title: appLocalizations.tr('lounge.preferences.auth.title')),
+            context: context, title: appLocalizations.tr(widget.titleText)),
         buildFormTextRow(
           context: context,
-          bloc: formBloc.usernameFieldBloc,
+          bloc: widget.formBloc.usernameFieldBloc,
           controller: _usernameController,
           icon: Icons.account_box,
           label: appLocalizations.tr('lounge.preferences.auth.field.username'
@@ -59,11 +56,11 @@ class LoungeAuthPreferencesFormWidgetState
               '.hint'),
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.none,
-          nextBloc: formBloc.passwordFieldBloc,
+          nextBloc: widget.formBloc.passwordFieldBloc,
         ),
         buildFormTextRow(
           context: context,
-          bloc: formBloc.passwordFieldBloc,
+          bloc: widget.formBloc.passwordFieldBloc,
           controller: _passwordController,
           icon: Icons.lock,
           label: appLocalizations.tr('lounge.preferences.auth.field.password'

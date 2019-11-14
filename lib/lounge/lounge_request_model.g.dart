@@ -81,6 +81,21 @@ Map<String, dynamic> _$NamesLoungeJsonRequestToJson(
       'target': instance.target,
     };
 
+RegistrationLoungeJsonRequest _$RegistrationLoungeJsonRequestFromJson(
+    Map<String, dynamic> json) {
+  return RegistrationLoungeJsonRequest(
+    json['user'] as String,
+    json['password'] as String,
+  );
+}
+
+Map<String, dynamic> _$RegistrationLoungeJsonRequestToJson(
+        RegistrationLoungeJsonRequest instance) =>
+    <String, dynamic>{
+      'user': instance.user,
+      'password': instance.password,
+    };
+
 AuthLoungeJsonRequestBody _$AuthLoungeJsonRequestBodyFromJson(
     Map<String, dynamic> json) {
   return AuthLoungeJsonRequestBody(

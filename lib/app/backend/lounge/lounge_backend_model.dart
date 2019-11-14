@@ -8,7 +8,7 @@ import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 
 abstract class LoungeException implements Exception {}
 
-class InvalidConnectionResponseException extends LoungeException {
+class InvalidResponseException extends LoungeException {
   final LoungePreferences preferences;
 
   final bool authorizedReceived;
@@ -16,7 +16,7 @@ class InvalidConnectionResponseException extends LoungeException {
   final bool commandReceived;
   final bool chatInitReceived;
 
-  InvalidConnectionResponseException(this.preferences, this.authorizedReceived,
+  InvalidResponseException(this.preferences, this.authorizedReceived,
       this.configReceived, this.commandReceived, this.chatInitReceived);
 }
 
@@ -68,4 +68,55 @@ class ChatNetworkNewLoungeJsonRequest extends NetworkNewLoungeJsonRequest {
               .networkConnectionPreferences.serverPreferences.name,
           commands: null, // set command only via edit interface
         );
+}
+
+class LoungeHostInformation {
+  bool connected;
+
+  bool authRequired;
+  bool authResponse;
+
+  // TODO: remove todo when will be in master branch
+  // only available in custom the lounge version
+  // https://github.com/xal/thelounge/tree/xal/sign_up
+  bool registrationSupported;
+
+  bool get isPublicMode => connected && !authRequired;
+
+  bool get isPrivateMode => connected && authRequired;
+
+  LoungeHostInformation._name(
+      {@required this.connected,
+      @required this.authRequired,
+      @required this.registrationSupported,
+      @required this.authResponse});
+
+  LoungeHostInformation.notConnected()
+      : this._name(
+            connected: false,
+            authRequired: null,
+            registrationSupported: null,
+            authResponse: null);
+
+  LoungeHostInformation.connectedToPublic()
+      : this._name(
+            connected: true,
+            authRequired: false,
+            registrationSupported: false,
+            authResponse: true);
+
+  LoungeHostInformation.connectedToPrivate(
+      {@required bool authResponse, @required bool registrationSupported})
+      : this._name(
+            connected: true,
+            authRequired: true,
+            registrationSupported: registrationSupported,
+            authResponse: authResponse);
+
+  @override
+  String toString() {
+    return 'LoungeHostInformation{connected: $connected,'
+        ' authRequired: $authRequired,'
+        ' registrationSupported: $registrationSupported}';
+  }
 }

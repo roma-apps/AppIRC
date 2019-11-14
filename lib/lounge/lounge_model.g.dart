@@ -6,15 +6,15 @@ part of 'lounge_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-LoungeConnectionPreferences _$LoungeConnectionPreferencesFromJson(
+LoungeHostPreferences _$LoungeHostPreferencesFromJson(
     Map<String, dynamic> json) {
-  return LoungeConnectionPreferences(
+  return LoungeHostPreferences(
     json['host'] as String,
   );
 }
 
-Map<String, dynamic> _$LoungeConnectionPreferencesToJson(
-        LoungeConnectionPreferences instance) =>
+Map<String, dynamic> _$LoungeHostPreferencesToJson(
+        LoungeHostPreferences instance) =>
     <String, dynamic>{
       'host': instance.host,
     };
@@ -36,10 +36,10 @@ Map<String, dynamic> _$LoungeAuthPreferencesToJson(
 
 LoungePreferences _$LoungePreferencesFromJson(Map<String, dynamic> json) {
   return LoungePreferences(
-    json['connectionPreferences'] == null
+    json['hostPreferences'] == null
         ? null
-        : LoungeConnectionPreferences.fromJson(
-            json['connectionPreferences'] as Map<String, dynamic>),
+        : LoungeHostPreferences.fromJson(
+            json['hostPreferences'] as Map<String, dynamic>),
     authPreferences: json['authPreferences'] == null
         ? null
         : LoungeAuthPreferences.fromJson(
@@ -49,6 +49,6 @@ LoungePreferences _$LoungePreferencesFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$LoungePreferencesToJson(LoungePreferences instance) =>
     <String, dynamic>{
-      'connectionPreferences': instance.connectionPreferences,
+      'hostPreferences': instance.hostPreferences,
       'authPreferences': instance.authPreferences,
     };

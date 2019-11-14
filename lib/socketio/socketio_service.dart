@@ -104,7 +104,9 @@ class SocketIOService extends Providable {
       _socketIO.off(type, listener);
 
   Future init() async {
-    _socketIO = await _manager.createInstance(_createSocketOptions(uri));
+    var socketOptions = _createSocketOptions(uri);
+    _logger.d(() => "init socketOptions = $socketOptions");
+    _socketIO = await _manager.createInstance(socketOptions);
 
     _logger.d(() => "init _socketIO = $_socketIO");
 

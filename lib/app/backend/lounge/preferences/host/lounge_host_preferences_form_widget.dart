@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/connection/lounge_connection_preferences_form_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
@@ -12,24 +12,24 @@ import 'package:flutter_appirc/provider/provider.dart';
 MyLogger _logger = MyLogger(
     logTag: "lounge_connection_preferences_form_widget.dart", enabled: true);
 
-class LoungeConnectionPreferencesFormWidget extends StatefulWidget {
-  final LoungeConnectionPreferences _startPreferences;
+class LoungeHostPreferencesFormWidget extends StatefulWidget {
+  final LoungeHostPreferencesFormBloc _hostPreferencesFormBloc;
 
-  LoungeConnectionPreferencesFormWidget(this._startPreferences);
+  LoungeHostPreferencesFormWidget(
+      this._hostPreferencesFormBloc);
 
   @override
   State<StatefulWidget> createState() =>
-      LoungeConnectionPreferencesFormWidgetState(_startPreferences);
+      LoungeHostPreferencesFormWidgetState(_hostPreferencesFormBloc.extractData());
 }
 
-class LoungeConnectionPreferencesFormWidgetState
-    extends State<LoungeConnectionPreferencesFormWidget> {
-  final LoungeConnectionPreferences _startPreferences;
+class LoungeHostPreferencesFormWidgetState
+    extends State<LoungeHostPreferencesFormWidget> {
+
   TextEditingController _hostController;
 
-  LoungeConnectionPreferencesFormWidgetState(this._startPreferences) {
-    _logger.d(() => "create");
-    _hostController = TextEditingController(text: _startPreferences.host);
+  LoungeHostPreferencesFormWidgetState(LoungeHostPreferences loungeHostPreferences) {
+    _hostController = TextEditingController(text: loungeHostPreferences.host);
   }
 
   @override
@@ -37,11 +37,9 @@ class LoungeConnectionPreferencesFormWidgetState
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      var loungePreferencesFormBloc =
-          Provider.of<LoungeConnectionPreferencesFormBloc>(context);
 
-      // todo: remove. Need only for test
-      loungePreferencesFormBloc.hostFieldBloc.valueStream
+
+      widget._hostPreferencesFormBloc.hostFieldBloc.valueStream
           .distinct()
           .listen((String newHost) {
         if (_hostController.text != newHost) {
@@ -59,8 +57,7 @@ class LoungeConnectionPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var loungePreferencesFormBloc =
-        Provider.of<LoungeConnectionPreferencesFormBloc>(context);
+    var hostFormBloc = widget._hostPreferencesFormBloc;
     var appLocalizations = AppLocalizations.of(context);
 
     _logger.d(() => "build");
@@ -69,15 +66,15 @@ class LoungeConnectionPreferencesFormWidgetState
       children: <Widget>[
         buildFormTitle(
             context: context,
-            title: appLocalizations.tr('lounge.preferences.connection.title')),
+            title: appLocalizations.tr('lounge.preferences.host.title')),
         buildFormTextRow(
           context: context,
-          bloc: loungePreferencesFormBloc.hostFieldBloc,
+          bloc: hostFormBloc.hostFieldBloc,
           controller: _hostController,
           icon: Icons.cloud,
-          label: appLocalizations.tr('lounge.preferences.connection.field.host'
+          label: appLocalizations.tr('lounge.preferences.host.field.host'
               '.label'),
-          hint: appLocalizations.tr('lounge.preferences.connection.field.host'
+          hint: appLocalizations.tr('lounge.preferences.host.field.host'
               '.hint'),
           textInputAction: TextInputAction.done,
         )

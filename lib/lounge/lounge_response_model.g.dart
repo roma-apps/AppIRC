@@ -230,8 +230,9 @@ Map<String, dynamic> _$ConfigurationLoungeResponseBodyToJson(
 AuthLoungeResponseBody _$AuthLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return AuthLoungeResponseBody(
-    json['serverHash'] as int,
     json['success'] as bool,
+    json['serverHash'] as int,
+    json['signUp'] as bool,
   );
 }
 
@@ -240,6 +241,22 @@ Map<String, dynamic> _$AuthLoungeResponseBodyToJson(
     <String, dynamic>{
       'success': instance.success,
       'serverHash': instance.serverHash,
+      'signUp': instance.signUp,
+    };
+
+RegistrationResponseBody _$RegistrationResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return RegistrationResponseBody(
+    json['success'] as bool,
+    json['errorType'] as String,
+  );
+}
+
+Map<String, dynamic> _$RegistrationResponseBodyToJson(
+        RegistrationResponseBody instance) =>
+    <String, dynamic>{
+      'success': instance.success,
+      'errorType': instance.errorType,
     };
 
 JoinLoungeResponseBody _$JoinLoungeResponseBodyFromJson(

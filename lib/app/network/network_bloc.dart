@@ -33,6 +33,7 @@ class NetworkBloc extends DisposableOwner {
 
   NetworkTitle get networkTitle =>
       NetworkTitle(_networkState.name, _networkState.nick);
+
   Stream<NetworkTitle> get networkTitleStream => _networkStateStream
       .map((state) => NetworkTitle(_networkState.name, _networkState.nick))
       .distinct();
@@ -52,8 +53,6 @@ class NetworkBloc extends DisposableOwner {
   Stream<bool> get networkConnectedStream =>
       _networkStateStream.map((state) => state?.connected).distinct();
 
-
-
   Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
           {bool waitForResult: false}) async =>
       await _backendService.printNetworkAvailableChannels(network,
@@ -66,7 +65,8 @@ class NetworkBloc extends DisposableOwner {
 
   Future<RequestResult<bool>> enableNetwork(
           {bool waitForResult: false}) async =>
-      await _backendService.enableNetwork(network, waitForResult: waitForResult);
+      await _backendService.enableNetwork(network,
+          waitForResult: waitForResult);
 
   Future<RequestResult<bool>> disableNetwork(
           {bool waitForResult: false}) async =>
@@ -89,14 +89,12 @@ class NetworkBloc extends DisposableOwner {
     if (alreadyJoinedChannel != null) {
       _activeChannelBloc.changeActiveChanel(alreadyJoinedChannel);
 
-      var channelState = _channelsStateBloc.getChannelState(
-          network, alreadyJoinedChannel);
+      var channelState =
+          _channelsStateBloc.getChannelState(network, alreadyJoinedChannel);
       var initMessages = <ChatMessage>[];
       var initUsers = <ChannelUser>[];
-      return RequestResult<ChannelWithState>(
-          true,
-          ChannelWithState(
-              alreadyJoinedChannel, channelState, initMessages, initUsers));
+      return RequestResult.withResponse(ChannelWithState(
+          alreadyJoinedChannel, channelState, initMessages, initUsers));
     } else {
       return await _backendService.joinChannel(network, preferences,
           waitForResult: waitForResult);

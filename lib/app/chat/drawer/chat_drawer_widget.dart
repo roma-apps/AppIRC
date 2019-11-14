@@ -2,14 +2,16 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_edit_connection_page.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/page/lounge_edit_preferences_page.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/network/list/network_list_widget.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_new_preferences_page.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/skin_day_night_widget.dart';
+import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ChatDrawerWidget extends StatelessWidget {
@@ -78,11 +80,16 @@ class ChatDrawerWidget extends StatelessWidget {
           Navigator.push(
               context,
               platformPageRoute(
-                  builder: (context) => EditLoungePreferencesPage(settings)));
+                  builder: (context) => Provider(
+                      providable: LoungeConnectionBloc(
+                          Provider.of<SocketIOManagerProvider>(context).manager,
+                          settings.hostPreferences, settings.authPreferences),
+                      child: EditLoungeConnectionPage())));
         },
         icon: Icon(Icons.settings),
         iosIcon: Icon(CupertinoIcons.settings),
       );
+
   Widget _buildSignOutButton(BuildContext context) => PlatformIconButton(
       onPressed: () async {
         var loungeBackendService = Provider.of<LoungeBackendService>(context);
