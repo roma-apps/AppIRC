@@ -74,6 +74,7 @@ PlatformTextField buildPlatformTextField({
   var platformTextField = PlatformTextField(
       keyboardType: keyboardType,
       focusNode: focusNode,
+      enabled: enabled,
       inputFormatters: formatters,
       maxLength: maxLength,
       minLines: minLines,
