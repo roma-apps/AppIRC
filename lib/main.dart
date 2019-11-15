@@ -86,7 +86,6 @@ final String relativePathToLangsFolder = 'assets/langs';
 final List<Locale> supportedLocales = [Locale('en', 'US')];
 
 Future main() async {
-  initCrashlytics();
 
 //  changeToCupertinoPlatformAware();
 
@@ -96,20 +95,28 @@ Future main() async {
 //           preferencesService.clear();
 
   var socketIOManager = SocketIOManager();
-
   var loungePreferencesBloc = LoungePreferencesBloc(preferencesService);
-  runApp(EasyLocalization(
-      child: Provider(
-    providable: SocketIOManagerProvider(socketIOManager),
-    child: Provider(
-        child: Provider(providable: preferencesService, child: AppIRC()),
-        providable: loungePreferencesBloc),
-  )));
-}
 
-void initCrashlytics() {
-  // Pass all uncaught errors from the framework to Crashlytics.
+  // Set `enableInDevMode` to true to see reports while in debug mode
+  // This is only to be used for confirming that reports are being
+  // submitted as expected. It is not intended to be used for everyday
+  // development.
+//  Crashlytics.instance.enableInDevMode = true;
+
+  // Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
+
+  runZoned<Future<void>>(() async {
+    runApp(EasyLocalization(
+        child: Provider(
+          providable: SocketIOManagerProvider(socketIOManager),
+          child: Provider(
+              child: Provider(providable: preferencesService, child: AppIRC()),
+              providable: loungePreferencesBloc),
+        )));
+  }, onError: Crashlytics.instance.recordError);
+
+
 }
 
 class AppIRC extends StatefulWidget {
