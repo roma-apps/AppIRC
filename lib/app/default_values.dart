@@ -3,7 +3,7 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 
 LoungePreferences createDefaultLoungePreferences(
         BuildContext context) =>
-LoungePreferences(LoungeHostPreferences("http://192.168.0.105:9000/"));
+LoungePreferences(LoungeHostPreferences("http://167.71.55.184:9000/"));
 
 
 
