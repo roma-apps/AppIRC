@@ -90,6 +90,13 @@ buildFormTextRow(
     };
   }
 
+  if (textInputAction == TextInputAction.done) {
+    assert(onSubmitted == null);
+    onSubmitted = (_) {
+      FocusScope.of(context).requestFocus(new FocusNode());
+    };
+  }
+
   if (bloc.visible) {
     FormTextFieldSkinBloc formTextFieldSkinBloc = Provider.of(context);
 

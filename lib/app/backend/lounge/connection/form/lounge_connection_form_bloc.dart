@@ -41,11 +41,6 @@ class LoungeConnectionFormBloc extends FormBloc {
       connectionBloc.onHostPreferencesChanged(extractHostPreferences());
     }));
 
-//    addDisposable(streamSubscription:
-//        hostFormBloc.hostInformationStream.listen((hostInformation) {
-//      connectionBloc.onHostConnectionResult(
-//          hostFormBloc.extractData(), hostInformation);
-//    }));
   }
 
   _onAuthChanged(_) {

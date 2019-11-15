@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_new_connection_page.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
@@ -348,12 +349,15 @@ class AppIRCState extends State<AppIRC> {
 
   Widget _buildAppForStartLoungePreferences(BuildContext context) {
     var settings = createDefaultLoungePreferences(context);
-    return Provider(
-        providable: LoungeConnectionBloc(
+    var connectionBloc = LoungeConnectionBloc(
             Provider.of<SocketIOManagerProvider>(context).manager,
             settings.hostPreferences,
-            settings.authPreferences),
-        child: _buildApp(NewLoungeConnectionPage()));
+            settings.authPreferences);
+    return Provider(
+        providable: connectionBloc,
+        child: Provider(
+            providable: LoungeConnectionFormBloc(connectionBloc),
+            child: _buildApp(NewLoungeConnectionPage())));
   }
 
   Widget _buildApp(Widget child, {bool isPreferencesReady = true}) {

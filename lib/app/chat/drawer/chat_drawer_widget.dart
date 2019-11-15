@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_edit_connection_page.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
@@ -80,11 +81,16 @@ class ChatDrawerWidget extends StatelessWidget {
           Navigator.push(
               context,
               platformPageRoute(
-                  builder: (context) => Provider(
-                      providable: LoungeConnectionBloc(
+                  builder: (context) {
+                    var connectionBloc = LoungeConnectionBloc(
                           Provider.of<SocketIOManagerProvider>(context).manager,
-                          settings.hostPreferences, settings.authPreferences),
-                      child: EditLoungeConnectionPage())));
+                          settings.hostPreferences, settings.authPreferences);
+                    return Provider(
+                      providable: connectionBloc,
+                      child: Provider(
+                          providable: LoungeConnectionFormBloc(connectionBloc),
+                          child: EditLoungeConnectionPage()));
+                  }));
         },
         icon: Icon(Icons.settings),
         iosIcon: Icon(CupertinoIcons.settings),

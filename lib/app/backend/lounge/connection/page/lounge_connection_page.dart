@@ -42,11 +42,8 @@ class LoungeConnectionPageState extends State<LoungeConnectionPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: Provider(
-                  providable: LoungeConnectionFormBloc(connectionBloc),
-                  child: LoungeConnectionFormWidget(loungePreferences,
-                      widget.onSuccessTestConnectionWithGivenPreferences),
-                ),
+                child: LoungeConnectionFormWidget(loungePreferences,
+                    widget.onSuccessTestConnectionWithGivenPreferences),
               )
             ],
           ),
