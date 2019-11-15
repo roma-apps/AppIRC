@@ -11,10 +11,12 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_dialog_widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_preferences_form_widget.dart';
+import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/async/async_dialog_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
@@ -134,6 +136,11 @@ class LoungeConnectionFormWidgetState
                 } else {
                   if (requestResult.isResponseReceived) {
                     var hostInformation = requestResult.result;
+
+                    if(hostInformation.connected && extractData
+                        .hostPreferences.host == appIRCLoungeInstance) {
+                      showAppIRCLoungeInstanceInfoAlertDialog(context);
+                    }
 
                     if (hostInformation.connected &&
                         !hostInformation.authRequired) {
@@ -340,4 +347,17 @@ class LoungeConnectionFormWidgetState
         child: Text(AppLocalizations.of(context).tr("lounge.preferences.action"
             ".switch_to_sign_in")));
   }
+}
+
+Future showAppIRCLoungeInstanceInfoAlertDialog(BuildContext context) async {
+  var appLocalizations = AppLocalizations.of(context);
+
+  String title =
+  appLocalizations.tr('appirc.dialog.test_server.title');
+
+  String content =
+  appLocalizations.tr('appirc.dialog.test_server.content');
+
+  return showPlatformAlertDialog(
+      context: context, title: Text(title), content: Text(content));
 }

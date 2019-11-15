@@ -24,6 +24,14 @@
       }
     }
   },
+  "appirc": {
+    "dialog": {
+      "test_server": {
+        "title": "AppIRC server",
+        "content": "You connected to test AppIRC The lounge instance. Only this server supports push notifications and sign up features. Note: push notifications works for last connected device only, several devices support not implemented yet."
+      }
+    }
+  },
   "lounge": {
     "dialog": {
       "timeout": {
