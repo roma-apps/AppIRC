@@ -69,6 +69,7 @@ class LoungeHostPreferencesFormWidgetState
             title: appLocalizations.tr('lounge.preferences.host.title')),
         buildFormTextRow(
           context: context,
+          textCapitalization: TextCapitalization.none,
           bloc: hostFormBloc.hostFieldBloc,
           controller: _hostController,
           icon: Icons.cloud,
