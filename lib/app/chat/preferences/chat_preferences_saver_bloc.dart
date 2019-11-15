@@ -18,7 +18,7 @@ var _logger =
 class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
   final NetworkStatesBloc _stateBloc;
-  final ChatPreferences _currentPreferences = ChatPreferences([]);
+  ChatPreferences _currentPreferences = ChatPreferences([]);
   final ChatPreferencesBloc chatPreferencesBloc;
   final ChatInitBloc initBloc;
 
@@ -116,6 +116,12 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
             network.name;
       }
     }, orElse: () => null);
+  }
+
+  reset() {
+    _currentPreferences = ChatPreferences.empty;
+    _onPreferencesChanged();
+
   }
 }
 

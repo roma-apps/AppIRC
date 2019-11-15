@@ -61,6 +61,7 @@ import 'package:flutter_appirc/app/skin/themes/day_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/night_app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/splash/splash_page.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
+import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/form/field/boolean/form_boolean_field_skin_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_skin_bloc.dart';
 import 'package:flutter_appirc/form/form_title_skin_bloc.dart';
@@ -200,15 +201,7 @@ class AppIRCState extends State<AppIRC> {
 
     await loungeBackendService.init();
 
-    loungeBackendService.listenForSignOut(() {
-      loungeBackendService.dispose();
-      this._loungeBackendService = null;
-      this._loungePreferences.authPreferences = null;
 
-      var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
-      loungePreferencesBloc.setValue(LoungePreferences.empty);
-      setState(() {});
-    });
 
     this._loungeBackendService = loungeBackendService;
 
@@ -256,6 +249,33 @@ class AppIRCState extends State<AppIRC> {
     var chatUploadBloc = ChatUploadBloc(loungeBackendService);
 
     var chatUnreadBloc = ChannelListUnreadCountBloc(channelsStatesBloc);
+
+
+    var chatPreferencesSaverBloc = ChatPreferencesSaverBloc(
+                                              loungeBackendService,
+                                              networkStatesBloc,
+                                              networksListBloc,
+                                              chatPreferencesBloc,
+                                              chatInitBloc);
+
+
+    Disposable signOutListener;
+    signOutListener = loungeBackendService.listenForSignOut(() {
+      chatPreferencesSaverBloc.reset();
+      this._loungeBackendService.dispose();
+      this._loungeBackendService = null;
+      this._loungePreferences = LoungePreferences.empty;
+
+
+
+      var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
+      loungePreferencesBloc.setValue(_loungePreferences);
+
+      signOutListener.dispose();
+
+      setState(() {});
+
+    });
     _createdWidget = Provider(
       providable: chatDeepLinkBloc,
       child: Provider(
@@ -296,12 +316,7 @@ class AppIRCState extends State<AppIRC> {
                                             networksListBloc,
                                             _database),
                                         child: Provider(
-                                          providable: ChatPreferencesSaverBloc(
-                                              loungeBackendService,
-                                              networkStatesBloc,
-                                              networksListBloc,
-                                              chatPreferencesBloc,
-                                              chatInitBloc),
+                                          providable: chatPreferencesSaverBloc,
                                           child: _buildApp(ChatPage()),
                                         ),
                                       ),
