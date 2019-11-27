@@ -137,11 +137,6 @@ class LoungeConnectionFormWidgetState
                   if (requestResult.isResponseReceived) {
                     var hostInformation = requestResult.result;
 
-                    if(hostInformation.connected && extractData
-                        .hostPreferences.host == appIRCLoungeInstance) {
-                      showAppIRCLoungeInstanceInfoAlertDialog(context);
-                    }
-
                     if (hostInformation.connected &&
                         !hostInformation.authRequired) {
                       successCallback(context, extractData);
@@ -347,17 +342,4 @@ class LoungeConnectionFormWidgetState
         child: Text(AppLocalizations.of(context).tr("lounge.preferences.action"
             ".switch_to_sign_in")));
   }
-}
-
-Future showAppIRCLoungeInstanceInfoAlertDialog(BuildContext context) async {
-  var appLocalizations = AppLocalizations.of(context);
-
-  String title =
-  appLocalizations.tr('appirc.dialog.test_server.title');
-
-  String content =
-  appLocalizations.tr('appirc.dialog.test_server.content');
-
-  return showPlatformAlertDialog(
-      context: context, title: Text(title), content: Text(content));
 }

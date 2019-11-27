@@ -14,6 +14,7 @@ import 'package:flutter_appirc/app/message/preview/message_video_preview_widget.
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 MyLogger _logger =
@@ -24,6 +25,8 @@ Widget buildPreview(
   _logger.d((() => " build preview for $preview"));
 
   MessagePreviewSkinBloc skinBloc = Provider.of(context);
+
+  TextSkinBloc textSkinBloc = Provider.of(context);
 
   return Padding(
     padding: const EdgeInsets.all(4.0),
@@ -38,7 +41,8 @@ Widget buildPreview(
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(AppLocalizations.of(context)
-                    .tr("chat.message.preview.title")),
+                    .tr("chat.message.preview.title"), style: textSkinBloc
+                    .defaultTextStyle),
               ),
               PlatformIconButton(
                   icon: Icon(

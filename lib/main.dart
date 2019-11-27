@@ -464,6 +464,7 @@ class AppIRCState extends State<AppIRC> {
                                                                 path:
                                                                     relativePathToLangsFolder),
                                                           ],
+                                                          debugShowCheckedModeBanner: false,
                                                           supportedLocales:
                                                               supportedLocales,
                                                           locale:

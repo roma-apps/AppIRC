@@ -156,7 +156,6 @@ void updatePreview(RegularMessage oldMessage,
     oldMessage.previews = [];
   }
 
-  oldMessage.previews
-      .removeWhere((preview) => preview.type == MessagePreviewType.loading);
+  oldMessage.previews.clear();
   oldMessage.previews.add(previewForMessage.messagePreview);
 }

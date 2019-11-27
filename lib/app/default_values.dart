@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 
-const String appIRCLoungeInstance = "http://167.71.55.184:9000/";
+const String appIRCLoungeInstance = "https://demo.appirc.com/";
 
 LoungePreferences createDefaultLoungePreferences(
         BuildContext context) =>

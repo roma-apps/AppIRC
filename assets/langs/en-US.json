@@ -24,14 +24,6 @@
       }
     }
   },
-  "appirc": {
-    "dialog": {
-      "test_server": {
-        "title": "AppIRC server",
-        "content": "You connected to test AppIRC The lounge instance. Only this server supports push notifications and sign up features. Note: push notifications works for last connected device only, several devices support not implemented yet."
-      }
-    }
-  },
   "lounge": {
     "dialog": {
       "timeout": {
@@ -190,7 +182,7 @@
             },
             "real_name": {
               "label": "Real name",
-              "hint": "https://irc.pleroma.social/"
+              "hint": "John Smith"
             },
             "user_name": {
               "label": "User name",
@@ -205,7 +197,7 @@
         "field": {
           "channels": {
             "label": "Channels",
-            "hint": "#pleroma, #thelounge"
+            "hint": "#channel1, #channel2"
           }
         }
       }
@@ -233,7 +225,7 @@
         "field": {
           "channel": {
             "label": "Channel",
-            "hint": "#pleroma"
+            "hint": "#channel"
           },
           "password": {
             "label": "Password",
