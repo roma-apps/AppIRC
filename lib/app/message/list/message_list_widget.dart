@@ -22,7 +22,9 @@ import 'package:flutter_widgets/flutter_widgets.dart';
 var _logger = MyLogger(logTag: "message_list_widget.dart", enabled: true);
 
 class MessageListWidget extends StatefulWidget {
-  MessageListWidget();
+  final MessageListLoadMoreBloc loadMoreBloc;
+
+  MessageListWidget(this.loadMoreBloc);
 
   @override
   _MessageListWidgetState createState() => _MessageListWidgetState();
@@ -72,6 +74,10 @@ class _MessageListWidgetState extends State<MessageListWidget> {
             maxIndex = position.index;
           }
         });
+        if (minIndex == 0) {
+          widget.loadMoreBloc.loadMore();
+        }
+
         minIndex -= _lastBuildMessagesStartIndex;
         maxIndex -= _lastBuildMessagesStartIndex;
 
@@ -145,33 +151,44 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
     if (chatMessageListState.updateType ==
         MessageListUpdateType.historyFromBackend) {
+      nextJumpDestination = MessageListJumpDestination(
+          items: chatMessageListState.items,
+          selectedFoundItem: initScrollPositionItem,
+          alignment: 0.0);
       Timer.run(() {
-        _jumpToMessage(chatMessageListState.items, initScrollPositionItem,
-            alignment: 0.1);
+        _jumpToMessage();
       });
     }
     if (chatMessageListState.updateType ==
         MessageListUpdateType.replacedByBackend) {
+      nextJumpDestination = MessageListJumpDestination(
+          items: chatMessageListState.items,
+          selectedFoundItem: chatMessageListState.items.last,
+          alignment: 0.9);
       Timer.run(() {
-        _jumpToMessage(
-            chatMessageListState.items, chatMessageListState.items.last,
-            alignment: 0.9);
+        _jumpToMessage();
       });
     }
 
     if (chatMessageListState.updateType ==
         MessageListUpdateType.loadedFromLocalDatabase) {
+      nextJumpDestination = MessageListJumpDestination(
+          items: chatMessageListState.items,
+          selectedFoundItem: initScrollPositionItem,
+          alignment: 0);
       Timer.run(() {
-        _jumpToMessage(chatMessageListState.items, initScrollPositionItem,
-            alignment: 0);
+        _jumpToMessage();
       });
     }
 
     if (visibleMessagesBounds?.updateType ==
         MessageListVisibleBoundsUpdateType.push) {
+      nextJumpDestination = MessageListJumpDestination(
+          items: chatMessageListState.items,
+          selectedFoundItem: initScrollPositionItem,
+          alignment: 0.5);
       Timer.run(() {
-        _jumpToMessage(chatMessageListState.items, initScrollPositionItem,
-            alignment: 0.5);
+        _jumpToMessage();
       });
     }
 
@@ -182,9 +199,12 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           var searchState = snapshot.data;
 
           if (searchState.selectedFoundItem != null) {
+            nextJumpDestination = MessageListJumpDestination(
+                items: chatMessageListState.items,
+                selectedFoundItem: searchState.selectedFoundItem,
+                alignment: 0);
             Timer.run(() {
-              var selectedFoundItem = searchState.selectedFoundItem;
-              _jumpToMessage(chatMessageListState.items, selectedFoundItem);
+              _jumpToMessage();
             });
           }
           return _buildListWidget(context, chatMessageListState.items,
@@ -192,16 +212,19 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         });
   }
 
-  void _jumpToMessage(
-      List<MessageListItem> items, MessageListItem selectedFoundItem,
-      {double alignment = 0}) {
-    var indexToJump =
-        items?.indexWhere((listItem) => listItem == selectedFoundItem);
-    _logger.d(() => "_jumpToMessage $selectedFoundItem"
-        "indexToJump $indexToJump");
-    _scrollController?.jumpTo(
-        index: indexToJump + _lastBuildMessagesStartIndex,
-        alignment: alignment);
+  MessageListJumpDestination nextJumpDestination;
+
+  void _jumpToMessage() {
+    if (nextJumpDestination != null) {
+      var indexToJump = nextJumpDestination.items?.indexWhere(
+          (listItem) => listItem == nextJumpDestination.selectedFoundItem);
+      _logger.d(() => "_jumpToMessage ${nextJumpDestination.selectedFoundItem}"
+          "indexToJump $indexToJump");
+      _scrollController?.jumpTo(
+          index: indexToJump + _lastBuildMessagesStartIndex,
+          alignment: nextJumpDestination.alignment);
+      nextJumpDestination = null;
+    }
   }
 
   MessageListItem _calculateInitScrollPositionMessage(
@@ -273,40 +296,35 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       initialAlignment = 1.0;
     }
 
-    MessageListBloc messageListBloc = Provider.of(context);
-    return Provider(
-      providable:
-          MessageListLoadMoreBloc(ChannelBloc.of(context), messageListBloc),
-      child: ScrollablePositionedList.builder(
-          initialScrollIndex: initialScrollIndex,
-          itemScrollController: _scrollController,
-          itemPositionsListener: _positionsListener,
-          itemCount: itemCount,
-          initialAlignment: initialAlignment,
-          itemBuilder: (BuildContext context, int index) {
+    return ScrollablePositionedList.builder(
+        initialScrollIndex: initialScrollIndex,
+        itemScrollController: _scrollController,
+        itemPositionsListener: _positionsListener,
+        itemCount: itemCount,
+        initialAlignment: initialAlignment,
+        itemBuilder: (BuildContext context, int index) {
 //          _logger.d(() => "itemBuilder $index items "
 //              "${items.length}");
 
-            if (index == 0) {
-              // return the header
-              // we should pass non-filtered list to extract non-filtered
-              // oldest message
-              return MessageListLoadMoreWidget();
-            } else {
-              // move start index
-              index -= 1;
-            }
+          if (index == 0) {
+            // return the header
+            // we should pass non-filtered list to extract non-filtered
+            // oldest message
+            return MessageListLoadMoreWidget();
+          } else {
+            // move start index
+            index -= 1;
+          }
 
-            if (index >= items.length || index < 0) {
-              return null;
-            }
+          if (index >= items.length || index < 0) {
+            return null;
+          }
 
-            var item = items[index];
-            var inSearchResults =
-                searchState?.isMessageListItemInSearchResults(item) ?? false;
-            return _buildListItem(context, item, inSearchResults);
-          }),
-    );
+          var item = items[index];
+          var inSearchResults =
+              searchState?.isMessageListItemInSearchResults(item) ?? false;
+          return _buildListItem(context, item, inSearchResults);
+        });
   }
 
   StreamBuilder<bool> _buildListViewEmptyWidget(BuildContext context) {

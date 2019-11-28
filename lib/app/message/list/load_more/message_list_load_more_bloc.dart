@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
@@ -5,9 +7,8 @@ import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-MyLogger _logger = MyLogger(logTag: "message_list_load_more_bloc.dart",
-    enabled: true);
-
+MyLogger _logger =
+    MyLogger(logTag: "message_list_load_more_bloc.dart", enabled: true);
 
 class MessageListLoadMoreBloc extends Providable {
   // ignore: close_sinks
@@ -16,7 +17,7 @@ class MessageListLoadMoreBloc extends Providable {
   LoadMoreState get state => _stateSubject.value;
 
   final ChannelBloc channelBloc;
-  final MessageListBloc messageListBloc;
+  MessageListBloc messageListBloc;
   MessageListLoadMoreBloc(this.channelBloc, this.messageListBloc) {
     addDisposable(subject: _stateSubject);
 
@@ -25,31 +26,28 @@ class MessageListLoadMoreBloc extends Providable {
             ? LoadMoreState.available
             : LoadMoreState.notAvailable);
 
-    addDisposable(streamSubscription: channelBloc.moreHistoryAvailableStream
-        .listen((moreHistoryAvailable) {
-      _updateLoadMoreState(moreHistoryAvailable);
+    addDisposable(streamSubscription:
+        channelBloc.moreHistoryAvailableStream.listen((moreHistoryAvailable) {
+          Future.delayed(Duration(seconds: 1),() {
+
+            _updateLoadMoreState(moreHistoryAvailable);
+          });
     }));
   }
 
   Future loadMore() async {
-    if(state == LoadMoreState.available) {
+    if (state == LoadMoreState.available) {
       _stateSubject.add(LoadMoreState.loading);
       var listState = messageListBloc.listState;
 
       var items = listState.items;
 
-      var oldestRegularItem = items?.firstWhere(
-              (item) => item.isHaveRegularMessage,
-          orElse: () => null);
+      var oldestRegularItem = items
+          ?.firstWhere((item) => item.isHaveRegularMessage, orElse: () => null);
 
       var oldestRegularMessage = oldestRegularItem.oldestRegularMessage;
 
-      var response = await channelBloc.loadMoreHistory(oldestRegularMessage);
-
-      var loadMoreResult = response.result;
-
-      var moreHistoryAvailable = loadMoreResult.moreHistoryAvailable;
-      _updateLoadMoreState(moreHistoryAvailable);
+      await channelBloc.loadMoreHistory(oldestRegularMessage);
 
     } else {
       _logger.w(() => "can't loadMore() because state = $state");
@@ -57,7 +55,7 @@ class MessageListLoadMoreBloc extends Providable {
   }
 
   void _updateLoadMoreState(bool moreHistoryAvailable) {
-    if(moreHistoryAvailable) {
+    if (moreHistoryAvailable) {
       _stateSubject.add(LoadMoreState.available);
     } else {
       _stateSubject.add(LoadMoreState.notAvailable);

@@ -35,7 +35,7 @@ MoreLoungeResponseBody _$MoreLoungeResponseBodyFromJson(
             ? null
             : MsgLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    json['moreHistoryAvailable'] as bool,
+    json['totalMessages'] as int,
   );
 }
 
@@ -44,7 +44,7 @@ Map<String, dynamic> _$MoreLoungeResponseBodyToJson(
     <String, dynamic>{
       'chan': instance.chan,
       'messages': instance.messages,
-      'moreHistoryAvailable': instance.moreHistoryAvailable,
+      'totalMessages': instance.totalMessages,
     };
 
 ChangelogLoungeResponseBody _$ChangelogLoungeResponseBodyFromJson(
@@ -805,6 +805,7 @@ ChannelLoungeResponseBodyPart _$ChannelLoungeResponseBodyPartFromJson(
             ? null
             : UserLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    json['totalMessages'] as int,
   );
 }
 
@@ -829,4 +830,5 @@ Map<String, dynamic> _$ChannelLoungeResponseBodyPartToJson(
       'unread': instance.unread,
       'highlight': instance.highlight,
       'users': instance.users,
+      'totalMessages': instance.totalMessages,
     };

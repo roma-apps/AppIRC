@@ -235,7 +235,7 @@ class AppIRCState extends State<AppIRC> {
         chatInitBloc, networksListBloc, preferencesService, chatPushesService);
 
     var channelsStatesBloc = ChannelStatesBloc(
-        loungeBackendService, networksListBloc, activeChannelBloc);
+        loungeBackendService, _database, networksListBloc, activeChannelBloc);
 
     var channelsBlocsBloc = ChannelBlocsBloc(loungeBackendService,
         chatPushesService, networksListBloc, channelsStatesBloc);

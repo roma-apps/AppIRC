@@ -538,6 +538,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       Network network,
       Channel channel,
       ChannelState Function() currentStateExtractor,
+      Future<int> Function() currentMessageCountExtractor,
       ChannelStateListener listener) {
     var disposable = CompositeDisposable([]);
     disposable.add(
@@ -553,12 +554,21 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       }
     }));
     disposable.add(
-        createEventListenerDisposable(MoreLoungeResponseBody.eventName, (raw) {
+        createEventListenerDisposable(MoreLoungeResponseBody.eventName, (raw)
+            async {
       var parsed = MoreLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == parsed.chan) {
         var channelState = currentStateExtractor();
-        channelState.moreHistoryAvailable = parsed.moreHistoryAvailable;
+
+        var currentMessageCount = await currentMessageCountExtractor();
+        var totalMessages = parsed.totalMessages;
+        var _moreHistoryAvailable = totalMessages > currentMessageCount;
+        _logger.d(() => "load more current $currentMessageCount totalMessages"
+            " totalMessages $totalMessages"
+            "_moreHistoryAvailable $_moreHistoryAvailable");
+
+        channelState.moreHistoryAvailable = _moreHistoryAvailable;
         listener(channelState);
       }
     }));

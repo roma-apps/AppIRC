@@ -231,7 +231,8 @@ class MessageListBloc extends Providable {
           _addCondensedItem(items, readyToCondenseMessages);
           readyToCondenseMessages = [];
         }
-        items.add(DaysDateSeparatorMessageListItem(currentMessageDate));
+        items
+            .add(DaysDateSeparatorMessageListItem(message, currentMessageDate));
       }
       lastMessageDate = currentMessageDate;
       if (message is RegularMessage) {

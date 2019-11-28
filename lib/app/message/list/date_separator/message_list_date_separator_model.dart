@@ -1,10 +1,12 @@
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 
 class DaysDateSeparatorMessageListItem extends MessageListItem {
   final DateTime dayFirstDate;
   DateTime _dayStartDate;
-  DaysDateSeparatorMessageListItem(this.dayFirstDate) {
+  final ChatMessage oldestMessage;
+  DaysDateSeparatorMessageListItem(this.oldestMessage, this.dayFirstDate) {
     _dayStartDate =
         DateTime(dayFirstDate.year, dayFirstDate.month, dayFirstDate.day);
   }
@@ -24,7 +26,7 @@ class DaysDateSeparatorMessageListItem extends MessageListItem {
   }
 
   @override
-  RegularMessage get oldestRegularMessage => null;
+  RegularMessage get oldestRegularMessage => oldestMessage as RegularMessage;
 
   @override
   bool isContainsText(String searchTerm, {bool ignoreCase}) => false;

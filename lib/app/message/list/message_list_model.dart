@@ -19,13 +19,13 @@ class MessageListVisibleBounds {
             maxRegularMessageRemoteId: messageRemoteId,
             updateType: MessageListVisibleBoundsUpdateType.push);
 
-
-  MessageListVisibleBounds.fromUi({@required int minRegularMessageRemoteId,
-    @required int maxRegularMessageRemoteId})
+  MessageListVisibleBounds.fromUi(
+      {@required int minRegularMessageRemoteId,
+      @required int maxRegularMessageRemoteId})
       : this._name(
-      minRegularMessageRemoteId: minRegularMessageRemoteId,
-      maxRegularMessageRemoteId: maxRegularMessageRemoteId,
-      updateType: MessageListVisibleBoundsUpdateType.ui);
+            minRegularMessageRemoteId: minRegularMessageRemoteId,
+            maxRegularMessageRemoteId: maxRegularMessageRemoteId,
+            updateType: MessageListVisibleBoundsUpdateType.ui);
 
   @override
   String toString() {
@@ -110,13 +110,13 @@ class MessageListState {
 }
 
 class MessageListLoadMore {
-  List<ChatMessage> messages;
-  bool moreHistoryAvailable;
+  final List<ChatMessage> messages;
+  final int totalMessages;
 
-  MessageListLoadMore(this.messages, this.moreHistoryAvailable);
+  MessageListLoadMore(this.messages, this.totalMessages);
 
   MessageListLoadMore.name(
-      {@required this.messages, @required this.moreHistoryAvailable});
+      {@required this.messages, @required this.totalMessages});
 }
 
 bool isHaveMessageRemoteId(
@@ -126,4 +126,14 @@ bool isHaveMessageRemoteId(
   } else {
     return false;
   }
+}
+
+class MessageListJumpDestination {
+  final List<MessageListItem> items;
+  final MessageListItem selectedFoundItem;
+  final double alignment;
+  MessageListJumpDestination(
+      {@required this.items,
+      @required this.selectedFoundItem,
+      @required this.alignment});
 }

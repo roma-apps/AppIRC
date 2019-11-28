@@ -5,12 +5,16 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
 import 'package:flutter_appirc/app/chat/active_channel/chat_active_channel_bloc.dart';
+import 'package:flutter_appirc/app/chat/db/chat_database.dart';
+import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ChannelStatesBloc extends ChannelListListenerBloc {
+  final ChatDatabase _db;
+
   final Map<String, Map<int, BehaviorSubject<ChannelState>>> _statesMap =
       Map();
   List<ChannelState> get allStates {
@@ -33,6 +37,7 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
 
   ChannelStatesBloc(
     this._backendService,
+    this._db,
     NetworkListBloc networksListBloc,
     this._activeChannelBloc,
   ) : super(networksListBloc) {
@@ -131,6 +136,7 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
             network,
             channel,
             () => _getStateSubjectForChannel(network, channel).value,
+            () => calculateChannelMessagesCount(channel),
             (state) {
       _updateState(network, channel, state);
     }));
@@ -151,4 +157,14 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
     _onStateChanged(state);
 //    });
   }
+
+  Future<int> calculateChannelMessagesCount(Channel channel) async {
+
+    var result = await _db.database.rawQuery(RegularMessageDao
+        .createChannelMessagesCountQuery
+      (channel));
+
+    return RegularMessageDao.extractCountFromQueryResult(result);
+  }
+
 }

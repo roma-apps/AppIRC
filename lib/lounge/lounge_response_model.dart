@@ -118,14 +118,16 @@ class MoreLoungeResponseBody extends LoungeResponseBody {
 
   final int chan;
   final List<MsgLoungeResponseBodyPart> messages;
-  final bool moreHistoryAvailable;
+  final int totalMessages;
 
-  MoreLoungeResponseBody(this.chan, this.messages, this.moreHistoryAvailable);
+  MoreLoungeResponseBody(this.chan, this.messages, this.totalMessages);
 
   @override
   String toString() {
-    return 'MoreLoungeResponseBody{chan: $chan, messages: $messages,'
-        ' moreHistoryAvailable: $moreHistoryAvailable}';
+    return 'MoreLoungeResponseBody{chan: $chan,'
+        ' totalMessages: $totalMessages'
+        ' messages: $messages,'
+        '}';
   }
 
   factory MoreLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -1029,6 +1031,7 @@ class ChannelLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final int unread;
   final int highlight;
   final List<UserLoungeResponseBodyPart> users;
+  final int totalMessages;
 
   @override
   String toString() {
@@ -1040,6 +1043,7 @@ class ChannelLoungeResponseBodyPart extends LoungeResponseBodyPart {
         'historyLoading: $historyLoading, editTopic: $editTopic, '
         'scrolledToBottom: $scrolledToBottom, topic: $topic, '
         'state: $state, firstUnread: $firstUnread, '
+        'totalMessages: $totalMessages, '
         'unread: $unread, highlight: $highlight, users: $users}';
   }
 
@@ -1061,7 +1065,8 @@ class ChannelLoungeResponseBodyPart extends LoungeResponseBodyPart {
       this.firstUnread,
       this.unread,
       this.highlight,
-      this.users);
+      this.users,
+      this.totalMessages);
 
   factory ChannelLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$ChannelLoungeResponseBodyPartFromJson(json);

@@ -2,12 +2,25 @@ import 'dart:convert';
 
 import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/message/message_db.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 
 @dao
 abstract class RegularMessageDao {
+  static String createChannelMessagesCountQuery(Channel channel) =>
+      'SELECT COUNT(*) FROM RegularMessageDB WHERE channelRemoteId = ${channel.remoteId}';
+
+  static int extractCountFromQueryResult(List<Map<String, dynamic>> result) {
+    var key = "COUNT(*)";
+    var pair = result.firstWhere((map) {
+      return map.containsKey(key);
+    });
+
+    return pair[key];
+  }
+
   @Query('SELECT * FROM RegularMessageDB')
   Future<List<RegularMessageDB>> getAllMessages();
 

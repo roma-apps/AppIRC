@@ -294,6 +294,16 @@ ChannelState toChannelState(
   var isConnected = type == ChannelType.query || type == ChannelType.special
       ? true
       : loungeChannel.state == ChannelStateLoungeConstants.connected;
+  var moreHistoryAvailable = loungeChannel.moreHistoryAvailable;
+  // very strange lounge behaviour
+  // sometimes lounge send moreHistoryAvailable and sometimes totalMessages
+  // todo: report to lounge
+  if (moreHistoryAvailable == null &&
+      loungeChannel.totalMessages != null &&
+      loungeChannel.messages != null) {
+    moreHistoryAvailable =
+        loungeChannel.totalMessages > loungeChannel.messages.length;
+  }
   return ChannelState.name(
       topic: loungeChannel.topic,
       firstUnreadRemoteMessageId: loungeChannel.firstUnread,
@@ -301,7 +311,7 @@ ChannelState toChannelState(
       unreadCount: loungeChannel.unread,
       connected: isConnected,
       highlighted: loungeChannel.highlight != null,
-      moreHistoryAvailable: loungeChannel.moreHistoryAvailable);
+      moreHistoryAvailable: moreHistoryAvailable);
 }
 
 NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
@@ -321,8 +331,7 @@ Future<MessageListLoadMore> toChatLoadMore(
   }
 
   return MessageListLoadMore.name(
-      messages: messages,
-      moreHistoryAvailable: moreLoungeResponseBody.moreHistoryAvailable);
+      messages: messages, totalMessages: moreLoungeResponseBody.totalMessages);
 }
 
 RegularMessageType detectRegularMessageType(String stringType) {
@@ -562,21 +571,18 @@ Future<NetworkWithState> toNetworkWithState(
   return networkWithState;
 }
 
-
-ChatRegistrationResult toChatRegistrationResult(RegistrationResponseBody parsed) {
-  if(parsed.success) {
+ChatRegistrationResult toChatRegistrationResult(
+    RegistrationResponseBody parsed) {
+  if (parsed.success) {
     return ChatRegistrationResult.success();
   } else {
-
-    return ChatRegistrationResult.fail(toChatRegistrationErrorType(parsed
-        .errorType));
+    return ChatRegistrationResult.fail(
+        toChatRegistrationErrorType(parsed.errorType));
   }
-
 }
 
 RegistrationErrorType toChatRegistrationErrorType(String errorType) {
-
-  switch(errorType) {
+  switch (errorType) {
     case RegistrationResponseBody.errorTypeInvalid:
       return RegistrationErrorType.invalid;
       break;

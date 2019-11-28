@@ -143,6 +143,7 @@ abstract class ChatBackendService implements Providable {
       Network network,
       Channel channel,
       ChannelState Function() currentStateExtractor,
+      Future<int> Function() currentMessageCountExtractor,
       ChannelStateListener listener);
 
   Disposable listenForChannelNames(Network network,
