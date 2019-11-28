@@ -50,9 +50,8 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
         pushesService.chatPushMessageStream.listen((chatPushMessage) async {
       _logger.d(() => "chatPushMessageStream $chatPushMessage");
 
-      var chanIdString = chatPushMessage.data?.chanId;
-      if (chanIdString != null) {
-        var channelRemoteId = int.parse(chanIdString);
+      var channelRemoteId = chatPushMessage.data?.chanId;
+      if (channelRemoteId != null) {
         if (chatPushMessage.type == PushMessageType.resume) {
           var channel = await findChannelWithRemoteID(channelRemoteId);
 

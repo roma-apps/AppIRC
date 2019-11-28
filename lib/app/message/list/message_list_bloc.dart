@@ -118,10 +118,8 @@ class MessageListBloc extends Providable {
     _searchStateSubject = BehaviorSubject(seedValue: initSearchState);
   }
 
-  void _onMessagesChanged(
-      List<ChatMessage> newMessages,
-      bool moreHistoryAvailable,
-      MessageListUpdateType lastAddedPosition) {
+  void _onMessagesChanged(List<ChatMessage> newMessages,
+      bool moreHistoryAvailable, MessageListUpdateType lastAddedPosition) {
     _logger.d(() => "newMessages = ${newMessages.length} "
         "moreHistoryAvailable = $moreHistoryAvailable");
 
@@ -131,10 +129,8 @@ class MessageListBloc extends Providable {
         messageListItems, moreHistoryAvailable, lastAddedPosition);
   }
 
-  void _updateMessageListItems(
-      List<MessageListItem> messageListItems,
-      bool moreHistoryAvailable,
-      MessageListUpdateType lastAddedPosition) {
+  void _updateMessageListItems(List<MessageListItem> messageListItems,
+      bool moreHistoryAvailable, MessageListUpdateType lastAddedPosition) {
     var messageListState = MessageListState.name(
         items: messageListItems,
         moreHistoryAvailable: moreHistoryAvailable,

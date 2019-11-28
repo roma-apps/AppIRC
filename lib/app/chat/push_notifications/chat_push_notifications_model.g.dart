@@ -23,7 +23,8 @@ Map<String, dynamic> _$ChatPushMessageNotificationToJson(
 
 ChatPushMessageData _$ChatPushMessageDataFromJson(Map<String, dynamic> json) {
   return ChatPushMessageData(
-    json['chanId'] as String,
+    int.parse(json['messageId'] as String),
+    int.parse(json['chanId'] as String),
     json['body'] as String,
     json['type'] as String,
     json['timestamp'] as String,
@@ -34,6 +35,7 @@ ChatPushMessageData _$ChatPushMessageDataFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$ChatPushMessageDataToJson(
         ChatPushMessageData instance) =>
     <String, dynamic>{
+      'messageId': instance.messageId,
       'chanId': instance.chanId,
       'body': instance.body,
       'type': instance.type,

@@ -8,6 +8,7 @@ import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_bloc.dart';
+import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
@@ -21,6 +22,8 @@ final Duration _usersListOutDateDuration = Duration(seconds: 15);
 
 class ChannelBloc extends DisposableOwner implements MoreHistoryOwner {
   final ChatBackendService _backendService;
+  final ChatPushesService chatPushesService;
+
   final Network network;
   Channel _channel;
   Channel get channel => _channel;
@@ -34,13 +37,13 @@ class ChannelBloc extends DisposableOwner implements MoreHistoryOwner {
 
   ChatInputMessageBloc get inputMessageBloc => _inputMessageBloc;
 
-  ChannelBloc(this._backendService, this.network,
+  ChannelBloc(this._backendService, this.chatPushesService, this.network,
       ChannelWithState channelWithState, this._channelsStatesBloc) {
     _channel = channelWithState.channel;
     _usersSubject =
         BehaviorSubject(seedValue: channelWithState.initUsers ?? []);
 
-    _messagesBloc = ChannelMessageListBloc(channel);
+    _messagesBloc = ChannelMessageListBloc(chatPushesService, channel);
     addDisposable(disposable: _messagesBloc);
 
     addDisposable(subject: _usersSubject);

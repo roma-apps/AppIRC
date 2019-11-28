@@ -5,6 +5,7 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
+import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
@@ -17,9 +18,10 @@ class ChannelBlocsBloc extends ChannelListListenerBloc {
 
   Map<Channel, ChannelBloc> _blocs = Map();
   final ChatBackendService _backendService;
+  final ChatPushesService chatPushesService;
   final ChannelStatesBloc _channelsStatesBloc;
 
-  ChannelBlocsBloc(this._backendService,
+  ChannelBlocsBloc(this._backendService, this.chatPushesService,
       NetworkListBloc networksListBloc, this._channelsStatesBloc)
       : super(networksListBloc) {
     addDisposable(disposable: CustomDisposable(() {
@@ -37,7 +39,8 @@ class ChannelBlocsBloc extends ChannelListListenerBloc {
   void onChannelJoined(
       Network network, ChannelWithState channelWithState) {
     _blocs[channelWithState.channel] = ChannelBloc(
-        _backendService, network, channelWithState, _channelsStatesBloc);
+        _backendService, chatPushesService,  network, channelWithState,
+        _channelsStatesBloc);
   }
 
   @override

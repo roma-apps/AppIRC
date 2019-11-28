@@ -87,7 +87,6 @@ final String relativePathToLangsFolder = 'assets/langs';
 final List<Locale> supportedLocales = [Locale('en', 'US')];
 
 Future main() async {
-
 //  changeToCupertinoPlatformAware();
 
   var preferencesService = PreferencesService();
@@ -110,14 +109,12 @@ Future main() async {
   runZoned<Future<void>>(() async {
     runApp(EasyLocalization(
         child: Provider(
-          providable: SocketIOManagerProvider(socketIOManager),
-          child: Provider(
-              child: Provider(providable: preferencesService, child: AppIRC()),
-              providable: loungePreferencesBloc),
-        )));
+      providable: SocketIOManagerProvider(socketIOManager),
+      child: Provider(
+          child: Provider(providable: preferencesService, child: AppIRC()),
+          providable: loungePreferencesBloc),
+    )));
   }, onError: Crashlytics.instance.recordError);
-
-
 }
 
 class AppIRC extends StatefulWidget {
@@ -209,8 +206,6 @@ class AppIRCState extends State<AppIRC> {
 
     await loungeBackendService.init();
 
-
-
     this._loungeBackendService = loungeBackendService;
 
     var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);
@@ -242,8 +237,8 @@ class AppIRCState extends State<AppIRC> {
     var channelsStatesBloc = ChannelStatesBloc(
         loungeBackendService, networksListBloc, activeChannelBloc);
 
-    var channelsBlocsBloc = ChannelBlocsBloc(
-        loungeBackendService, networksListBloc, channelsStatesBloc);
+    var channelsBlocsBloc = ChannelBlocsBloc(loungeBackendService,
+        chatPushesService, networksListBloc, channelsStatesBloc);
     var networksBlocsBloc = NetworkBlocsBloc(
         loungeBackendService,
         networksListBloc,
@@ -258,14 +253,12 @@ class AppIRCState extends State<AppIRC> {
 
     var chatUnreadBloc = ChannelListUnreadCountBloc(channelsStatesBloc);
 
-
     var chatPreferencesSaverBloc = ChatPreferencesSaverBloc(
-                                              loungeBackendService,
-                                              networkStatesBloc,
-                                              networksListBloc,
-                                              chatPreferencesBloc,
-                                              chatInitBloc);
-
+        loungeBackendService,
+        networkStatesBloc,
+        networksListBloc,
+        chatPreferencesBloc,
+        chatInitBloc);
 
     Disposable signOutListener;
     signOutListener = loungeBackendService.listenForSignOut(() {
@@ -274,15 +267,12 @@ class AppIRCState extends State<AppIRC> {
       this._loungeBackendService = null;
       this._loungePreferences = LoungePreferences.empty;
 
-
-
       var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
       loungePreferencesBloc.setValue(_loungePreferences);
 
       signOutListener.dispose();
 
       setState(() {});
-
     });
     _createdWidget = Provider(
       providable: chatDeepLinkBloc,
@@ -350,9 +340,9 @@ class AppIRCState extends State<AppIRC> {
   Widget _buildAppForStartLoungePreferences(BuildContext context) {
     var settings = createDefaultLoungePreferences(context);
     var connectionBloc = LoungeConnectionBloc(
-            Provider.of<SocketIOManagerProvider>(context).manager,
-            settings.hostPreferences,
-            settings.authPreferences);
+        Provider.of<SocketIOManagerProvider>(context).manager,
+        settings.hostPreferences,
+        settings.authPreferences);
     return Provider(
         providable: connectionBloc,
         child: Provider(
@@ -464,7 +454,8 @@ class AppIRCState extends State<AppIRC> {
                                                                 path:
                                                                     relativePathToLangsFolder),
                                                           ],
-                                                          debugShowCheckedModeBanner: false,
+                                                          debugShowCheckedModeBanner:
+                                                              false,
                                                           supportedLocales:
                                                               supportedLocales,
                                                           locale:

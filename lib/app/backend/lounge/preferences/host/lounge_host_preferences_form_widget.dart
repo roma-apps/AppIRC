@@ -7,7 +7,6 @@ import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 
 MyLogger _logger = MyLogger(
     logTag: "lounge_connection_preferences_form_widget.dart", enabled: true);
@@ -15,20 +14,19 @@ MyLogger _logger = MyLogger(
 class LoungeHostPreferencesFormWidget extends StatefulWidget {
   final LoungeHostPreferencesFormBloc _hostPreferencesFormBloc;
 
-  LoungeHostPreferencesFormWidget(
-      this._hostPreferencesFormBloc);
+  LoungeHostPreferencesFormWidget(this._hostPreferencesFormBloc);
 
   @override
-  State<StatefulWidget> createState() =>
-      LoungeHostPreferencesFormWidgetState(_hostPreferencesFormBloc.extractData());
+  State<StatefulWidget> createState() => LoungeHostPreferencesFormWidgetState(
+      _hostPreferencesFormBloc.extractData());
 }
 
 class LoungeHostPreferencesFormWidgetState
     extends State<LoungeHostPreferencesFormWidget> {
-
   TextEditingController _hostController;
 
-  LoungeHostPreferencesFormWidgetState(LoungeHostPreferences loungeHostPreferences) {
+  LoungeHostPreferencesFormWidgetState(
+      LoungeHostPreferences loungeHostPreferences) {
     _hostController = TextEditingController(text: loungeHostPreferences.host);
   }
 
@@ -37,8 +35,6 @@ class LoungeHostPreferencesFormWidgetState
     super.initState();
 
     Future.delayed(Duration.zero, () {
-
-
       widget._hostPreferencesFormBloc.hostFieldBloc.valueStream
           .distinct()
           .listen((String newHost) {

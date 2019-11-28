@@ -92,9 +92,9 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         ChannelBloc channelBloc = ChannelBloc.of(context);
 
         channelBloc.messagesBloc.onVisibleMessagesBounds(
-            MessageListVisibleBounds(
-                min: _lastBuildItems[minIndex],
-                max: _lastBuildItems[maxIndex]));
+            MessageListVisibleBounds.fromUi(
+                minRegularMessageRemoteId: _lastBuildItems[minIndex].oldestRegularMessage?.messageRemoteId,
+                maxRegularMessageRemoteId: _lastBuildItems[maxIndex].oldestRegularMessage?.messageRemoteId));
       }
     }
   }
@@ -162,6 +162,16 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       });
     }
 
+
+    if (visibleMessagesBounds?.updateType ==
+    MessageListVisibleBoundsUpdateType.push) {
+      Timer.run(() {
+        _jumpToMessage(
+            chatMessageListState.items, initScrollPositionItem,
+            alignment: 0.5);
+      });
+    }
+
     return StreamBuilder<MessageListSearchState>(
         stream: chatListMessagesBloc.searchStateStream,
         initialData: chatListMessagesBloc.searchState,
@@ -201,7 +211,11 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     MessageListItem initScrollPositionItem;
 
     if (visibleMessagesBounds != null) {
-      initScrollPositionItem = visibleMessagesBounds.min;
+      var remoteId  = visibleMessagesBounds.minRegularMessageRemoteId;
+      initScrollPositionItem = items.firstWhere((item) {
+        return item.isContainsMessageWithRemoteId(remoteId);
+      }, orElse: () => null);
+//      initScrollPositionItem = visibleMessagesBounds.min;
     } else {
       ChannelBloc channelBloc = ChannelBloc.of(context);
       var firstUnreadRemoteMessageId =
