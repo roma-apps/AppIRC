@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -27,7 +28,8 @@ class LoungeConnectionPageState extends State<LoungeConnectionPage> {
   Widget build(BuildContext context) {
     LoungeConnectionBloc connectionBloc = Provider.of(context);
     var loungePreferences = connectionBloc.preferences;
-    return PlatformScaffold(
+    return buildPlatformScaffold(
+      context,
       iosContentBottomPadding: true,
       iosContentPadding: false,
       appBar: PlatformAppBar(

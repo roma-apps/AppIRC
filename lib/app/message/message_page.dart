@@ -62,15 +62,17 @@ class MessagePage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     var channelBloc = ChannelBlocsBloc.of(context).getChannelBloc(channel);
-    return Provider(
-        providable: ChannelBlocProvider(channelBloc),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: buildMessageWidget(
-              message: message,
-              messageWidgetType: MessageWidgetType.raw,
-              inSearchResults: false,
-              enableMessageActions: false),
-        ));
+    return SafeArea(
+      child: Provider(
+          providable: ChannelBlocProvider(channelBloc),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildMessageWidget(
+                message: message,
+                messageWidgetType: MessageWidgetType.raw,
+                inSearchResults: false,
+                enableMessageActions: false),
+          )),
+    );
   }
 }

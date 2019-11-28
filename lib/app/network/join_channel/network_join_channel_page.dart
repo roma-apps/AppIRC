@@ -9,6 +9,7 @@ import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -36,7 +37,8 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
     var appLocalizations = AppLocalizations.of(context);
     var channelJoinFormBloc = NetworkJoinChannelFormBloc();
     var networkBloc = NetworkBlocsBloc.of(context).getNetworkBloc(network);
-    return PlatformScaffold(
+    return buildPlatformScaffold(
+      context,
       appBar: PlatformAppBar(
         title: Text(appLocalizations.tr('chat.network.join_channel.title')),
       ),

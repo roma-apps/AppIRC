@@ -4,6 +4,7 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_form_
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_widget.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -96,7 +97,8 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
+    return buildPlatformScaffold(
+      context,
       iosContentBottomPadding: true,
       iosContentPadding: false,
       appBar: PlatformAppBar(

@@ -33,6 +33,7 @@ import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware.dart'
     as platform_aware;
+import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/skin_model.dart';
@@ -72,7 +73,8 @@ class _ChatPageState extends State<ChatPage> {
           // PlatformScaffold without custom ios key works good on iOS
           // and keyboard appears as excepted
           if (platform_aware.isMaterial) {
-            return PlatformScaffold(
+            return buildPlatformScaffold(
+                context,
                 android: (context) => MaterialScaffoldData(
                     widgetKey: _scaffoldKey,
                     appBar: AppBar(
@@ -88,7 +90,8 @@ class _ChatPageState extends State<ChatPage> {
                     drawer: Drawer(child: ChatDrawerWidget()),
                     body: _buildBody(context)));
           } else if (platform_aware.isCupertino) {
-            return PlatformScaffold(
+            return buildPlatformScaffold(
+                context,
                 iosContentBottomPadding: true,
                 iosContentPadding: false,
                 appBar: PlatformAppBar(

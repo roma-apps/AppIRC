@@ -206,8 +206,10 @@ Widget buildMessageRawBody(
       Card(
           child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child:
-            SelectableText(text, style: messageSkinBloc.messageBodyTextStyle),
+        child: SelectableText(text,
+            toolbarOptions: ToolbarOptions(
+                copy: true, selectAll: true, cut: false, paste: false),
+            style: messageSkinBloc.messageBodyTextStyle),
       )),
     ],
   );

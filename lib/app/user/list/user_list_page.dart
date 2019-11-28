@@ -6,6 +6,7 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/user/list/user_list_bloc.dart';
 import 'package:flutter_appirc/app/user/list/user_list_widget.dart';
+import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -34,7 +35,8 @@ class ChannelUsersPageState extends State<ChannelUsersPage> {
 
     var channelUsersListBloc = ChannelUsersListBloc(channelBloc);
 
-    return PlatformScaffold(
+    var platformScaffold = buildPlatformScaffold(
+      context,
       appBar: PlatformAppBar(
         title: Text(AppLocalizations.of(context).tr('chat.users_list.title')),
       ),
@@ -50,5 +52,6 @@ class ChannelUsersPageState extends State<ChannelUsersPage> {
         ),
       ),
     );
+    return platformScaffold;
   }
 }
