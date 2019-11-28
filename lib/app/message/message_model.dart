@@ -20,6 +20,8 @@ abstract class ChatMessage {
 
   bool get isRegular => chatMessageType == ChatMessageType.regular;
 
+
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

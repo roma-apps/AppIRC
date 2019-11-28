@@ -104,6 +104,7 @@ class RegularMessage extends ChatMessage {
 
     return contains;
   }
+
 }
 
 enum RegularMessageType {

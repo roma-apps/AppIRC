@@ -23,8 +23,8 @@ Map<String, dynamic> _$ChatPushMessageNotificationToJson(
 
 ChatPushMessageData _$ChatPushMessageDataFromJson(Map<String, dynamic> json) {
   return ChatPushMessageData(
-    int.parse(json['messageId'] as String),
-    int.parse(json['chanId'] as String),
+    _parseJsonInt(json['messageId'] as String),
+    _parseJsonInt(json['chanId'] as String),
     json['body'] as String,
     json['type'] as String,
     json['timestamp'] as String,

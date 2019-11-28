@@ -6,6 +6,7 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
+import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
@@ -14,14 +15,8 @@ import 'package:flutter_appirc/provider/provider.dart';
 
 class CondensedMessageWidget extends StatefulWidget {
   final CondensedMessageListItem _condensedMessageListItem;
-  final bool _inSearchResults;
-  final String _searchTerm;
 
-  bool get _expanded =>
-      _condensedMessageListItem.isCondensed == false || _inSearchResults;
-
-  CondensedMessageWidget(
-      this._condensedMessageListItem, this._inSearchResults, this._searchTerm);
+  CondensedMessageWidget(this._condensedMessageListItem);
 
   @override
   _CondensedMessageWidgetState createState() => _CondensedMessageWidgetState();
@@ -30,52 +25,54 @@ class CondensedMessageWidget extends StatefulWidget {
 class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
   @override
   Widget build(BuildContext context) {
-    if (widget._expanded) {
+    bool expanded = widget._condensedMessageListItem.isCondensed == false ||
+        _isInSearchResults(context);
+    if (expanded) {
       return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            _buildCondensedTitle(context, widget._condensedMessageListItem),
+            _buildCondensedTitle(
+                context, widget._condensedMessageListItem, expanded),
             _buildCondensedBody(context, widget._condensedMessageListItem),
           ]);
     } else {
-      return _buildCondensedTitle(context, widget._condensedMessageListItem);
+      return _buildCondensedTitle(
+          context, widget._condensedMessageListItem, expanded);
     }
   }
 
-  Widget _buildCondensedTitle(
-      BuildContext context, CondensedMessageListItem condensedMessageListItem) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <
-        Widget>[
-      Flexible(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: _buildCondensedTitleMessage(context, condensedMessageListItem),
-        ),
-      ),
-      Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: _buildCondensedTitleButton(context, condensedMessageListItem)),
-    ]);
+  Widget _buildCondensedTitle(BuildContext context,
+      CondensedMessageListItem condensedMessageListItem, bool expanded) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: _buildCondensedTitleMessage(
+                  context, condensedMessageListItem),
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: _buildCondensedTitleButton(
+                  context, condensedMessageListItem, expanded)),
+        ]);
   }
 
   Widget _buildCondensedBody(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
+    MessageListBloc messageListBloc = Provider.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: condensedMessageListItem.messages.map((message) {
-        var searchTerm = widget._searchTerm;
-        bool inSearchResults;
-        if (widget._inSearchResults) {
-          inSearchResults =
-              message.isContainsText(searchTerm, ignoreCase: true);
-        } else {
-          inSearchResults = false;
-        }
-        return buildDecoratedMessageWidget(
-            context: context,
+        var inSearchResults = messageListBloc.isMessageInSearchResults(message);
+        return buildMessageWidget(
             message: message,
             inSearchResults: inSearchResults,
-            searchTerm: searchTerm);
+            enableMessageActions: true,
+            messageWidgetType: MessageWidgetType.formatted);
       }).toList(),
     );
   }
@@ -115,23 +112,22 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
         ));
   }
 
-  Widget _buildCondensedTitleButton(
-      BuildContext context, CondensedMessageListItem condensedMessageListItem) {
+  Widget _buildCondensedTitleButton(BuildContext context,
+      CondensedMessageListItem condensedMessageListItem, bool expanded) {
     var messagesSkin = Provider.of<MessageSkinBloc>(context);
     return GestureDetector(
         onTap: () {
           _toggleCondensed(context);
         },
         child: Icon(
-          widget._expanded ? Icons.arrow_drop_down : Icons.arrow_right,
+          expanded ? Icons.arrow_drop_down : Icons.arrow_right,
           color: messagesSkin.messageBodyTextStyle.color,
         ));
   }
 
   void _toggleCondensed(BuildContext context) {
     var messageListItem = widget._condensedMessageListItem;
-    messageListItem.isCondensed =
-        !messageListItem.isCondensed;
+    messageListItem.isCondensed = !messageListItem.isCondensed;
 
     ChannelBloc channelBloc = ChannelBloc.of(context);
     MessageCondensedBloc condensedBloc = Provider.of(context);
@@ -139,5 +135,12 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     condensedBloc.onCondensedStateChanged(channelBloc.channel, messageListItem);
 
     setState(() {});
+  }
+
+  bool _isInSearchResults(BuildContext context) {
+    MessageListBloc messageListBloc = Provider.of(context);
+
+    return messageListBloc
+        .isListItemInSearchResults(widget._condensedMessageListItem);
   }
 }

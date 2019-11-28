@@ -52,6 +52,8 @@ class MessageListBloc extends Providable {
 
   MessageListSearchState get searchState => _searchStateSubject.value;
 
+  String get searchTerm => searchState.searchTerm;
+
   MessageListBloc(this._channelMessagesListBloc, this._messageLoaderBloc,
       this._moreHistoryOwner, this._messageCondensedBloc) {
     init();
@@ -256,5 +258,25 @@ class MessageListBloc extends Providable {
     }
 
     return items;
+  }
+
+  bool isListItemInSearchResults(MessageListItem messageListItem) {
+    if (searchState != null) {
+      return searchState.isMessageListItemInSearchResults(messageListItem);
+    } else {
+      return false;
+    }
+  }
+
+  bool isMessageInSearchResults(ChatMessage message) {
+    bool inSearchResults;
+    var term = this.searchTerm;
+    if (term != null) {
+      inSearchResults = message.isContainsText(searchTerm, ignoreCase: true);
+    } else {
+      inSearchResults = false;
+    }
+
+    return inSearchResults;
   }
 }

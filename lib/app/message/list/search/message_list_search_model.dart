@@ -39,6 +39,6 @@ class MessageListSearchState {
         ' selectedFoundItem: $selectedFoundMessageIndex}';
   }
 
-  bool isMessageInSearchResults(MessageListItem item) =>
+  bool isMessageListItemInSearchResults(MessageListItem item) =>
       foundItems?.contains(item) ?? false;
 }

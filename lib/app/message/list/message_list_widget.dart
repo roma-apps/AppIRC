@@ -93,8 +93,12 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
         channelBloc.messagesBloc.onVisibleMessagesBounds(
             MessageListVisibleBounds.fromUi(
-                minRegularMessageRemoteId: _lastBuildItems[minIndex].oldestRegularMessage?.messageRemoteId,
-                maxRegularMessageRemoteId: _lastBuildItems[maxIndex].oldestRegularMessage?.messageRemoteId));
+                minRegularMessageRemoteId: _lastBuildItems[minIndex]
+                    .oldestRegularMessage
+                    ?.messageRemoteId,
+                maxRegularMessageRemoteId: _lastBuildItems[maxIndex]
+                    .oldestRegularMessage
+                    ?.messageRemoteId));
       }
     }
   }
@@ -146,7 +150,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
             alignment: 0.1);
       });
     }
-    if (chatMessageListState.updateType == MessageListUpdateType.replacedByBackend) {
+    if (chatMessageListState.updateType ==
+        MessageListUpdateType.replacedByBackend) {
       Timer.run(() {
         _jumpToMessage(
             chatMessageListState.items, chatMessageListState.items.last,
@@ -154,20 +159,18 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       });
     }
 
-    if (chatMessageListState.updateType == MessageListUpdateType.loadedFromLocalDatabase) {
+    if (chatMessageListState.updateType ==
+        MessageListUpdateType.loadedFromLocalDatabase) {
       Timer.run(() {
-        _jumpToMessage(
-            chatMessageListState.items, initScrollPositionItem,
+        _jumpToMessage(chatMessageListState.items, initScrollPositionItem,
             alignment: 0);
       });
     }
 
-
     if (visibleMessagesBounds?.updateType ==
-    MessageListVisibleBoundsUpdateType.push) {
+        MessageListVisibleBoundsUpdateType.push) {
       Timer.run(() {
-        _jumpToMessage(
-            chatMessageListState.items, initScrollPositionItem,
+        _jumpToMessage(chatMessageListState.items, initScrollPositionItem,
             alignment: 0.5);
       });
     }
@@ -201,7 +204,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     _logger.d(() => "_jumpToMessage $selectedFoundItem"
         "indexToJump $indexToJump");
     _scrollController?.jumpTo(
-        index: indexToJump + _lastBuildMessagesStartIndex, alignment: alignment);
+        index: indexToJump + _lastBuildMessagesStartIndex,
+        alignment: alignment);
   }
 
   MessageListItem _calculateInitScrollPositionMessage(
@@ -211,7 +215,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     MessageListItem initScrollPositionItem;
 
     if (visibleMessagesBounds != null) {
-      var remoteId  = visibleMessagesBounds.minRegularMessageRemoteId;
+      var remoteId = visibleMessagesBounds.minRegularMessageRemoteId;
       initScrollPositionItem = items.firstWhere((item) {
         return item.isContainsMessageWithRemoteId(remoteId);
       }, orElse: () => null);
@@ -306,9 +310,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
           var item = items[index];
           var inSearchResults =
-              searchState?.isMessageInSearchResults(item) ?? false;
-          return _buildListItem(
-              context, item, inSearchResults, searchState?.searchTerm);
+              searchState?.isMessageListItemInSearchResults(item) ?? false;
+          return _buildListItem(context, item, inSearchResults);
         });
   }
 
@@ -360,16 +363,16 @@ Widget _buildLoadMoreButton(
         child: Text(AppLocalizations.of(context)
             .tr("chat.messages_list.action.load_more")));
 
-Widget _buildListItem(BuildContext context, MessageListItem item,
-    bool inSearchResults, String searchTerm) {
+Widget _buildListItem(
+    BuildContext context, MessageListItem item, bool inSearchResults) {
   if (item is SimpleMessageListItem) {
-    return buildDecoratedMessageWidget(
-        context: context,
-        message: item.message,
+    return buildMessageWidget(
+        message:item.message,
         inSearchResults: inSearchResults,
-        searchTerm: searchTerm);
+        enableMessageActions: true,
+        messageWidgetType: MessageWidgetType.formatted);
   } else if (item is CondensedMessageListItem) {
-    return CondensedMessageWidget(item, inSearchResults, searchTerm);
+    return CondensedMessageWidget(item);
   } else if (item is DaysDateSeparatorMessageListItem) {
     return DaysDateSeparatorMessageListItemWidget(item);
   } else {

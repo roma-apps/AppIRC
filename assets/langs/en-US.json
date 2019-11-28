@@ -298,6 +298,13 @@
       "loading": "Loading messages..."
     },
     "message": {
+      "title": {
+        "simple": "Message",
+        "from": "Message from {}"
+      },
+      "action": {
+        "copy": "Copy text body"
+      },
       "condensed": {
         "join_separator": ", "
       },

@@ -9,23 +9,34 @@ var _onlyDateFormatter = new DateFormat().add_yMd();
 
 class DaysDateSeparatorMessageListItemWidget extends StatelessWidget {
   final DaysDateSeparatorMessageListItem item;
+
   DaysDateSeparatorMessageListItemWidget(this.item);
 
   @override
   Widget build(BuildContext context) {
+    var date = item.dayFirstDate;
 
-    MessageSkinBloc messageSkinBloc = Provider.of(context);
-    var borderSide = BorderSide(color: Colors.grey);
-    return Container(
-      decoration: BoxDecoration(border: Border(top: borderSide)),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-          _onlyDateFormatter.format(item.dayFirstDate),
-          style: messageSkinBloc.messageBodyTextStyle,
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
+    return _buildDateWidget(context, date);
   }
+}
+
+Container _buildDateWidget(BuildContext context, DateTime date) {
+  var dateString = _onlyDateFormatter.format(date);
+  return buildMessageDateWidget(context, dateString);
+}
+
+Container buildMessageDateWidget(BuildContext context, String dateString) {
+  MessageSkinBloc messageSkinBloc = Provider.of(context);
+  var borderSide = BorderSide(color: Colors.grey);
+  return Container(
+    decoration: BoxDecoration(border: Border(top: borderSide)),
+    child: Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Text(
+        dateString,
+        style: messageSkinBloc.messageBodyTextStyle,
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
 }

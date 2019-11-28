@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_nickname_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_search_highlight.dart';
+import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_widget.dart';
@@ -15,54 +16,88 @@ import 'package:flutter_appirc/span_builder/span_builder.dart';
 final int _longMessageTextMinimumLength = 10;
 final String _paramsMessageBodyTextSeparator = ", ";
 
-Widget buildRegularMessageWidget(
-    {@required BuildContext context,
-    @required RegularMessage message,
-    @required bool isHighlightedBySearch,
-    @required String searchTerm}) {
-  RegularMessageSkinBloc regularMessageSkinBloc = Provider.of(context);
-  var color =
-      regularMessageSkinBloc.getColorForMessageType(message.regularMessageType);
+class RegularMessageWidget extends MessageWidget<RegularMessage> {
+  RegularMessageWidget(
+      {@required RegularMessage message,
+      @required bool enableMessageActions,
+      @required bool inSearchResults,
+      @required MessageWidgetType messageWidgetType})
+      : super(
+            message: message,
+            inSearchResults: inSearchResults,
+            enableMessageActions: enableMessageActions,
+            messageWidgetType: messageWidgetType);
 
-  var spans = <InlineSpan>[];
-  spans.add(buildMessageDateTextSpan(
-      context: context, date: message.date, color: color));
+  @override
+  Widget buildMessageBody(BuildContext context) {
+    switch (messageWidgetType) {
+      case MessageWidgetType.formatted:
+        return _buildFormattedBody(context);
+        break;
+      case MessageWidgetType.raw:
+        return buildMessageRawBody(context, message, getBodyRawText(context));
+        break;
 
-  var messageIcon = _getMessageIcon(message);
-  if (messageIcon != null) {
-    spans.add(buildMessageIconWidgetSpan(iconData: messageIcon, color: color));
+      default:
+        throw "Invalud message widget type $messageWidgetType";
+    }
   }
 
-  if (message.fromNick?.isNotEmpty == true) {
-    spans.add(buildHighlightedNicknameButtonWidgetSpan(
-        context: context, nick: message.fromNick));
+  MultiChildRenderObjectWidget _buildFormattedBody(BuildContext context) {
+    RegularMessageSkinBloc regularMessageSkinBloc = Provider.of(context);
+    var color = regularMessageSkinBloc
+        .getColorForMessageType(message.regularMessageType);
+
+    var spans = <InlineSpan>[];
+    spans.add(buildMessageDateTextSpan(
+        context: context, date: message.date, color: color));
+
+    var messageIcon = _getMessageIcon(message);
+    if (messageIcon != null) {
+      spans
+          .add(buildMessageIconWidgetSpan(iconData: messageIcon, color: color));
+    }
+
+    if (message.fromNick?.isNotEmpty == true) {
+      spans.add(buildHighlightedNicknameButtonWidgetSpan(
+          context: context, nick: message.fromNick));
+    }
+
+    var title = _getMessageTitleString(context, message);
+
+    if (title?.isNotEmpty == true) {
+      spans.add(buildMessageTitleTextSpan(
+          context: context, title: title, color: color));
+    }
+
+    var isNeedDisplayText = true;
+    isNeedDisplayText = _calculateIsNeedToDisplayMessageText(message);
+
+    if (isNeedDisplayText) {
+      spans.addAll(createMessageTextSpans(
+          context: context,
+          message: message,
+          isHighlightedBySearch: inSearchResults));
+    }
+
+    if (message.previews?.isNotEmpty == true) {
+      var children = <Widget>[buildMessageRichText(spans)];
+      message.previews.forEach(
+          (preview) => children.add(buildPreview(context, message, preview)));
+      return Column(children: children);
+    } else {
+      return buildMessageRichText(spans);
+    }
   }
 
-  var title = _getMessageTitleString(context, message);
-
-  if (title?.isNotEmpty == true) {
-    spans.add(buildMessageTitleTextSpan(
-        context: context, title: title, color: color));
-  }
-
-  var isNeedDisplayText = true;
-  isNeedDisplayText = _calculateIsNeedToDisplayMessageText(message);
-
-  if (isNeedDisplayText) {
-    spans.addAll(createMessageTextSpans(
-        context: context,
-        message: message,
-        isHighlightedBySearch: isHighlightedBySearch,
-        searchTerm: searchTerm));
-  }
-
-  if (message.previews?.isNotEmpty == true) {
-    var children = <Widget>[buildMessageRichText(spans)];
-    message.previews.forEach(
-        (preview) => children.add(buildPreview(context, message, preview)));
-    return Column(children: children);
-  } else {
-    return buildMessageRichText(spans);
+  @override
+  String getBodyRawText(BuildContext context) {
+    if (message.params != null) {
+      return """${message.params}
+      ${message.text}""";
+    } else {
+      return message.text;
+    }
   }
 }
 
@@ -77,19 +112,10 @@ TextSpan buildMessageTitleTextSpan(
   );
 }
 
-RichText buildMessageRichText(List<InlineSpan> spans) {
-  return RichText(
-    text: TextSpan(
-      children: spans,
-    ),
-  );
-}
-
 List<InlineSpan> createMessageTextSpans(
     {@required BuildContext context,
     @required RegularMessage message,
-    @required bool isHighlightedBySearch,
-    @required String searchTerm}) {
+    @required bool isHighlightedBySearch}) {
   var messagesSkin = Provider.of<MessageSkinBloc>(context);
   var spans = <InlineSpan>[];
   var params = message.params;
@@ -112,6 +138,9 @@ List<InlineSpan> createMessageTextSpans(
                 context: context, nickname: nickname)) ??
         []);
     if (isHighlightedBySearch) {
+      MessageListBloc messageListBloc = Provider.of(context);
+
+      String searchTerm = messageListBloc.searchTerm;
       spanBuilders.add(
           buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
     }

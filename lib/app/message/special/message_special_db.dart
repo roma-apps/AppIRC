@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:floor/floor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/message_db.dart';
+import 'package:flutter_appirc/app/message/special/body/channel_info/message_special_channel_info_body_model.dart';
+import 'package:flutter_appirc/app/message/special/body/text/message_special_text_body_model.dart';
+import 'package:flutter_appirc/app/message/special/body/whois/message_special_who_is_body_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 
 

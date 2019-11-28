@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'message_special_model.dart';
+part of 'message_special_who_is_body_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -49,34 +49,4 @@ Map<String, dynamic> _$WhoIsSpecialMessageBodyToJson(
       'secure': instance.secure,
       'server': instance.server,
       'serverInfo': instance.serverInfo,
-    };
-
-ChannelInfoSpecialMessageBody _$ChannelInfoSpecialMessageBodyFromJson(
-    Map<String, dynamic> json) {
-  return ChannelInfoSpecialMessageBody(
-    json['name'] as String,
-    json['topic'] as String,
-    json['usersCount'] as int,
-  );
-}
-
-Map<String, dynamic> _$ChannelInfoSpecialMessageBodyToJson(
-        ChannelInfoSpecialMessageBody instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'topic': instance.topic,
-      'usersCount': instance.usersCount,
-    };
-
-TextSpecialMessageBody _$TextSpecialMessageBodyFromJson(
-    Map<String, dynamic> json) {
-  return TextSpecialMessageBody(
-    json['message'] as String,
-  );
-}
-
-Map<String, dynamic> _$TextSpecialMessageBodyToJson(
-        TextSpecialMessageBody instance) =>
-    <String, dynamic>{
-      'message': instance.message,
     };
