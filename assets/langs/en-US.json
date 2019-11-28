@@ -100,7 +100,6 @@
             "title": "Sign Up failed",
             "content": "Unknown error"
           },
-
           "success": {
             "title": "Success Sign Up",
             "content": "You can sign in now"
@@ -288,8 +287,9 @@
           }
         }
       },
-      "action": {
-        "load_more": "Load more..."
+      "load_more": {
+        "action": "Load more",
+        "not_available": "More history not available"
       },
       "empty": {
         "connected": "This channel doesn't have any messages yet",

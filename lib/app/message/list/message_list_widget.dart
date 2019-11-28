@@ -7,15 +7,15 @@ import 'package:flutter_appirc/app/message/list/condensed/message_condensed_mode
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_widget.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_model.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_widget.dart';
+import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_bloc.dart';
+import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_widget.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
-import 'package:flutter_appirc/async/async_dialog.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
@@ -187,12 +187,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
               _jumpToMessage(chatMessageListState.items, selectedFoundItem);
             });
           }
-          return _buildListWidget(
-              context,
-              chatMessageListState.items,
-              chatMessageListState.moreHistoryAvailable ?? false,
-              chatListMessagesBloc.searchState,
-              initScrollPositionItem);
+          return _buildListWidget(context, chatMessageListState.items,
+              chatListMessagesBloc.searchState, initScrollPositionItem);
         });
   }
 
@@ -243,7 +239,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   Widget _buildListWidget(
       BuildContext context,
       List<MessageListItem> items,
-      bool moreHistoryAvailable,
       MessageListSearchState searchState,
       MessageListItem messageForInitScrollItem) {
     _lastBuildItems = items;
@@ -252,15 +247,12 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     int initialScrollIndex =
         items.indexWhere((item) => item == messageForInitScrollItem);
 
-    if (moreHistoryAvailable) {
-      itemCount += 1;
-      initialScrollIndex += 1;
-      _lastBuildMessagesStartIndex = 1;
-    } else {
-      _lastBuildMessagesStartIndex = 0;
-    }
+    // more history
+    itemCount += 1;
+    initialScrollIndex += 1;
+    _lastBuildMessagesStartIndex = 1;
 
-    if (initialScrollIndex == 1 && moreHistoryAvailable) {
+    if (initialScrollIndex == 1) {
       // hack to display load more button
       // when list want to display first message
       initialScrollIndex = 0;
@@ -269,8 +261,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     _logger.d(() => "_buildListWidget "
         "itemCount $itemCount "
         "items ${items?.length}"
-        "initialScrollIndex = $initialScrollIndex "
-        "moreHistoryAvailable $moreHistoryAvailable");
+        "initialScrollIndex = $initialScrollIndex ");
 
     double initialAlignment = 0.0;
 
@@ -282,37 +273,40 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       initialAlignment = 1.0;
     }
 
-    return ScrollablePositionedList.builder(
-        initialScrollIndex: initialScrollIndex,
-        itemScrollController: _scrollController,
-        itemPositionsListener: _positionsListener,
-        itemCount: itemCount,
-        initialAlignment: initialAlignment,
-        itemBuilder: (BuildContext context, int index) {
+    MessageListBloc messageListBloc = Provider.of(context);
+    return Provider(
+      providable:
+          MessageListLoadMoreBloc(ChannelBloc.of(context), messageListBloc),
+      child: ScrollablePositionedList.builder(
+          initialScrollIndex: initialScrollIndex,
+          itemScrollController: _scrollController,
+          itemPositionsListener: _positionsListener,
+          itemCount: itemCount,
+          initialAlignment: initialAlignment,
+          itemBuilder: (BuildContext context, int index) {
 //          _logger.d(() => "itemBuilder $index items "
 //              "${items.length}");
 
-          if (moreHistoryAvailable) {
             if (index == 0) {
               // return the header
               // we should pass non-filtered list to extract non-filtered
               // oldest message
-              return _buildLoadMoreButton(context, items);
+              return MessageListLoadMoreWidget();
             } else {
               // move start index
               index -= 1;
             }
-          }
 
-          if (index >= items.length || index < 0) {
-            return null;
-          }
+            if (index >= items.length || index < 0) {
+              return null;
+            }
 
-          var item = items[index];
-          var inSearchResults =
-              searchState?.isMessageListItemInSearchResults(item) ?? false;
-          return _buildListItem(context, item, inSearchResults);
-        });
+            var item = items[index];
+            var inSearchResults =
+                searchState?.isMessageListItemInSearchResults(item) ?? false;
+            return _buildListItem(context, item, inSearchResults);
+          }),
+    );
   }
 
   StreamBuilder<bool> _buildListViewEmptyWidget(BuildContext context) {
@@ -342,32 +336,11 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   }
 }
 
-Widget _buildLoadMoreButton(
-        BuildContext context, List<MessageListItem> items) =>
-    createSkinnedPlatformButton(context, onPressed: () {
-      doAsyncOperationWithDialog(
-          context: context,
-          asyncCode: () async {
-            var oldestRegularItem = items?.firstWhere(
-                (item) => item.isHaveRegularMessage,
-                orElse: () => null);
-
-            var oldestRegularMessage = oldestRegularItem.oldestRegularMessage;
-
-            var channelBloc = ChannelBloc.of(context);
-            return await channelBloc.loadMoreHistory(oldestRegularMessage);
-          },
-          cancellationValue: null,
-          isDismissible: true);
-    },
-        child: Text(AppLocalizations.of(context)
-            .tr("chat.messages_list.action.load_more")));
-
 Widget _buildListItem(
     BuildContext context, MessageListItem item, bool inSearchResults) {
   if (item is SimpleMessageListItem) {
     return buildMessageWidget(
-        message:item.message,
+        message: item.message,
         inSearchResults: inSearchResults,
         enableMessageActions: true,
         messageWidgetType: MessageWidgetType.formatted);
