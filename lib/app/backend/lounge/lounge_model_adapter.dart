@@ -99,8 +99,6 @@ Future<ChatMessage> toChatMessage(
       }
     }
 
-    var linksInMessage = await findUrls([text, msgLoungeResponseBody.command]);
-
     return RegularMessage.name(
       channel.remoteId,
       command: msgLoungeResponseBody.command,
@@ -130,7 +128,7 @@ Future<ChatMessage> toChatMessage(
       nicknames: msgLoungeResponseBody.users != null
           ? msgLoungeResponseBody.users
           : null,
-      linksInText: linksInMessage,
+      linksInText: null,
     );
   }
 }
@@ -139,20 +137,12 @@ Future<SpecialMessage> toWhoIsSpecialMessage(
     Channel channel, MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
   var whoIsSpecialBody = toWhoIsSpecialMessageBody(msgLoungeResponseBody.whois);
 
-  var linksInMessage = await findUrls([
-    whoIsSpecialBody.actualHostname,
-    whoIsSpecialBody.realName,
-    whoIsSpecialBody.account,
-    whoIsSpecialBody.server,
-    whoIsSpecialBody.serverInfo
-  ]);
-
   return SpecialMessage.name(
       channelRemoteId: channel.remoteId,
       data: whoIsSpecialBody,
       specialType: SpecialMessageType.whoIs,
       date: DateTime.now(),
-      linksInMessage: linksInMessage);
+      linksInMessage: null);
 }
 
 // Return list instead of one message
@@ -192,14 +182,13 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
         loungeChannelItem.topic,
         loungeChannelItem.num_users);
 
-    var linksInMessage = await findUrls([channelInfoSpecialMessageBody.topic]);
-//    var linksInMessage = <String>[];
+
     specialMessages.add(SpecialMessage.name(
         data: channelInfoSpecialMessageBody,
         channelRemoteId: channel.remoteId,
         specialType: messageType,
         date: DateTime.now(),
-        linksInMessage: linksInMessage));
+        linksInMessage: null));
   }
 
   _logger.d(() => "toChannelsListSpecialMessages ${specialMessages.length}");
@@ -214,14 +203,13 @@ Future<SpecialMessage> toTextSpecialMessage(
   var textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(
       messageSpecialLoungeResponseBody.data);
 
-  var linksInMessage = await findUrls([textMessage.text]);
 
   return SpecialMessage.name(
       data: TextSpecialMessageBody(textMessage.text),
       channelRemoteId: channel.remoteId,
       specialType: messageType,
       date: DateTime.now(),
-      linksInMessage: linksInMessage);
+      linksInMessage: null);
 }
 
 // Lounge don't provide type field in response

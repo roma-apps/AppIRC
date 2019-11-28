@@ -33,6 +33,8 @@ abstract class ChatMessage {
   int get hashCode => messageLocalId.hashCode;
 
   bool isContainsText(String searchTerm, {@required bool ignoreCase});
+
+  Future<List<String>> extractLinks();
 }
 
 bool isContainsSearchTerm(String text, String searchTerm, {bool ignoreCase}) {

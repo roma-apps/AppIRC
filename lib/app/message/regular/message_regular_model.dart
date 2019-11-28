@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
+import 'package:flutter_appirc/url/url_finder.dart';
 
 class RegularMessage extends ChatMessage {
   final int messageRemoteId;
@@ -103,6 +104,13 @@ class RegularMessage extends ChatMessage {
     }
 
     return contains;
+  }
+
+  @override
+  Future<List<String>> extractLinks() async {
+    return await findUrls([
+      text
+    ]);
   }
 
 }

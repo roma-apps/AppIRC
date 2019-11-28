@@ -29,6 +29,9 @@ class SpecialMessage extends ChatMessage {
         );
 
   @override
+  Future<List<String>>  extractLinks() => data.extractLinks();
+
+  @override
   bool isContainsText(String searchTerm, {@required bool ignoreCase}) =>
       data.isContainsText(searchTerm, ignoreCase: ignoreCase);
 

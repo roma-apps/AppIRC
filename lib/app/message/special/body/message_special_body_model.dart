@@ -6,4 +6,6 @@ abstract class SpecialMessageBody {
   Map<String, dynamic> toJson();
 
   bool isContainsText(String searchTerm, {@required bool ignoreCase});
+
+  Future<List<String>> extractLinks();
 }

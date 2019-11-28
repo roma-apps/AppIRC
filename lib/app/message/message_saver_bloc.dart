@@ -29,7 +29,6 @@ class MessageSaverBloc extends ChannelListListenerBloc {
     _logger.d(() => "Create ChannelMessagesSaverBloc");
   }
 
-
   // ignore: close_sinks
   BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
       BehaviorSubject();
