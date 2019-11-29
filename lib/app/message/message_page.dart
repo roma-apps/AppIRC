@@ -25,16 +25,12 @@ class MessagePage extends StatelessWidget {
 
   PlatformAppBar _buildAppBar(BuildContext context) {
     return PlatformAppBar(
-      leading: PlatformIconButton(
-        androidIcon: Icon(Icons.arrow_back),
-        iosIcon: Icon(Icons.arrow_back_ios),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
+      leading: buildPlatformScaffoldAppBarBackButton(context),
       title: _buildAppBarTitle(context),
     );
   }
+
+
 
   Text _buildAppBarTitle(BuildContext context) {
     String text;

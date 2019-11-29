@@ -14,15 +14,6 @@ class ChannelMessageListBloc extends Providable {
   final Channel channel;
 
   // ignore: close_sinks
-  BehaviorSubject<bool> _searchEnabledSubject =
-      BehaviorSubject(seedValue: false);
-
-  Stream<bool> get searchEnabledStream =>
-      _searchEnabledSubject.stream.distinct();
-
-  bool get searchEnabled => _searchEnabledSubject.value;
-
-  // ignore: close_sinks
   BehaviorSubject<MessageListVisibleBounds> _visibleMessagesBoundsSubject =
       BehaviorSubject(seedValue: null);
 
@@ -32,26 +23,10 @@ class ChannelMessageListBloc extends Providable {
   MessageListVisibleBounds get visibleMessagesBounds =>
       _visibleMessagesBoundsSubject.value;
 
-  bool get isNeedSearch =>
-      _mapIsNeedSearchTerm(searchEnabled, searchFieldBloc.value);
-
-  Stream<bool> get isNeedSearchStream => Observable.combineLatest2(
-          searchEnabledStream, searchFieldBloc.valueStream,
-          (searchEnabled, searchTerm) {
-        return _mapIsNeedSearchTerm(searchEnabled, searchTerm);
-      });
 
   FormValueFieldBloc<String> searchFieldBloc = FormValueFieldBloc("");
 
   ChannelMessageListBloc(this.chatPushesService, this.channel) {
-    addDisposable(
-        streamSubscription: _searchEnabledSubject.stream.listen((enabled) {
-      if (!enabled) {
-        searchFieldBloc.onNewValue("");
-      }
-    }));
-
-    addDisposable(subject: _searchEnabledSubject);
     addDisposable(subject: _visibleMessagesBoundsSubject);
     addDisposable(disposable: searchFieldBloc);
 
@@ -67,24 +42,8 @@ class ChannelMessageListBloc extends Providable {
       }
     }));
   }
-
-  bool _mapIsNeedSearchTerm(searchEnabled, searchTerm) =>
-      searchEnabled && searchTerm?.isNotEmpty == true;
-
   void onVisibleMessagesBounds(MessageListVisibleBounds visibleMessagesBounds) {
     this._visibleMessagesBoundsSubject.add(visibleMessagesBounds);
     _logger.d(() => "visibleMessagesBounds $visibleMessagesBounds");
-  }
-
-  void onNeedShowSearch() {
-    _searchEnabledSubject.add(true);
-  }
-
-  void onNeedHideSearch() {
-    _searchEnabledSubject.add(false);
-  }
-
-  void onNeedToggleSearch() {
-    _searchEnabledSubject.add(!_searchEnabledSubject.value);
   }
 }

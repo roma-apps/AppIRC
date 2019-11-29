@@ -5,7 +5,6 @@ import 'package:flutter_appirc/app/chat/input_message/chat_input_message_widget.
 import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_widget.dart';
-import 'package:flutter_appirc/app/message/list/search/message_list_search_widget.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
@@ -31,7 +30,6 @@ class _ChannelWidgetState extends State<ChannelWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          MessageListSearchWidget(),
           Expanded(
               child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 2.0),

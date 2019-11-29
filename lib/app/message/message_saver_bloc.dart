@@ -204,6 +204,10 @@ class MessageSaverBloc extends ChannelListListenerBloc {
       }
     }
   }
+
+
+  Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>
+      messageUpdateStream.where((updatedMessage) => message == updatedMessage);
 }
 
 Future<List<List<String>>> extractLinks(List<ChatMessage> messages) async {

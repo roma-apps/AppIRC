@@ -143,21 +143,4 @@ class MessageListJumpDestination {
       @required this.alignment});
 }
 
-class MessageInListState {
-  final bool inSearchResult;
-  final String searchTerm;
-  final ChatMessage message;
 
-  MessageInListState.name(
-      {@required this.message,
-      @required this.inSearchResult,
-      @required this.searchTerm});
-
-  @override
-  String toString() {
-    return 'MessageInListState{inSearchResult: $inSearchResult,'
-        ' searchTerm: $searchTerm, message: $message}';
-  }
-
-
-}

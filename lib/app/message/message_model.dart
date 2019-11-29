@@ -83,3 +83,14 @@ enum MessageListUpdateType {
 historyFromBackend,
   notUpdated
 }
+
+
+class MessageInListState {
+  final bool inSearchResult;
+  final String searchTerm;
+
+  MessageInListState.name(
+      {
+        @required this.inSearchResult,
+        @required this.searchTerm});
+}

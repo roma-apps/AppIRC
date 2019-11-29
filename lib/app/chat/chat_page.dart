@@ -21,6 +21,8 @@ import 'package:flutter_appirc/app/chat/drawer/chat_drawer_page.dart';
 import 'package:flutter_appirc/app/chat/drawer/chat_drawer_widget.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
+import 'package:flutter_appirc/app/chat/search/chat_search_bloc.dart';
+import 'package:flutter_appirc/app/chat/search/chat_search_page.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_loader_bloc.dart';
@@ -212,7 +214,15 @@ class _ChatPageState extends State<ChatPage> {
                       color: Provider.of<ChatAppBarSkinBloc>(context)
                           .iconAppBarColor),
                   onPressed: () {
-                    channelBloc.messagesBloc.onNeedToggleSearch();
+                    Navigator.push(
+                        context,
+                        platformPageRoute(
+                            builder: (context) {
+                              var searchBloc = ChatSearchBloc(channel);
+                              return Provider(
+                                  providable: searchBloc,
+                                  child: ChatSearchPage());
+                            }));
                   }));
 
           return Row(mainAxisSize: MainAxisSize.min, children: items);

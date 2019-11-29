@@ -204,6 +204,9 @@
   },
   "chat": {
     "title": "Chat",
+    "search": {
+      "title": "Search"
+    },
     "state": {
       "connection": {
         "status": {

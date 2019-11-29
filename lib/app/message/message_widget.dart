@@ -4,11 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_widget.dart';
-import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
-import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_page.dart';
+import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_widget.dart';
@@ -50,6 +49,8 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   final T message;
   final bool enableMessageActions;
   final MessageWidgetType messageWidgetType;
+  final MessageInListState messageInListState =
+      MessageInListState.name(inSearchResult: false, searchTerm: null);
 
   String getBodyRawText(BuildContext context);
 
@@ -103,38 +104,35 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   }
 
   Widget _buildDecoratedBody(BuildContext context) {
-    MessageListBloc messageListBloc = Provider.of(context);
+    MessageSaverBloc messageSaverBloc = Provider.of(context);
 
-    MessageInListState messageState = messageListBloc
-        .getMessageInListState(message);
-    _logger.d(() => "StreamBuilder messageState =$messageState");
-    return Container(
-        decoration:
-        _createMessageDecoration(context: context, messageInListState: messageState),
-        child: buildMessageBody(context, messageState));
-    return StreamBuilder<MessageInListState>(
-      stream: messageListBloc.getMessageInListStateStream(message),
-      initialData: messageListBloc.getMessageInListState(message),
-      builder: (context, snapshot) {
+    return StreamBuilder<ChatMessage>(
+        stream: messageSaverBloc.getMessageUpdateStream(message),
+        initialData: message,
+        builder: (context, snapshot) {
+          ChatMessage message = snapshot.data;
 
-    MessageInListState messageState = snapshot.data;
-
-      }
-    );
+          _logger.d(() => "StreamBuilder messageState =$message");
+          return Container(
+              decoration: _createMessageDecoration(
+                  context: context, messageInListState: messageInListState),
+              child: buildMessageBody(context, message));
+        });
   }
 
-  Widget buildMessageBody(BuildContext context, MessageInListState messageInListState);
+  Widget buildMessageBody(BuildContext context, ChatMessage message);
 
   Decoration _createMessageDecoration(
-      {@required BuildContext context, @required MessageInListState
-      messageInListState}) {
+      {@required BuildContext context,
+      @required MessageInListState messageInListState}) {
     var isHighlightBySearch = messageInListState.inSearchResult;
 
     var decoration;
     bool isHighlightByServer;
 
-    if (message is RegularMessage) {
-      isHighlightByServer = isHighlightedByServer(messageInListState.message);
+    var currentMessage = message;
+    if (currentMessage is RegularMessage) {
+      isHighlightByServer = isHighlightedByServer(currentMessage);
     }
 
     var messagesSkin = Provider.of<MessageListSkinBloc>(context);

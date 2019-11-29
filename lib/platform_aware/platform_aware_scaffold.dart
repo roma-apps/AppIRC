@@ -47,3 +47,13 @@ Widget buildPlatformScaffold(BuildContext context,
         iosContentBottomPadding: iosContentBottomPadding);
   }
 }
+
+PlatformIconButton buildPlatformScaffoldAppBarBackButton(BuildContext context) {
+  return PlatformIconButton(
+    androidIcon: Icon(Icons.arrow_back),
+    iosIcon: Icon(Icons.arrow_back_ios),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  );
+}

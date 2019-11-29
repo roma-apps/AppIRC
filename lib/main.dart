@@ -26,11 +26,11 @@ import 'package:flutter_appirc/app/chat/preferences/chat_preferences_bloc.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_saver_bloc.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
+import 'package:flutter_appirc/app/chat/search/chat_search_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
-import 'package:flutter_appirc/app/message/list/search/message_list_search_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_skin_bloc.dart';
@@ -48,7 +48,7 @@ import 'package:flutter_appirc/app/skin/app_irc_chat_input_message_skin_bloc.dar
 import 'package:flutter_appirc/app/skin/app_irc_form_boolean_field_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_text_field_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_title_skin_bloc.dart';
-import 'package:flutter_appirc/app/skin/app_irc_message_list_search_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_search_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_preview_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_regular_skin_bloc.dart';
@@ -404,7 +404,7 @@ class AppIRCState extends State<AppIRC> {
                                   child: Provider<MessageSkinBloc>(
                                     providable:
                                         AppIRCMessageSkinBloc(appSkinTheme),
-                                    child: Provider<MessageListSearchSkinBloc>(
+                                    child: Provider<SearchSkinBloc>(
                                       providable:
                                           AppIRCMessageListSearchSkinBloc(
                                               appSkinTheme),

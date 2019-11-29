@@ -11,7 +11,6 @@ import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more
 import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_widget.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
-import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
@@ -37,7 +36,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
   final ItemScrollController _scrollController = ItemScrollController();
 
-  StreamSubscription<MessageListSearchState> _positionSubscription;
 
   int _lastBuildMessagesStartIndex = 0;
   List<MessageListItem> _lastBuildItems;
@@ -46,7 +44,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   void dispose() {
     super.dispose();
     _positionsListener.itemPositions.removeListener(onVisiblePositionsChanged);
-    _positionSubscription?.cancel();
     disposable.dispose();
   }
 
@@ -68,67 +65,6 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         Timer.run(() {
           _jumpToMessage();
         });
-      })));
-
-//      disposable.add(StreamSubscriptionDisposable(
-//          messageListBloc.searchStateStream.listen((searchState) {
-//        if (searchState.selectedFoundItem != null) {
-//          nextJumpDestination = MessageListJumpDestination(
-//              items: messageListBloc.listState.items,
-//              selectedFoundItem: searchState.selectedFoundItem,
-//              alignment: 0);
-//          Timer.run(() {
-//            _jumpToMessage();
-//          });
-//        }
-//      })));
-
-      disposable.add(StreamSubscriptionDisposable(
-          messageListBloc.listStateStream.listen((chatMessageListState) {
-
-//
-//            if (chatMessageListState.updateType ==
-//                MessageListUpdateType.historyFromBackend) {
-//              nextJumpDestination = MessageListJumpDestination(
-//                  items: chatMessageListState.items,
-//                  selectedFoundItem: initScrollPositionItem,
-//                  alignment: 0.0);
-//              Timer.run(() {
-//                _jumpToMessage();
-//              });
-//            }
-//            if (chatMessageListState.updateType ==
-//                MessageListUpdateType.replacedByBackend) {
-//              nextJumpDestination = MessageListJumpDestination(
-//                  items: chatMessageListState.items,
-//                  selectedFoundItem: chatMessageListState.items.last,
-//                  alignment: 0.9);
-//              Timer.run(() {
-//                _jumpToMessage();
-//              });
-//            }
-//
-//            if (chatMessageListState.updateType ==
-//                MessageListUpdateType.loadedFromLocalDatabase) {
-//              nextJumpDestination = MessageListJumpDestination(
-//                  items: chatMessageListState.items,
-//                  selectedFoundItem: initScrollPositionItem,
-//                  alignment: 0);
-//              Timer.run(() {
-//                _jumpToMessage();
-//              });
-//            }
-//
-//            if (visibleMessagesBounds?.updateType ==
-//                MessageListVisibleBoundsUpdateType.push) {
-//              nextJumpDestination = MessageListJumpDestination(
-//                  items: chatMessageListState.items,
-//                  selectedFoundItem: initScrollPositionItem,
-//                  alignment: 0.5);
-//              Timer.run(() {
-//                _jumpToMessage();
-//              });
-//            }
       })));
     });
   }

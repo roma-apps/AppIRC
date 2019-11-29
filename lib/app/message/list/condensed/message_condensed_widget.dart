@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
-import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
@@ -25,8 +24,7 @@ class CondensedMessageWidget extends StatefulWidget {
 class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
   @override
   Widget build(BuildContext context) {
-    bool expanded = widget._condensedMessageListItem.isCondensed == false ||
-        _isInSearchResults(context);
+    bool expanded = widget._condensedMessageListItem.isCondensed == false;
     if (expanded) {
       return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,12 +133,5 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     condensedBloc.onCondensedStateChanged(channelBloc.channel, messageListItem);
 
     setState(() {});
-  }
-
-  bool _isInSearchResults(BuildContext context) {
-    MessageListBloc messageListBloc = Provider.of(context);
-
-    return messageListBloc
-        .isListItemInSearchResults(widget._condensedMessageListItem);
   }
 }

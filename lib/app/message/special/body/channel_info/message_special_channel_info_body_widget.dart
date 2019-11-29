@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_search_highlight.dart';
-import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/special/body/channel_info/message_special_channel_info_body_model.dart';
@@ -15,8 +15,11 @@ import 'package:flutter_appirc/span_builder/span_builder.dart';
 
 class ChannelInfoSpecialMessageBodyWidget
     extends SpecialMessageBodyWidget<ChannelInfoSpecialMessageBody> {
+  final MessageInListState messageInListState;
+
   ChannelInfoSpecialMessageBodyWidget(
       {@required SpecialMessage message,
+      @required this.messageInListState,
       @required ChannelInfoSpecialMessageBody body,
       @required bool inSearchResults,
       @required MessageWidgetType messageWidgetType})
@@ -81,8 +84,7 @@ class ChannelInfoSpecialMessageBodyWidget
     spanBuilders.addAll(linksInText
         .map((link) => buildLinkHighlighter(context: context, link: link)));
     if (inSearchResults) {
-      MessageListBloc messageListBloc = Provider.of(context);
-      var searchTerm = messageListBloc.searchTerm;
+      var searchTerm = messageInListState.searchTerm;
       spanBuilders.add(
           buildSearchSpanHighlighter(context: context, searchTerm: searchTerm));
     }

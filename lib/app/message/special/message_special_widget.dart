@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/message/list/message_list_model.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/special/body/channel_info/message_special_channel_info_body_model.dart';
 import 'package:flutter_appirc/app/message/special/body/channel_info/message_special_channel_info_body_widget.dart';
@@ -23,7 +23,7 @@ class SpecialMessageWidget extends MessageWidget<SpecialMessage> {
             messageWidgetType: messageWidgetType);
 
   @override
-  Widget buildMessageBody(BuildContext context, MessageInListState messageInListState) {
+  Widget buildMessageBody(BuildContext context, ChatMessage message) {
     switch (messageWidgetType) {
       case MessageWidgetType.formatted:
         return _buildSpecialBody(messageInListState.inSearchResult);
@@ -59,6 +59,7 @@ class SpecialMessageWidget extends MessageWidget<SpecialMessage> {
           inSearchResults: inSearchResults,
           body: message.data as ChannelInfoSpecialMessageBody,
           messageWidgetType: messageWidgetType,
+          messageInListState: messageInListState,
         );
         break;
       case SpecialMessageType.text:
