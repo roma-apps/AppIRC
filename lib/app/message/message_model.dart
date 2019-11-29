@@ -10,7 +10,7 @@ abstract class ChatMessage {
 
   final int channelRemoteId;
   final DateTime date;
-  final List<String> linksInText;
+  List<String> linksInText;
 
   ChatMessage(
       this.chatMessageType, this.channelRemoteId, this.date, this.linksInText,

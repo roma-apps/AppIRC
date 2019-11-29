@@ -285,6 +285,21 @@ class _$SpecialMessageDao extends SpecialMessageDao {
                   'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch,
                   'linksJsonEncoded': item.linksJsonEncoded
                 },
+            changeListener),
+        _specialMessageDBUpdateAdapter = UpdateAdapter(
+            database,
+            'SpecialMessageDB',
+            ['localId'],
+            (SpecialMessageDB item) => <String, dynamic>{
+                  'localId': item.localId,
+                  'channelLocalId': item.channelLocalId,
+                  'chatMessageTypeId': item.chatMessageTypeId,
+                  'channelRemoteId': item.channelRemoteId,
+                  'dataJsonEncoded': item.dataJsonEncoded,
+                  'specialTypeId': item.specialTypeId,
+                  'dateMicrosecondsSinceEpoch': item.dateMicrosecondsSinceEpoch,
+                  'linksJsonEncoded': item.linksJsonEncoded
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -305,6 +320,8 @@ class _$SpecialMessageDao extends SpecialMessageDao {
           row['linksJsonEncoded'] as String);
 
   final InsertionAdapter<SpecialMessageDB> _specialMessageDBInsertionAdapter;
+
+  final UpdateAdapter<SpecialMessageDB> _specialMessageDBUpdateAdapter;
 
   @override
   Future<List<SpecialMessageDB>> getAllMessages() async {
@@ -344,6 +361,12 @@ class _$SpecialMessageDao extends SpecialMessageDao {
   @override
   Future<int> insertSpecialMessage(SpecialMessageDB specialMessage) {
     return _specialMessageDBInsertionAdapter.insertAndReturnId(
+        specialMessage, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<int> updateRegularMessage(SpecialMessageDB specialMessage) {
+    return _specialMessageDBUpdateAdapter.updateAndReturnChangedRows(
         specialMessage, sqflite.ConflictAlgorithm.abort);
   }
 }

@@ -25,6 +25,9 @@ abstract class SpecialMessageDao {
   @insert
   Future<int> insertSpecialMessage(SpecialMessageDB specialMessage);
 
+  @update
+  Future<int> updateRegularMessage(SpecialMessageDB specialMessage);
+
   @Query('DELETE FROM SpecialMessageDB')
   Future<void> deleteAllSpecialMessages();
 

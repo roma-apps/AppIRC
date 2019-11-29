@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_listener_bloc.dart';
@@ -23,15 +24,23 @@ class MessageSaverBloc extends ChannelListListenerBloc {
 
   final Map<int, Disposable> _channelsListeners = Map();
 
-  MessageSaverBloc(
-      this._backendService, NetworkListBloc networksListBloc, this._db)
-      : super(networksListBloc) {
-    _logger.d(() => "Create ChannelMessagesSaverBloc");
-  }
+  // ignore: close_sinks
+  BehaviorSubject<ChatMessage> _messageUpdateSubject = BehaviorSubject();
+
+  Stream<ChatMessage> get messageUpdateStream => _messageUpdateSubject.stream;
 
   // ignore: close_sinks
   BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
       BehaviorSubject();
+
+  MessageSaverBloc(
+      this._backendService, NetworkListBloc networksListBloc, this._db)
+      : super(networksListBloc) {
+    _logger.d(() => "Create ChannelMessagesSaverBloc");
+
+    addDisposable(subject: _realtimeMessagesSubject);
+    addDisposable(subject: _messageUpdateSubject);
+  }
 
   Disposable listenForMessages(
       Network network, Channel channel, ChannelMessageListener listener) {
@@ -58,19 +67,23 @@ class MessageSaverBloc extends ChannelListListenerBloc {
 
     channelDisposable.add(_backendService.listenForMessages(network, channel,
         (messagesForChannel) {
-          _logger.d(() => "onChannelJoined listenForMessages "
-              "${messagesForChannel.messages.length}");
+      _logger.d(() => "onChannelJoined listenForMessages "
+          "${messagesForChannel.messages.length}");
       _onNewMessages(messagesForChannel);
     }));
 
     channelDisposable.add(_backendService
         .listenForMessagePreviews(network, channel, (previewForMessage) async {
-      await _updatePreview(previewForMessage);
+      var newMessage = await _updatePreview(previewForMessage);
+
+      _messageUpdateSubject.add(newMessage);
     }));
 
     channelDisposable.add(_backendService.listenForMessagePreviewToggle(
         network, channel, (ToggleMessagePreviewData togglePreview) async {
-      await _togglePreview(togglePreview);
+      var newMessage = await _togglePreview(togglePreview);
+
+      _messageUpdateSubject.add(newMessage);
     }));
 
     _channelsListeners[channel.remoteId] = channelDisposable;
@@ -79,38 +92,43 @@ class MessageSaverBloc extends ChannelListListenerBloc {
     addDisposable(subject: _realtimeMessagesSubject);
   }
 
-  Future _togglePreview(ToggleMessagePreviewData togglePreview) async {
+  Future<ChatMessage> _togglePreview(
+      ToggleMessagePreviewData togglePreview) async {
     var previewForMessage = MessagePreviewForRemoteMessageId(
         togglePreview.message.messageRemoteId, togglePreview.preview);
 
     var oldMessageDB = await _db.regularMessagesDao
         .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
-    var oldMessage = regularMessageDBToChatMessage(oldMessageDB);
+    var message = regularMessageDBToChatMessage(oldMessageDB);
 
-    var foundOldMessage = oldMessage.previews.firstWhere((preview) {
+    var foundOldMessage = message.previews.firstWhere((preview) {
       return preview.link == previewForMessage.messagePreview.link;
     }, orElse: () => null);
 
     foundOldMessage.shown = togglePreview.newShownValue;
 
-    var newMessageDB = toRegularMessageDB(oldMessage);
+    var newMessageDB = toRegularMessageDB(message);
     newMessageDB.localId = oldMessageDB.localId;
     _db.regularMessagesDao.updateRegularMessage(newMessageDB);
+
+    return message;
   }
 
-  Future _updatePreview(
+  Future<ChatMessage> _updatePreview(
       MessagePreviewForRemoteMessageId previewForMessage) async {
     var oldMessageDB = await _db.regularMessagesDao
         .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
-    var oldMessage = regularMessageDBToChatMessage(oldMessageDB);
+    var message = regularMessageDBToChatMessage(oldMessageDB);
 
-    updatePreview(oldMessage, previewForMessage);
+    updatePreview(message, previewForMessage);
 
-    var newMessageDB = toRegularMessageDB(oldMessage);
+    var newMessageDB = toRegularMessageDB(message);
     newMessageDB.localId = oldMessageDB.localId;
     _db.regularMessagesDao.updateRegularMessage(newMessageDB);
+
+    return message;
   }
 
   void _onNewMessages(MessagesForChannel messagesForChannel) async {
@@ -119,26 +137,49 @@ class MessageSaverBloc extends ChannelListListenerBloc {
     var newMessages = messagesForChannel.messages;
 
     for (var newMessage in newMessages) {
-      var chatMessageType = newMessage.chatMessageType;
-
-      int id;
-      switch (chatMessageType) {
-        case ChatMessageType.special:
-          var specialMessageDB = toSpecialMessageDB(newMessage);
-          id = await _db.specialMessagesDao
-              .insertSpecialMessage(specialMessageDB);
-          break;
-        case ChatMessageType.regular:
-          var regularMessageDB = toRegularMessageDB(newMessage);
-          id = await _db.regularMessagesDao
-              .insertRegularMessage(regularMessageDB);
-          break;
-      }
+      int id = await _insertMessage(newMessage);
 
       newMessage.messageLocalId = id;
     }
 
     _realtimeMessagesSubject.add(messagesForChannel);
+
+    // don't await
+    _extractLinks(messagesForChannel);
+  }
+
+  Future<int> _insertMessage(ChatMessage newMessage) async {
+    int id;
+    var chatMessageType = newMessage.chatMessageType;
+
+    switch (chatMessageType) {
+      case ChatMessageType.special:
+        var specialMessageDB = toSpecialMessageDB(newMessage);
+        id =
+            await _db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
+        break;
+      case ChatMessageType.regular:
+        var regularMessageDB = toRegularMessageDB(newMessage);
+        id =
+            await _db.regularMessagesDao.insertRegularMessage(regularMessageDB);
+        break;
+    }
+    return id;
+  }
+
+  Future _updateMessage(ChatMessage newMessage) async {
+    var chatMessageType = newMessage.chatMessageType;
+
+    switch (chatMessageType) {
+      case ChatMessageType.special:
+        var specialMessageDB = toSpecialMessageDB(newMessage);
+        await _db.specialMessagesDao.updateRegularMessage(specialMessageDB);
+        break;
+      case ChatMessageType.regular:
+        var regularMessageDB = toRegularMessageDB(newMessage);
+        await _db.regularMessagesDao.updateRegularMessage(regularMessageDB);
+        break;
+    }
   }
 
   @override
@@ -148,6 +189,33 @@ class MessageSaverBloc extends ChannelListListenerBloc {
 
     _channelsListeners.remove(channel.remoteId).dispose();
   }
+
+  Future _extractLinks(MessagesForChannel messagesForChannel) async {
+    var messages = messagesForChannel.messages;
+    var linksList = await compute(extractLinks, messages);
+
+    for (int i = 0; i < messages.length; i++) {
+      var message = messages[i];
+      message.linksInText = linksList[i];
+
+      if (message.linksInText.isNotEmpty) {
+        _updateMessage(message);
+        _messageUpdateSubject.add(message);
+      }
+    }
+  }
+}
+
+Future<List<List<String>>> extractLinks(List<ChatMessage> messages) async {
+  Iterable<Future<List<String>>> mappedList =
+      messages.map((i) => i.extractLinks());
+  print(mappedList); // you print an Iterable of Future
+
+  // to get the list of int you have to do the following
+  Future<List<List<String>>> futureList = Future.wait(mappedList);
+  List<List<String>> result = await futureList;
+
+  return result;
 }
 
 void updatePreview(RegularMessage oldMessage,

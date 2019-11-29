@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_widget.dart';
+import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_page.dart';
@@ -102,11 +103,20 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
     ]);
   }
 
-  Container _buildDecoratedBody(BuildContext context) {
-    return Container(
-        decoration:
-            _createMessageDecoration(context: context, message: message),
-        child: buildMessageBody(context));
+  Widget _buildDecoratedBody(BuildContext context) {
+    MessageListBloc messageListBloc = Provider.of(context);
+    return StreamBuilder<ChatMessage>(
+      stream: messageListBloc.getMessageUpdateStream(message),
+      initialData: message,
+      builder: (context, snapshot) {
+
+        ChatMessage message = snapshot.data;
+        return Container(
+            decoration:
+                _createMessageDecoration(context: context, message: message),
+            child: buildMessageBody(context));
+      }
+    );
   }
 
   Widget buildMessageBody(BuildContext context);

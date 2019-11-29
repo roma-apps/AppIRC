@@ -36,6 +36,12 @@ class MessageLoaderBloc extends Providable {
 
   Stream<MessagesList> get messagesListStream => _messagesListSubject.stream;
 
+  Stream<ChatMessage> get _messageUpdateStream =>
+      _messagesSaverBloc.messageUpdateStream;
+
+  Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>
+      _messageUpdateStream.where((updatedMessage) => message == updatedMessage);
+
   MessagesList get messagesList => _messagesListSubject?.value;
 
   MessageLoaderBloc(this._backendService, this._db, this._messagesSaverBloc,

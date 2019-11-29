@@ -280,4 +280,7 @@ class MessageListBloc extends Providable {
 
     return inSearchResults;
   }
+
+  Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>
+      _messageLoaderBloc.getMessageUpdateStream(message);
 }
