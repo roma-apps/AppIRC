@@ -4,7 +4,7 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/db/chat_database.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
-import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
+import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
@@ -19,7 +19,7 @@ var _logger = MyLogger(logTag: "message_loader_bloc.dart", enabled: true);
 
 class MessageLoaderBloc extends Providable {
   final ChatBackendService _backendService;
-  final MessageSaverBloc _messagesSaverBloc;
+  final MessageManagerBloc _messagesSaverBloc;
   final ChatDatabase _db;
   final Network _network;
   final Channel _channel;

@@ -26,7 +26,7 @@ import 'package:flutter_appirc/app/chat/search/chat_search_page.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_loader_bloc.dart';
-import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
+import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_form_bloc.dart';
@@ -322,7 +322,7 @@ class _ChatPageState extends State<ChatPage> {
                   var messagesLoaderBloc = MessageLoaderBloc(
                       backendService,
                       chatDatabaseProvider.db,
-                      Provider.of<MessageSaverBloc>(context),
+                      Provider.of<MessageManagerBloc>(context),
                       channelBloc.network,
                       channelBloc.channel);
                   _logger.d(() => "before stream");

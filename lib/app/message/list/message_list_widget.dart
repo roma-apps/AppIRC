@@ -200,9 +200,14 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           (listItem) => listItem == nextJumpDestination.selectedFoundItem);
       _logger.d(() => "_jumpToMessage ${nextJumpDestination.selectedFoundItem}"
           "indexToJump $indexToJump");
+      try {
+
       _scrollController?.jumpTo(
           index: indexToJump + _lastBuildMessagesStartIndex,
           alignment: nextJumpDestination.alignment);
+      } catch(e) {
+        _logger.e(() => "error during _jumpToMessage $e");
+      }
       nextJumpDestination = null;
     }
   }

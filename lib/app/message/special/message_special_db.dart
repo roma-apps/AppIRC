@@ -39,7 +39,7 @@ abstract class SpecialMessageDao {
 @Entity(tableName: "SpecialMessageDB")
 class SpecialMessageDB implements ChatMessageDB {
   @PrimaryKey(autoGenerate: true)
-  final int localId;
+  int localId;
 
   int channelLocalId;
 

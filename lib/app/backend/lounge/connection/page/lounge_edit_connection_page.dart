@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_connection_page.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
+import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
@@ -33,6 +34,10 @@ class EditLoungeConnectionPage extends LoungeConnectionPage {
                       .tr("lounge.preferences.edit.dialog.confirm.action"
                           ".save_reload")),
                   onPressed: () async {
+
+                    MessageManagerBloc managerBloc = Provider.of(context);
+                    await managerBloc.clearAllMessages();
+
                     _dismissDialog(context);
                     _goToPreviousPage(context);
                     _saveNewPreferenceValue(context, preferences);

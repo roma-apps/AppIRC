@@ -18,7 +18,7 @@ import 'package:rxdart/rxdart.dart';
 
 var _logger = MyLogger(logTag: "message_saver_bloc.dart", enabled: true);
 
-class MessageSaverBloc extends ChannelListListenerBloc {
+class MessageManagerBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
   final ChatDatabase _db;
 
@@ -33,7 +33,7 @@ class MessageSaverBloc extends ChannelListListenerBloc {
   BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
       BehaviorSubject();
 
-  MessageSaverBloc(
+  MessageManagerBloc(
       this._backendService, NetworkListBloc networksListBloc, this._db)
       : super(networksListBloc) {
     _logger.d(() => "Create ChannelMessagesSaverBloc");
@@ -153,17 +153,28 @@ class MessageSaverBloc extends ChannelListListenerBloc {
     var chatMessageType = newMessage.chatMessageType;
 
     switch (chatMessageType) {
+      case ChatMessageType.regular:
+        var regularMessage = newMessage as RegularMessage;
+
+        var foundMessage = await _db.regularMessagesDao
+            .findMessageWithRemoteId(regularMessage.messageRemoteId);
+
+        if (foundMessage != null) {
+          // nothing
+          id = foundMessage.localId;
+        } else {
+          var regularMessageDB = toRegularMessageDB(newMessage);
+          id = await _db.regularMessagesDao
+              .insertRegularMessage(regularMessageDB);
+        }
+        break;
       case ChatMessageType.special:
         var specialMessageDB = toSpecialMessageDB(newMessage);
         id =
             await _db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
         break;
-      case ChatMessageType.regular:
-        var regularMessageDB = toRegularMessageDB(newMessage);
-        id =
-            await _db.regularMessagesDao.insertRegularMessage(regularMessageDB);
-        break;
     }
+
     return id;
   }
 
@@ -173,10 +184,12 @@ class MessageSaverBloc extends ChannelListListenerBloc {
     switch (chatMessageType) {
       case ChatMessageType.special:
         var specialMessageDB = toSpecialMessageDB(newMessage);
+        specialMessageDB.localId = newMessage.messageLocalId;
         await _db.specialMessagesDao.updateRegularMessage(specialMessageDB);
         break;
       case ChatMessageType.regular:
         var regularMessageDB = toRegularMessageDB(newMessage);
+        regularMessageDB.localId = newMessage.messageLocalId;
         await _db.regularMessagesDao.updateRegularMessage(regularMessageDB);
         break;
     }
@@ -205,9 +218,13 @@ class MessageSaverBloc extends ChannelListListenerBloc {
     }
   }
 
-
   Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>
       messageUpdateStream.where((updatedMessage) => message == updatedMessage);
+
+  Future clearAllMessages() async {
+    await _db.regularMessagesDao.deleteAllRegularMessages();
+    await _db.specialMessagesDao.deleteAllSpecialMessages();
+  }
 }
 
 Future<List<List<String>>> extractLinks(List<ChatMessage> messages) async {

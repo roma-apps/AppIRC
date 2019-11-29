@@ -31,7 +31,7 @@ import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
-import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
+import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_skin_bloc.dart';
@@ -167,9 +167,6 @@ class AppIRCState extends State<AppIRC> {
     _database =
         await $FloorChatDatabase.databaseBuilder('flutter_database.db').build();
 
-    _database.regularMessagesDao.deleteAllRegularMessages();
-    _database.specialMessagesDao.deleteAllSpecialMessages();
-
     await _pushesService.init();
     await _pushesService.askPermissions();
     await _pushesService.configure();
@@ -260,8 +257,17 @@ class AppIRCState extends State<AppIRC> {
         chatPreferencesBloc,
         chatInitBloc);
 
+    var messageManagerBloc = MessageManagerBloc(
+                                            loungeBackendService,
+                                            networksListBloc,
+                                            _database);
+
     Disposable signOutListener;
-    signOutListener = loungeBackendService.listenForSignOut(() {
+    signOutListener = loungeBackendService.listenForSignOut(() async {
+
+
+      await messageManagerBloc.clearAllMessages();
+
       chatPreferencesSaverBloc.reset();
       this._loungeBackendService.dispose();
       this._loungeBackendService = null;
@@ -309,10 +315,7 @@ class AppIRCState extends State<AppIRC> {
                                     child: Provider(
                                       providable: chatUploadBloc,
                                       child: Provider(
-                                        providable: MessageSaverBloc(
-                                            loungeBackendService,
-                                            networksListBloc,
-                                            _database),
+                                        providable: messageManagerBloc,
                                         child: Provider(
                                           providable: chatPreferencesSaverBloc,
                                           child: _buildApp(ChatPage()),

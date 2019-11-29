@@ -205,7 +205,7 @@
   "chat": {
     "title": "Chat",
     "search": {
-      "title": "Search"
+      "title": "Search in {}"
     },
     "state": {
       "connection": {

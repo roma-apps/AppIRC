@@ -7,7 +7,7 @@ import 'package:flutter_appirc/app/message/list/date_separator/message_list_date
 import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_page.dart';
-import 'package:flutter_appirc/app/message/message_saver_bloc.dart';
+import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_widget.dart';
@@ -104,7 +104,7 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   }
 
   Widget _buildDecoratedBody(BuildContext context) {
-    MessageSaverBloc messageSaverBloc = Provider.of(context);
+    MessageManagerBloc messageSaverBloc = Provider.of(context);
 
     return StreamBuilder<ChatMessage>(
         stream: messageSaverBloc.getMessageUpdateStream(message),

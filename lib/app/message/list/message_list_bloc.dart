@@ -222,7 +222,9 @@ class MessageListBloc extends Providable {
       }
       if (initScrollPositionItem == null) {
         _logger.w(() => "use latest message for init scroll");
-        initScrollPositionItem = items.last;
+        if(items?.isNotEmpty == true) {
+          initScrollPositionItem = items.last;
+        }
       }
       _logger.d(() => "_buildMessagesList "
           "visibleMessagesBounds $visibleMessagesBounds "
