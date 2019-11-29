@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
 
 class MessageListSearchState {
   final List<MessageListItem> foundItems;
+  final List<ChatMessage> foundMessages;
   final String searchTerm;
   final MessageListItem selectedFoundItem;
 
@@ -26,11 +28,15 @@ class MessageListSearchState {
 
   MessageListSearchState.name(
       {@required this.foundItems,
+      @required this.foundMessages,
       @required this.searchTerm,
       @required this.selectedFoundItem});
 
   static get empty => MessageListSearchState.name(
-      foundItems: [], searchTerm: null, selectedFoundItem: null);
+      foundItems: [],
+      foundMessages: [],
+      searchTerm: null,
+      selectedFoundItem: null);
 
   @override
   String toString() {

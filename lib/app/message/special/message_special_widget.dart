@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/special/body/channel_info/message_special_channel_info_body_model.dart';
 import 'package:flutter_appirc/app/message/special/body/channel_info/message_special_channel_info_body_widget.dart';
@@ -12,20 +13,20 @@ import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 class SpecialMessageWidget extends MessageWidget<SpecialMessage> {
   SpecialMessageWidget(
       {@required SpecialMessage message,
-      @required bool inSearchResults,
+//      @required bool inSearchResults,
       @required bool enableMessageActions,
       @required MessageWidgetType messageWidgetType})
       : super(
             message: message,
-            inSearchResults: inSearchResults,
+//            inSearchResults: inSearchResults,
             enableMessageActions: enableMessageActions,
             messageWidgetType: messageWidgetType);
 
   @override
-  Widget buildMessageBody(BuildContext context) {
+  Widget buildMessageBody(BuildContext context, MessageInListState messageInListState) {
     switch (messageWidgetType) {
       case MessageWidgetType.formatted:
-        return _buildSpecialBody();
+        return _buildSpecialBody(messageInListState.inSearchResult);
         break;
       case MessageWidgetType.raw:
         return buildMessageRawBody(context, message, getBodyRawText(context));
@@ -38,10 +39,10 @@ class SpecialMessageWidget extends MessageWidget<SpecialMessage> {
 
   @override
   String getBodyRawText(BuildContext context) {
-    return _buildSpecialBody().getBodyRawText(context);
+    return _buildSpecialBody(false).getBodyRawText(context);
   }
 
-  SpecialMessageBodyWidget _buildSpecialBody() {
+  SpecialMessageBodyWidget _buildSpecialBody(bool inSearchResults) {
     SpecialMessageBodyWidget messageBodyWidget;
     switch (message.specialType) {
       case SpecialMessageType.whoIs:

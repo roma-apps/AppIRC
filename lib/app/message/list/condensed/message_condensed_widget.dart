@@ -62,15 +62,15 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
 
   Widget _buildCondensedBody(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
-    MessageListBloc messageListBloc = Provider.of(context);
+//    MessageListBloc messageListBloc = Provider.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: condensedMessageListItem.messages.map((message) {
-        var inSearchResults = messageListBloc.isMessageInSearchResults(message);
+//        var inSearchResults = messageListBloc.isMessageInSearchResults(message);
         return buildMessageWidget(
             message: message,
-            inSearchResults: inSearchResults,
+//            inSearchResults: inSearchResults,
             enableMessageActions: true,
             messageWidgetType: MessageWidgetType.formatted);
       }).toList(),

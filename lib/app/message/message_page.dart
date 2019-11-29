@@ -70,7 +70,7 @@ class MessagePage extends StatelessWidget {
             child: buildMessageWidget(
                 message: message,
                 messageWidgetType: MessageWidgetType.raw,
-                inSearchResults: false,
+//                inSearchResults: false,
                 enableMessageActions: false),
           )),
     );

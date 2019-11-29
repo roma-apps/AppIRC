@@ -5,6 +5,7 @@ import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart
 import 'package:flutter_appirc/app/message/highlight/message_nickname_highlight.dart';
 import 'package:flutter_appirc/app/message/highlight/message_search_highlight.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
+import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_widget.dart';
@@ -20,19 +21,19 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
   RegularMessageWidget(
       {@required RegularMessage message,
       @required bool enableMessageActions,
-      @required bool inSearchResults,
+//      @required bool inSearchResults,
       @required MessageWidgetType messageWidgetType})
       : super(
             message: message,
-            inSearchResults: inSearchResults,
+//            inSearchResults: inSearchResults,
             enableMessageActions: enableMessageActions,
             messageWidgetType: messageWidgetType);
 
   @override
-  Widget buildMessageBody(BuildContext context) {
+  Widget buildMessageBody(BuildContext context, MessageInListState messageInListState) {
     switch (messageWidgetType) {
       case MessageWidgetType.formatted:
-        return _buildFormattedBody(context);
+        return _buildFormattedBody(context, messageInListState);
         break;
       case MessageWidgetType.raw:
         return buildMessageRawBody(context, message, getBodyRawText(context));
@@ -43,7 +44,7 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
     }
   }
 
-  MultiChildRenderObjectWidget _buildFormattedBody(BuildContext context) {
+  MultiChildRenderObjectWidget _buildFormattedBody(BuildContext context, MessageInListState messageInListState) {
     RegularMessageSkinBloc regularMessageSkinBloc = Provider.of(context);
     var color = regularMessageSkinBloc
         .getColorForMessageType(message.regularMessageType);
@@ -77,7 +78,7 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
       spans.addAll(createMessageTextSpans(
           context: context,
           message: message,
-          isHighlightedBySearch: inSearchResults));
+          isHighlightedBySearch: messageInListState.inSearchResult));
     }
 
     if (message.previews?.isNotEmpty == true) {

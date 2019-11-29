@@ -11,7 +11,7 @@ List<String> _findUrls(List<String> originalTexts) {
   var resultUrls = <String>[];
 
   for (var value in originalTexts) {
-    if (value == null) {
+    if (value?.isNotEmpty != true) {
       continue;
     }
     var urlMatches = _regex.allMatches(value);

@@ -12,8 +12,9 @@ import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/search/message_list_search_model.dart';
-import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
+import 'package:flutter_appirc/disposable/async_disposable.dart';
+import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/text_skin_bloc.dart';
@@ -46,13 +47,90 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     super.dispose();
     _positionsListener.itemPositions.removeListener(onVisiblePositionsChanged);
     _positionSubscription?.cancel();
+    disposable.dispose();
   }
+
+  CompositeDisposable disposable = CompositeDisposable([]);
 
   @override
   void initState() {
     super.initState();
 
     _positionsListener.itemPositions.addListener(onVisiblePositionsChanged);
+
+    Timer.run(() {
+      MessageListBloc messageListBloc = Provider.of(context);
+
+      disposable.add(StreamSubscriptionDisposable(messageListBloc
+          .listJumpDestinationStream
+          .listen((newJumpDestination) {
+        nextJumpDestination = newJumpDestination;
+        Timer.run(() {
+          _jumpToMessage();
+        });
+      })));
+
+//      disposable.add(StreamSubscriptionDisposable(
+//          messageListBloc.searchStateStream.listen((searchState) {
+//        if (searchState.selectedFoundItem != null) {
+//          nextJumpDestination = MessageListJumpDestination(
+//              items: messageListBloc.listState.items,
+//              selectedFoundItem: searchState.selectedFoundItem,
+//              alignment: 0);
+//          Timer.run(() {
+//            _jumpToMessage();
+//          });
+//        }
+//      })));
+
+      disposable.add(StreamSubscriptionDisposable(
+          messageListBloc.listStateStream.listen((chatMessageListState) {
+
+//
+//            if (chatMessageListState.updateType ==
+//                MessageListUpdateType.historyFromBackend) {
+//              nextJumpDestination = MessageListJumpDestination(
+//                  items: chatMessageListState.items,
+//                  selectedFoundItem: initScrollPositionItem,
+//                  alignment: 0.0);
+//              Timer.run(() {
+//                _jumpToMessage();
+//              });
+//            }
+//            if (chatMessageListState.updateType ==
+//                MessageListUpdateType.replacedByBackend) {
+//              nextJumpDestination = MessageListJumpDestination(
+//                  items: chatMessageListState.items,
+//                  selectedFoundItem: chatMessageListState.items.last,
+//                  alignment: 0.9);
+//              Timer.run(() {
+//                _jumpToMessage();
+//              });
+//            }
+//
+//            if (chatMessageListState.updateType ==
+//                MessageListUpdateType.loadedFromLocalDatabase) {
+//              nextJumpDestination = MessageListJumpDestination(
+//                  items: chatMessageListState.items,
+//                  selectedFoundItem: initScrollPositionItem,
+//                  alignment: 0);
+//              Timer.run(() {
+//                _jumpToMessage();
+//              });
+//            }
+//
+//            if (visibleMessagesBounds?.updateType ==
+//                MessageListVisibleBoundsUpdateType.push) {
+//              nextJumpDestination = MessageListJumpDestination(
+//                  items: chatMessageListState.items,
+//                  selectedFoundItem: initScrollPositionItem,
+//                  alignment: 0.5);
+//              Timer.run(() {
+//                _jumpToMessage();
+//              });
+//            }
+      })));
+    });
   }
 
   void onVisiblePositionsChanged() {
@@ -146,76 +224,42 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         chatListMessagesBloc.channelMessagesListBloc.visibleMessagesBounds;
 
     MessageListItem initScrollPositionItem =
-        _calculateInitScrollPositionMessage(
-            context, visibleMessagesBounds, chatMessageListState.items);
+        chatListMessagesBloc.calculateInitScrollPositionMessage(
+            visibleMessagesBounds, chatMessageListState.items);
 
-    if (chatMessageListState.updateType ==
-        MessageListUpdateType.historyFromBackend) {
-      nextJumpDestination = MessageListJumpDestination(
-          items: chatMessageListState.items,
-          selectedFoundItem: initScrollPositionItem,
-          alignment: 0.0);
-      Timer.run(() {
-        _jumpToMessage();
-      });
-    }
-    if (chatMessageListState.updateType ==
-        MessageListUpdateType.replacedByBackend) {
-      nextJumpDestination = MessageListJumpDestination(
-          items: chatMessageListState.items,
-          selectedFoundItem: chatMessageListState.items.last,
-          alignment: 0.9);
-      Timer.run(() {
-        _jumpToMessage();
-      });
-    }
-
-    if (chatMessageListState.updateType ==
-        MessageListUpdateType.loadedFromLocalDatabase) {
-      nextJumpDestination = MessageListJumpDestination(
-          items: chatMessageListState.items,
-          selectedFoundItem: initScrollPositionItem,
-          alignment: 0);
-      Timer.run(() {
-        _jumpToMessage();
-      });
-    }
-
-    if (visibleMessagesBounds?.updateType ==
-        MessageListVisibleBoundsUpdateType.push) {
-      nextJumpDestination = MessageListJumpDestination(
-          items: chatMessageListState.items,
-          selectedFoundItem: initScrollPositionItem,
-          alignment: 0.5);
-      Timer.run(() {
-        _jumpToMessage();
-      });
-    }
-
-    return StreamBuilder<MessageListSearchState>(
-        stream: chatListMessagesBloc.searchStateStream,
-        initialData: chatListMessagesBloc.searchState,
-        builder: (context, snapshot) {
-          var searchState = snapshot.data;
-
-          if (searchState.selectedFoundItem != null) {
-            nextJumpDestination = MessageListJumpDestination(
-                items: chatMessageListState.items,
-                selectedFoundItem: searchState.selectedFoundItem,
-                alignment: 0);
-            Timer.run(() {
-              _jumpToMessage();
-            });
-          }
-          return _buildListWidget(context, chatMessageListState.items,
-              chatListMessagesBloc.searchState, initScrollPositionItem);
-        });
+    return _buildListWidget(
+        context,
+        chatMessageListState.items,
+//              chatListMessagesBloc.searchState,
+        initScrollPositionItem);
+//
+//    return StreamBuilder<MessageListSearchState>(
+//        stream: chatListMessagesBloc.searchStateStream,
+//        initialData: chatListMessagesBloc.searchState,
+//        builder: (context, snapshot) {
+//          var searchState = snapshot.data;
+//
+//          if (searchState.selectedFoundItem != null) {
+//            nextJumpDestination = MessageListJumpDestination(
+//                items: chatMessageListState.items,
+//                selectedFoundItem: searchState.selectedFoundItem,
+//                alignment: 0);
+//            Timer.run(() {
+//              _jumpToMessage();
+//            });
+//          }
+//          return _buildListWidget(
+//              context,
+//              chatMessageListState.items,
+////              chatListMessagesBloc.searchState,
+//              initScrollPositionItem);
+//        });
   }
 
   MessageListJumpDestination nextJumpDestination;
 
   void _jumpToMessage() {
-    if (nextJumpDestination != null) {
+    if (nextJumpDestination != null && _scrollController != null) {
       var indexToJump = nextJumpDestination.items?.indexWhere(
           (listItem) => listItem == nextJumpDestination.selectedFoundItem);
       _logger.d(() => "_jumpToMessage ${nextJumpDestination.selectedFoundItem}"
@@ -227,42 +271,10 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     }
   }
 
-  MessageListItem _calculateInitScrollPositionMessage(
-      BuildContext context,
-      MessageListVisibleBounds visibleMessagesBounds,
-      List<MessageListItem> items) {
-    MessageListItem initScrollPositionItem;
-
-    if (visibleMessagesBounds != null) {
-      var remoteId = visibleMessagesBounds.minRegularMessageRemoteId;
-      initScrollPositionItem = items.firstWhere((item) {
-        return item.isContainsMessageWithRemoteId(remoteId);
-      }, orElse: () => null);
-//      initScrollPositionItem = visibleMessagesBounds.min;
-    } else {
-      ChannelBloc channelBloc = ChannelBloc.of(context);
-      var firstUnreadRemoteMessageId =
-          channelBloc.channelState.firstUnreadRemoteMessageId;
-      if (firstUnreadRemoteMessageId != null) {
-        initScrollPositionItem = items.firstWhere((item) {
-          return item.isContainsMessageWithRemoteId(firstUnreadRemoteMessageId);
-        }, orElse: () => null);
-      }
-      if (initScrollPositionItem == null) {
-        _logger.w(() => "use latest message for init scroll");
-        initScrollPositionItem = items.last;
-      }
-      _logger.d(() => "_buildMessagesList "
-          "visibleMessagesBounds $visibleMessagesBounds "
-          "initScrollPositionItem $initScrollPositionItem ");
-    }
-    return initScrollPositionItem;
-  }
-
   Widget _buildListWidget(
       BuildContext context,
       List<MessageListItem> items,
-      MessageListSearchState searchState,
+//      MessageListSearchState searchState,
       MessageListItem messageForInitScrollItem) {
     _lastBuildItems = items;
     var itemCount = items.length;
@@ -303,8 +315,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         itemCount: itemCount,
         initialAlignment: initialAlignment,
         itemBuilder: (BuildContext context, int index) {
-//          _logger.d(() => "itemBuilder $index items "
-//              "${items.length}");
+          _logger.d(() => "itemBuilder $index items "
+              "${items.length}");
 
           if (index == 0) {
             // return the header
@@ -321,9 +333,12 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           }
 
           var item = items[index];
-          var inSearchResults =
-              searchState?.isMessageListItemInSearchResults(item) ?? false;
-          return _buildListItem(context, item, inSearchResults);
+//          var inSearchResults =
+//              searchState?.isMessageListItemInSearchResults(item) ?? false;
+          return _buildListItem(
+            context, item,
+//              inSearchResults
+          );
         });
   }
 
@@ -355,11 +370,14 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 }
 
 Widget _buildListItem(
-    BuildContext context, MessageListItem item, bool inSearchResults) {
+  BuildContext context,
+  MessageListItem item,
+//    bool inSearchResults
+) {
   if (item is SimpleMessageListItem) {
     return buildMessageWidget(
         message: item.message,
-        inSearchResults: inSearchResults,
+//        inSearchResults: inSearchResults,
         enableMessageActions: true,
         messageWidgetType: MessageWidgetType.formatted);
   } else if (item is CondensedMessageListItem) {

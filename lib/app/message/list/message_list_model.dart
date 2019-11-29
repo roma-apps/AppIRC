@@ -35,12 +35,12 @@ class MessageListVisibleBounds {
 }
 
 enum MessageListVisibleBoundsUpdateType { push, ui }
-
-abstract class MoreHistoryOwner {
-  bool get moreHistoryAvailable;
-
-  Stream<bool> get moreHistoryAvailableStream;
-}
+//
+//abstract class MoreHistoryOwner {
+//  bool get moreHistoryAvailable;
+//
+//  Stream<bool> get moreHistoryAvailableStream;
+//}
 
 class SimpleMessageListItem extends MessageListItem {
   final ChatMessage message;
@@ -88,24 +88,28 @@ abstract class MessageListItem {
 
 class MessageListState {
   final List<MessageListItem> items;
-  final bool moreHistoryAvailable;
-  final MessageListUpdateType updateType;
+//  final bool moreHistoryAvailable;
+//  final MessageListUpdateType updateType;
 
   MessageListState.name(
       {@required this.items,
-      @required this.moreHistoryAvailable,
-      @required this.updateType});
+//      @required this.moreHistoryAvailable,
+//      @required this.updateType
+      });
 
   static get empty => MessageListState.name(
       items: [],
-      moreHistoryAvailable: false,
-      updateType: MessageListUpdateType.notUpdated);
+//      moreHistoryAvailable: false,
+//      updateType: MessageListUpdateType.notUpdated
+  );
 
   @override
   String toString() {
     return 'MessageListState{items: $items,'
-        ' moreHistoryAvailable: $moreHistoryAvailable,'
-        ' position: $updateType}';
+//        ' moreHistoryAvailable: $moreHistoryAvailable,'
+//        ' position: $updateType'
+        '}'
+    ;
   }
 }
 
@@ -132,8 +136,28 @@ class MessageListJumpDestination {
   final List<MessageListItem> items;
   final MessageListItem selectedFoundItem;
   final double alignment;
+
   MessageListJumpDestination(
       {@required this.items,
       @required this.selectedFoundItem,
       @required this.alignment});
+}
+
+class MessageInListState {
+  final bool inSearchResult;
+  final String searchTerm;
+  final ChatMessage message;
+
+  MessageInListState.name(
+      {@required this.message,
+      @required this.inSearchResult,
+      @required this.searchTerm});
+
+  @override
+  String toString() {
+    return 'MessageInListState{inSearchResult: $inSearchResult,'
+        ' searchTerm: $searchTerm, message: $message}';
+  }
+
+
 }

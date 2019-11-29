@@ -329,9 +329,9 @@ class _ChatPageState extends State<ChatPage> {
                               "messages $length");
                           if (initFinished && length != null) {
                             var chatListMessagesBloc = MessageListBloc(
+                              channelBloc,
                                 channelBloc.messagesBloc,
                                 messagesLoaderBloc,
-                                channelBloc,
                                 Provider.of<MessageCondensedBloc>(context));
 
                             _logger.d(() =>

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/messages/channel_message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
@@ -19,13 +20,15 @@ import 'condensed/message_condensed_bloc.dart';
 var _logger = MyLogger(logTag: "message_list_bloc.dart", enabled: true);
 
 class MessageListBloc extends Providable {
+  final ChannelBloc channelBloc;
   final ChannelMessageListBloc _channelMessagesListBloc;
   final MessageCondensedBloc _messageCondensedBloc;
 
   ChannelMessageListBloc get channelMessagesListBloc =>
       _channelMessagesListBloc;
   final MessageLoaderBloc _messageLoaderBloc;
-  final MoreHistoryOwner _moreHistoryOwner;
+
+//  final MoreHistoryOwner _moreHistoryOwner;
 
   Stream<bool> get searchNextEnabledStream => searchStateStream
       .map((state) => state?.isCanMoveNext ?? false)
@@ -45,6 +48,15 @@ class MessageListBloc extends Providable {
 
   MessageListState get listState => _listStateSubject.value;
 
+  BehaviorSubject<MessageListJumpDestination> _listJumpDestinationSubject  =
+      BehaviorSubject();
+
+  Stream<MessageListJumpDestination> get listJumpDestinationStream =>
+      _listJumpDestinationSubject.stream;
+
+  MessageListJumpDestination get listJumpDestination =>
+      _listJumpDestinationSubject.value;
+
   BehaviorSubject<MessageListSearchState> _searchStateSubject;
 
   Stream<MessageListSearchState> get searchStateStream =>
@@ -54,26 +66,32 @@ class MessageListBloc extends Providable {
 
   String get searchTerm => searchState.searchTerm;
 
-  MessageListBloc(this._channelMessagesListBloc, this._messageLoaderBloc,
-      this._moreHistoryOwner, this._messageCondensedBloc) {
+  MessageListBloc(
+      this.channelBloc,
+      this._channelMessagesListBloc,
+      this._messageLoaderBloc,
+//      this._moreHistoryOwner,
+      this._messageCondensedBloc) {
     init();
+
+    addDisposable(subject: _listJumpDestinationSubject);
 
     addDisposable(streamSubscription:
         _messageLoaderBloc.messagesListStream.listen((messageList) {
       _onMessagesChanged(
           messageList.allMessages,
-          _moreHistoryOwner.moreHistoryAvailable ?? false,
+//          _moreHistoryOwner.moreHistoryAvailable ?? false,
           messageList.messageListUpdateType);
     }));
 
-    addDisposable(streamSubscription: _moreHistoryOwner
-        .moreHistoryAvailableStream
-        .listen((moreHistoryAvailable) {
-      _updateMessageListItems(
-          listState.items,
-          _moreHistoryOwner.moreHistoryAvailable ?? false,
-          MessageListUpdateType.notUpdated);
-    }));
+//    addDisposable(streamSubscription: _moreHistoryOwner
+//        .moreHistoryAvailableStream
+//        .listen((moreHistoryAvailable) {
+//      _updateMessageListItems(
+//          listState.items,
+//          _moreHistoryOwner.moreHistoryAvailable ?? false,
+//          MessageListUpdateType.notUpdated);
+//    }));
 
     addDisposable(streamSubscription:
         channelMessagesListBloc.isNeedSearchStream.listen((isNeedSearch) {
@@ -82,7 +100,22 @@ class MessageListBloc extends Providable {
             true);
       } else {
         _searchStateSubject.add(MessageListSearchState.empty);
-        updateMessagesList();
+//        updateMessagesList();
+      }
+    }));
+
+    addDisposable(streamSubscription: _channelMessagesListBloc
+        .visibleMessagesBoundsStream
+        .listen((visibleMessageBounds) {
+      if (visibleMessageBounds?.updateType ==
+          MessageListVisibleBoundsUpdateType.push) {
+        _listJumpDestinationSubject.add(MessageListJumpDestination(
+            items: listState.items,
+            selectedFoundItem: listState.items.firstWhere((item) =>
+                item.isContainsMessageWithRemoteId(
+                    visibleMessageBounds.minRegularMessageRemoteId), orElse:
+            () => null),
+            alignment: 0.5));
       }
     }));
 
@@ -96,9 +129,7 @@ class MessageListBloc extends Providable {
     var messageListItems = _convertMessagesToMessageListItems(messages);
 
     MessageListState initListState = MessageListState.name(
-        items: messageListItems,
-        moreHistoryAvailable: _moreHistoryOwner.moreHistoryAvailable,
-        updateType: MessageListUpdateType.loadedFromLocalDatabase);
+        items: messageListItems);
     _logger.d(() => "init messages $initListState");
     MessageListSearchState initSearchState;
 
@@ -110,8 +141,8 @@ class MessageListBloc extends Providable {
       initSearchState = MessageListSearchState.name(
           foundItems: filteredItems,
           searchTerm: searchTerm,
-          selectedFoundItem:
-              filteredItems.isNotEmpty ? filteredItems[0] : null);
+          selectedFoundItem: filteredItems.isNotEmpty ? filteredItems[0] : null,
+          foundMessages: <ChatMessage>[]);
     } else {
       initSearchState = MessageListSearchState.empty;
     }
@@ -120,23 +151,56 @@ class MessageListBloc extends Providable {
     _searchStateSubject = BehaviorSubject(seedValue: initSearchState);
   }
 
-  void _onMessagesChanged(List<ChatMessage> newMessages,
-      bool moreHistoryAvailable, MessageListUpdateType lastAddedPosition) {
+  void _onMessagesChanged(
+      List<ChatMessage> newMessages,
+//      bool moreHistoryAvailable,
+      MessageListUpdateType lastAddedPosition) {
     _logger.d(() => "newMessages = ${newMessages.length} "
-        "moreHistoryAvailable = $moreHistoryAvailable");
+//        "moreHistoryAvailable = $moreHistoryAvailable"
+        );
 
     var messageListItems = _convertMessagesToMessageListItems(newMessages);
 
     _updateMessageListItems(
-        messageListItems, moreHistoryAvailable, lastAddedPosition);
+        messageListItems,
+//        moreHistoryAvailable,
+        lastAddedPosition);
   }
 
   void _updateMessageListItems(List<MessageListItem> messageListItems,
-      bool moreHistoryAvailable, MessageListUpdateType lastAddedPosition) {
+//      bool moreHistoryAvailable,
+      MessageListUpdateType updateType) {
+
+
+
+    var visibleMessagesBounds =
+        channelMessagesListBloc.visibleMessagesBounds;
+
+    MessageListItem initScrollPositionItem =
+    calculateInitScrollPositionMessage(visibleMessagesBounds, listState.items);
+
+    if (updateType == MessageListUpdateType.historyFromBackend) {
+      _listJumpDestinationSubject.add(MessageListJumpDestination(
+          items: listState.items,
+          selectedFoundItem: initScrollPositionItem,
+          alignment: 0.0));
+    }
+    if (updateType == MessageListUpdateType.replacedByBackend) {
+        _listJumpDestinationSubject.add(MessageListJumpDestination(
+          items:  listState.items,
+          selectedFoundItem: listState.items.last,
+          alignment: 0.9));
+    }
+
+    if (updateType == MessageListUpdateType.loadedFromLocalDatabase) {
+          _listJumpDestinationSubject.add(MessageListJumpDestination(
+          items:  listState.items,
+          selectedFoundItem: initScrollPositionItem,
+          alignment: 0));
+    }
+
     var messageListState = MessageListState.name(
-        items: messageListItems,
-        moreHistoryAvailable: moreHistoryAvailable,
-        updateType: lastAddedPosition);
+        items: messageListItems);
     _logger.d(() => "_updateMessageListItems $messageListState");
     _listStateSubject.add(messageListState);
     if (channelMessagesListBloc.isNeedSearch) {
@@ -147,36 +211,85 @@ class MessageListBloc extends Providable {
 
   void _search(List<MessageListItem> messageListItems, String searchTerm,
       bool isSearchTermChanged) {
-    List<MessageListItem> filteredItems =
-        _filterItems(messageListItems, searchTerm);
+//    List<MessageListItem> filteredItems =
+//    _filterItems(messageListItems, searchTerm);
 
-    _logger.d(() => "_search $searchTerm "
-        "isNeedChangeSelectedFoundMessage $isSearchTermChanged"
-        "filteredItems ${filteredItems.length}");
 
-    var searchState = MessageListSearchState.name(
-        foundItems: filteredItems,
-        searchTerm: searchTerm,
-        selectedFoundItem:
-            filteredItems.isNotEmpty ? filteredItems.first : null);
+//    var searchState = MessageListSearchState.name(
+//        foundItems: filteredItems,
+//        searchTerm: searchTerm,
+//        selectedFoundItem:
+//        filteredItems.isNotEmpty ? filteredItems.first : null);
+    var searchState = _createSearchState(messageListItems, searchTerm);
+    _logger.d(() => "_search $searchState ");
     _searchStateSubject.add(searchState);
+
+    _listJumpDestinationSubject.add(MessageListJumpDestination(
+        items: listState.items,
+        selectedFoundItem: searchState.selectedFoundItem,
+        alignment: 0));
 
     if (isSearchTermChanged) {
       // redraw search highlighted words
-      updateMessagesList();
+//      updateMessagesList();
     }
   }
 
-  void updateMessagesList() {
-    _updateMessageListItems(listState.items, listState.moreHistoryAvailable,
-        MessageListUpdateType.notUpdated);
-  }
+//  void updateMessagesList() {
+//    _updateMessageListItems(listState.items, listState.moreHistoryAvailable,
+//        MessageListUpdateType.notUpdated);
+//  }
 
   List<MessageListItem> _filterItems(
       List<MessageListItem> messageListItems, String searchTerm) {
     return messageListItems
         .where((item) => item.isContainsText(searchTerm, ignoreCase: true))
         .toList();
+  }
+
+  MessageListSearchState _createSearchState(
+      List<MessageListItem> messageListItems, String searchTerm) {
+    List<MessageListItem> foundItems = [];
+    List<ChatMessage> foundMessages = [];
+
+    messageListItems.forEach((item) {
+      if (item is SimpleMessageListItem) {
+        bool contains =
+            item.message.isContainsText(searchTerm, ignoreCase: true);
+
+        if (contains) {
+          foundItems.add(item);
+          foundMessages.add(item.message);
+        }
+      } else if (item is CondensedMessageListItem) {
+        bool itemContains = false;
+
+        item.messages.forEach((message) {
+          bool contains = message.isContainsText(searchTerm, ignoreCase: true);
+
+          if (contains) {
+            itemContains = true;
+            foundMessages.add(message);
+          }
+        });
+
+        if (itemContains) {
+          foundItems.add(item);
+        }
+      }
+    });
+
+    MessageListSearchState searchState = MessageListSearchState.name(
+        foundItems: foundItems,
+        foundMessages: foundMessages,
+        searchTerm: searchTerm,
+        selectedFoundItem: foundItems.isNotEmpty ? foundItems.first : null);
+
+    return searchState;
+
+//    return messageListItems
+//        .where((item) => item.isContainsText(searchTerm, ignoreCase: true))
+//        .toList();
   }
 
   void changeSelectedMessage(int newSelectedFoundMessageIndex) {
@@ -189,7 +302,8 @@ class MessageListBloc extends Providable {
     var listSearchState = MessageListSearchState.name(
         foundItems: state.foundItems,
         searchTerm: state.searchTerm,
-        selectedFoundItem: foundMessage);
+        selectedFoundItem: foundMessage,
+        foundMessages: state.foundMessages);
     _searchStateSubject.add(listSearchState);
     _logger.d(() => "changeSelectedMessage after");
   }
@@ -270,17 +384,94 @@ class MessageListBloc extends Providable {
   }
 
   bool isMessageInSearchResults(ChatMessage message) {
-    bool inSearchResults;
-    var term = this.searchTerm;
-    if (term != null) {
-      inSearchResults = message.isContainsText(searchTerm, ignoreCase: true);
-    } else {
-      inSearchResults = false;
-    }
+    return searchState.foundMessages.contains(message);
 
-    return inSearchResults;
+//    bool inSearchResults;
+//    var term = this.searchTerm;
+//    if (term != null) {
+//      inSearchResults = message.isContainsText(searchTerm, ignoreCase: true);
+//    } else {
+//      inSearchResults = false;
+//    }
+//
+//    return inSearchResults;
   }
 
-  Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>
-      _messageLoaderBloc.getMessageUpdateStream(message);
+  Stream<MessageInListState> getMessageInListStateStream(ChatMessage message) =>
+      merge(_messageLoaderBloc.getMessageUpdateStream(message),
+              _searchStateSubject)
+          .distinct((oldState, newState) {
+
+
+        var changed = oldState.inSearchResult == newState.inSearchResult &&
+            oldState.searchTerm == newState.searchTerm &&
+            oldState.message.linksInText == newState.message.linksInText &&
+            _checkPreviews(oldState, newState);
+            _logger.d(()=> "getMessageInListStateStream changed $changed"
+            "oldState $oldState "
+            "newState $newState "
+            );
+        return changed;
+      });
+
+  MessageInListState getMessageInListState(ChatMessage message) =>
+      MessageInListState.name(
+          message: message,
+          inSearchResult: isMessageInSearchResults(message),
+          searchTerm: searchTerm);
+
+  Stream<MessageInListState> merge(
+      Stream<ChatMessage> streamA, Stream<MessageListSearchState> streamB) {
+    return Observable.combineLatest2(
+        streamA, streamB, (a, b) => getMessageInListState(a));
+
+//    return streamA
+//        .transform(Observable.combineLatest(streamB, (a, b) =>
+//        getMessageInListState(a)));
+  }
+
+
+
+  MessageListItem calculateInitScrollPositionMessage(
+      MessageListVisibleBounds visibleMessagesBounds,
+      List<MessageListItem> items) {
+    MessageListItem initScrollPositionItem;
+
+    if (visibleMessagesBounds != null) {
+      var remoteId = visibleMessagesBounds.minRegularMessageRemoteId;
+      initScrollPositionItem = items.firstWhere((item) {
+        return item.isContainsMessageWithRemoteId(remoteId);
+      }, orElse: () => null);
+//      initScrollPositionItem = visibleMessagesBounds.min;
+    } else {
+
+      var firstUnreadRemoteMessageId =
+          channelBloc.channelState.firstUnreadRemoteMessageId;
+      if (firstUnreadRemoteMessageId != null) {
+        initScrollPositionItem = items.firstWhere((item) {
+          return item.isContainsMessageWithRemoteId(firstUnreadRemoteMessageId);
+        }, orElse: () => null);
+      }
+      if (initScrollPositionItem == null) {
+        _logger.w(() => "use latest message for init scroll");
+        initScrollPositionItem = items.last;
+      }
+      _logger.d(() => "_buildMessagesList "
+          "visibleMessagesBounds $visibleMessagesBounds "
+          "initScrollPositionItem $initScrollPositionItem ");
+    }
+    return initScrollPositionItem;
+  }
+
 }
+
+bool _checkPreviews(MessageInListState oldState, MessageInListState newState) {
+  var oldMessage = oldState.message;
+  var newMessage = newState.message;
+  if (oldMessage is RegularMessage && newMessage is RegularMessage) {
+    return oldMessage.previews == newMessage.previews;
+  } else {
+    return true;
+  }
+}
+

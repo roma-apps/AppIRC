@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_widget.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
+import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_page.dart';
@@ -13,16 +14,18 @@ import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_widget.dart';
 import 'package:flutter_appirc/app/message/special/message_special_widget.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
+import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
+MyLogger _logger = MyLogger(logTag: "message_widget.dart", enabled: true);
+
 enum MessageWidgetType { formatted, raw }
 
 Widget buildMessageWidget(
     {@required ChatMessage message,
-    @required bool inSearchResults,
     @required bool enableMessageActions,
     @required MessageWidgetType messageWidgetType}) {
   Widget child;
@@ -30,14 +33,12 @@ Widget buildMessageWidget(
     case ChatMessageType.regular:
       child = RegularMessageWidget(
           message: message,
-          inSearchResults: inSearchResults,
           enableMessageActions: enableMessageActions,
           messageWidgetType: messageWidgetType);
       break;
     case ChatMessageType.special:
       child = SpecialMessageWidget(
           message: message,
-          inSearchResults: inSearchResults,
           enableMessageActions: enableMessageActions,
           messageWidgetType: messageWidgetType);
       break;
@@ -47,7 +48,6 @@ Widget buildMessageWidget(
 
 abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   final T message;
-  final bool inSearchResults;
   final bool enableMessageActions;
   final MessageWidgetType messageWidgetType;
 
@@ -56,7 +56,6 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   MessageWidget(
       {@required this.message,
       @required this.enableMessageActions,
-      @required this.inSearchResults,
       @required this.messageWidgetType});
 
   @override
@@ -105,31 +104,37 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
   Widget _buildDecoratedBody(BuildContext context) {
     MessageListBloc messageListBloc = Provider.of(context);
-    return StreamBuilder<ChatMessage>(
-      stream: messageListBloc.getMessageUpdateStream(message),
-      initialData: message,
+
+    MessageInListState messageState = messageListBloc
+        .getMessageInListState(message);
+    _logger.d(() => "StreamBuilder messageState =$messageState");
+    return Container(
+        decoration:
+        _createMessageDecoration(context: context, messageInListState: messageState),
+        child: buildMessageBody(context, messageState));
+    return StreamBuilder<MessageInListState>(
+      stream: messageListBloc.getMessageInListStateStream(message),
+      initialData: messageListBloc.getMessageInListState(message),
       builder: (context, snapshot) {
 
-        ChatMessage message = snapshot.data;
-        return Container(
-            decoration:
-                _createMessageDecoration(context: context, message: message),
-            child: buildMessageBody(context));
+    MessageInListState messageState = snapshot.data;
+
       }
     );
   }
 
-  Widget buildMessageBody(BuildContext context);
+  Widget buildMessageBody(BuildContext context, MessageInListState messageInListState);
 
-  _createMessageDecoration(
-      {@required BuildContext context, @required ChatMessage message}) {
-    var isHighlightBySearch = inSearchResults;
+  Decoration _createMessageDecoration(
+      {@required BuildContext context, @required MessageInListState
+      messageInListState}) {
+    var isHighlightBySearch = messageInListState.inSearchResult;
 
     var decoration;
     bool isHighlightByServer;
 
     if (message is RegularMessage) {
-      isHighlightByServer = isHighlightedByServer(message);
+      isHighlightByServer = isHighlightedByServer(messageInListState.message);
     }
 
     var messagesSkin = Provider.of<MessageListSkinBloc>(context);

@@ -20,7 +20,7 @@ import 'package:rxdart/rxdart.dart';
 
 final Duration _usersListOutDateDuration = Duration(seconds: 15);
 
-class ChannelBloc extends DisposableOwner implements MoreHistoryOwner {
+class ChannelBloc extends DisposableOwner {
   final ChatBackendService _backendService;
   final ChatPushesService chatPushesService;
 
