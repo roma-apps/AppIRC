@@ -142,6 +142,11 @@ class MessageManagerBloc extends ChannelListListenerBloc {
       newMessage.messageLocalId = id;
     }
 
+
+    // remove messages which already exist in local storage
+    messagesForChannel.messages = newMessages.where((message) => message
+        .messageLocalId != null).toList();
+
     _realtimeMessagesSubject.add(messagesForChannel);
 
     // don't await
@@ -161,7 +166,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
         if (foundMessage != null) {
           // nothing
-          id = foundMessage.localId;
+//          id = foundMessage.localId;
         } else {
           var regularMessageDB = toRegularMessageDB(newMessage);
           id = await _db.regularMessagesDao

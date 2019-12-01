@@ -281,7 +281,6 @@ class AppIRCState extends State<AppIRC> {
     var messageManagerBloc =
         MessageManagerBloc(loungeBackendService, networksListBloc, _database);
 
-    messageManagerBloc.clearAllMessages();
 
     Disposable signOutListener;
     signOutListener = loungeBackendService.listenForSignOut(() async {

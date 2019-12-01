@@ -52,7 +52,7 @@ enum ChatMessageType { special, regular }
 
 class MessagesForChannel {
   final Channel channel;
-  final List<ChatMessage> messages;
+   List<ChatMessage> messages;
   final bool isContainsTextSpecialMessage;
 
   MessagesForChannel.name(
