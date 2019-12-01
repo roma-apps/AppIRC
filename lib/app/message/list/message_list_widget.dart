@@ -313,12 +313,11 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 Widget _buildListItem(
   BuildContext context,
   MessageListItem item,
-//    bool inSearchResults
 ) {
   if (item is SimpleMessageListItem) {
     return buildMessageWidget(
         message: item.message,
-//        inSearchResults: inSearchResults,
+        messageInListState: notInSearchState,
         enableMessageActions: true,
         messageWidgetType: MessageWidgetType.formatted);
   } else if (item is CondensedMessageListItem) {

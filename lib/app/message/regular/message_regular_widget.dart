@@ -20,11 +20,11 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
   RegularMessageWidget(
       {@required RegularMessage message,
       @required bool enableMessageActions,
-//      @required bool inSearchResults,
+      @required MessageInListState messageInListState,
       @required MessageWidgetType messageWidgetType})
       : super(
             message: message,
-//            inSearchResults: inSearchResults,
+            messageInListState: messageInListState,
             enableMessageActions: enableMessageActions,
             messageWidgetType: messageWidgetType);
 

@@ -18,6 +18,13 @@ abstract class SpecialMessageDao {
       'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = :channelRemoteId')
   Future<List<SpecialMessageDB>> getChannelMessages(int channelRemoteId);
 
+
+  @Query('SELECT * FROM SpecialMessageDB WHERE channelRemoteId = '
+      ':channelRemoteId AND dataJsonEncoded LIKE :search ORDER BY '
+      'dateMicrosecondsSinceEpoch ASC')
+  Future<List<SpecialMessageDB>> searchChannelMessagesOrderByDate(
+      int channelRemoteId, String search);
+
   @Query(
       'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = :channelRemoteId')
   Stream<List<SpecialMessageDB>> getChannelMessagesStream(int channelRemoteId);

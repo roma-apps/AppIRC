@@ -26,38 +26,45 @@ enum MessageWidgetType { formatted, raw }
 Widget buildMessageWidget(
     {@required ChatMessage message,
     @required bool enableMessageActions,
+      @required MessageInListState messageInListState,
     @required MessageWidgetType messageWidgetType}) {
   Widget child;
   switch (message.chatMessageType) {
     case ChatMessageType.regular:
       child = RegularMessageWidget(
           message: message,
+          messageInListState: messageInListState,
           enableMessageActions: enableMessageActions,
           messageWidgetType: messageWidgetType);
       break;
     case ChatMessageType.special:
       child = SpecialMessageWidget(
           message: message,
+          messageInListState: messageInListState,
           enableMessageActions: enableMessageActions,
           messageWidgetType: messageWidgetType);
       break;
   }
   return child;
 }
+final MessageInListState notInSearchState =  MessageInListState.name
+(inSearchResult:
+false, searchTerm: null);
 
 abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   final T message;
   final bool enableMessageActions;
   final MessageWidgetType messageWidgetType;
-  final MessageInListState messageInListState =
-      MessageInListState.name(inSearchResult: false, searchTerm: null);
+  final MessageInListState messageInListState;
 
   String getBodyRawText(BuildContext context);
 
   MessageWidget(
       {@required this.message,
       @required this.enableMessageActions,
-      @required this.messageWidgetType});
+      @required this.messageWidgetType,
+      @required this.messageInListState,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +122,7 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
           _logger.d(() => "StreamBuilder messageState =$message");
           return Container(
               decoration: _createMessageDecoration(
-                  context: context, messageInListState: messageInListState),
+                  context: context),
               child: buildMessageBody(context, message));
         });
   }
@@ -123,9 +130,7 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   Widget buildMessageBody(BuildContext context, ChatMessage message);
 
   Decoration _createMessageDecoration(
-      {@required BuildContext context,
-      @required MessageInListState messageInListState}) {
-    var isHighlightBySearch = messageInListState.inSearchResult;
+      {@required BuildContext context}) {
 
     var decoration;
     bool isHighlightByServer;
@@ -136,13 +141,11 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
     }
 
     var messagesSkin = Provider.of<MessageListSkinBloc>(context);
-    if (isHighlightBySearch) {
-      decoration = messagesSkin.highlightSearchDecoration;
-    } else {
+
       if (isHighlightByServer ??= false) {
         decoration = messagesSkin.highlightServerDecoration;
       }
-    }
+
     return decoration;
   }
 }

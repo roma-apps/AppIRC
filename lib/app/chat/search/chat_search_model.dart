@@ -1,3 +1,26 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
+
+class SearchState {
+  final String searchTerm;
+  final bool isLoading;
+  final List<ChatMessage> messages;
+
+  SearchState.name({
+    @required this.searchTerm,
+    @required this.messages,
+    @required this.isLoading,
+  });
+
+  SearchState(this.searchTerm, this.isLoading, this.messages);
+
+  @override
+  String toString() {
+    return 'SearchState{searchTerm: $searchTerm,'
+        ' isLoading: $isLoading, messages: $messages}';
+  }
+}
+
 //import 'package:flutter/widgets.dart';
 //import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 //import 'package:flutter_appirc/app/message/message_model.dart';

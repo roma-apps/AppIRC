@@ -6,8 +6,6 @@ abstract class MessageSkinBloc extends SkinBloc {
 
   TextStyle get messageBodyTextStyle;
 
-  Color get highlightSearchBackgroundColor;
-
   Color get highlightServerBackgroundColor;
 
 

@@ -205,7 +205,13 @@
   "chat": {
     "title": "Chat",
     "search": {
-      "title": "Search in {}"
+      "title": "Search in {}",
+      "field": {
+        "filter": {
+          "hint": "Text, nickname, or status..."
+        }
+      },
+      "nothing_found": "Nothing found"
     },
     "state": {
       "connection": {
@@ -279,17 +285,6 @@
       }
     },
     "messages_list": {
-      "search": {
-        "field": {
-          "filter": {
-            "label": {
-              "nothing_found": "Nothing found",
-              "found": "Found {}/{}"
-            },
-            "hint": "Text, nickname, or status..."
-          }
-        }
-      },
       "load_more": {
         "action": "Load more",
         "not_available": "More history not available"

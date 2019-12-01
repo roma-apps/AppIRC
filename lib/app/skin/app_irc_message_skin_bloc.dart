@@ -57,9 +57,6 @@ class AppIRCMessageSkinBloc extends MessageSkinBloc {
 
   Color get textHighlightBackgroundColor => theme.textHighlightBackgroundColor;
 
-  @override
-  Color get highlightSearchBackgroundColor =>
-      theme.highlightSearchBackgroundColor;
 
   @override
   Color get highlightServerBackgroundColor =>

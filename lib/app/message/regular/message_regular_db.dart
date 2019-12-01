@@ -36,6 +36,13 @@ abstract class RegularMessageDao {
   Future<List<RegularMessageDB>> getChannelMessagesOrderByDate(
       int channelRemoteId);
 
+  @Query('SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
+      ':channelRemoteId AND (text LIKE :search OR fromNick LIKE :nickSearch) ORDER '
+      'BY '
+      'dateMicrosecondsSinceEpoch ASC')
+  Future<List<RegularMessageDB>> searchChannelMessagesOrderByDate(
+      int channelRemoteId, String search, String nickSearch);
+
   @Query(
       'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1')
   Future<RegularMessageDB> getLatestMessage();

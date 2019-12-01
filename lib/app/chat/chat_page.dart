@@ -4,6 +4,7 @@ import 'package:flutter/material.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
 import 'package:flutter_appirc/app/channel/channel_blocs_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
@@ -214,21 +215,29 @@ class _ChatPageState extends State<ChatPage> {
                       color: Provider.of<ChatAppBarSkinBloc>(context)
                           .iconAppBarColor),
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        platformPageRoute(
-                            builder: (context) {
-                              var searchBloc = ChatSearchBloc(channel);
-                              return Provider(
-                                  providable: searchBloc,
-                                  child: ChatSearchPage());
-                            }));
+                    _goToSearchPage(context, channel, channelBloc);
                   }));
 
           return Row(mainAxisSize: MainAxisSize.min, children: items);
         }
       },
     );
+  }
+
+  void _goToSearchPage(BuildContext context, Channel channel, ChannelBloc channelBloc) {
+
+    ChatDatabaseProvider databaseProvider = Provider.of(context);
+
+    Navigator.push(
+        context,
+        platformPageRoute(
+            builder: (context) {
+              return Provider(
+                  providable: ChatSearchBloc(databaseProvider.db, channel),
+                  child: Provider(
+                      providable: ChannelBlocProvider(channelBloc),
+                      child: ChatSearchPage()));
+            }));
   }
 
   Widget _buildAppBarChild(BuildContext context) {

@@ -47,9 +47,6 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   Color get onNotActiveListItemColor => onAppBackgroundColor;
 
   @override
-  Color get highlightSearchBackgroundColor => _themeData.primaryColorDark;
-
-  @override
   Color get highlightServerBackgroundColor => Colors.black26;
 
 

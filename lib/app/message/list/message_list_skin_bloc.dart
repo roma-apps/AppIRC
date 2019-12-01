@@ -3,7 +3,5 @@ import 'package:flutter_appirc/skin/skin_bloc.dart';
 
 abstract class MessageListSkinBloc extends SkinBloc {
 
-  BoxDecoration get highlightSearchDecoration;
-
   BoxDecoration get highlightServerDecoration;
 }

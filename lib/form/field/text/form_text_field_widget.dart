@@ -9,7 +9,7 @@ import 'package:flutter_appirc/platform_aware/platform_aware_text_field.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-buildFormTextField(
+Widget buildFormTextField(
     {@required BuildContext context,
     @required FormValueFieldBloc<String> bloc,
     @required TextEditingController controller,

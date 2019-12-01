@@ -226,6 +226,15 @@ class _$RegularMessageDao extends RegularMessageDao {
   }
 
   @override
+  Future<List<RegularMessageDB>> searchChannelMessagesOrderByDate(
+      int channelRemoteId, String search, String nickSearch) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? AND (text LIKE ? OR fromNick LIKE ?) ORDER BY dateMicrosecondsSinceEpoch ASC',
+        arguments: <dynamic>[channelRemoteId, search, nickSearch],
+        mapper: _regularMessageDBMapper);
+  }
+
+  @override
   Future<RegularMessageDB> getLatestMessage() async {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1',
@@ -341,6 +350,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
     return _queryAdapter.queryList(
         'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId],
+        mapper: _specialMessageDBMapper);
+  }
+
+  @override
+  Future<List<SpecialMessageDB>> searchChannelMessagesOrderByDate(
+      int channelRemoteId, String search) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = ? AND dataJsonEncoded LIKE ? ORDER BY dateMicrosecondsSinceEpoch ASC',
+        arguments: <dynamic>[channelRemoteId, search],
         mapper: _specialMessageDBMapper);
   }
 

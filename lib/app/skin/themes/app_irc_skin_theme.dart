@@ -30,7 +30,6 @@ abstract class AppIRCSkinTheme extends AppSkinTheme {
 
   Color get onNotActiveListItemColor;
 
-  Color get highlightSearchBackgroundColor;
 
   Color get highlightServerBackgroundColor;
 

@@ -65,12 +65,13 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: condensedMessageListItem.messages.map((message) {
-//        var inSearchResults = messageListBloc.isMessageInSearchResults(message);
+
         return buildMessageWidget(
             message: message,
-//            inSearchResults: inSearchResults,
             enableMessageActions: true,
-            messageWidgetType: MessageWidgetType.formatted);
+            messageWidgetType: MessageWidgetType.formatted,
+            messageInListState: notInSearchState
+        );
       }).toList(),
     );
   }

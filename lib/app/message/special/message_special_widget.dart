@@ -13,12 +13,12 @@ import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 class SpecialMessageWidget extends MessageWidget<SpecialMessage> {
   SpecialMessageWidget(
       {@required SpecialMessage message,
-//      @required bool inSearchResults,
+      @required MessageInListState messageInListState,
       @required bool enableMessageActions,
       @required MessageWidgetType messageWidgetType})
       : super(
             message: message,
-//            inSearchResults: inSearchResults,
+            messageInListState: messageInListState,
             enableMessageActions: enableMessageActions,
             messageWidgetType: messageWidgetType);
 

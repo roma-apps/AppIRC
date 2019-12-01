@@ -65,8 +65,8 @@ class MessagePage extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: buildMessageWidget(
                 message: message,
+                messageInListState: notInSearchState,
                 messageWidgetType: MessageWidgetType.raw,
-//                inSearchResults: false,
                 enableMessageActions: false),
           )),
     );
