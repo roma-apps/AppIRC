@@ -110,32 +110,34 @@ class SocketIOService extends Providable {
 
     _logger.d(() => "init _socketIO = $_socketIO");
 
-    addDisposable(disposable: _listenConnectionState((state) {
-      _logger.d(() => "onNewState => $state");
-      _connectionStateController.add(state);
+    addDisposable(disposable: _listenConnectionState((socketState, eventName) {
+      _logger.d(() => "onNewState => $socketState eventName = $eventName");
+      _connectionStateController.add(socketState);
     }));
+
+
   }
 
   Disposable _listenConnectionState(
-      void Function(SocketConnectionState) listener) {
+      void Function(SocketConnectionState, String) listener) {
     SocketEventListener connectListener =
-        (_) => listener(SocketConnectionState.connected);
+        (_) => listener(SocketConnectionState.connected, "connected");
     SocketEventListener disconnectListener =
-        (_) => listener(SocketConnectionState.disconnected);
+        (_) => listener(SocketConnectionState.disconnected, "disconnected");
     SocketEventListener connectErrorListener =
-        (_) => listener(SocketConnectionState.disconnected);
+        (_) => listener(SocketConnectionState.disconnected, "connectError");
     SocketEventListener connectTimeoutListener =
-        (_) => listener(SocketConnectionState.disconnected);
+        (_) => listener(SocketConnectionState.disconnected, "connectTimeout");
     SocketEventListener connectingListener =
-        (_) => listener(SocketConnectionState.connecting);
+        (_) => listener(SocketConnectionState.connecting, "connecting");
     SocketEventListener reconnectListener =
-        (_) => listener(SocketConnectionState.connected);
+        (_) => listener(SocketConnectionState.connected, "reconnect");
     SocketEventListener reconnectFailedListener =
-        (_) => listener(SocketConnectionState.disconnected);
+        (_) => listener(SocketConnectionState.disconnected, "reconnectFailed");
     SocketEventListener reconnectErrorListener =
-        (_) => listener(SocketConnectionState.disconnected);
+        (_) => listener(SocketConnectionState.disconnected, "reconnectError");
     SocketEventListener reconnectingListener =
-        (_) => listener(SocketConnectionState.connecting);
+        (_) => listener(SocketConnectionState.connecting, "reconnecting");
     onConnect(connectListener);
     onDisconnect(disconnectListener);
     onConnectError(connectErrorListener);

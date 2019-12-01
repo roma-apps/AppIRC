@@ -34,7 +34,11 @@ abstract class RegularMessageDao {
   @Query('SELECT * FROM RegularMessageDB WHERE channelRemoteId = '
       ':channelRemoteId ORDER BY dateMicrosecondsSinceEpoch ASC')
   Future<List<RegularMessageDB>> getChannelMessagesOrderByDate(
-      intchannelRemoteId);
+      int channelRemoteId);
+
+  @Query(
+      'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1')
+  Future<RegularMessageDB> getLatestMessage();
 
   @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')

@@ -96,19 +96,38 @@ Map<String, dynamic> _$RegistrationLoungeJsonRequestToJson(
       'password': instance.password,
     };
 
-AuthLoungeJsonRequestBody _$AuthLoungeJsonRequestBodyFromJson(
+AuthLoginLoungeJsonRequestBody _$AuthLoginLoungeJsonRequestBodyFromJson(
     Map<String, dynamic> json) {
-  return AuthLoungeJsonRequestBody(
+  return AuthLoginLoungeJsonRequestBody(
     json['user'] as String,
     json['password'] as String,
   );
 }
 
-Map<String, dynamic> _$AuthLoungeJsonRequestBodyToJson(
-        AuthLoungeJsonRequestBody instance) =>
+Map<String, dynamic> _$AuthLoginLoungeJsonRequestBodyToJson(
+        AuthLoginLoungeJsonRequestBody instance) =>
     <String, dynamic>{
       'user': instance.user,
       'password': instance.password,
+    };
+
+AuthReconnectLoungeJsonRequestBody _$AuthReconnectLoungeJsonRequestBodyFromJson(
+    Map<String, dynamic> json) {
+  return AuthReconnectLoungeJsonRequestBody(
+    json['lastMessage'] as int,
+    json['openChannel'] as int,
+    json['user'] as String,
+    json['token'] as String,
+  );
+}
+
+Map<String, dynamic> _$AuthReconnectLoungeJsonRequestBodyToJson(
+        AuthReconnectLoungeJsonRequestBody instance) =>
+    <String, dynamic>{
+      'lastMessage': instance.lastMessageId,
+      'openChannel': instance.openChannelId,
+      'user': instance.user,
+      'token': instance.token,
     };
 
 NetworkEditLoungeJsonRequest _$NetworkEditLoungeJsonRequestFromJson(

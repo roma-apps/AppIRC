@@ -218,10 +218,17 @@ class _$RegularMessageDao extends RegularMessageDao {
 
   @override
   Future<List<RegularMessageDB>> getChannelMessagesOrderByDate(
-      dynamic intchannelRemoteId) async {
+      int channelRemoteId) async {
     return _queryAdapter.queryList(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY dateMicrosecondsSinceEpoch ASC',
-        arguments: <dynamic>[intchannelRemoteId],
+        arguments: <dynamic>[channelRemoteId],
+        mapper: _regularMessageDBMapper);
+  }
+
+  @override
+  Future<RegularMessageDB> getLatestMessage() async {
+    return _queryAdapter.query(
+        'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1',
         mapper: _regularMessageDBMapper);
   }
 

@@ -28,8 +28,13 @@ Future<ChatInitInformation> toChatInitInformation(
     InitLoungeResponseBody parsed) async {
   var loungeNetworks = parsed.networks;
   var networksWithState = <NetworkWithState>[];
+  var channelsWithState = <ChannelWithState>[];
   for (var loungeNetwork in loungeNetworks) {
     networksWithState.add(await toNetworkWithState(loungeNetwork));
+
+    for (var loungeChannel in loungeNetwork.channels) {
+      channelsWithState.add(await toChannelWithState(loungeChannel));
+    }
   }
   int activeChannelRemoteId = parsed.active;
   var isUndefinedActiveId =
@@ -38,8 +43,11 @@ Future<ChatInitInformation> toChatInitInformation(
     activeChannelRemoteId = null;
   }
   return ChatInitInformation.name(
-      activeChannelRemoteId: activeChannelRemoteId,
-      networksWithState: networksWithState);
+    activeChannelRemoteId: activeChannelRemoteId,
+    networksWithState: networksWithState,
+    channelsWithState: channelsWithState,
+    authToken: parsed.token,
+  );
 }
 
 ChatConfig toChatConfig(
@@ -181,7 +189,6 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
         loungeChannelItem.topic,
         loungeChannelItem.num_users);
 
-
     specialMessages.add(SpecialMessage.name(
         data: channelInfoSpecialMessageBody,
         channelRemoteId: channel.remoteId,
@@ -201,7 +208,6 @@ Future<SpecialMessage> toTextSpecialMessage(
     SpecialMessageType messageType) async {
   var textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(
       messageSpecialLoungeResponseBody.data);
-
 
   return SpecialMessage.name(
       data: TextSpecialMessageBody(textMessage.text),

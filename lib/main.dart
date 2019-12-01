@@ -11,6 +11,7 @@ import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_new_con
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_blocs_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/channel/list/unread_count/channel_list_unread_count_bloc.dart';
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
@@ -48,7 +49,6 @@ import 'package:flutter_appirc/app/skin/app_irc_chat_input_message_skin_bloc.dar
 import 'package:flutter_appirc/app/skin/app_irc_form_boolean_field_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_text_field_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_form_title_skin_bloc.dart';
-import 'package:flutter_appirc/app/skin/app_irc_search_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_preview_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_regular_skin_bloc.dart';
@@ -56,6 +56,7 @@ import 'package:flutter_appirc/app/skin/app_irc_message_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_message_special_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_network_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_popup_menu_skin_bloc.dart';
+import 'package:flutter_appirc/app/skin/app_irc_search_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/app_irc_text_skin_bloc.dart';
 import 'package:flutter_appirc/app/skin/themes/app_irc_skin_theme.dart';
 import 'package:flutter_appirc/app/skin/themes/day_app_irc_skin_theme.dart';
@@ -201,7 +202,22 @@ class AppIRCState extends State<AppIRC> {
     var loungeBackendService =
         LoungeBackendService(socketManagerProvider.manager, _loungePreferences);
 
-    await loungeBackendService.init();
+    ChatActiveChannelBloc activeChannelBloc;
+    Channel Function() currentChannelExtractor = () {
+      return activeChannelBloc?.activeChannel;
+    };
+
+
+    await loungeBackendService.init(currentChannelExtractor:
+    currentChannelExtractor,
+        lastMessageRemoteIdExtractor:
+            () async {
+      var latestMessage = (await _database.regularMessagesDao.getLatestMessage());
+
+      _logger.d(() => " latestMessage $latestMessage");
+
+      return latestMessage?.messageRemoteId;
+    });
 
     this._loungeBackendService = loungeBackendService;
 
@@ -215,12 +231,15 @@ class AppIRCState extends State<AppIRC> {
 
     var messageCondensedBloc = MessageCondensedBloc();
 
-    var connectionBloc = ChatConnectionBloc(loungeBackendService);
     var networkStatesBloc =
         NetworkStatesBloc(loungeBackendService, networksListBloc);
 
     var _startPreferences =
         chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
+
+
+    var connectionBloc =
+    ChatConnectionBloc(loungeBackendService);
 
     var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
         networksListBloc, _startPreferences);
@@ -228,8 +247,10 @@ class AppIRCState extends State<AppIRC> {
     var chatPushesService =
         ChatPushesService(_pushesService, loungeBackendService, chatInitBloc);
 
-    var activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,
+    activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,
         chatInitBloc, networksListBloc, preferencesService, chatPushesService);
+
+
 
     var channelsStatesBloc = ChannelStatesBloc(
         loungeBackendService, _database, networksListBloc, activeChannelBloc);
@@ -257,15 +278,13 @@ class AppIRCState extends State<AppIRC> {
         chatPreferencesBloc,
         chatInitBloc);
 
-    var messageManagerBloc = MessageManagerBloc(
-                                            loungeBackendService,
-                                            networksListBloc,
-                                            _database);
+    var messageManagerBloc =
+        MessageManagerBloc(loungeBackendService, networksListBloc, _database);
+
+    messageManagerBloc.clearAllMessages();
 
     Disposable signOutListener;
     signOutListener = loungeBackendService.listenForSignOut(() async {
-
-
       await messageManagerBloc.clearAllMessages();
 
       chatPreferencesSaverBloc.reset();

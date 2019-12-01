@@ -211,7 +211,7 @@ class RegistrationLoungeJsonRequest extends LoungeJsonRequest {
 }
 
 @JsonSerializable()
-class AuthLoungeJsonRequestBody extends LoungeJsonRequest {
+class AuthLoginLoungeJsonRequestBody extends LoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.auth;
 
@@ -223,16 +223,47 @@ class AuthLoungeJsonRequestBody extends LoungeJsonRequest {
     return 'AuthLoungeJsonRequestBody{user: $user, password: $password}';
   }
 
-  AuthLoungeJsonRequestBody(this.user, this.password);
+  AuthLoginLoungeJsonRequestBody(this.user, this.password);
 
-  AuthLoungeJsonRequestBody.name(
+  AuthLoginLoungeJsonRequestBody.name(
       {@required this.user, @required this.password});
 
   @override
-  Map<String, dynamic> toJson() => _$AuthLoungeJsonRequestBodyToJson(this);
+  Map<String, dynamic> toJson() => _$AuthLoginLoungeJsonRequestBodyToJson(this);
 
-  factory AuthLoungeJsonRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$AuthLoungeJsonRequestBodyFromJson(json);
+  factory AuthLoginLoungeJsonRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$AuthLoginLoungeJsonRequestBodyFromJson(json);
+}
+
+@JsonSerializable()
+class AuthReconnectLoungeJsonRequestBody extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.auth;
+
+  @JsonKey(name: "lastMessage")
+   int lastMessageId;
+  @JsonKey(name: "openChannel")
+   int openChannelId;
+  final String user;
+  final String token;
+
+  AuthReconnectLoungeJsonRequestBody(
+      this.lastMessageId, this.openChannelId,
+      this.user, this.token);
+
+  AuthReconnectLoungeJsonRequestBody.name(
+      {
+        @required this.lastMessageId,
+        @required this.openChannelId,
+        @required this.user,
+        @required this.token,
+      });
+
+  @override
+  Map<String, dynamic> toJson() => _$AuthReconnectLoungeJsonRequestBodyToJson(this);
+
+  factory AuthReconnectLoungeJsonRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+      _$AuthReconnectLoungeJsonRequestBodyFromJson(json);
 }
 
 @JsonSerializable()

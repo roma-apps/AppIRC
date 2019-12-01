@@ -45,11 +45,19 @@ abstract class ChatBackendService implements Providable {
 
   ChatInitInformation get chatInit;
 
+
   bool get isReadyToConnect;
 
   Future<RequestResult<ChatLoginResult>> connectChat();
 
   Future<RequestResult<bool>> disconnectChat({bool waitForResult: false});
+
+  Future<RequestResult<ChatInitInformation>> authAfterReconnect(
+      {@required String token,
+      @required int activeChannelId,
+      @required int lastMessageId,
+      @required String user,
+      bool waitForResult: false});
 
   Future<RequestResult<NetworkWithState>> joinNetwork(
       NetworkPreferences preferences,
@@ -83,8 +91,7 @@ abstract class ChatBackendService implements Providable {
       Network network, Channel channel, String nick,
       {bool waitForResult: false});
 
-  Future<RequestResult<bool>> leaveChannel(
-      Network network, Channel channel,
+  Future<RequestResult<bool>> leaveChannel(Network network, Channel channel,
       {bool waitForResult: false});
 
   Future<RequestResult<ChannelUser>> requestUserInfo(
@@ -133,8 +140,7 @@ abstract class ChatBackendService implements Providable {
   Disposable listenForNetworkEdit(
       Network network, NetworkConnectionListener listener);
 
-  Disposable listenForChannelJoin(
-      Network network, ChannelListener listener);
+  Disposable listenForChannelJoin(Network network, ChannelListener listener);
 
   Disposable listenForChannelLeave(
       Network network, Channel channel, VoidCallback listener);
@@ -146,21 +152,22 @@ abstract class ChatBackendService implements Providable {
       Future<int> Function() currentMessageCountExtractor,
       ChannelStateListener listener);
 
-  Disposable listenForChannelNames(Network network,
-      Channel channel, Function(List<ChannelUser>) listener);
+  Disposable listenForChannelNames(
+      Network network, Channel channel, Function(List<ChannelUser>) listener);
 
   Disposable listenForChannelUsers(
       Network network, Channel channel, VoidCallback listener);
 
-  Disposable listenForMessages(Network network, Channel channel,
-      ChannelMessageListener listener);
+  Disposable listenForMessages(
+      Network network, Channel channel, ChannelMessageListener listener);
 
-  Disposable listenForMessagePreviews(Network network, Channel channel,
-      ChannelMessagePreviewListener listener);
+  Disposable listenForMessagePreviews(
+      Network network, Channel channel, ChannelMessagePreviewListener listener);
 
-  Disposable listenForMessagePreviewToggle(Network network,
-      Channel channel, Function(ToggleMessagePreviewData) callback);
+  Disposable listenForMessagePreviewToggle(Network network, Channel channel,
+      Function(ToggleMessagePreviewData) callback);
 
-  Disposable listenForChannelPreviewToggle(Network network,
-      Channel channel, Function(ToggleChannelPreviewData) callback);
+  Disposable listenForChannelPreviewToggle(Network network, Channel channel,
+      Function(ToggleChannelPreviewData) callback);
+
 }

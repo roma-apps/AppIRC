@@ -110,7 +110,9 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     addDisposable(subject: _chatConfigSubject);
   }
 
-  Future init() async {
+  Future init(
+      {@required Channel Function() currentChannelExtractor,
+      @required Future<int> Function() lastMessageRemoteIdExtractor}) async {
     _logger.d(() => "init started");
 
     var host = _loungePreferences.hostPreferences.host;
@@ -118,9 +120,43 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     await _socketIOService.init();
 
+    _listenForInit(_socketIOService, (init) {
+      _logger.d(() => "debug init $init" );
+    });
+
+    _listenForAuth(_socketIOService, (auth) async {
+      if (chatInit != null) {
+        // reconnect
+        var authToken = chatInit.authToken;
+//        var lastMessage =
+//            await chatDatabase.regularMessagesDao.getLatestMessage();
+
+        _logger.d(() => "auth after reconnecting"
+            " authToken $authToken"
+            " auth $auth");
+
+        var result = await authAfterReconnect(
+            token: authToken,
+            activeChannelId: currentChannelExtractor()?.remoteId,
+            lastMessageId: await lastMessageRemoteIdExtractor(),
+            user: _loungePreferences?.authPreferences?.username,
+            waitForResult: true);
+
+        _logger.d(() => "auth after reconnecting result $result");
+      }
+    });
+
     addDisposable(streamSubscription:
         _socketIOService.connectionStateStream.listen((socketState) {
-      var newBackendState = mapConnectionState(socketState);
+      ChatConnectionState newBackendState = mapConnectionState(socketState);
+
+      // reconnecting
+      if (newBackendState == ChatConnectionState.connected &&
+          chatInit != null) {
+        // send connect after reconnecting. required by lounge
+        _socketIOService.connect();
+      }
+
       _logger.d(() => "newState socketState $socketState "
           " newBackendState $newBackendState");
       _connectionStateSubject.add(newBackendState);
@@ -130,6 +166,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
   @override
   Future<RequestResult<ChatLoginResult>> connectChat() async {
+    _logger.d(() => "connectChat");
+
     assert(_loungePreferences != LoungeHostPreferences.empty);
     _logger.d(() => "connectChat _loungePreferences $_loungePreferences");
 
@@ -410,6 +448,21 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   Disposable listenForMessages(
       Network network, Channel channel, ChannelMessageListener listener) {
     var disposable = CompositeDisposable([]);
+
+    disposable.add(_listenForInit(_socketIOService, (initResponse) {
+      var channelsWithState = initResponse.channelsWithState;
+
+      var channelWithState = channelsWithState.firstWhere(
+          (channelsWithState) =>
+              channelsWithState.channel.remoteId == channel.remoteId,
+          orElse: () => null);
+
+      if (channelWithState != null) {
+        listener(MessagesForChannel.name(
+            channel: channel, messages: channelWithState.initMessages));
+      }
+    }));
+
     disposable.add(
         createEventListenerDisposable(MsgLoungeResponseBody.eventName, (raw) {
       var data = MsgLoungeResponseBody.fromJson(_preProcessRawData(raw));
@@ -459,7 +512,6 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   Future<SpecialMessage> _toWhoIsSpecialMessage(
       MsgLoungeResponseBody data) async {
     var whoIsSpecialBody = toWhoIsSpecialMessageBody(data.msg.whois);
-
 
     return SpecialMessage.name(
         channelRemoteId: data.chan,
@@ -546,9 +598,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
         }
       }
     }));
-    disposable.add(
-        createEventListenerDisposable(MoreLoungeResponseBody.eventName, (raw)
-            async {
+    disposable.add(createEventListenerDisposable(
+        MoreLoungeResponseBody.eventName, (raw) async {
       var parsed = MoreLoungeResponseBody.fromJson(_preProcessRawData(raw));
 
       if (channel.remoteId == parsed.chan) {
@@ -936,6 +987,49 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     return disposable;
   }
 
+  @override
+  Future<RequestResult<ChatInitInformation>> authAfterReconnect(
+      {@required String token,
+      @required int activeChannelId,
+      @required int lastMessageId,
+      @required String user,
+      bool waitForResult: false}) async {
+    _logger.d(() => "authAfterReconnect "
+        "token = $token "
+        "activeChannelId = $activeChannelId "
+        "lastMessageId = $lastMessageId "
+        "waitForResult $waitForResult");
+
+    var request = AuthReconnectLoungeJsonRequestBody.name(
+                lastMessageId: lastMessageId,
+        openChannelId: activeChannelId,
+        user: user,
+        token: token);
+    Disposable disposable;
+    var result;
+    disposable = _listenForInit(_socketIOService, (chatInit) async {
+      _logger.d(() => "_listenForInit");
+      result = chatInit;
+    });
+    disposable = _listenForAuthorized(_socketIOService, () async {
+      _logger.d(() => "_listenForAuthorized");
+    });
+    disposable = _listenForCommands(_socketIOService, (commands) async {
+      _logger.d(() => "_listenForAuthorized");
+    });
+    _sendRequest(request, isNeedAddRequestToPending: false);
+
+
+    RequestResult<ChatInitInformation> requestResult;
+    if (waitForResult) {
+      requestResult = await _doWaitForResult<ChatInitInformation>(() => result);
+    } else {
+      requestResult = RequestResult.notWaitForResponse();
+    }
+    disposable.dispose();
+    return requestResult;
+  }
+
   Disposable listenForSignOut(VoidCallback callback) {
     var disposable = CompositeDisposable([]);
 
@@ -1035,6 +1129,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     _sendRequest(SignOutLoungeEmptyRequest(), isNeedAddRequestToPending: false);
   }
+
+
 }
 
 Disposable _listenForConfiguration(SocketIOService _socketIOService,
@@ -1379,7 +1475,7 @@ Future<RequestResult<ChatLoginResult>> _connectAndLogin(
       if (isPrivateModeResponseReceived &&
           !isAuthRequestSent &&
           authPreferencesExist) {
-        var authRequest = AuthLoungeJsonRequestBody.name(
+        var authRequest = AuthLoginLoungeJsonRequestBody.name(
             user: authPreferences.username, password: authPreferences.password);
 
         authResponse = null;
