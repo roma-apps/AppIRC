@@ -24,10 +24,13 @@ abstract class RegularMessageDao {
   @Query('SELECT * FROM RegularMessageDB')
   Future<List<RegularMessageDB>> getAllMessages();
 
-  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :remoteId '
+  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :messageRemoteId ')
+  Future<RegularMessageDB> findMessageWithRemoteId(int messageRemoteId);
+
+  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :messageRemoteId '
       'AND channelRemoteId = :channelRemoteId')
-  Future<RegularMessageDB> findMessageWithRemoteId(
-      int channelRemoteId, intmessageRemoteId);
+  Future<RegularMessageDB> findMessageWithChannelAndRemoteId(
+      int channelRemoteId, int messageRemoteId);
 
   @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')

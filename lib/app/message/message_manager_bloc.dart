@@ -107,7 +107,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
         togglePreview.message.messageRemoteId, togglePreview.preview);
 
     var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
-        channel.remoteId, previewForMessage.remoteMessageId);
+        previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
@@ -127,7 +127,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   Future<ChatMessage> _updatePreview(Channel channel,
       MessagePreviewForRemoteMessageId previewForMessage) async {
     var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
-        channel.remoteId, previewForMessage.remoteMessageId);
+        previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
@@ -170,7 +170,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
         var regularMessage = newMessage as RegularMessage;
 
         var foundMessage = await _db.regularMessagesDao.findMessageWithRemoteId(
-            newMessage.channelRemoteId, regularMessage.messageRemoteId);
+            regularMessage.messageRemoteId);
 
         if (foundMessage != null) {
           // nothing

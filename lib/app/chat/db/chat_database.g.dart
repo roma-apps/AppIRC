@@ -201,11 +201,19 @@ class _$RegularMessageDao extends RegularMessageDao {
   }
 
   @override
-  Future<RegularMessageDB> findMessageWithRemoteId(
-      int channelRemoteId, dynamic intmessageRemoteId) async {
+  Future<RegularMessageDB> findMessageWithRemoteId(int messageRemoteId) async {
+    return _queryAdapter.query(
+        'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ?',
+        arguments: <dynamic>[messageRemoteId],
+        mapper: _regularMessageDBMapper);
+  }
+
+  @override
+  Future<RegularMessageDB> findMessageWithChannelAndRemoteId(
+      int channelRemoteId, int messageRemoteId) async {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ? AND channelRemoteId = ?',
-        arguments: <dynamic>[channelRemoteId, intmessageRemoteId],
+        arguments: <dynamic>[channelRemoteId, messageRemoteId],
         mapper: _regularMessageDBMapper);
   }
 
