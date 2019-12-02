@@ -212,11 +212,11 @@ class AppIRCState extends State<AppIRC> {
     currentChannelExtractor,
         lastMessageRemoteIdExtractor:
             () async {
-      var latestMessage = (await _database.regularMessagesDao.getLatestMessage());
+      var newestMessage = (await _database.regularMessagesDao.getNewestAllChannelsMessage());
 
-      _logger.d(() => " latestMessage $latestMessage");
+      _logger.d(() => " newestMessage $newestMessage");
 
-      return latestMessage?.messageRemoteId;
+      return newestMessage?.messageRemoteId;
     });
 
     this._loungeBackendService = loungeBackendService;

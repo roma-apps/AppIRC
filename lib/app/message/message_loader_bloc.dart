@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/db/chat_database.dart';
-import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
+import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
@@ -35,8 +35,6 @@ class MessageLoaderBloc extends Providable {
   BehaviorSubject<MessagesList> _messagesListSubject;
 
   Stream<MessagesList> get messagesListStream => _messagesListSubject.stream;
-
-
 
   MessagesList get messagesList => _messagesListSubject?.value;
 
@@ -133,7 +131,7 @@ class MessageLoaderBloc extends Providable {
     addDisposable(
         disposable: _messagesSaverBloc.listenForMessages(_network, _channel,
             (messagesForChannel) {
-      _addNewMessages(messagesForChannel);
+      _addNewMessages(_network, _channel, messagesForChannel);
     }));
 
     addDisposable(
@@ -193,15 +191,17 @@ class MessageLoaderBloc extends Providable {
         messagesList.allMessages, [], MessageListUpdateType.notUpdated);
   }
 
-  MessagesForChannel _lastHandledMessages;
 
-  void _addNewMessages(MessagesForChannel messagesForChannel) {
-    if (_lastHandledMessages == messagesForChannel) {
-      return;
+  void _addNewMessages(Network network, Channel channel, MessagesForChannel
+  messagesForChannel) {
+
+    if (messagesForChannel.isNeedCheckAdditionalLoadMore) {
+      // lounge send maximum 100 newest messages on start
+      // AppIRC should check local storage to identify missed and load them
+
+      _checkAdditionalLoadMore(network, channel, messagesForChannel);
     }
 
-    var isFirstHandle = _lastHandledMessages == null;
-    _lastHandledMessages = messagesForChannel;
 
     var messages = this.messagesList.allMessages;
 
@@ -212,26 +212,14 @@ class MessageLoaderBloc extends Providable {
       // maybe during loading history
       return;
     }
-    var firstMessage = newMessages.first;
+    var newFirstMessage = newMessages.first;
 
     MessageListUpdateType messageListUpdateType;
 
-    var replaced = false;
-    if (isFirstHandle) {
-      // sometimes loader receives already display messages during first handle
-      // TODO: remove hack. Already handled messages should not be emitted
-      if (messages.isNotEmpty) {
-        var firstMessage = messages.first;
-        if (firstMessage == newMessages.first) {
-          messages.remove(firstMessage);
-          replaced = true;
-        }
-      }
-    }
 
     if (messages.isNotEmpty) {
       var lastDate = messages.last.date;
-      var firstMessageDate = firstMessage.date;
+      var firstMessageDate = newFirstMessage.date;
       if (lastDate.isBefore(firstMessageDate) ||
           lastDate.millisecondsSinceEpoch ==
               firstMessageDate.millisecondsSinceEpoch) {
@@ -249,11 +237,9 @@ class MessageLoaderBloc extends Providable {
         _resort(messages);
       }
     } else {
-      if (replaced) {
-        messageListUpdateType = MessageListUpdateType.replacedByBackend;
-      } else {
+
         messageListUpdateType = MessageListUpdateType.loadedFromLocalDatabase;
-      }
+
       messages.addAll(newMessages);
     }
     _logger.d(() => "_addNewMessages $newMessages");
@@ -263,5 +249,58 @@ class MessageLoaderBloc extends Providable {
     }
 
     _onMessagesChanged(messages, newMessages, messageListUpdateType);
+  }
+
+  _checkAdditionalLoadMore(Network network, Channel channel, MessagesForChannel
+  messagesForChannel)
+  async {
+    // lounge send maximum 100 newest messages on start
+    // AppIRC should check local storage to identify missed and load them
+
+    var messages = messagesForChannel.messages;
+    if (messages?.isNotEmpty != true) {
+      return;
+    }
+
+    var oldestRemoteMessage = messages.firstWhere(
+        (message) => message is RegularMessage,
+        orElse: () => null) as RegularMessage;
+    var newestRemoteMessage = messages.lastWhere(
+        (message) => message is RegularMessage,
+        orElse: () => null) as RegularMessage;
+
+    if (oldestRemoteMessage == null || newestRemoteMessage == null) {
+      return;
+    }
+
+    var oldestLocalMessage = await _db.regularMessagesDao.getOldestChannelMessage(channel.remoteId);
+
+    // lounge messages id given in chronological order
+    if (oldestLocalMessage.messageRemoteId > newestRemoteMessage.messageRemoteId) {
+      // simple load history from remote
+      return;
+    } else {
+      var newestLocalMessage = await _db.regularMessagesDao.getNewestChannelMessage(channel.remoteId);
+      if (newestLocalMessage.messageRemoteId <
+          newestRemoteMessage.messageRemoteId) {
+        // new messages after reconnecting or init
+        if(newestLocalMessage.messageRemoteId < oldestRemoteMessage
+            .messageRemoteId) {
+          // remote message is newer than local
+          // we should try load more from remote
+
+          _logger.d(() => "_checkAdditionalLoadMore loadMore "
+              "newestLocalMessage $newestLocalMessage"
+              "oldestRemoteMessage $oldestRemoteMessage"
+          );
+
+          _backendService.loadMoreHistory(network, channel,
+              oldestRemoteMessage.messageRemoteId);
+        }
+        return;
+      } else {
+        _logger.e(() => "_checkAdditionalLoadMore: Invalid case");
+      }
+    }
   }
 }

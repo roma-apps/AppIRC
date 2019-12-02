@@ -24,8 +24,10 @@ abstract class RegularMessageDao {
   @Query('SELECT * FROM RegularMessageDB')
   Future<List<RegularMessageDB>> getAllMessages();
 
-  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :remoteId')
-  Future<RegularMessageDB> findMessageWithRemoteId(int remoteId);
+  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :remoteId '
+      'AND channelRemoteId = :channelRemoteId')
+  Future<RegularMessageDB> findMessageWithRemoteId(
+      int channelRemoteId, intmessageRemoteId);
 
   @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')
@@ -43,9 +45,16 @@ abstract class RegularMessageDao {
   Future<List<RegularMessageDB>> searchChannelMessagesOrderByDate(
       int channelRemoteId, String search, String nickSearch);
 
+  @Query('SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1')
+  Future<RegularMessageDB> getNewestAllChannelsMessage();
+
   @Query(
-      'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1')
-  Future<RegularMessageDB> getLatestMessage();
+      'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId ORDER BY messageRemoteId DESC LIMIT 1')
+  Future<RegularMessageDB> getNewestChannelMessage(int channelRemoteId);
+
+  @Query(
+      'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId ORDER BY messageRemoteId ASC LIMIT 1')
+  Future<RegularMessageDB> getOldestChannelMessage(int channelRemoteId);
 
   @Query(
       'SELECT * FROM RegularMessageDB WHERE channelRemoteId = :channelRemoteId')

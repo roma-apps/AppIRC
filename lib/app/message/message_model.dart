@@ -20,8 +20,6 @@ abstract class ChatMessage {
 
   bool get isRegular => chatMessageType == ChatMessageType.regular;
 
-
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -52,17 +50,21 @@ enum ChatMessageType { special, regular }
 
 class MessagesForChannel {
   final Channel channel;
-   List<ChatMessage> messages;
+  List<ChatMessage> messages;
+  final bool isNeedCheckAdditionalLoadMore;
   final bool isContainsTextSpecialMessage;
 
   MessagesForChannel.name(
       {@required this.channel,
       @required this.messages,
+      @required this.isNeedCheckAdditionalLoadMore,
       this.isContainsTextSpecialMessage = false});
 
   @override
   String toString() {
-    return 'MessagesForChannel{channel: $channel, messages: $messages, '
+    return 'MessagesForChannel{channel: $channel,'
+        ' messages: $messages, '
+        ' isNeedCheckAdditionalLoadMore: $isNeedCheckAdditionalLoadMore, '
         'isContainsTextSpecialMessage: $isContainsTextSpecialMessage}';
   }
 }
@@ -72,25 +74,23 @@ class MessagesList {
   List<ChatMessage> lastAddedMessages;
   MessageListUpdateType messageListUpdateType;
 
-  MessagesList.name({@required this.allMessages, @required this.lastAddedMessages,
-    @required this.messageListUpdateType});
-
-
+  MessagesList.name(
+      {@required this.allMessages,
+      @required this.lastAddedMessages,
+      @required this.messageListUpdateType});
 }
 
 enum MessageListUpdateType {
-  loadedFromLocalDatabase, replacedByBackend, newMessagesFromBackend,
-historyFromBackend,
+  loadedFromLocalDatabase,
+  newMessagesFromBackend,
+  historyFromBackend,
   notUpdated
 }
-
 
 class MessageInListState {
   final bool inSearchResult;
   final String searchTerm;
 
   MessageInListState.name(
-      {
-        @required this.inSearchResult,
-        @required this.searchTerm});
+      {@required this.inSearchResult, @required this.searchTerm});
 }

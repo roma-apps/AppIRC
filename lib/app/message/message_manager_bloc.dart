@@ -44,9 +44,16 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
   Disposable listenForMessages(
       Network network, Channel channel, ChannelMessageListener listener) {
+    var valueBeforeSubscription = _realtimeMessagesSubject.value;
+
     return StreamSubscriptionDisposable(
         _realtimeMessagesSubject.stream.listen((messagesForChannel) {
-      if (messagesForChannel.channel.remoteId == channel.remoteId) {
+      // we need avoid messages already loaded in init stage
+      if (valueBeforeSubscription == messagesForChannel) {
+        return;
+      }
+
+      if (messagesForChannel?.channel?.remoteId == channel.remoteId) {
         listener(messagesForChannel);
       }
     }));
@@ -61,27 +68,29 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     _logger.d(() => "onChannelJoined _onNewMessages "
         "${channelWithState.initMessages.length}");
     _onNewMessages(MessagesForChannel.name(
-        channel: channel, messages: channelWithState.initMessages));
+        isNeedCheckAdditionalLoadMore: true,
+        channel: channel,
+        messages: channelWithState.initMessages));
 
     var channelDisposable = CompositeDisposable([]);
 
     channelDisposable.add(_backendService.listenForMessages(network, channel,
         (messagesForChannel) {
-      _logger.d(() => "onChannelJoined listenForMessages "
+      _logger.d(() => "listenForMessages "
           "${messagesForChannel.messages.length}");
       _onNewMessages(messagesForChannel);
     }));
 
     channelDisposable.add(_backendService
         .listenForMessagePreviews(network, channel, (previewForMessage) async {
-      var newMessage = await _updatePreview(previewForMessage);
+      var newMessage = await _updatePreview(channel, previewForMessage);
 
       _messageUpdateSubject.add(newMessage);
     }));
 
     channelDisposable.add(_backendService.listenForMessagePreviewToggle(
         network, channel, (ToggleMessagePreviewData togglePreview) async {
-      var newMessage = await _togglePreview(togglePreview);
+      var newMessage = await _togglePreview(channel, togglePreview);
 
       _messageUpdateSubject.add(newMessage);
     }));
@@ -93,12 +102,12 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   }
 
   Future<ChatMessage> _togglePreview(
-      ToggleMessagePreviewData togglePreview) async {
+      Channel channel, ToggleMessagePreviewData togglePreview) async {
     var previewForMessage = MessagePreviewForRemoteMessageId(
         togglePreview.message.messageRemoteId, togglePreview.preview);
 
-    var oldMessageDB = await _db.regularMessagesDao
-        .findMessageWithRemoteId(previewForMessage.remoteMessageId);
+    var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
+        channel.remoteId, previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
@@ -115,10 +124,10 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     return message;
   }
 
-  Future<ChatMessage> _updatePreview(
+  Future<ChatMessage> _updatePreview(Channel channel,
       MessagePreviewForRemoteMessageId previewForMessage) async {
-    var oldMessageDB = await _db.regularMessagesDao
-        .findMessageWithRemoteId(previewForMessage.remoteMessageId);
+    var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
+        channel.remoteId, previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
@@ -142,10 +151,9 @@ class MessageManagerBloc extends ChannelListListenerBloc {
       newMessage.messageLocalId = id;
     }
 
-
     // remove messages which already exist in local storage
-    messagesForChannel.messages = newMessages.where((message) => message
-        .messageLocalId != null).toList();
+    messagesForChannel.messages =
+        newMessages.where((message) => message.messageLocalId != null).toList();
 
     _realtimeMessagesSubject.add(messagesForChannel);
 
@@ -161,12 +169,11 @@ class MessageManagerBloc extends ChannelListListenerBloc {
       case ChatMessageType.regular:
         var regularMessage = newMessage as RegularMessage;
 
-        var foundMessage = await _db.regularMessagesDao
-            .findMessageWithRemoteId(regularMessage.messageRemoteId);
+        var foundMessage = await _db.regularMessagesDao.findMessageWithRemoteId(
+            newMessage.channelRemoteId, regularMessage.messageRemoteId);
 
         if (foundMessage != null) {
           // nothing
-//          id = foundMessage.localId;
         } else {
           var regularMessageDB = toRegularMessageDB(newMessage);
           id = await _db.regularMessagesDao

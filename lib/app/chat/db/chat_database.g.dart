@@ -201,10 +201,11 @@ class _$RegularMessageDao extends RegularMessageDao {
   }
 
   @override
-  Future<RegularMessageDB> findMessageWithRemoteId(int remoteId) async {
+  Future<RegularMessageDB> findMessageWithRemoteId(
+      int channelRemoteId, dynamic intmessageRemoteId) async {
     return _queryAdapter.query(
-        'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ?',
-        arguments: <dynamic>[remoteId],
+        'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ? AND channelRemoteId = ?',
+        arguments: <dynamic>[channelRemoteId, intmessageRemoteId],
         mapper: _regularMessageDBMapper);
   }
 
@@ -235,9 +236,25 @@ class _$RegularMessageDao extends RegularMessageDao {
   }
 
   @override
-  Future<RegularMessageDB> getLatestMessage() async {
+  Future<RegularMessageDB> getNewestAllChannelsMessage() async {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1',
+        mapper: _regularMessageDBMapper);
+  }
+
+  @override
+  Future<RegularMessageDB> getNewestChannelMessage(int channelRemoteId) async {
+    return _queryAdapter.query(
+        'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY messageRemoteId DESC LIMIT 1',
+        arguments: <dynamic>[channelRemoteId],
+        mapper: _regularMessageDBMapper);
+  }
+
+  @override
+  Future<RegularMessageDB> getOldestChannelMessage(int channelRemoteId) async {
+    return _queryAdapter.query(
+        'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY messageRemoteId ASC LIMIT 1',
+        arguments: <dynamic>[channelRemoteId],
         mapper: _regularMessageDBMapper);
   }
 

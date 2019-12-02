@@ -119,12 +119,6 @@ class MessageListBloc extends Providable {
           selectedFoundItem: initScrollPositionItem,
           alignment: 0.0));
     }
-    if (updateType == MessageListUpdateType.replacedByBackend) {
-        _listJumpDestinationSubject.add(MessageListJumpDestination(
-          items:  listState.items,
-          selectedFoundItem: listState.items.last,
-          alignment: 0.9));
-    }
 
     if (updateType == MessageListUpdateType.loadedFromLocalDatabase) {
           _listJumpDestinationSubject.add(MessageListJumpDestination(

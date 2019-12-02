@@ -110,10 +110,13 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     addDisposable(subject: _chatConfigSubject);
   }
 
+  Future<int> Function() lastMessageRemoteIdExtractor;
   Future init(
       {@required Channel Function() currentChannelExtractor,
       @required Future<int> Function() lastMessageRemoteIdExtractor}) async {
     _logger.d(() => "init started");
+
+    this.lastMessageRemoteIdExtractor = lastMessageRemoteIdExtractor;
 
     var host = _loungePreferences.hostPreferences.host;
     _socketIOService = SocketIOService(socketIOManager, host);
@@ -122,6 +125,10 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     _listenForInit(_socketIOService, (init) {
       _logger.d(() => "debug init $init" );
+
+      // TODO: don't know why. But init not called after reconnection without
+      //  this debug subscription
+      // maybe bug in socket io lib
     });
 
     _listenForAuth(_socketIOService, (auth) async {
@@ -450,6 +457,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     var disposable = CompositeDisposable([]);
 
     disposable.add(_listenForInit(_socketIOService, (initResponse) {
+      // new messages after reconnect
+
       var channelsWithState = initResponse.channelsWithState;
 
       var channelWithState = channelsWithState.firstWhere(
@@ -459,7 +468,9 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
       if (channelWithState != null) {
         listener(MessagesForChannel.name(
-            channel: channel, messages: channelWithState.initMessages));
+            channel: channel,
+            messages: channelWithState.initMessages,
+            isNeedCheckAdditionalLoadMore: true));
       }
     }));
 
@@ -476,10 +487,12 @@ class LoungeBackendService extends Providable implements ChatBackendService {
             // but actually lounge client display it as special
             _toWhoIsSpecialMessage(data).then((message) {
               listener(MessagesForChannel.name(
+                  isNeedCheckAdditionalLoadMore: false,
                   channel: channel, messages: <ChatMessage>[message]));
             });
           } else {
             listener(MessagesForChannel.name(
+                isNeedCheckAdditionalLoadMore: false,
                 channel: channel, messages: <ChatMessage>[message]));
           }
         });
@@ -494,6 +507,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       if (channel.remoteId == data.chan) {
         toSpecialMessages(channel, data).then((specialMessages) {
           listener(MessagesForChannel.name(
+              isNeedCheckAdditionalLoadMore: false,
               channel: channel,
               messages: specialMessages,
               isContainsTextSpecialMessage: true));
@@ -503,6 +517,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     disposable.add(listenForLoadMore(network, channel, (loadMoreResponse) {
       listener(MessagesForChannel.name(
+          isNeedCheckAdditionalLoadMore: true,
           channel: channel, messages: loadMoreResponse.messages));
     }));
 
@@ -1001,7 +1016,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
         "waitForResult $waitForResult");
 
     var request = AuthReconnectLoungeJsonRequestBody.name(
-                lastMessageId: lastMessageId,
+        lastMessageId: lastMessageId,
         openChannelId: activeChannelId,
         user: user,
         token: token);
@@ -1018,7 +1033,6 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       _logger.d(() => "_listenForAuthorized");
     });
     _sendRequest(request, isNeedAddRequestToPending: false);
-
 
     RequestResult<ChatInitInformation> requestResult;
     if (waitForResult) {
@@ -1129,8 +1143,6 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     _sendRequest(SignOutLoungeEmptyRequest(), isNeedAddRequestToPending: false);
   }
-
-
 }
 
 Disposable _listenForConfiguration(SocketIOService _socketIOService,
