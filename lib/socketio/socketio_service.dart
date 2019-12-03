@@ -131,7 +131,7 @@ class SocketIOService extends Providable {
     SocketEventListener connectingListener =
         (_) => listener(SocketConnectionState.connecting, "connecting");
     SocketEventListener reconnectListener =
-        (_) => listener(SocketConnectionState.connected, "reconnect");
+        (_) => listener(SocketConnectionState.connecting, "reconnect");
     SocketEventListener reconnectFailedListener =
         (_) => listener(SocketConnectionState.disconnected, "reconnectFailed");
     SocketEventListener reconnectErrorListener =
