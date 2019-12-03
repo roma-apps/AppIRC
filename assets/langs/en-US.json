@@ -293,6 +293,10 @@
         "connected": "This channel doesn't have any messages yet",
         "not_connected": "Server not connected to channel on remote IRC server. Try /connect to connect again"
       },
+      "jump_to_latest": {
+        "with_new_messages": "Jump to latest messages ({} new)",
+        "no_messages": "Jump to latest messages"
+      },
       "loading": "Loading messages..."
     },
     "message": {

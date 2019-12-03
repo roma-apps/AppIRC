@@ -23,6 +23,12 @@ class MessageListBloc extends Providable {
   final ChannelMessageListBloc _channelMessagesListBloc;
   final MessageCondensedBloc _messageCondensedBloc;
 
+  Stream<MessageListVisibleBounds> get visibleMessagesBoundsStream =>
+      channelMessagesListBloc.visibleMessagesBoundsStream;
+
+  MessageListVisibleBounds get visibleMessagesBounds =>
+      channelMessagesListBloc.visibleMessagesBounds;
+
   ChannelMessageListBloc get channelMessagesListBloc =>
       _channelMessagesListBloc;
   final MessageLoaderBloc _messageLoaderBloc;
@@ -33,7 +39,7 @@ class MessageListBloc extends Providable {
 
   MessageListState get listState => _listStateSubject.value;
 
-  BehaviorSubject<MessageListJumpDestination> _listJumpDestinationSubject  =
+  BehaviorSubject<MessageListJumpDestination> _listJumpDestinationSubject =
       BehaviorSubject();
 
   Stream<MessageListJumpDestination> get listJumpDestinationStream =>
@@ -42,20 +48,15 @@ class MessageListBloc extends Providable {
   MessageListJumpDestination get listJumpDestination =>
       _listJumpDestinationSubject.value;
 
-
-  MessageListBloc(
-      this.channelBloc,
-      this._channelMessagesListBloc,
-      this._messageLoaderBloc,
-      this._messageCondensedBloc) {
+  MessageListBloc(this.channelBloc, this._channelMessagesListBloc,
+      this._messageLoaderBloc, this._messageCondensedBloc) {
     init();
 
     addDisposable(subject: _listJumpDestinationSubject);
 
     addDisposable(streamSubscription:
         _messageLoaderBloc.messagesListStream.listen((messageList) {
-      _onMessagesChanged(
-          messageList.allMessages,
+      _onMessagesChanged(messageList.allMessages, messageList.lastAddedMessages,
           messageList.messageListUpdateType);
     }));
 
@@ -66,10 +67,10 @@ class MessageListBloc extends Providable {
           MessageListVisibleBoundsUpdateType.push) {
         _listJumpDestinationSubject.add(MessageListJumpDestination(
             items: listState.items,
-            selectedFoundItem: listState.items.firstWhere((item) =>
-                item.isContainsMessageWithRemoteId(
-                    visibleMessageBounds.minRegularMessageRemoteId), orElse:
-            () => null),
+            selectedFoundItem: listState.items.firstWhere(
+                (item) => item.isContainsMessageWithRemoteId(
+                    visibleMessageBounds.minRegularMessageRemoteId),
+                orElse: () => null),
             alignment: 0.5));
       }
     }));
@@ -83,7 +84,9 @@ class MessageListBloc extends Providable {
     var messageListItems = _convertMessagesToMessageListItems(messages);
 
     MessageListState initListState = MessageListState.name(
-        items: messageListItems);
+        items: messageListItems,
+        newItems: messages,
+        updateType: MessageListUpdateType.loadedFromLocalDatabase);
     _logger.d(() => "init messages $initListState");
 
     _listStateSubject = BehaviorSubject(seedValue: initListState);
@@ -91,27 +94,23 @@ class MessageListBloc extends Providable {
 
   void _onMessagesChanged(
       List<ChatMessage> newMessages,
-      MessageListUpdateType lastAddedPosition) {
-    _logger.d(() => "newMessages = ${newMessages.length} "
-        );
+      List<ChatMessage> lastAddedMessages,
+      MessageListUpdateType updateType) {
+    _logger.d(() => "newMessages = ${newMessages.length} ");
 
     var messageListItems = _convertMessagesToMessageListItems(newMessages);
 
-    _updateMessageListItems(
-        messageListItems,
-        lastAddedPosition);
+    _updateMessageListItems(messageListItems, lastAddedMessages, updateType);
   }
 
-  void _updateMessageListItems(List<MessageListItem> messageListItems,
+  void _updateMessageListItems(
+      List<MessageListItem> messageListItems,
+      List<ChatMessage> newMessages,
       MessageListUpdateType updateType) {
+    var visibleMessagesBounds = channelMessagesListBloc.visibleMessagesBounds;
 
-
-
-    var visibleMessagesBounds =
-        channelMessagesListBloc.visibleMessagesBounds;
-
-    MessageListItem initScrollPositionItem =
-    calculateInitScrollPositionMessage(visibleMessagesBounds, listState.items);
+    MessageListItem initScrollPositionItem = calculateInitScrollPositionMessage(
+        visibleMessagesBounds, listState.items);
 
     if (updateType == MessageListUpdateType.historyFromBackend) {
       _listJumpDestinationSubject.add(MessageListJumpDestination(
@@ -121,14 +120,16 @@ class MessageListBloc extends Providable {
     }
 
     if (updateType == MessageListUpdateType.loadedFromLocalDatabase) {
-          _listJumpDestinationSubject.add(MessageListJumpDestination(
-          items:  listState.items,
+      _listJumpDestinationSubject.add(MessageListJumpDestination(
+          items: listState.items,
           selectedFoundItem: initScrollPositionItem,
           alignment: 0));
     }
 
     var messageListState = MessageListState.name(
-        items: messageListItems);
+        items: messageListItems,
+        newItems: newMessages,
+        updateType: updateType);
     _logger.d(() => "_updateMessageListItems $messageListState");
     _listStateSubject.add(messageListState);
   }
@@ -192,8 +193,6 @@ class MessageListBloc extends Providable {
     return items;
   }
 
-
-
   MessageListItem calculateInitScrollPositionMessage(
       MessageListVisibleBounds visibleMessagesBounds,
       List<MessageListItem> items) {
@@ -206,7 +205,6 @@ class MessageListBloc extends Providable {
       }, orElse: () => null);
 //      initScrollPositionItem = visibleMessagesBounds.min;
     } else {
-
       var firstUnreadRemoteMessageId =
           channelBloc.channelState.firstUnreadRemoteMessageId;
       if (firstUnreadRemoteMessageId != null) {
@@ -216,7 +214,7 @@ class MessageListBloc extends Providable {
       }
       if (initScrollPositionItem == null) {
         _logger.w(() => "use latest message for init scroll");
-        if(items?.isNotEmpty == true) {
+        if (items?.isNotEmpty == true) {
           initScrollPositionItem = items.last;
         }
       }
@@ -227,4 +225,12 @@ class MessageListBloc extends Providable {
     return initScrollPositionItem;
   }
 
+  jumpToLatestMessage() {
+    if (listState.items?.isNotEmpty == true) {
+      _listJumpDestinationSubject.add(MessageListJumpDestination(
+          items: listState.items,
+          selectedFoundItem: listState.items.last,
+          alignment: 0.9));
+    }
+  }
 }

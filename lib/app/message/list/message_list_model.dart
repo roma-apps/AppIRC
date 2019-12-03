@@ -35,12 +35,6 @@ class MessageListVisibleBounds {
 }
 
 enum MessageListVisibleBoundsUpdateType { push, ui }
-//
-//abstract class MoreHistoryOwner {
-//  bool get moreHistoryAvailable;
-//
-//  Stream<bool> get moreHistoryAvailableStream;
-//}
 
 class SimpleMessageListItem extends MessageListItem {
   final ChatMessage message;
@@ -88,28 +82,26 @@ abstract class MessageListItem {
 
 class MessageListState {
   final List<MessageListItem> items;
+  final List<ChatMessage> newItems;
+
 //  final bool moreHistoryAvailable;
-//  final MessageListUpdateType updateType;
+  final MessageListUpdateType updateType;
 
   MessageListState.name(
       {@required this.items,
-//      @required this.moreHistoryAvailable,
-//      @required this.updateType
-      });
+      @required this.newItems,
+      @required this.updateType});
 
   static get empty => MessageListState.name(
-      items: [],
-//      moreHistoryAvailable: false,
-//      updateType: MessageListUpdateType.notUpdated
-  );
+      items: [], newItems: [], updateType: MessageListUpdateType.notUpdated);
 
   @override
   String toString() {
-    return 'MessageListState{items: $items,'
-//        ' moreHistoryAvailable: $moreHistoryAvailable,'
-//        ' position: $updateType'
-        '}'
-    ;
+    return 'MessageListState{'
+        'items: $items,'
+        'newItems: $newItems,'
+        ' updateType: $updateType'
+        '}';
   }
 }
 
@@ -142,5 +134,3 @@ class MessageListJumpDestination {
       @required this.selectedFoundItem,
       @required this.alignment});
 }
-
-
