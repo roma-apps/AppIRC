@@ -385,7 +385,6 @@
           "ctcp_request": "CTCP request",
           "chghost": "changed host",
           "kick": "kick",
-          "action": "action",
           "invite": "invite",
           "ctcp": "CTCP"
         }

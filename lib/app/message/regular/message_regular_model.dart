@@ -139,5 +139,5 @@ enum RegularMessageType {
   invite,
   ctcp,
   chghost,
-  kick
+  kick,
 }

@@ -52,6 +52,12 @@ class MessageTypeLoungeConstants {
   static const part = "part";
   static const nick = "nick";
   static const ctcpRequest = "ctcp_request";
+  static const action = "action";
+  static const invite = "invite";
+  static const ctcp = "ctcp";
+  static const chghost = "chghost";
+  static const kick = "kick";
+
 }
 
 @JsonSerializable()
