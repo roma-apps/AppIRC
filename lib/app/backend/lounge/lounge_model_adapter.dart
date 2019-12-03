@@ -106,6 +106,9 @@ Future<ChatMessage> toChatMessage(
       }
     }
 
+    var date = DateTime.parse(msgLoungeResponseBody.time);
+
+    date = DateTime.fromMicrosecondsSinceEpoch(date.microsecondsSinceEpoch);
     return RegularMessage.name(
       channel.remoteId,
       command: msgLoungeResponseBody.command,
@@ -120,7 +123,7 @@ Future<ChatMessage> toChatMessage(
               .map((loungePreview) => toMessagePreview(loungePreview))
               .toList()
           : null,
-      date: DateTime.parse(msgLoungeResponseBody.time),
+      date: date,
       fromNick: msgLoungeResponseBody.from != null
           ? msgLoungeResponseBody.from.nick
           : null,

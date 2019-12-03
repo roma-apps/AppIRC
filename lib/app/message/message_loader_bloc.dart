@@ -117,7 +117,25 @@ class MessageLoaderBloc extends Providable {
   _loadStartMessagesFromDatabaseAndSubscribe() async {
     _logger.d(() => "init start $disposed");
 
+    var receivedMessages = <List<ChatMessage>>[];
+    // socket listener
+    addDisposable(
+        disposable: _messagesSaverBloc.listenForMessages(_network, _channel,
+            (messagesForChannel) {
+      if (_messagesListSubject != null) {
+        _addNewMessages(_network, _channel, messagesForChannel);
+      } else {
+        receivedMessages.add(messagesForChannel.messages);
+      }
+    }));
+
     var initMessages = await loadInitMessages();
+
+    if (receivedMessages.isNotEmpty) {
+      receivedMessages.forEach((messages) {
+        initMessages.addAll(messages);
+      });
+    }
     _messagesListSubject = new BehaviorSubject<MessagesList>(
         seedValue: MessagesList.name(
             allMessages: initMessages,
@@ -126,13 +144,6 @@ class MessageLoaderBloc extends Providable {
                 MessageListUpdateType.loadedFromLocalDatabase));
     _logger.d(() => "init finish");
     _isInitFinishedSubject.add(true);
-
-    // socket listener
-    addDisposable(
-        disposable: _messagesSaverBloc.listenForMessages(_network, _channel,
-            (messagesForChannel) {
-      _addNewMessages(_network, _channel, messagesForChannel);
-    }));
 
     addDisposable(
         disposable: _backendService.listenForMessagePreviews(_network, _channel,
@@ -191,17 +202,14 @@ class MessageLoaderBloc extends Providable {
         messagesList.allMessages, [], MessageListUpdateType.notUpdated);
   }
 
-
-  void _addNewMessages(Network network, Channel channel, MessagesForChannel
-  messagesForChannel) {
-
+  void _addNewMessages(
+      Network network, Channel channel, MessagesForChannel messagesForChannel) {
     if (messagesForChannel.isNeedCheckAdditionalLoadMore) {
       // lounge send maximum 100 newest messages on start
       // AppIRC should check local storage to identify missed and load them
 
       _checkAdditionalLoadMore(network, channel, messagesForChannel);
     }
-
 
     var messages = this.messagesList.allMessages;
 
@@ -215,7 +223,6 @@ class MessageLoaderBloc extends Providable {
     var newFirstMessage = newMessages.first;
 
     MessageListUpdateType messageListUpdateType;
-
 
     if (messages.isNotEmpty) {
       var lastDate = messages.last.date;
@@ -237,8 +244,7 @@ class MessageLoaderBloc extends Providable {
         _resort(messages);
       }
     } else {
-
-        messageListUpdateType = MessageListUpdateType.loadedFromLocalDatabase;
+      messageListUpdateType = MessageListUpdateType.loadedFromLocalDatabase;
 
       messages.addAll(newMessages);
     }
@@ -251,9 +257,8 @@ class MessageLoaderBloc extends Providable {
     _onMessagesChanged(messages, newMessages, messageListUpdateType);
   }
 
-  _checkAdditionalLoadMore(Network network, Channel channel, MessagesForChannel
-  messagesForChannel)
-  async {
+  _checkAdditionalLoadMore(Network network, Channel channel,
+      MessagesForChannel messagesForChannel) async {
     // lounge send maximum 100 newest messages on start
     // AppIRC should check local storage to identify missed and load them
 
@@ -273,29 +278,31 @@ class MessageLoaderBloc extends Providable {
       return;
     }
 
-    var oldestLocalMessage = await _db.regularMessagesDao.getOldestChannelMessage(channel.remoteId);
+    var oldestLocalMessage =
+        await _db.regularMessagesDao.getOldestChannelMessage(channel.remoteId);
 
     // lounge messages id given in chronological order
-    if (oldestLocalMessage.messageRemoteId > newestRemoteMessage.messageRemoteId) {
+    if (oldestLocalMessage.messageRemoteId >
+        newestRemoteMessage.messageRemoteId) {
       // simple load history from remote
       return;
     } else {
-      var newestLocalMessage = await _db.regularMessagesDao.getNewestChannelMessage(channel.remoteId);
+      var newestLocalMessage = await _db.regularMessagesDao
+          .getNewestChannelMessage(channel.remoteId);
       if (newestLocalMessage.messageRemoteId <
           newestRemoteMessage.messageRemoteId) {
         // new messages after reconnecting or init
-        if(newestLocalMessage.messageRemoteId < oldestRemoteMessage
-            .messageRemoteId) {
+        if (newestLocalMessage.messageRemoteId <
+            oldestRemoteMessage.messageRemoteId) {
           // remote message is newer than local
           // we should try load more from remote
 
           _logger.d(() => "_checkAdditionalLoadMore loadMore "
               "newestLocalMessage $newestLocalMessage"
-              "oldestRemoteMessage $oldestRemoteMessage"
-          );
+              "oldestRemoteMessage $oldestRemoteMessage");
 
-          _backendService.loadMoreHistory(network, channel,
-              oldestRemoteMessage.messageRemoteId);
+          _backendService.loadMoreHistory(
+              network, channel, oldestRemoteMessage.messageRemoteId);
         }
         return;
       } else {

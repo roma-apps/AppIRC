@@ -52,11 +52,13 @@ class MessagesForChannel {
   final Channel channel;
   List<ChatMessage> messages;
   final bool isNeedCheckAdditionalLoadMore;
+  final bool isNeedCheckAlreadyExistInLocalStorage;
   final bool isContainsTextSpecialMessage;
 
   MessagesForChannel.name(
       {@required this.channel,
       @required this.messages,
+      @required this.isNeedCheckAlreadyExistInLocalStorage,
       @required this.isNeedCheckAdditionalLoadMore,
       this.isContainsTextSpecialMessage = false});
 
@@ -64,6 +66,7 @@ class MessagesForChannel {
   String toString() {
     return 'MessagesForChannel{channel: $channel,'
         ' messages: $messages, '
+        ' isNeedCheckAlreadyExistInLocalStorage: $isNeedCheckAlreadyExistInLocalStorage, '
         ' isNeedCheckAdditionalLoadMore: $isNeedCheckAdditionalLoadMore, '
         'isContainsTextSpecialMessage: $isContainsTextSpecialMessage}';
   }

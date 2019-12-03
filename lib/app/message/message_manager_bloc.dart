@@ -9,9 +9,9 @@ import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_db.dart';
+import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
@@ -23,40 +23,39 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   final ChatDatabase _db;
 
   final Map<int, Disposable> _channelsListeners = Map();
+  final Map<int, List<ChannelMessageListener>> _channelsMessagesListeners =
+      Map();
 
   // ignore: close_sinks
   BehaviorSubject<ChatMessage> _messageUpdateSubject = BehaviorSubject();
 
   Stream<ChatMessage> get messageUpdateStream => _messageUpdateSubject.stream;
 
-  // ignore: close_sinks
-  BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
-      BehaviorSubject();
+//  // ignore: close_sinks
+//  BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
+//      BehaviorSubject();
 
   MessageManagerBloc(
       this._backendService, NetworkListBloc networksListBloc, this._db)
       : super(networksListBloc) {
     _logger.d(() => "Create ChannelMessagesSaverBloc");
 
-    addDisposable(subject: _realtimeMessagesSubject);
+//    addDisposable(subject: _realtimeMessagesSubject);
     addDisposable(subject: _messageUpdateSubject);
   }
 
   Disposable listenForMessages(
       Network network, Channel channel, ChannelMessageListener listener) {
-    var valueBeforeSubscription = _realtimeMessagesSubject.value;
+    var key = channel.remoteId;
+    if (!_channelsMessagesListeners.containsKey(key)) {
+      _channelsMessagesListeners[key] = List();
+    }
 
-    return StreamSubscriptionDisposable(
-        _realtimeMessagesSubject.stream.listen((messagesForChannel) {
-      // we need avoid messages already loaded in init stage
-      if (valueBeforeSubscription == messagesForChannel) {
-        return;
-      }
+    _channelsMessagesListeners[key].add(listener);
 
-      if (messagesForChannel?.channel?.remoteId == channel.remoteId) {
-        listener(messagesForChannel);
-      }
-    }));
+    return CustomDisposable(() {
+      _channelsMessagesListeners[key].remove(listener);
+    });
   }
 
   @override
@@ -70,7 +69,8 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     _onNewMessages(MessagesForChannel.name(
         isNeedCheckAdditionalLoadMore: true,
         channel: channel,
-        messages: channelWithState.initMessages));
+        messages: channelWithState.initMessages,
+        isNeedCheckAlreadyExistInLocalStorage: true));
 
     var channelDisposable = CompositeDisposable([]);
 
@@ -98,7 +98,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     _channelsListeners[channel.remoteId] = channelDisposable;
 
     addDisposable(disposable: channelDisposable);
-    addDisposable(subject: _realtimeMessagesSubject);
+//    addDisposable(subject: _realtimeMessagesSubject);
   }
 
   Future<ChatMessage> _togglePreview(
@@ -106,8 +106,8 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     var previewForMessage = MessagePreviewForRemoteMessageId(
         togglePreview.message.messageRemoteId, togglePreview.preview);
 
-    var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
-        previewForMessage.remoteMessageId);
+    var oldMessageDB = await _db.regularMessagesDao
+        .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
@@ -126,8 +126,8 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
   Future<ChatMessage> _updatePreview(Channel channel,
       MessagePreviewForRemoteMessageId previewForMessage) async {
-    var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
-        previewForMessage.remoteMessageId);
+    var oldMessageDB = await _db.regularMessagesDao
+        .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
@@ -143,67 +143,77 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   void _onNewMessages(MessagesForChannel messagesForChannel) async {
     _logger.d(() => "_onNewMessages $messagesForChannel");
 
-    var newMessages = messagesForChannel.messages;
+    List<ChatMessage> newMessages = messagesForChannel.messages;
 
-    for (var newMessage in newMessages) {
-      int id = await _insertMessage(newMessage);
+    if (messagesForChannel.isNeedCheckAlreadyExistInLocalStorage) {
+      List<int> alreadyExistRemoteIds = [];
+      for (var message in messagesForChannel.messages) {
+        if (message.isRegular) {
+          var regularMessage = message as RegularMessage;
+          var remoteId = regularMessage.messageRemoteId;
+          var localMessage = await _db.regularMessagesDao
+              .findMessageLocalIdWithRemoteId(remoteId);
 
-      newMessage.messageLocalId = id;
+          if (localMessage?.localId != null) {
+            alreadyExistRemoteIds.add(remoteId);
+          }
+        }
+      }
+
+      if (alreadyExistRemoteIds.isNotEmpty) {
+        newMessages.removeWhere((message) {
+          if (message is RegularMessage) {
+            return alreadyExistRemoteIds.contains(message.messageRemoteId);
+          } else {
+            return false;
+          }
+        });
+      }
     }
+    await _insertMessages(newMessages);
 
     // remove messages which already exist in local storage
-    messagesForChannel.messages =
-        newMessages.where((message) => message.messageLocalId != null).toList();
+//    messagesForChannel.messages =
+//        newMessages.where((message) => message.messageLocalId == null).toList();
 
-    _realtimeMessagesSubject.add(messagesForChannel);
+    var key = messagesForChannel.channel.remoteId;
+    if (_channelsMessagesListeners.containsKey(key)) {
+      _channelsMessagesListeners[key]
+          .forEach((ChannelMessageListener listener) {
+        listener(messagesForChannel);
+      });
+    }
+
+//    _realtimeMessagesSubject.add(messagesForChannel);
 
     // don't await
     _extractLinks(messagesForChannel);
   }
 
-  Future<int> _insertMessage(ChatMessage newMessage) async {
-    int id;
-    var chatMessageType = newMessage.chatMessageType;
-
-    switch (chatMessageType) {
-      case ChatMessageType.regular:
-        var regularMessage = newMessage as RegularMessage;
-
-        var foundMessage = await _db.regularMessagesDao.findMessageWithRemoteId(
-            regularMessage.messageRemoteId);
-
-        if (foundMessage != null) {
-          // nothing
-        } else {
-          var regularMessageDB = toRegularMessageDB(newMessage);
-          id = await _db.regularMessagesDao
-              .insertRegularMessage(regularMessageDB);
-        }
-        break;
-      case ChatMessageType.special:
-        var specialMessageDB = toSpecialMessageDB(newMessage);
-        id =
-            await _db.specialMessagesDao.insertSpecialMessage(specialMessageDB);
-        break;
-    }
-
-    return id;
+  Future _insertMessages(List<ChatMessage> newMessages) async {
+    await _insertRegularMessages(newMessages);
+    await _insertSpecialMessages(newMessages);
   }
 
-  Future _updateMessage(ChatMessage newMessage) async {
-    var chatMessageType = newMessage.chatMessageType;
+  Future _insertRegularMessages(List<ChatMessage> newMessages) async {
+    List<RegularMessage> regularMessages = newMessages
+        .where((message) => message.chatMessageType == ChatMessageType.regular)
+        .map((message) => message as RegularMessage)
+        .toList();
 
-    switch (chatMessageType) {
-      case ChatMessageType.special:
-        var specialMessageDB = toSpecialMessageDB(newMessage);
-        specialMessageDB.localId = newMessage.messageLocalId;
-        await _db.specialMessagesDao.updateRegularMessage(specialMessageDB);
-        break;
-      case ChatMessageType.regular:
-        var regularMessageDB = toRegularMessageDB(newMessage);
-        regularMessageDB.localId = newMessage.messageLocalId;
-        await _db.regularMessagesDao.updateRegularMessage(regularMessageDB);
-        break;
+    if (regularMessages.isNotEmpty) {
+      await _db.regularMessagesDao.upsertRegularMessages(regularMessages);
+    }
+  }
+
+  Future _insertSpecialMessages(List<ChatMessage> newMessages) async {
+    List<SpecialMessage> specialMessages = newMessages
+        .where((message) => message.chatMessageType == ChatMessageType.special)
+        .map((message) => message as SpecialMessage)
+        .toList();
+
+    if (specialMessages.isNotEmpty) {
+      await _db.specialMessagesDao.upsertSpecialMessages(specialMessages);
     }
   }
 
@@ -219,15 +229,29 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     var messages = messagesForChannel.messages;
     var linksList = await compute(extractLinks, messages);
 
+    var regularMessagesToUpdate = <RegularMessageDB>[];
+    var specialMessagesToUpdate = <SpecialMessageDB>[];
     for (int i = 0; i < messages.length; i++) {
       var message = messages[i];
       message.linksInText = linksList[i];
 
       if (message.linksInText.isNotEmpty) {
-        _updateMessage(message);
+        switch (message.chatMessageType) {
+          case ChatMessageType.regular:
+            regularMessagesToUpdate.add(toRegularMessageDB(message));
+            break;
+
+          case ChatMessageType.special:
+            specialMessagesToUpdate.add(toSpecialMessageDB(message));
+            break;
+        }
+
         _messageUpdateSubject.add(message);
       }
     }
+
+    _db.regularMessagesDao.updateRegularMessages(regularMessagesToUpdate);
+    _db.specialMessagesDao.updateSpecialMessages(specialMessagesToUpdate);
   }
 
   Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>

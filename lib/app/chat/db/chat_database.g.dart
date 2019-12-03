@@ -209,6 +209,15 @@ class _$RegularMessageDao extends RegularMessageDao {
   }
 
   @override
+  Future<RegularMessageDB> findMessageLocalIdWithRemoteId(
+      int messageRemoteId) async {
+    return _queryAdapter.query(
+        'SELECT localId FROM RegularMessageDB WHERE messageRemoteId = ?',
+        arguments: <dynamic>[messageRemoteId],
+        mapper: _regularMessageDBMapper);
+  }
+
+  @override
   Future<RegularMessageDB> findMessageWithChannelAndRemoteId(
       int channelRemoteId, int messageRemoteId) async {
     return _queryAdapter.query(
@@ -307,6 +316,66 @@ class _$RegularMessageDao extends RegularMessageDao {
   Future<int> updateRegularMessage(RegularMessageDB regularMessage) {
     return _regularMessageDBUpdateAdapter.updateAndReturnChangedRows(
         regularMessage, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future upsertRegularMessage(RegularMessage regularMessage) async {
+    if (database is sqflite.Transaction) {
+      await super.upsertRegularMessage(regularMessage);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.regularMessagesDao
+            .upsertRegularMessage(regularMessage);
+      });
+    }
+  }
+
+  @override
+  Future upsertRegularMessages(List<RegularMessage> messages) async {
+    if (database is sqflite.Transaction) {
+      await super.upsertRegularMessages(messages);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.regularMessagesDao
+            .upsertRegularMessages(messages);
+      });
+    }
+  }
+
+  @override
+  Future insertRegularMessages(List<RegularMessageDB> messages) async {
+    if (database is sqflite.Transaction) {
+      await super.insertRegularMessages(messages);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.regularMessagesDao
+            .insertRegularMessages(messages);
+      });
+    }
+  }
+
+  @override
+  Future updateRegularMessages(List<RegularMessageDB> messages) async {
+    if (database is sqflite.Transaction) {
+      await super.updateRegularMessages(messages);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.regularMessagesDao
+            .updateRegularMessages(messages);
+      });
+    }
   }
 }
 
@@ -415,8 +484,68 @@ class _$SpecialMessageDao extends SpecialMessageDao {
   }
 
   @override
-  Future<int> updateRegularMessage(SpecialMessageDB specialMessage) {
+  Future<int> updateSpecialMessage(SpecialMessageDB specialMessage) {
     return _specialMessageDBUpdateAdapter.updateAndReturnChangedRows(
         specialMessage, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future upsertSpecialMessage(SpecialMessage specialMessage) async {
+    if (database is sqflite.Transaction) {
+      await super.upsertSpecialMessage(specialMessage);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.specialMessagesDao
+            .upsertSpecialMessage(specialMessage);
+      });
+    }
+  }
+
+  @override
+  Future upsertSpecialMessages(List<SpecialMessage> messages) async {
+    if (database is sqflite.Transaction) {
+      await super.upsertSpecialMessages(messages);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.specialMessagesDao
+            .upsertSpecialMessages(messages);
+      });
+    }
+  }
+
+  @override
+  Future insertSpecialMessages(List<SpecialMessageDB> messages) async {
+    if (database is sqflite.Transaction) {
+      await super.insertSpecialMessages(messages);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.specialMessagesDao
+            .insertSpecialMessages(messages);
+      });
+    }
+  }
+
+  @override
+  Future updateSpecialMessages(List<SpecialMessageDB> messages) async {
+    if (database is sqflite.Transaction) {
+      await super.updateSpecialMessages(messages);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$ChatDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.specialMessagesDao
+            .updateSpecialMessages(messages);
+      });
+    }
   }
 }

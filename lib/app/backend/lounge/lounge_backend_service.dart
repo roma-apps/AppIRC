@@ -470,7 +470,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
         listener(MessagesForChannel.name(
             channel: channel,
             messages: channelWithState.initMessages,
-            isNeedCheckAdditionalLoadMore: true));
+            isNeedCheckAdditionalLoadMore: true,
+            isNeedCheckAlreadyExistInLocalStorage: true));
       }
     }));
 
@@ -487,11 +488,13 @@ class LoungeBackendService extends Providable implements ChatBackendService {
             // but actually lounge client display it as special
             _toWhoIsSpecialMessage(data).then((message) {
               listener(MessagesForChannel.name(
+                  isNeedCheckAlreadyExistInLocalStorage: true,
                   isNeedCheckAdditionalLoadMore: false,
                   channel: channel, messages: <ChatMessage>[message]));
             });
           } else {
             listener(MessagesForChannel.name(
+                isNeedCheckAlreadyExistInLocalStorage: false,
                 isNeedCheckAdditionalLoadMore: false,
                 channel: channel, messages: <ChatMessage>[message]));
           }
@@ -507,6 +510,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       if (channel.remoteId == data.chan) {
         toSpecialMessages(channel, data).then((specialMessages) {
           listener(MessagesForChannel.name(
+              isNeedCheckAlreadyExistInLocalStorage: false,
               isNeedCheckAdditionalLoadMore: false,
               channel: channel,
               messages: specialMessages,
@@ -517,6 +521,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
     disposable.add(listenForLoadMore(network, channel, (loadMoreResponse) {
       listener(MessagesForChannel.name(
+          isNeedCheckAlreadyExistInLocalStorage: false,
           isNeedCheckAdditionalLoadMore: true,
           channel: channel, messages: loadMoreResponse.messages));
     }));

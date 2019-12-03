@@ -8,7 +8,6 @@ import 'package:flutter_appirc/app/message/special/body/text/message_special_tex
 import 'package:flutter_appirc/app/message/special/body/whois/message_special_who_is_body_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 
-
 @dao
 abstract class SpecialMessageDao {
   @Query('SELECT * FROM SpecialMessageDB')
@@ -17,7 +16,6 @@ abstract class SpecialMessageDao {
   @Query(
       'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = :channelRemoteId')
   Future<List<SpecialMessageDB>> getChannelMessages(int channelRemoteId);
-
 
   @Query('SELECT * FROM SpecialMessageDB WHERE channelRemoteId = '
       ':channelRemoteId AND dataJsonEncoded LIKE :search ORDER BY '
@@ -33,7 +31,38 @@ abstract class SpecialMessageDao {
   Future<int> insertSpecialMessage(SpecialMessageDB specialMessage);
 
   @update
-  Future<int> updateRegularMessage(SpecialMessageDB specialMessage);
+  Future<int> updateSpecialMessage(SpecialMessageDB specialMessage);
+
+  @transaction
+  Future upsertSpecialMessage(SpecialMessage specialMessage) async {
+    if (specialMessage.messageLocalId != null) {
+      await updateSpecialMessage(toSpecialMessageDB(specialMessage));
+    } else {
+      var id = await insertSpecialMessage(toSpecialMessageDB(specialMessage));
+      specialMessage.messageLocalId = id;
+    }
+
+    return specialMessage.messageLocalId;
+  }
+
+  @transaction
+  Future upsertSpecialMessages(
+      List<SpecialMessage> messages) async {
+    return await Future.wait(
+        messages.map((message) async => await upsertSpecialMessage(message)));
+  }
+
+  @transaction
+  Future insertSpecialMessages(List<SpecialMessageDB> messages) async {
+    return await Future.wait(
+        messages.map((message) async => await insertSpecialMessage(message)));
+  }
+
+  @transaction
+  Future updateSpecialMessages(List<SpecialMessageDB> messages) async {
+    return await Future.wait(
+        messages.map((message) async => await updateSpecialMessage(message)));
+  }
 
   @Query('DELETE FROM SpecialMessageDB')
   Future<void> deleteAllSpecialMessages();
@@ -71,8 +100,7 @@ class SpecialMessageDB implements ChatMessageDB {
       this.dataJsonEncoded,
       this.specialTypeId,
       this.dateMicrosecondsSinceEpoch,
-      this.linksJsonEncoded
-      );
+      this.linksJsonEncoded);
 
   SpecialMessageDB.name(
       {this.localId,
@@ -82,8 +110,7 @@ class SpecialMessageDB implements ChatMessageDB {
       @required this.dataJsonEncoded,
       @required this.specialTypeId,
       @required this.dateMicrosecondsSinceEpoch,
-      @required this.linksJsonEncoded
-      });
+      @required this.linksJsonEncoded});
 }
 
 SpecialMessageType specialMessageTypeIdToType(int id) {
@@ -127,8 +154,6 @@ SpecialMessageDB toSpecialMessageDB(SpecialMessage specialMessage) =>
             : null,
         dateMicrosecondsSinceEpoch: specialMessage.date.microsecondsSinceEpoch);
 
-
-
 SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
   var type = specialMessageTypeIdToType(messageDB.specialTypeId);
   var decodedJson = json.decode(messageDB.dataJsonEncoded);
@@ -150,8 +175,8 @@ SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
       channelRemoteId: messageDB.channelRemoteId,
       data: body,
       specialType: type,
-      linksInMessage: messageDB.linksJsonEncoded != null
-          ? convertLinks(messageDB) : null,
+      linksInMessage:
+          messageDB.linksJsonEncoded != null ? convertLinks(messageDB) : null,
       date: DateTime.fromMicrosecondsSinceEpoch(
           messageDB.dateMicrosecondsSinceEpoch));
 }

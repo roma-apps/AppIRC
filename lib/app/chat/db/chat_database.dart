@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:floor/floor.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
+import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_db.dart';
+import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;

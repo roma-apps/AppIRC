@@ -24,10 +24,16 @@ abstract class RegularMessageDao {
   @Query('SELECT * FROM RegularMessageDB')
   Future<List<RegularMessageDB>> getAllMessages();
 
-  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :messageRemoteId ')
+  @Query(
+      'SELECT * FROM RegularMessageDB WHERE messageRemoteId = :messageRemoteId ')
   Future<RegularMessageDB> findMessageWithRemoteId(int messageRemoteId);
 
-  @Query('SELECT * FROM RegularMessageDB WHERE messageRemoteId = :messageRemoteId '
+  @Query('SELECT localId FROM RegularMessageDB WHERE messageRemoteId = '
+      ':messageRemoteId ')
+  Future<RegularMessageDB> findMessageLocalIdWithRemoteId(int messageRemoteId);
+
+  @Query(
+      'SELECT * FROM RegularMessageDB WHERE messageRemoteId = :messageRemoteId '
       'AND channelRemoteId = :channelRemoteId')
   Future<RegularMessageDB> findMessageWithChannelAndRemoteId(
       int channelRemoteId, int messageRemoteId);
@@ -73,6 +79,47 @@ abstract class RegularMessageDao {
 
   @update
   Future<int> updateRegularMessage(RegularMessageDB regularMessage);
+
+  @transaction
+  Future upsertRegularMessage(RegularMessage regularMessage) async {
+    if (regularMessage.messageLocalId != null) {
+      await updateRegularMessage(toRegularMessageDB(regularMessage));
+    } else {
+      var id = await insertRegularMessage(toRegularMessageDB(regularMessage));
+      regularMessage.messageLocalId = id;
+    }
+    return regularMessage.messageLocalId;
+  }
+
+  Future findRegularMessageLocalIds(
+      List<RegularMessage> regularMessages) async {
+    for(var regularMessage in regularMessages) {
+      var regularMessageDB =
+      await findMessageLocalIdWithRemoteId(regularMessage.messageRemoteId);
+      var localId = (regularMessageDB)?.localId;
+
+      regularMessage.messageLocalId = localId;
+    }
+  }
+
+  @transaction
+  Future upsertRegularMessages(
+      List<RegularMessage> messages) async {
+    return await Future.wait(
+        messages.map((message) async => await upsertRegularMessage(message)));
+  }
+
+  @transaction
+  Future insertRegularMessages(List<RegularMessageDB> messages) async {
+    return await Future.wait(
+        messages.map((message) async => await insertRegularMessage(message)));
+  }
+
+  @transaction
+  Future updateRegularMessages(List<RegularMessageDB> messages) async {
+    return await Future.wait(
+        messages.map((message) async => await updateRegularMessage(message)));
+  }
 
   @Query('DELETE FROM RegularMessageDB')
   Future<void> deleteAllRegularMessages();
