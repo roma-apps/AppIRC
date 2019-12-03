@@ -388,6 +388,21 @@ RegularMessageType detectRegularMessageType(String stringType) {
     case MessageTypeLoungeConstants.ctcpRequest:
       type = RegularMessageType.ctcpRequest;
       break;
+    case MessageTypeLoungeConstants.action:
+      type = RegularMessageType.action;
+      break;
+    case MessageTypeLoungeConstants.invite:
+      type = RegularMessageType.invite;
+      break;
+    case MessageTypeLoungeConstants.ctcp:
+      type = RegularMessageType.ctcp;
+      break;
+    case MessageTypeLoungeConstants.chghost:
+      type = RegularMessageType.chghost;
+      break;
+    case MessageTypeLoungeConstants.kick:
+      type = RegularMessageType.kick;
+      break;
 
     default:
       type = RegularMessageType.unknown;

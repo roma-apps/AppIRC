@@ -258,7 +258,7 @@ String _getMessageTitleString(BuildContext context, RegularMessage message) {
       title = appLocalizations.tr("chat.message.regular.sub_message.kick");
       break;
     case RegularMessageType.action:
-      title = appLocalizations.tr("chat.message.regular.sub_message.action");
+      title = "";
       break;
     case RegularMessageType.invite:
       title = appLocalizations.tr("chat.message.regular.sub_message.invite");
@@ -343,7 +343,7 @@ IconData _getMessageIcon(RegularMessage message) {
       icon = Icons.info;
       break;
     case RegularMessageType.action:
-      icon = Icons.info;
+      icon = Icons.star;
       break;
     case RegularMessageType.invite:
       icon = Icons.info;
