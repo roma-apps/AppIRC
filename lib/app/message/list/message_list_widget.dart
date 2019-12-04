@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_widget.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_model.dart';
@@ -265,11 +266,18 @@ class _MessageListWidgetState extends State<MessageListWidget> {
                 );
               }),
         ),
-        Align(
-            alignment: Alignment.bottomCenter,
-            child: MessageListJumpToNewestWidget())
+        _buildJumpWidget(context)
       ],
     );
+  }
+
+  Widget _buildJumpWidget(BuildContext context) {
+
+    ChannelBloc channelBloc = ChannelBloc.of(context);
+
+    return channelBloc.channel.type != ChannelType.special ? Align(
+          alignment: Alignment.bottomCenter,
+          child: MessageListJumpToNewestWidget()) : SizedBox.shrink();
   }
 
   StreamBuilder<bool> _buildListViewEmptyWidget(BuildContext context) {

@@ -124,7 +124,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     await _socketIOService.init();
 
     _listenForInit(_socketIOService, (init) {
-      _logger.d(() => "debug init $init" );
+      _logger.d(() => "debug init $init");
 
       // TODO: don't know why. But init not called after reconnection without
       //  this debug subscription
@@ -490,13 +490,15 @@ class LoungeBackendService extends Providable implements ChatBackendService {
               listener(MessagesForChannel.name(
                   isNeedCheckAlreadyExistInLocalStorage: true,
                   isNeedCheckAdditionalLoadMore: false,
-                  channel: channel, messages: <ChatMessage>[message]));
+                  channel: channel,
+                  messages: <ChatMessage>[message]));
             });
           } else {
             listener(MessagesForChannel.name(
                 isNeedCheckAlreadyExistInLocalStorage: false,
                 isNeedCheckAdditionalLoadMore: false,
-                channel: channel, messages: <ChatMessage>[message]));
+                channel: channel,
+                messages: <ChatMessage>[message]));
           }
         });
       }
@@ -509,6 +511,10 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
       if (channel.remoteId == data.chan) {
         toSpecialMessages(channel, data).then((specialMessages) {
+          if (specialMessages.length == 1 &&
+              specialMessages.first.specialType == SpecialMessageType.text) {
+            return;
+          }
           listener(MessagesForChannel.name(
               isNeedCheckAlreadyExistInLocalStorage: false,
               isNeedCheckAdditionalLoadMore: false,
@@ -523,7 +529,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       listener(MessagesForChannel.name(
           isNeedCheckAlreadyExistInLocalStorage: false,
           isNeedCheckAdditionalLoadMore: true,
-          channel: channel, messages: loadMoreResponse.messages));
+          channel: channel,
+          messages: loadMoreResponse.messages));
     }));
 
     return disposable;

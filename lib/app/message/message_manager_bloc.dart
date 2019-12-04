@@ -210,6 +210,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     List<SpecialMessage> specialMessages = newMessages
         .where((message) => message.chatMessageType == ChatMessageType.special)
         .map((message) => message as SpecialMessage)
+        .where((message) => message.specialType == SpecialMessageType.whoIs)
         .toList();
 
     if (specialMessages.isNotEmpty) {
@@ -266,7 +267,6 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 Future<List<List<String>>> extractLinks(List<ChatMessage> messages) async {
   Iterable<Future<List<String>>> mappedList =
       messages.map((i) => i.extractLinks());
-  print(mappedList); // you print an Iterable of Future
 
   // to get the list of int you have to do the following
   Future<List<List<String>>> futureList = Future.wait(mappedList);
