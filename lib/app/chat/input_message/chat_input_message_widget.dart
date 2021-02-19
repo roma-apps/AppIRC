@@ -190,7 +190,6 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
 
   _buildAttachMenuItems(BuildContext context, ChatUploadBloc chatUploadBloc,
       ChatInputMessageBloc inputMessageBloc) {
-
     return <PlatformAwarePopupMenuAction>[
       PlatformAwarePopupMenuAction(
         text: tr("chat.new_message.attach.action.file"),
@@ -243,25 +242,27 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       BuildContext context,
       ChatUploadBloc chatUploadBloc,
       ChatInputMessageBloc inputMessageBloc) async {
-    FilePicker.getFile(type: fileType).then((pickedFile) async {
-      if (pickedFile != null) {
-        _uploadFile(context, chatUploadBloc, pickedFile, inputMessageBloc);
+    FilePicker.platform.pickFiles().then((result) {
+      if (result != null) {
+        try {
+          File pickedFile = File(result.files.single.path);
+          _uploadFile(context, chatUploadBloc, pickedFile, inputMessageBloc);
+        } catch (e) {
+          showPlatformAlertDialog(
+              context: context,
+              title: Text(tr("chat.new_message.attach"
+                  ".error.title")),
+              content: Text(tr("chat.new_message.attach"
+                  ".error.cant_access_file")));
+        }
       } else {
-        showPlatformAlertDialog(
-            context: context,
-            title:
-                Text(tr("chat.new_message.attach"
-                    ".error.title")),
-            content:
-                Text(tr("chat.new_message.attach"
-                    ".error.cant_access_file")));
+        // User canceled the picker
       }
     });
   }
 
   Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc,
       File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
-
     try {
       var asyncDialogResult = await doAsyncOperationWithDialog(
           context: context,
@@ -305,8 +306,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
           title: Text(
             tr("chat.new_message.attach.error.title"),
           ),
-          content: Text(tr(
-              "chat.new_message.attach.error.http_code",
+          content: Text(tr("chat.new_message.attach.error.http_code",
               args: [e.responseCode.toString()])));
     } on InvalidHttpResponseBodyLoungeUploadException catch (e) {
       showPlatformAlertDialog(
@@ -314,8 +314,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
           title: Text(
             tr("chat.new_message.attach.error.title"),
           ),
-          content: Text(tr(
-              "chat.new_message.attach.error.http_body",
+          content: Text(tr("chat.new_message.attach.error.http_body",
               args: [e.responseBody])));
     } on TimeoutHttpLoungeUploadException {
       showPlatformAlertDialog(
