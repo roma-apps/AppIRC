@@ -16,20 +16,19 @@ Widget buildFormTextField(
     @required String label,
     @required String hint,
     List<TextInputFormatter> formatters,
-    TextInputType keyboardType = TextInputType.text,
+    TextInputType keyboardType,
     int maxLength,
     int minLines,
-    int maxLines,
-    bool obscureText = false,
-    bool autoCorrect = false,
-    TextAlign textAlign: TextAlign.start,
-    TextCapitalization textCapitalization = TextCapitalization.sentences,
-    TextInputAction textInputAction = TextInputAction.next,
-    bool expands = false,
+    int maxLines = 1,
+    bool obscureText,
+    bool autoCorrect,
+    TextAlign textAlign,
+    TextCapitalization textCapitalization,
+    TextInputAction textInputAction,
+    bool expands,
     VoidCallback onEditingComplete,
     ValueChanged<String> onSubmitted,
     FormValueFieldBloc nextBloc}) {
-
   FormTextFieldSkinBloc skinBloc = Provider.of(context);
 
   return buildPlatformTextField(
@@ -61,27 +60,28 @@ Widget buildFormTextField(
   );
 }
 
-buildFormTextRow(
-    {@required BuildContext context,
-    @required FormValueFieldBloc<String> bloc,
-    @required TextEditingController controller,
-    @required IconData icon,
-    @required String label,
-    @required String hint,
-    List<TextInputFormatter> formatters,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLength,
-    int minLines,
-    int maxLines,
-    bool obscureText = false,
-    bool autoCorrect = false,
-    TextAlign textAlign: TextAlign.start,
-    TextCapitalization textCapitalization = TextCapitalization.sentences,
-    TextInputAction textInputAction = TextInputAction.next,
-    bool expands = false,
-    VoidCallback onEditingComplete,
-    ValueChanged<String> onSubmitted,
-    FormValueFieldBloc nextBloc}) {
+buildFormTextRow({
+  @required BuildContext context,
+  @required FormValueFieldBloc<String> bloc,
+  @required TextEditingController controller,
+  @required IconData icon,
+  @required String label,
+  @required String hint,
+  List<TextInputFormatter> formatters,
+  TextInputType keyboardType = TextInputType.text,
+  int maxLength,
+  int minLines,
+  int maxLines = 1,
+  bool obscureText,
+  bool autoCorrect,
+  TextAlign textAlign,
+  TextCapitalization textCapitalization,
+  TextInputAction textInputAction,
+  bool expands,
+  VoidCallback onEditingComplete,
+  ValueChanged<String> onSubmitted,
+  FormValueFieldBloc nextBloc,
+}) {
   if (textInputAction == TextInputAction.next) {
     assert(nextBloc != null);
     assert(onSubmitted == null);
