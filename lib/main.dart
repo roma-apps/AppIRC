@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_form_bloc.dart';
@@ -105,10 +104,10 @@ Future main() async {
 //  Crashlytics.instance.enableInDevMode = true;
 
   // Pass all uncaught errors to Crashlytics.
-  FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  // FlutterError.onError = Crashlytics.instance.recordFlutterError;
 
-  runZoned<Future<void>>(
-    () async {
+  // runZoned<Future<void>>(
+  //   () async {
       runApp(
         EasyLocalization(
           supportedLocales: [
@@ -128,9 +127,9 @@ Future main() async {
           ),
         ),
       );
-    },
-    onError: Crashlytics.instance.recordError,
-  );
+  //   },
+  //   onError: Crashlytics.instance.recordError,
+  // );
 }
 
 class _InitAppIRCApp extends StatefulWidget {
