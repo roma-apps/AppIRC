@@ -89,6 +89,8 @@ final List<Locale> supportedLocales = [Locale('en', 'US')];
 Future main() async {
 //  changeToCupertinoPlatformAware();
 
+  WidgetsFlutterBinding.ensureInitialized();
+
   var preferencesService = PreferencesService();
 
   await preferencesService.init();
