@@ -20,7 +20,7 @@ import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/skin/text_skin_bloc.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 var _logger = MyLogger(logTag: "message_list_widget.dart", enabled: true);
 

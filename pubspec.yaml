@@ -47,9 +47,9 @@ dependencies:
   # days separators in search
   grouped_list: ^1.2.1
 
-  # non-official widgets from google
-  # Use ScrollablePositionedList for message list page
-  flutter_widgets: ^0.1.6
+  # non-official widget from google
+  # Use ScrollablePositionedList for messages list page
+  scrollable_positioned_list: ^0.1.9
 
   # open links in messages
   url_launcher: ^5.1.2
