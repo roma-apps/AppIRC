@@ -42,7 +42,7 @@ class NetworkJoinChannelFormWidgetState
     NetworkJoinChannelFormBloc formBloc =
         Provider.of<NetworkJoinChannelFormBloc>(context);
 
-    var appLocalizations = AppLocalizations.of(context);
+
     return Column(
       children: <Widget>[
         buildFormTextRow(
@@ -50,10 +50,8 @@ class NetworkJoinChannelFormWidgetState
           bloc: formBloc.channelFieldBloc,
           controller: _channelController,
           icon: Icons.add,
-          label: appLocalizations
-              .tr('chat.network.join_channel.field.channel.label'),
-          hint: appLocalizations
-              .tr('chat.network.join_channel.field.channel.hint'),
+          label: tr('chat.network.join_channel.field.channel.label'),
+          hint: tr('chat.network.join_channel.field.channel.hint'),
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.passwordFieldBloc,
         ),
@@ -62,10 +60,8 @@ class NetworkJoinChannelFormWidgetState
             bloc: formBloc.passwordFieldBloc,
             controller: _passwordController,
             icon: Icons.lock,
-            label: appLocalizations
-                .tr('chat.network.join_channel.field.password.label'),
-            hint: appLocalizations
-                .tr('chat.network.join_channel.field.password.hint'),
+            label: tr('chat.network.join_channel.field.password.label'),
+            hint: tr('chat.network.join_channel.field.password.hint'),
             textInputAction: TextInputAction.done,
             obscureText: true),
       ],

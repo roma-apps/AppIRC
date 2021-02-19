@@ -1,4 +1,4 @@
-import 'package:easy_localization/easy_localization_delegate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/message/highlight/message_link_highlight.dart';
@@ -99,7 +99,7 @@ class ChannelInfoSpecialMessageBodyWidget
 
   Widget _buildChannelInfoUsersCount(
       {@required BuildContext context, @required int usersCount}) {
-    return Text(AppLocalizations.of(context).tr(
+    return Text(tr(
         "chat"
         ".message.special.channels_list.users",
         args: [usersCount.toString()]));

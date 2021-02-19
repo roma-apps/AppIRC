@@ -17,21 +17,17 @@ class EditLoungeConnectionPage extends LoungeConnectionPage {
   @override
   onSuccessTestConnectionWithGivenPreferences(
       BuildContext context, LoungePreferences preferences) async {
-    var appLocalizations = AppLocalizations.of(context);
 
     _logger.d(() => "build");
     showPlatformDialog(
         androidBarrierDismissible: true,
         context: context,
         builder: (_) => PlatformAlertDialog(
-              title: Text(appLocalizations
-                  .tr("lounge.preferences.edit.dialog.confirm.title")),
-              content: Text(appLocalizations
-                  .tr("lounge.preferences.edit.dialog.confirm.content")),
+              title: Text(tr("lounge.preferences.edit.dialog.confirm.title")),
+              content: Text(tr("lounge.preferences.edit.dialog.confirm.content")),
               actions: <Widget>[
                 PlatformDialogAction(
-                  child: Text(appLocalizations
-                      .tr("lounge.preferences.edit.dialog.confirm.action"
+                  child: Text(tr("lounge.preferences.edit.dialog.confirm.action"
                           ".save_reload")),
                   onPressed: () async {
 
@@ -44,7 +40,7 @@ class EditLoungeConnectionPage extends LoungeConnectionPage {
                   },
                 ),
                 PlatformDialogAction(
-                  child: Text(appLocalizations.tr(
+                  child: Text(tr(
                       "lounge.preferences.edit.dialog.confirm.action.cancel")),
                   onPressed: () async {
                     _dismissDialog(context);

@@ -64,9 +64,9 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
 
 void _buildLeaveAction(BuildContext context,
     List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return items.add(PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.network.action.exit"),
+      text: tr("chat.network.action.exit"),
       iconData: Icons.clear,
       actionCallback: (action) {
         networkBloc.leaveNetwork();
@@ -75,9 +75,9 @@ void _buildLeaveAction(BuildContext context,
 
 void _buildConnectAction(BuildContext context,
     List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return items.add(PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.network.action.connect"),
+      text: tr("chat.network.action.connect"),
       iconData: Icons.cloud,
       actionCallback: (action) {
         networkBloc.enableNetwork();
@@ -86,9 +86,9 @@ void _buildConnectAction(BuildContext context,
 
 void _buildDisconnectionAction(BuildContext context,
     List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return items.add(PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.network.action.disconnect"),
+      text: tr("chat.network.action.disconnect"),
       iconData: Icons.cloud_off,
       actionCallback: (action) {
         networkBloc.disableNetwork();
@@ -97,9 +97,9 @@ void _buildDisconnectionAction(BuildContext context,
 
 PlatformAwarePopupMenuAction _buildIgnoredUsersListAction(
     BuildContext context, NetworkBloc networkBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.network.action.list_ignored_users"),
+      text: tr("chat.network.action.list_ignored_users"),
       iconData: Icons.list,
       actionCallback: (action) {
         networkBloc.printNetworkIgnoredUsers();
@@ -108,9 +108,9 @@ PlatformAwarePopupMenuAction _buildIgnoredUsersListAction(
 
 PlatformAwarePopupMenuAction _buildChannelsListAction(
     BuildContext context, NetworkBloc networkBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.network.action.list_all_channels"),
+      text: tr("chat.network.action.list_all_channels"),
       iconData: Icons.list,
       actionCallback: (action) {
         networkBloc.printNetworkAvailableChannels();
@@ -119,9 +119,9 @@ PlatformAwarePopupMenuAction _buildChannelsListAction(
 
 PlatformAwarePopupMenuAction _buildJoinChannelAction(
     BuildContext context, NetworkBloc networkBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.network.action.join_channel"),
+      text: tr("chat.network.action.join_channel"),
       iconData: Icons.add,
       actionCallback: (action) {
         Navigator.push(
@@ -133,9 +133,9 @@ PlatformAwarePopupMenuAction _buildJoinChannelAction(
 
 PlatformAwarePopupMenuAction _buildEditAction(BuildContext context,
     NetworkBloc networkBloc, ChatBackendService backendService) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.network.action.edit"),
+      text: tr("chat.network.action.edit"),
       iconData: Icons.edit,
       actionCallback: (action) {
         Navigator.push(

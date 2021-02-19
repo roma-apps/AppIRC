@@ -25,37 +25,36 @@ class WhoIsSpecialMessageBodyWidget
   Widget build(BuildContext context) {
     String actualHostNameValue = calculateActualHostName(body);
 
-    var appLocalizations = AppLocalizations.of(context);
+
 
     var child = Column(
       children: <Widget>[
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.hostmask"),
+            tr("chat.message.special.who_is.hostmask"),
             "${body.ident}@${body.hostname}"),
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.actual_hostname"),
+            tr("chat.message.special.who_is.actual_hostname"),
             actualHostNameValue),
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.real_name"),
+            tr("chat.message.special.who_is.real_name"),
             body.realName),
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.channels"),
+            tr("chat.message.special.who_is.channels"),
             body.channels),
         _buildWhoIsRow(
-            appLocalizations
-                .tr("chat.message.special.who_is.secure_connection"),
+            tr("chat.message.special.who_is.secure_connection"),
             body.secure.toString()),
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.connected_to"),
+            tr("chat.message.special.who_is.connected_to"),
             "${body.server} (${body.serverInfo})"),
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.account"),
+            tr("chat.message.special.who_is.account"),
             body.account),
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.connected_at"),
+            tr("chat.message.special.who_is.connected_at"),
             regularDateFormatter.format(body.logonTime)),
         _buildWhoIsRow(
-            appLocalizations.tr("chat.message.special.who_is.idle_since"),
+            tr("chat.message.special.who_is.idle_since"),
             regularDateFormatter.format(body.idleTime)),
       ],
     );
@@ -129,35 +128,35 @@ String _buildWhoIsRawBody(
     @required WhoIsSpecialMessageBody whoIsBody}) {
   String actualHostNameValue = calculateActualHostName(whoIsBody);
 
-  var appLocalizations = AppLocalizations.of(context);
+
 
   var rawBody = _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is"
+          tr("chat.message.special.who_is"
               ".hostmask"),
           "${whoIsBody.ident}@${whoIsBody.hostname}") +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.actual_hostname"),
+          tr("chat.message.special.who_is.actual_hostname"),
           actualHostNameValue) +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.real_name"),
+          tr("chat.message.special.who_is.real_name"),
           whoIsBody.realName) +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.channels"),
+          tr("chat.message.special.who_is.channels"),
           whoIsBody.channels) +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.secure_connection"),
+          tr("chat.message.special.who_is.secure_connection"),
           whoIsBody.secure.toString()) +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.connected_to"),
+          tr("chat.message.special.who_is.connected_to"),
           "${whoIsBody.server} (${whoIsBody.serverInfo})") +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.account"),
+          tr("chat.message.special.who_is.account"),
           whoIsBody.account) +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.connected_at"),
+          tr("chat.message.special.who_is.connected_at"),
           regularDateFormatter.format(whoIsBody.logonTime)) +
       _buildWhoIsRawRow(
-          appLocalizations.tr("chat.message.special.who_is.idle_since"),
+          tr("chat.message.special.who_is.idle_since"),
           regularDateFormatter.format(whoIsBody.idleTime));
 
   return rawBody;

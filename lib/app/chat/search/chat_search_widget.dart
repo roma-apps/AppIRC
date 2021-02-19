@@ -94,7 +94,7 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
 //                            (inSearchResult: true, searchTerm: result.searchTerm));
 //                    });
               } else {
-                return Text(AppLocalizations.of(context).tr("chat"
+                return Text(tr("chat"
                     ".search.nothing_found"));
               }
             }
@@ -118,7 +118,7 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
           bloc: searchBloc.searchFieldBloc,
           controller: _searchController,
           hint:
-              AppLocalizations.of(context).tr("chat.search.field.filter.hint"),
+              tr("chat.search.field.filter.hint"),
           label: null),
     );
   }
@@ -218,7 +218,7 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
 //                bloc: channelBloc.messagesBloc.searchFieldBloc,
 //                controller: _searchController,
 //                label: labelText,
-//                hint: AppLocalizations.of(context)
+//                hint: of(context)
 //                    .tr("chat.messages_list.search.field.filter.hint")),
 //          );
 //        });
@@ -229,11 +229,11 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
 //    String labelText;
 //    if (searchState.searchTerm?.isNotEmpty == true) {
 //      if (searchState.foundItems.isEmpty) {
-//        labelText = AppLocalizations.of(context)
+//        labelText = of(context)
 //            .tr("chat.messages_list.search.field.filter"
 //            ".label.nothing_found");
 //      } else {
-//        labelText = AppLocalizations.of(context)
+//        labelText = of(context)
 //            .tr("chat.messages_list.search.field.filter.label.found", args: [
 //          searchState.selectedFoundMessagePosition.toString(),
 //          searchState.maxPossibleSelectedFoundPosition.toString()

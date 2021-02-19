@@ -177,94 +177,92 @@ isHighlightedByServer(RegularMessage message) =>
 
 String _getMessageTitleString(BuildContext context, RegularMessage message) {
   var regularMessageType = message.regularMessageType;
-  var appLocalizations = AppLocalizations.of(context);
+
   String title;
   switch (regularMessageType) {
     case RegularMessageType.topicSetBy:
       title =
-          appLocalizations.tr("chat.message.regular.sub_message.topic_set_by");
+          tr("chat.message.regular.sub_message.topic_set_by");
       break;
     case RegularMessageType.topic:
-      title = appLocalizations.tr("chat.message.regular.sub_message.topic");
+      title = tr("chat.message.regular.sub_message.topic");
       break;
     case RegularMessageType.whoIs:
-      title = appLocalizations.tr("chat.message.regular.sub_message.who_is");
+      title = tr("chat.message.regular.sub_message.who_is");
       break;
     case RegularMessageType.unhandled:
       title = null;
       break;
     case RegularMessageType.unknown:
-      title = appLocalizations.tr("chat.message.regular.sub_message.unknown");
+      title = tr("chat.message.regular.sub_message.unknown");
       break;
     case RegularMessageType.message:
       title = null;
       break;
     case RegularMessageType.join:
-      title = appLocalizations.tr("chat.message.regular.sub_message.join");
+      title = tr("chat.message.regular.sub_message.join");
       break;
     case RegularMessageType.mode:
       if (_isHaveLongText(message)) {
         title =
-            appLocalizations.tr("chat.message.regular.sub_message.mode_long");
+            tr("chat.message.regular.sub_message.mode_long");
       } else {
-        title = appLocalizations.tr(
+        title = tr(
             "chat.message.regular.sub_message.mode_short",
             args: [message.text]);
       }
 
       break;
     case RegularMessageType.motd:
-      title = appLocalizations
-          .tr("chat.message.regular.sub_message.motd", args: [message.text]);
+      title = tr("chat.message.regular.sub_message.motd", args: [message.text]);
       break;
     case RegularMessageType.notice:
-      title = appLocalizations.tr("chat.message.regular.sub_message.notice");
+      title = tr("chat.message.regular.sub_message.notice");
       break;
     case RegularMessageType.error:
-      title = appLocalizations.tr("chat.message.regular.sub_message.error");
+      title = tr("chat.message.regular.sub_message.error");
       break;
     case RegularMessageType.away:
-      title = appLocalizations.tr("chat.message.regular.sub_message.away");
+      title = tr("chat.message.regular.sub_message.away");
       break;
     case RegularMessageType.back:
-      title = appLocalizations.tr("chat.message.regular.sub_message.back");
+      title = tr("chat.message.regular.sub_message.back");
       break;
     case RegularMessageType.modeChannel:
-      title = appLocalizations.tr(
+      title = tr(
           "chat.message.regular.sub_message.channel_mode",
           args: [message.text]);
       break;
     case RegularMessageType.quit:
-      title = appLocalizations.tr("chat.message.regular.sub_message.quit");
+      title = tr("chat.message.regular.sub_message.quit");
       break;
     case RegularMessageType.raw:
       title = null;
       break;
     case RegularMessageType.part:
-      title = appLocalizations.tr("chat.message.regular.sub_message.part");
+      title = tr("chat.message.regular.sub_message.part");
       break;
     case RegularMessageType.nick:
-      title = appLocalizations
-          .tr("chat.message.regular.sub_message.nick", args: [message.newNick]);
+      title = tr("chat.message.regular.sub_message.nick", args: [message.newNick]);
       break;
     case RegularMessageType.ctcpRequest:
       title =
-          appLocalizations.tr("chat.message.regular.sub_message.ctcp_request");
+          tr("chat.message.regular.sub_message.ctcp_request");
       break;
     case RegularMessageType.chghost:
-      title = appLocalizations.tr("chat.message.regular.sub_message.chghost");
+      title = tr("chat.message.regular.sub_message.chghost");
       break;
     case RegularMessageType.kick:
-      title = appLocalizations.tr("chat.message.regular.sub_message.kick");
+      title = tr("chat.message.regular.sub_message.kick");
       break;
     case RegularMessageType.action:
       title = "";
       break;
     case RegularMessageType.invite:
-      title = appLocalizations.tr("chat.message.regular.sub_message.invite");
+      title = tr("chat.message.regular.sub_message.invite");
       break;
     case RegularMessageType.ctcp:
-      title = appLocalizations.tr("chat.message.regular.sub_message.ctcp");
+      title = tr("chat.message.regular.sub_message.ctcp");
       break;
   }
   return title;

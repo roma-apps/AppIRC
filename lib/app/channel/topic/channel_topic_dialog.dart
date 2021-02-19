@@ -14,7 +14,7 @@ void showTopicDialog(BuildContext context, ChannelBloc channelBloc) {
         ChannelTopicFormBloc topicFormBloc = ChannelTopicFormBloc(topicString);
 
         return PlatformAlertDialog(
-          title: Text(AppLocalizations.of(context).tr(
+          title: Text(tr(
               "chat.channel.topic.dialog.title",
               args: [channelBloc.channel.name])),
           content: Provider(
@@ -32,8 +32,7 @@ void showTopicDialog(BuildContext context, ChannelBloc channelBloc) {
 
 PlatformDialogAction _buildCancelActionWidget(BuildContext context) {
   return PlatformDialogAction(
-    child: Text(AppLocalizations.of(context)
-        .tr("chat.channel.topic.dialog.action.cancel")),
+    child: Text(tr("chat.channel.topic.dialog.action.cancel")),
     onPressed: () {
       Navigator.pop(context);
     },
@@ -56,8 +55,7 @@ StreamBuilder<bool> _buildEditTopicActionWidget(
           };
         }
         return PlatformDialogAction(
-          child: Text(AppLocalizations.of(context)
-              .tr("chat.channel.topic.dialog.action.change")),
+          child: Text(tr("chat.channel.topic.dialog.action.change")),
           onPressed: onPressed,
         );
       });

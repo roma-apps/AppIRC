@@ -4,4 +4,4 @@ import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
 
 Widget buildMessageLoadingPreview(
         {@required BuildContext context, @required MessagePreview preview}) =>
-    Text(AppLocalizations.of(context).tr("chat.message.preview.loading"));
+    Text(tr("chat.message.preview.loading"));

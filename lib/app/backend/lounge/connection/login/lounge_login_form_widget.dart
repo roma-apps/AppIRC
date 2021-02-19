@@ -18,7 +18,7 @@ class LoungeLoginFormWidget extends StatelessWidget {
         Provider<LoungeAuthPreferencesFormBloc>(
           providable: loginFormBloc,
           child: LoungeAuthPreferencesFormWidget(
-              AppLocalizations.of(context).tr('lounge.preferences.login.title'),
+              tr('lounge.preferences.login.title'),
               loginFormBloc),
         )
       ],
@@ -27,13 +27,9 @@ class LoungeLoginFormWidget extends StatelessWidget {
 }
 
 Future showLoungeLoginFailAlertDialog(BuildContext context) async {
-  var appLocalizations = AppLocalizations.of(context);
+  String title = tr('lounge.preferences.login.dialog.login_fail.title');
 
-  String title =
-      appLocalizations.tr('lounge.preferences.login.dialog.login_fail.title');
-
-  String content =
-      appLocalizations.tr('lounge.preferences.login.dialog.login_fail.content');
+  String content = tr('lounge.preferences.login.dialog.login_fail.content');
 
   return showPlatformAlertDialog(
       context: context, title: Text(title), content: Text(content));

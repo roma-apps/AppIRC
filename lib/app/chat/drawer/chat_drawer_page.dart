@@ -20,7 +20,7 @@ class ChatDrawerPageState extends State<ChatDrawerPage> {
   Widget build(BuildContext context) => buildPlatformScaffold(
       context,
       appBar: PlatformAppBar(
-        title: Text(AppLocalizations.of(context).tr('chat.settings.title')),
+        title: Text(tr('chat.settings.title')),
       ),
       body: SafeArea(
           child: Padding(

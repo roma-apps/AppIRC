@@ -38,7 +38,7 @@ class ChannelUsersPageState extends State<ChannelUsersPage> {
     var platformScaffold = buildPlatformScaffold(
       context,
       appBar: PlatformAppBar(
-        title: Text(AppLocalizations.of(context).tr('chat.users_list.title')),
+        title: Text(tr('chat.users_list.title')),
       ),
       body: SafeArea(
         child: Padding(

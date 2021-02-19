@@ -36,7 +36,7 @@ class MessagePage extends StatelessWidget {
     String text;
     switch (message.chatMessageType) {
       case ChatMessageType.special:
-        text = AppLocalizations.of(context).tr("chat.message.title.simple");
+        text = tr("chat.message.title.simple");
         break;
       case ChatMessageType.regular:
         var regularMessage = message as RegularMessage;
@@ -44,11 +44,10 @@ class MessagePage extends StatelessWidget {
 
         if(fromNick != null) {
 
-        text = AppLocalizations.of(context)
-            .tr("chat.message.title.from", args: [fromNick]);
+        text = tr("chat.message.title.from", args: [fromNick]);
         } else {
 
-          text = AppLocalizations.of(context).tr("chat.message.title.simple");
+          text = tr("chat.message.title.simple");
         }
         break;
     }

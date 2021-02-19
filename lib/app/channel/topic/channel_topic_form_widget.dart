@@ -36,10 +36,8 @@ class ChannelTopicWidgetState extends State<ChannelTopicWidget> {
         context: context,
         bloc: formBloc.topicFieldBloc,
         controller: _topicController,
-        label: AppLocalizations.of(context)
-            .tr("chat.channel.topic.dialog.field.edit.label"),
-        hint: AppLocalizations.of(context)
-            .tr("chat.channel.topic.dialog.field.edit.hint"),
+        label: tr("chat.channel.topic.dialog.field.edit.label"),
+        hint: tr("chat.channel.topic.dialog.field.edit.hint"),
         minLines: 1,
         textInputAction: TextInputAction.done);
   }

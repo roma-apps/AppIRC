@@ -127,13 +127,10 @@ String getCondensedStringForRegularMessageTypeAndCount(
 
 String _plural(BuildContext context, String key, int count) {
   if (count == 0) {
-    return AppLocalizations.of(context)
-        .tr(key + ".zero", args: [count.toString()]);
+    return tr(key + ".zero", args: [count.toString()]);
   } else if (count == 1) {
-    return AppLocalizations.of(context)
-        .tr(key + ".one", args: [count.toString()]);
+    return tr(key + ".one", args: [count.toString()]);
   } else {
-    return AppLocalizations.of(context)
-        .tr(key + ".other", args: [count.toString()]);
+    return tr(key + ".other", args: [count.toString()]);
   }
 }

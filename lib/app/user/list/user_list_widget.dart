@@ -57,11 +57,11 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
   }
 
   Center _buildLoadingWidget(BuildContext context) {
-    var appLocalizations = AppLocalizations.of(context);
+
 
     TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
-        child: Text(appLocalizations.tr("chat.users_list.loading"),
+        child: Text(tr("chat.users_list.loading"),
             style: textSkinBloc.defaultTextStyle));
   }
 
@@ -73,10 +73,8 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
           context: context,
           bloc: channelUsersListBloc.filterFieldBloc,
           controller: _filterController,
-          label: AppLocalizations.of(context)
-              .tr("chat.users_list.search.field.filter.label"),
-          hint: AppLocalizations.of(context)
-              .tr("chat.users_list.search.field.filter.hint"),
+          label: tr("chat.users_list.search.field.filter.label"),
+          hint: tr("chat.users_list.search.field.filter.hint"),
         ),
         body,
       ],
@@ -96,14 +94,14 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
   }
 
   Padding _buildEmptyListWidget(BuildContext context) {
-    var appLocalizations = AppLocalizations.of(context);
+
 
     TextSkinBloc textSkinBloc = Provider.of(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Center(
           child: Text(
-              appLocalizations.tr("chat.users_list.search.users_not_found"),
+              tr("chat.users_list.search.users_not_found"),
               style: textSkinBloc.defaultTextStyle)),
     );
   }

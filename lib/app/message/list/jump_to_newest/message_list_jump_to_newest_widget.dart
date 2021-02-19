@@ -55,12 +55,11 @@ class MessageListJumpToNewestWidget extends StatelessWidget {
 
     String text;
     if (newMessagesCount > 0) {
-      text = AppLocalizations.of(context).tr(
+      text = tr(
           "chat.messages_list.jump_to_latest.with_new_messages",
           args: [newMessagesCount.toString()]);
     } else {
-      text = AppLocalizations.of(context)
-          .tr("chat.messages_list.jump_to_latest.no_messages");
+      text = tr("chat.messages_list.jump_to_latest.no_messages");
     }
 
     return Text(text);

@@ -14,7 +14,7 @@ class LoungeRegistrationFormWidget extends StatelessWidget {
     return Column(
       children: <Widget>[
         LoungeAuthPreferencesFormWidget(
-            AppLocalizations.of(context).tr('lounge.preferences.registration'
+            tr('lounge.preferences.registration'
                 '.title'),
             registrationFormBloc),
       ],
@@ -23,26 +23,20 @@ class LoungeRegistrationFormWidget extends StatelessWidget {
 }
 
 Future showLoungeRegistrationInvalidAlertDialog(BuildContext context) async {
-  var appLocalizations = AppLocalizations.of(context);
 
-  String title = appLocalizations
-      .tr('lounge.preferences.registration.dialog.error_invalid.title');
+  String title = tr('lounge.preferences.registration.dialog.error_invalid.title');
 
-  String content = appLocalizations
-      .tr('lounge.preferences.registration.dialog.error_invalid.content');
+  String content = tr('lounge.preferences.registration.dialog.error_invalid.content');
 
   return showPlatformAlertDialog(
       context: context, title: Text(title), content: Text(content));
 }
 
 Future showLoungeRegistrationUnknownAlertDialog(BuildContext context) async {
-  var appLocalizations = AppLocalizations.of(context);
 
-  String title = appLocalizations
-      .tr('lounge.preferences.registration.dialog.error_unknown.title');
+  String title = tr('lounge.preferences.registration.dialog.error_unknown.title');
 
-  String content = appLocalizations
-      .tr('lounge.preferences.registration.dialog.error_unknown.content');
+  String content = tr('lounge.preferences.registration.dialog.error_unknown.content');
 
   return showPlatformAlertDialog(
       context: context, title: Text(title), content: Text(content));
@@ -50,26 +44,20 @@ Future showLoungeRegistrationUnknownAlertDialog(BuildContext context) async {
 
 Future showLoungeRegistrationAlreadyExistAlertDialog(
     BuildContext context) async {
-  var appLocalizations = AppLocalizations.of(context);
 
-  String title = appLocalizations
-      .tr('lounge.preferences.registration.dialog.error_already_exist.title');
+  String title = tr('lounge.preferences.registration.dialog.error_already_exist.title');
 
-  String content = appLocalizations
-      .tr('lounge.preferences.registration.dialog.error_already_exist.content');
+  String content = tr('lounge.preferences.registration.dialog.error_already_exist.content');
 
   return showPlatformAlertDialog(
       context: context, title: Text(title), content: Text(content));
 }
 
 Future showLoungeRegistrationSuccessAlertDialog(BuildContext context) async {
-  var appLocalizations = AppLocalizations.of(context);
 
-  String title = appLocalizations
-      .tr('lounge.preferences.registration.dialog.success.title');
+  String title = tr('lounge.preferences.registration.dialog.success.title');
 
-  String content = appLocalizations
-      .tr('lounge.preferences.registration.dialog.success.content');
+  String content = tr('lounge.preferences.registration.dialog.success.content');
 
   return showPlatformAlertDialog(
       context: context, title: Text(title), content: Text(content));

@@ -14,7 +14,7 @@ class ChatSearchPage extends StatelessWidget {
     return buildPlatformScaffold(context,
         appBar: PlatformAppBar(
           leading: buildPlatformScaffoldAppBarBackButton(context),
-          title: Text(AppLocalizations.of(context).tr("chat.search.title",
+          title: Text(tr("chat.search.title",
               args: [chatSearchBloc.channel.name])),
         ),
         body: SafeArea(child: ChatSearchWidget()));

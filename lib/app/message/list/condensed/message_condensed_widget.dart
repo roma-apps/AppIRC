@@ -96,8 +96,7 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     var textString = groupedByType.keys
         .map((regularType) => getCondensedStringForRegularMessageTypeAndCount(
             context, regularType, groupedByType[regularType].length))
-        .join(AppLocalizations.of(context)
-            .tr("chat.message.condensed.join_separator"));
+        .join(tr("chat.message.condensed.join_separator"));
 
     var messagesSkin = Provider.of<MessageSkinBloc>(context);
     return GestureDetector(

@@ -155,7 +155,7 @@ class LoungeConnectionFormWidgetState
               }
             },
                 child: Text(
-                    AppLocalizations.of(context).tr('lounge.preferences.host'
+                    tr('lounge.preferences.host'
                         '.action'
                         '.connect')));
           }
@@ -189,8 +189,7 @@ class LoungeConnectionFormWidgetState
               ? createSkinnedPlatformButton(context, onPressed: () {
                   connectionBloc.switchToRegistration();
                 },
-                  child: Text(AppLocalizations.of(context)
-                      .tr("lounge.preferences.action"
+                  child: Text(tr("lounge.preferences.action"
                           ".switch_to_sign_up")))
               : SizedBox.shrink();
         });
@@ -244,7 +243,7 @@ class LoungeConnectionFormWidgetState
                       }
                     }
                   : null,
-              child: Text(AppLocalizations.of(context).tr("lounge"
+              child: Text(tr("lounge"
                   ".preferences.login.action.login")));
         });
   }
@@ -327,7 +326,7 @@ class LoungeConnectionFormWidgetState
                       }
                     }
                   : null,
-              child: Text(AppLocalizations.of(context).tr("lounge"
+              child: Text(tr("lounge"
                   ".preferences.registration.action.register")));
         });
   }
@@ -337,7 +336,7 @@ class LoungeConnectionFormWidgetState
     return createSkinnedPlatformButton(context, onPressed: () {
       connectionBloc.switchToLogin();
     },
-        child: Text(AppLocalizations.of(context).tr("lounge.preferences.action"
+        child: Text(tr("lounge.preferences.action"
             ".switch_to_sign_in")));
   }
 }

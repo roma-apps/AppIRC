@@ -257,22 +257,19 @@ class _ChatPageState extends State<ChatPage> {
                   AsyncSnapshot<ChatConnectionState> snapshot) {
                 var connectionState = snapshot.data;
 
-                var title = AppLocalizations.of(context).tr('chat.title');
+                var title = tr('chat.title');
 
                 String content;
 
                 switch (connectionState) {
                   case ChatConnectionState.connected:
-                    content = AppLocalizations.of(context)
-                        .tr('chat.state.connection.status.connected');
+                    content = tr('chat.state.connection.status.connected');
                     break;
                   case ChatConnectionState.connecting:
-                    content = AppLocalizations.of(context)
-                        .tr('chat.state.connection.status.connecting');
+                    content = tr('chat.state.connection.status.connecting');
                     break;
                   case ChatConnectionState.disconnected:
-                    content = AppLocalizations.of(context)
-                        .tr('chat.state.connection.status.disconnected');
+                    content = tr('chat.state.connection.status.disconnected');
                     break;
                 }
 
@@ -374,18 +371,17 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildLoadingMessagesWidget(BuildContext context) {
     return _buildLoadingWidget(
-        context, AppLocalizations.of(context).tr("chat.messages_list.loading"));
+        context, tr("chat.messages_list.loading"));
   }
 
   Widget _buildInitMessagesWidget(BuildContext context) {
     return _buildLoadingWidget(
-        context, AppLocalizations.of(context).tr("chat.state.init"));
+        context, tr("chat.state.init"));
   }
 
   Widget _buildConnectingWidget(BuildContext context) => _buildLoadingWidget(
       context,
-      AppLocalizations.of(context)
-          .tr("chat.state.connection.status.connecting"));
+      tr("chat.state.connection.status.connecting"));
 
   Widget _buildLoadingWidget(BuildContext context, String message) {
     TextSkinBloc textSkinBloc = Provider.of(context);
@@ -429,7 +425,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildDisconnectedWidget(BuildContext context) {
-    var appLocalizations = AppLocalizations.of(context);
+
     TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
       child: Column(
@@ -437,11 +433,11 @@ class _ChatPageState extends State<ChatPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(
-              appLocalizations.tr("chat.state.connection"
+              tr("chat.state.connection"
                   ".status.disconnected"),
               style: textSkinBloc.defaultTextStyle),
           createSkinnedPlatformButton(context,
-              child: Text(appLocalizations.tr(
+              child: Text(tr(
                   "chat.state.connection.action.reconnect")), onPressed: () {
             var connectionBloc = Provider.of<ChatConnectionBloc>(context);
             connectionBloc.reconnect();
@@ -487,7 +483,7 @@ class _ChatPageState extends State<ChatPage> {
           (context, preferences) async {
         var networksBloc = Provider.of<NetworkListBloc>(context);
         await networksBloc.joinNetwork(preferences);
-      }, AppLocalizations.of(context).tr('irc.connection.new.action.connect')),
+      }, tr('irc.connection.new.action.connect')),
     );
   }
 
@@ -495,7 +491,7 @@ class _ChatPageState extends State<ChatPage> {
     TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
         child: Text(
-      AppLocalizations.of(context).tr('chat.state.active_channel_not_selected'),
+      tr('chat.state.active_channel_not_selected'),
       style: textSkinBloc.defaultTextStyle,
     ));
   }

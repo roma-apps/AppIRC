@@ -40,8 +40,7 @@ Widget buildPreview(
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(AppLocalizations.of(context)
-                    .tr("chat.message.preview.title"), style: textSkinBloc
+                child: Text(tr("chat.message.preview.title"), style: textSkinBloc
                     .defaultTextStyle),
               ),
               PlatformIconButton(

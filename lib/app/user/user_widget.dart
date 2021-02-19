@@ -42,11 +42,11 @@ List<PlatformAwarePopupMenuAction> buildUserNickPopupMenuActions(
     {@required BuildContext context,
     @required String nick,
     @required actionCallback(PlatformAwarePopupMenuAction action)}) {
-  var appLocalizations = AppLocalizations.of(context);
+
   ChannelBloc channelBloc = ChannelBloc.of(context);
   return <PlatformAwarePopupMenuAction>[
     PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("chat.user.action.information"),
+        text: tr("chat.user.action.information"),
         iconData: Icons.account_box,
         actionCallback: (action) {
           channelBloc.printUserInfo(nick);
@@ -55,7 +55,7 @@ List<PlatformAwarePopupMenuAction> buildUserNickPopupMenuActions(
           }
         }),
     PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("chat.user.action"
+        text: tr("chat.user.action"
             ".direct_messages"),
         iconData: Icons.message,
         actionCallback: (action) {

@@ -39,20 +39,20 @@ class LoungeAuthPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var appLocalizations = AppLocalizations.of(context);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         buildFormTitle(
-            context: context, title: appLocalizations.tr(widget.titleText)),
+            context: context, title: tr(widget.titleText)),
         buildFormTextRow(
           context: context,
           bloc: widget.formBloc.usernameFieldBloc,
           controller: _usernameController,
           icon: Icons.account_box,
-          label: appLocalizations.tr('lounge.preferences.auth.field.username'
+          label: tr('lounge.preferences.auth.field.username'
               '.label'),
-          hint: appLocalizations.tr('lounge.preferences.auth.field.username'
+          hint: tr('lounge.preferences.auth.field.username'
               '.hint'),
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.none,
@@ -63,9 +63,9 @@ class LoungeAuthPreferencesFormWidgetState
           bloc: widget.formBloc.passwordFieldBloc,
           controller: _passwordController,
           icon: Icons.lock,
-          label: appLocalizations.tr('lounge.preferences.auth.field.password'
+          label: tr('lounge.preferences.auth.field.password'
               '.label'),
-          hint: appLocalizations.tr('lounge.preferences.auth.field.password'
+          hint: tr('lounge.preferences.auth.field.password'
               '.hint'),
           obscureText: true,
           textCapitalization: TextCapitalization.none,

@@ -79,8 +79,7 @@ class AsyncProgressDialog {
           if (cancelableOperation != null) {
             actions.add(PlatformDialogAction(
                 child: cancelAction ??
-                    Text(AppLocalizations.of(context)
-                        .tr("dialog.async.action.cancel")),
+                    Text(tr("dialog.async.action.cancel")),
                 onPressed: () {
                   cancelableOperation.cancel();
                   hide(context);
@@ -89,8 +88,7 @@ class AsyncProgressDialog {
 
           return PlatformAlertDialog(
             title: title ??
-                Text(AppLocalizations.of(context)
-                    .tr("dialog.async.title")),
+                Text(tr("dialog.async.title")),
             content: content ??
                 Row(
                     mainAxisAlignment: MainAxisAlignment.center,

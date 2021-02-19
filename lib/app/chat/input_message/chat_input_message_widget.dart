@@ -74,8 +74,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
     PopupMenuSkinBloc popupMenuSkinBloc = Provider.of(context);
 
     var popupBackgroundColor = popupMenuSkinBloc.backgroundColor;
-    var hintText = AppLocalizations.of(context)
-        .tr("chat.new_message.field.enter_message.hint");
+    var hintText = tr("chat.new_message.field.enter_message.hint");
 
     ChatConnectionBloc chatConnectionBloc = Provider.of(context);
 
@@ -191,34 +190,34 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
 
   _buildAttachMenuItems(BuildContext context, ChatUploadBloc chatUploadBloc,
       ChatInputMessageBloc inputMessageBloc) {
-    var appLocalizations = AppLocalizations.of(context);
+
     return <PlatformAwarePopupMenuAction>[
       PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("chat.new_message.attach.action.file"),
+        text: tr("chat.new_message.attach.action.file"),
         iconData: Icons.insert_drive_file,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
-              FileType.ANY, context, chatUploadBloc, inputMessageBloc);
+              FileType.any, context, chatUploadBloc, inputMessageBloc);
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("chat.new_message.attach.action.audio"),
+        text: tr("chat.new_message.attach.action.audio"),
         iconData: Icons.audiotrack,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
-              FileType.AUDIO, context, chatUploadBloc, inputMessageBloc);
+              FileType.audio, context, chatUploadBloc, inputMessageBloc);
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("chat.new_message.attach.action.image"),
+        text: tr("chat.new_message.attach.action.image"),
         iconData: Icons.image,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
-              FileType.IMAGE, context, chatUploadBloc, inputMessageBloc);
+              FileType.image, context, chatUploadBloc, inputMessageBloc);
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("chat.new_message.attach.action.camera"),
+        text: tr("chat.new_message.attach.action.camera"),
         iconData: Icons.camera_alt,
         actionCallback: (PlatformAwarePopupMenuAction action) async {
           var pickedPhoto =
@@ -229,11 +228,11 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
         },
       ),
       PlatformAwarePopupMenuAction(
-        text: appLocalizations.tr("chat.new_message.attach.action.video"),
+        text: tr("chat.new_message.attach.action.video"),
         iconData: Icons.video_library,
         actionCallback: (PlatformAwarePopupMenuAction action) {
           pickAndUploadFile(
-              FileType.VIDEO, context, chatUploadBloc, inputMessageBloc);
+              FileType.video, context, chatUploadBloc, inputMessageBloc);
         },
       ),
     ];
@@ -251,10 +250,10 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
         showPlatformAlertDialog(
             context: context,
             title:
-                Text(AppLocalizations.of(context).tr("chat.new_message.attach"
+                Text(tr("chat.new_message.attach"
                     ".error.title")),
             content:
-                Text(AppLocalizations.of(context).tr("chat.new_message.attach"
+                Text(tr("chat.new_message.attach"
                     ".error.cant_access_file")));
       }
     });
@@ -262,7 +261,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
 
   Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc,
       File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
-    var appLocalizations = AppLocalizations.of(context);
+
     try {
       var asyncDialogResult = await doAsyncOperationWithDialog(
           context: context,
@@ -287,18 +286,16 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       showPlatformAlertDialog(
           context: context,
           title: Text(
-            appLocalizations.tr("chat.new_message.attach.error.title"),
+            tr("chat.new_message.attach.error.title"),
           ),
-          content: Text(appLocalizations
-              .tr("chat.new_message.attach.error.server_auth")));
+          content: Text(tr("chat.new_message.attach.error.server_auth")));
     } on FileSizeExceededLoungeUploadException catch (e) {
       showPlatformAlertDialog(
           context: context,
           title: Text(
-            appLocalizations.tr("chat.new_message.attach.error.title"),
+            tr("chat.new_message.attach.error.title"),
           ),
-          content: Text(appLocalizations
-              .tr("chat.new_message.attach.error.file_size", args: [
+          content: Text(tr("chat.new_message.attach.error.file_size", args: [
             e.maximumPossibleUploadFileSizeInBytes.toString(),
             e.actualSizeInBytes.toString()
           ])));
@@ -306,28 +303,27 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       showPlatformAlertDialog(
           context: context,
           title: Text(
-            appLocalizations.tr("chat.new_message.attach.error.title"),
+            tr("chat.new_message.attach.error.title"),
           ),
-          content: Text(appLocalizations.tr(
+          content: Text(tr(
               "chat.new_message.attach.error.http_code",
               args: [e.responseCode.toString()])));
     } on InvalidHttpResponseBodyLoungeUploadException catch (e) {
       showPlatformAlertDialog(
           context: context,
           title: Text(
-            appLocalizations.tr("chat.new_message.attach.error.title"),
+            tr("chat.new_message.attach.error.title"),
           ),
-          content: Text(appLocalizations.tr(
+          content: Text(tr(
               "chat.new_message.attach.error.http_body",
               args: [e.responseBody])));
     } on TimeoutHttpLoungeUploadException {
       showPlatformAlertDialog(
           context: context,
           title: Text(
-            appLocalizations.tr("chat.new_message.attach.error.title"),
+            tr("chat.new_message.attach.error.title"),
           ),
-          content: Text(appLocalizations
-              .tr("chat.new_message.attach.error.http_timeout")));
+          content: Text(tr("chat.new_message.attach.error.http_timeout")));
     }
   }
 }

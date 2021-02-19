@@ -34,7 +34,7 @@ class LoungeConnectionPageState extends State<LoungeConnectionPage> {
       iosContentPadding: false,
       appBar: PlatformAppBar(
         title:
-            Text(AppLocalizations.of(context).tr('lounge.preferences.title')),
+            Text(tr('lounge.preferences.title')),
       ),
       body: SafeArea(
         child: Padding(

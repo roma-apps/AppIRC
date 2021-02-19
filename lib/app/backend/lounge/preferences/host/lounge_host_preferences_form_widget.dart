@@ -54,7 +54,7 @@ class LoungeHostPreferencesFormWidgetState
   @override
   Widget build(BuildContext context) {
     var hostFormBloc = widget._hostPreferencesFormBloc;
-    var appLocalizations = AppLocalizations.of(context);
+
 
     _logger.d(() => "build");
     return Column(
@@ -62,16 +62,16 @@ class LoungeHostPreferencesFormWidgetState
       children: <Widget>[
         buildFormTitle(
             context: context,
-            title: appLocalizations.tr('lounge.preferences.host.title')),
+            title: tr('lounge.preferences.host.title')),
         buildFormTextRow(
           context: context,
           textCapitalization: TextCapitalization.none,
           bloc: hostFormBloc.hostFieldBloc,
           controller: _hostController,
           icon: Icons.cloud,
-          label: appLocalizations.tr('lounge.preferences.host.field.host'
+          label: tr('lounge.preferences.host.field.host'
               '.label'),
-          hint: appLocalizations.tr('lounge.preferences.host.field.host'
+          hint: tr('lounge.preferences.host.field.host'
               '.hint'),
           textInputAction: TextInputAction.done,
         )

@@ -18,14 +18,13 @@ class NewNetworkPreferencesPage extends NetworkPreferencesPage {
       this.outerCallback})
       : super.name(
             titleText:
-                AppLocalizations.of(context).tr('irc.connection.new.title'),
+                tr('irc.connection.new.title'),
             startValues: startValues,
             isNeedShowChannels: true,
             isNeedShowCommands: false,
             serverPreferencesEnabled: serverPreferencesEnabled,
             serverPreferencesVisible: serverPreferencesVisible,
-            buttonText: AppLocalizations.of(context)
-                .tr('irc.connection.new.action.connect'));
+            buttonText: tr('irc.connection.new.action.connect'));
 
   @override
   successCallback(

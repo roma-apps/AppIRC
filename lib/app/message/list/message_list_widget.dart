@@ -292,14 +292,12 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         if (connected) {
           return Center(
               child: Text(
-                  AppLocalizations.of(context)
-                      .tr("chat.messages_list.empty.connected"),
+                  tr("chat.messages_list.empty.connected"),
                   style: textSkinBloc.defaultTextStyle));
         } else {
           return Center(
               child: Text(
-                  AppLocalizations.of(context)
-                      .tr("chat.messages_list.empty.not_connected"),
+                  tr("chat.messages_list.empty.not_connected"),
                   style: textSkinBloc.defaultTextStyle));
         }
       },

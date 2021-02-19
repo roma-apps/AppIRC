@@ -34,13 +34,13 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
 
   @override
   Widget build(BuildContext context) {
-    var appLocalizations = AppLocalizations.of(context);
+
     var channelJoinFormBloc = NetworkJoinChannelFormBloc();
     var networkBloc = NetworkBlocsBloc.of(context).getNetworkBloc(network);
     return buildPlatformScaffold(
       context,
       appBar: PlatformAppBar(
-        title: Text(appLocalizations.tr('chat.network.join_channel.title')),
+        title: Text(tr('chat.network.join_channel.title')),
       ),
       body: SafeArea(
           child: Provider(
@@ -64,8 +64,7 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
                   return createSkinnedPlatformButton(
                     context,
                     child: Text(
-                      appLocalizations
-                          .tr('chat.network.join_channel.action.join'),
+                      tr('chat.network.join_channel.action.join'),
                     ),
                     onPressed: pressed,
                   );

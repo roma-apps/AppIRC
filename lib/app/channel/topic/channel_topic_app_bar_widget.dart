@@ -36,12 +36,10 @@ class ChannelTopicTitleAppBarWidget extends StatelessWidget {
                   subTitleText = topic;
                   break;
                 case ChatConnectionState.connecting:
-                  subTitleText = AppLocalizations.of(context)
-                      .tr("chat.state.connection.status.connecting");
+                  subTitleText = tr("chat.state.connection.status.connecting");
                   break;
                 case ChatConnectionState.disconnected:
-                  subTitleText = AppLocalizations.of(context)
-                      .tr("chat.state.connection.status.disconnected");
+                  subTitleText = tr("chat.state.connection.status.disconnected");
                   break;
               }
 

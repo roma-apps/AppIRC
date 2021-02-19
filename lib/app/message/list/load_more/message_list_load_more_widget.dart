@@ -21,8 +21,7 @@ class MessageListLoadMoreWidget extends StatelessWidget {
             case LoadMoreState.notAvailable:
               MessageSkinBloc skinBloc = Provider.of(context);
               child = Text(
-                AppLocalizations.of(context)
-                    .tr("chat.messages_list.load_more.not_available"),
+                tr("chat.messages_list.load_more.not_available"),
                 style: skinBloc.messageBodyTextStyle,
               );
               break;
@@ -31,8 +30,7 @@ class MessageListLoadMoreWidget extends StatelessWidget {
                 MessageListLoadMoreBloc loadMoreBloc = Provider.of(context);
                 loadMoreBloc.loadMore();
               },
-                  child: Text(AppLocalizations.of(context)
-                      .tr("chat.messages_list.load_more.action")));
+                  child: Text(tr("chat.messages_list.load_more.action")));
               break;
             case LoadMoreState.loading:
               child = CircularProgressIndicator();

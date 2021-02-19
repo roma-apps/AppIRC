@@ -99,10 +99,10 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   }
 
   void _showMessagePopup(BuildContext context, RelativeRect tapPosition) {
-    var appLocalizations = AppLocalizations.of(context);
+
     showPlatformAwarePopup(context, tapPosition, [
       PlatformAwarePopupMenuAction(
-          text: appLocalizations.tr("chat.message.action.copy"),
+          text: tr("chat.message.action.copy"),
           iconData: Icons.content_copy,
           actionCallback: (action) {
             Clipboard.setData(ClipboardData(text: getBodyRawText(context)));

@@ -1,4 +1,4 @@
-import 'package:easy_localization/easy_localization_delegate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Divider, Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
@@ -63,7 +63,7 @@ class NetworkListWidget extends StatelessWidget {
   Center _buildEmptyListWidget(BuildContext context) {
     TextSkinBloc textSkinBloc = Provider.of(context);
     return Center(
-      child: Text(AppLocalizations.of(context).tr("chat.networks_list.empty"),
+      child: Text(tr("chat.networks_list.empty"),
           style: textSkinBloc.defaultTextStyle),
     );
   }

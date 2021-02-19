@@ -14,14 +14,14 @@ class EditNetworkPreferencesPage extends NetworkPreferencesPage {
       @required bool serverPreferencesVisible})
       : super.name(
             titleText:
-                AppLocalizations.of(context).tr('irc.connection.edit.title'),
+                tr('irc.connection.edit.title'),
             startValues: startValues,
             isNeedShowChannels: false,
             isNeedShowCommands: true,
             serverPreferencesEnabled: serverPreferencesEnabled,
             serverPreferencesVisible: serverPreferencesVisible,
             buttonText:
-                AppLocalizations.of(context).tr('irc.connection.edit.action'
+                tr('irc.connection.edit.action'
                     '.save'));
 
   @override

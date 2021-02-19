@@ -14,8 +14,7 @@ void showPlatformAlertDialog(
               actions: <Widget>[
                 PlatformDialogAction(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)
-                      .tr("dialog.alert.action.ok")),
+                  child: Text(tr("dialog.alert.action.ok")),
                 )
               ],
             ),

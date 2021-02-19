@@ -107,23 +107,38 @@ Future main() async {
   // Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
 
-  runZoned<Future<void>>(() async {
-    runApp(EasyLocalization(
-        child: Provider(
-      providable: SocketIOManagerProvider(socketIOManager),
-      child: Provider(
-          child: Provider(providable: preferencesService, child: AppIRC()),
-          providable: loungePreferencesBloc),
-    )));
-  }, onError: Crashlytics.instance.recordError);
+  runZoned<Future<void>>(
+    () async {
+      runApp(
+        EasyLocalization(
+          supportedLocales: [
+            Locale('en', 'US'),
+          ],
+          path: 'assets/langs',
+          fallbackLocale: Locale('en', 'US'),
+          child: Provider(
+            providable: SocketIOManagerProvider(socketIOManager),
+            child: Provider(
+              child: Provider(
+                providable: preferencesService,
+                child: _InitAppIRCApp(),
+              ),
+              providable: loungePreferencesBloc,
+            ),
+          ),
+        ),
+      );
+    },
+    onError: Crashlytics.instance.recordError,
+  );
 }
 
-class AppIRC extends StatefulWidget {
+class _InitAppIRCApp extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => AppIRCState();
+  State<StatefulWidget> createState() => _InitAppIRCAppState();
 }
 
-class AppIRCState extends State<AppIRC> {
+class _InitAppIRCAppState extends State<_InitAppIRCApp> {
   bool isInitStarted = false;
   bool isInitSuccess = false;
   LoungeBackendService _loungeBackendService;
@@ -207,17 +222,16 @@ class AppIRCState extends State<AppIRC> {
       return activeChannelBloc?.activeChannel;
     };
 
+    await loungeBackendService.init(
+        currentChannelExtractor: currentChannelExtractor,
+        lastMessageRemoteIdExtractor: () async {
+          var newestMessage = (await _database.regularMessagesDao
+              .getNewestAllChannelsMessage());
 
-    await loungeBackendService.init(currentChannelExtractor:
-    currentChannelExtractor,
-        lastMessageRemoteIdExtractor:
-            () async {
-      var newestMessage = (await _database.regularMessagesDao.getNewestAllChannelsMessage());
+          _logger.d(() => " newestMessage $newestMessage");
 
-      _logger.d(() => " newestMessage $newestMessage");
-
-      return newestMessage?.messageRemoteId;
-    });
+          return newestMessage?.messageRemoteId;
+        });
 
     this._loungeBackendService = loungeBackendService;
 
@@ -237,9 +251,7 @@ class AppIRCState extends State<AppIRC> {
     var _startPreferences =
         chatPreferencesBloc.getValue(defaultValue: ChatPreferences.empty);
 
-
-    var connectionBloc =
-    ChatConnectionBloc(loungeBackendService);
+    var connectionBloc = ChatConnectionBloc(loungeBackendService);
 
     var chatInitBloc = ChatInitBloc(loungeBackendService, connectionBloc,
         networksListBloc, _startPreferences);
@@ -249,8 +261,6 @@ class AppIRCState extends State<AppIRC> {
 
     activeChannelBloc = ChatActiveChannelBloc(loungeBackendService,
         chatInitBloc, networksListBloc, preferencesService, chatPushesService);
-
-
 
     var channelsStatesBloc = ChannelStatesBloc(
         loungeBackendService, _database, networksListBloc, activeChannelBloc);
@@ -280,7 +290,6 @@ class AppIRCState extends State<AppIRC> {
 
     var messageManagerBloc =
         MessageManagerBloc(loungeBackendService, networksListBloc, _database);
-
 
     Disposable signOutListener;
     signOutListener = loungeBackendService.listenForSignOut(() async {
@@ -385,6 +394,12 @@ class AppIRCState extends State<AppIRC> {
       child: Provider<AppSkinPreferenceBloc>(
         providable: appSkinPreferenceBloc,
         child: EasyLocalization(
+          // todo: remove copy-paste
+          supportedLocales: [
+            Locale('en', 'US'),
+          ],
+          path: 'assets/langs',
+          fallbackLocale: Locale('en', 'US'),
           child: StreamBuilder<AppIRCSkinTheme>(
               stream: isPreferencesReady
                   ? appSkinPreferenceBloc.appSkinStream
@@ -396,10 +411,9 @@ class AppIRCState extends State<AppIRC> {
               builder: (context, snapshot) {
                 AppIRCSkinTheme appSkinTheme = snapshot.data;
 
-                var data = EasyLocalizationProvider.of(context).data;
-
                 var appIRCAppSkinBloc = AppIRCAppSkinBloc(appSkinTheme);
 
+                // todo: rework to multi-provider
                 return Provider(
                   providable: appIRCAppSkinBloc,
                   child: Provider<AppSkinBloc>(
@@ -465,30 +479,11 @@ class AppIRCState extends State<AppIRC> {
                                                           ColoredNicknamesBloc(
                                                               appSkinTheme
                                                                   .coloredNicknamesData),
-                                                      child: PlatformApp(
-                                                          title: appTitle,
-                                                          localizationsDelegates: [
-                                                            //app-specific localization
-                                                            EasylocaLizationDelegate(
-                                                                locale:
-                                                                    data.locale,
-                                                                path:
-                                                                    relativePathToLangsFolder),
-                                                          ],
-                                                          debugShowCheckedModeBanner:
-                                                              false,
-                                                          supportedLocales:
-                                                              supportedLocales,
-                                                          locale:
-                                                              data.savedLocale,
-                                                          android: (_) =>
-                                                              MaterialAppData(
-                                                                  theme: appSkinTheme
-                                                                      .androidThemeDataCreator()),
-                                                          ios: (_) => CupertinoAppData(
-                                                              theme: appSkinTheme
-                                                                  .iosThemeDataCreator()),
-                                                          home: child),
+                                                      child: _AppIrc(
+                                                        appSkinTheme:
+                                                            appSkinTheme,
+                                                        child: child,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -511,6 +506,35 @@ class AppIRCState extends State<AppIRC> {
               }),
         ),
       ),
+    );
+  }
+}
+
+class _AppIrc extends StatelessWidget {
+  const _AppIrc({
+    Key key,
+    @required this.appSkinTheme,
+    @required this.child,
+  }) : super(key: key);
+
+  final AppIRCSkinTheme appSkinTheme;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return PlatformApp(
+      title: appTitle,
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      android: (_) => MaterialAppData(
+        theme: appSkinTheme.androidThemeDataCreator(),
+      ),
+      ios: (_) => CupertinoAppData(
+        theme: appSkinTheme.iosThemeDataCreator(),
+      ),
+      home: child,
     );
   }
 }

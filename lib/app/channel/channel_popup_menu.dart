@@ -91,9 +91,9 @@ List<PlatformAwarePopupMenuAction> _buildUserChannelMenuItems(
 
 PlatformAwarePopupMenuAction _buildCloseMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.channel.action.leave"),
+      text: tr("chat.channel.action.leave"),
       iconData: Icons.clear,
       actionCallback: (action) {
         channelBloc.leaveChannel();
@@ -102,9 +102,9 @@ PlatformAwarePopupMenuAction _buildCloseMenuItem(
 
 PlatformAwarePopupMenuAction _buildMembersMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.channel.action.users"),
+      text: tr("chat.channel.action.users"),
       iconData: Icons.group,
       actionCallback: (action) {
         Navigator.push(
@@ -117,9 +117,9 @@ PlatformAwarePopupMenuAction _buildMembersMenuItem(
 
 PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.channel.action.user_information"),
+      text: tr("chat.channel.action.user_information"),
       iconData: Icons.account_box,
       actionCallback: (action) {
         channelBloc.printUserInfo(channelBloc.channel.name);
@@ -128,9 +128,9 @@ PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
 
 PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.channel.action.list_banned"),
+      text: tr("chat.channel.action.list_banned"),
       iconData: Icons.list,
       actionCallback: (action) {
         channelBloc.printChannelBannedUsers();
@@ -139,9 +139,9 @@ PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
 
 PlatformAwarePopupMenuAction _buildEditTopicMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-  var appLocalizations = AppLocalizations.of(context);
+
   return PlatformAwarePopupMenuAction(
-      text: appLocalizations.tr("chat.channel.action.topic"),
+      text: tr("chat.channel.action.topic"),
       iconData: Icons.edit,
       actionCallback: (action) {
         showTopicDialog(context, channelBloc);

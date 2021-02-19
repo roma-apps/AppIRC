@@ -50,7 +50,7 @@ class NetworkPreferencesFormWidgetState
   Widget build(BuildContext context) {
     NetworkPreferencesFormBloc formBloc = Provider.of(context);
 
-    var appLocalizations = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -74,10 +74,8 @@ class NetworkPreferencesFormWidgetState
                   bloc: formBloc.channelsFieldBloc,
                   controller: _channelsController,
                   icon: Icons.list,
-                  label: appLocalizations
-                      .tr('irc.connection.preferences.field.channels.label'),
-                  hint: appLocalizations
-                      .tr('irc.connection.preferences.field.channels.hint'),
+                  label: tr('irc.connection.preferences.field.channels.label'),
+                  hint: tr('irc.connection.preferences.field.channels.hint'),
                   textInputAction: TextInputAction.done,
                 )
               ],

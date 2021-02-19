@@ -48,22 +48,20 @@ class NetworkUserPreferencesFormState
   @override
   Widget build(BuildContext context) {
     var formBloc = Provider.of<NetworkUserPreferencesFormBloc>(context);
-    var appLocalizations = AppLocalizations.of(context);
+
     return Column(
       children: <Widget>[
         buildFormTitle(
             context: context,
-            title: appLocalizations.tr('irc.connection.preferences'
+            title: tr('irc.connection.preferences'
                 '.user.title')),
         buildFormTextRow(
           context: context,
           bloc: formBloc.nickFieldBloc,
           controller: _nickController,
           icon: Icons.account_circle,
-          label: appLocalizations
-              .tr('irc.connection.preferences.user.field.nick.label'),
-          hint: appLocalizations
-              .tr('irc.connection.preferences.user.field.nick.hint'),
+          label: tr('irc.connection.preferences.user.field.nick.label'),
+          hint: tr('irc.connection.preferences.user.field.nick.hint'),
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.passwordFieldBloc,
         ),
@@ -72,10 +70,8 @@ class NetworkUserPreferencesFormState
           bloc: formBloc.passwordFieldBloc,
           controller: _passwordController,
           icon: Icons.lock,
-          label: appLocalizations
-              .tr('irc.connection.preferences.user.field.password.label'),
-          hint: appLocalizations
-              .tr('irc.connection.preferences.user.field.password.hint'),
+          label: tr('irc.connection.preferences.user.field.password.label'),
+          hint: tr('irc.connection.preferences.user.field.password.hint'),
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.none,
           obscureText: true,
@@ -86,10 +82,8 @@ class NetworkUserPreferencesFormState
           bloc: formBloc.realNameFieldBloc,
           controller: _realNameController,
           icon: Icons.account_circle,
-          label: appLocalizations
-              .tr('irc.connection.preferences.user.field.real_name.label'),
-          hint: appLocalizations
-              .tr('irc.connection.preferences.user.field.real_name.hint'),
+          label: tr('irc.connection.preferences.user.field.real_name.label'),
+          hint: tr('irc.connection.preferences.user.field.real_name.hint'),
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.userNameFieldBloc,
         ),
@@ -98,10 +92,8 @@ class NetworkUserPreferencesFormState
           bloc: formBloc.userNameFieldBloc,
           controller: _userNameController,
           icon: Icons.account_circle,
-          label: appLocalizations
-              .tr('irc.connection.preferences.user.field.user_name.label'),
-          hint: appLocalizations
-              .tr('irc.connection.preferences.user.field.user_name.hint'),
+          label: tr('irc.connection.preferences.user.field.user_name.label'),
+          hint: tr('irc.connection.preferences.user.field.user_name.hint'),
           textInputAction: TextInputAction.done,
         ),
         buildFormTextRow(
@@ -109,10 +101,8 @@ class NetworkUserPreferencesFormState
           bloc: formBloc.commandsFieldBloc,
           controller: _commandsController,
           icon: Icons.settings,
-          label: appLocalizations
-              .tr('irc.connection.preferences.user.field.commands.label'),
-          hint: appLocalizations
-              .tr('irc.connection.preferences.user.field.commands.hint'),
+          label: tr('irc.connection.preferences.user.field.commands.label'),
+          hint: tr('irc.connection.preferences.user.field.commands.hint'),
           textInputAction: TextInputAction.newline,
           minLines: 1,
           maxLines: 4,
