@@ -60,6 +60,12 @@ dependencies:
   # FCM for push notifications
   firebase_messaging: 5.1.8
 
+  # required by firebase_crashlytics
+  firebase_core: "^0.7.0"
+
+  # crash reporting
+  firebase_crashlytics: "^0.4.0+1"
+
   # handle click on irc:// links
   uni_links: ^0.2.0
 
