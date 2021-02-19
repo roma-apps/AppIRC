@@ -5,9 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_widget.dart';
 import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
+import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_page.dart';
-import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_widget.dart';
@@ -26,7 +26,7 @@ enum MessageWidgetType { formatted, raw }
 Widget buildMessageWidget(
     {@required ChatMessage message,
     @required bool enableMessageActions,
-      @required MessageInListState messageInListState,
+    @required MessageInListState messageInListState,
     @required MessageWidgetType messageWidgetType}) {
   Widget child;
   switch (message.chatMessageType) {
@@ -47,9 +47,9 @@ Widget buildMessageWidget(
   }
   return child;
 }
-final MessageInListState notInSearchState =  MessageInListState.name
-(inSearchResult:
-false, searchTerm: null);
+
+final MessageInListState notInSearchState =
+    MessageInListState.name(inSearchResult: false, searchTerm: null);
 
 abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   final T message;
@@ -59,12 +59,12 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
   String getBodyRawText(BuildContext context);
 
-  MessageWidget(
-      {@required this.message,
-      @required this.enableMessageActions,
-      @required this.messageWidgetType,
-      @required this.messageInListState,
-      });
+  MessageWidget({
+    @required this.message,
+    @required this.enableMessageActions,
+    @required this.messageWidgetType,
+    @required this.messageInListState,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -94,12 +94,16 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
   void _showMessagePage(BuildContext context) {
     var channel = ChannelBloc.of(context).channel;
-    Navigator.push(context,
-        platformPageRoute(builder: (context) => MessagePage(channel, message)));
+    Navigator.push(
+      context,
+      platformPageRoute(
+        context: context,
+        builder: (context) => MessagePage(channel, message),
+      ),
+    );
   }
 
   void _showMessagePopup(BuildContext context, RelativeRect tapPosition) {
-
     showPlatformAwarePopup(context, tapPosition, [
       PlatformAwarePopupMenuAction(
           text: tr("chat.message.action.copy"),
@@ -121,17 +125,14 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
           _logger.d(() => "StreamBuilder messageState =$message");
           return Container(
-              decoration: _createMessageDecoration(
-                  context: context),
+              decoration: _createMessageDecoration(context: context),
               child: buildMessageBody(context, message));
         });
   }
 
   Widget buildMessageBody(BuildContext context, ChatMessage message);
 
-  Decoration _createMessageDecoration(
-      {@required BuildContext context}) {
-
+  Decoration _createMessageDecoration({@required BuildContext context}) {
     var decoration;
     bool isHighlightByServer;
 
@@ -142,9 +143,9 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
     var messagesSkin = Provider.of<MessageListSkinBloc>(context);
 
-      if (isHighlightByServer ??= false) {
-        decoration = messagesSkin.highlightServerDecoration;
-      }
+    if (isHighlightByServer ??= false) {
+      decoration = messagesSkin.highlightServerDecoration;
+    }
 
     return decoration;
   }

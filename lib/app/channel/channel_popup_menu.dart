@@ -39,8 +39,7 @@ List<PlatformAwarePopupMenuAction> _buildMenuItems(
   List<PlatformAwarePopupMenuAction> menuItems;
 
   ChannelBloc channelBloc =
-      Provider.of<ChannelBlocsBloc>(context)
-          .getChannelBloc(channel);
+      Provider.of<ChannelBlocsBloc>(context).getChannelBloc(channel);
 
   switch (channel.type) {
     case ChannelType.lobby:
@@ -91,7 +90,6 @@ List<PlatformAwarePopupMenuAction> _buildUserChannelMenuItems(
 
 PlatformAwarePopupMenuAction _buildCloseMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.channel.action.leave"),
       iconData: Icons.clear,
@@ -102,7 +100,6 @@ PlatformAwarePopupMenuAction _buildCloseMenuItem(
 
 PlatformAwarePopupMenuAction _buildMembersMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.channel.action.users"),
       iconData: Icons.group,
@@ -110,6 +107,7 @@ PlatformAwarePopupMenuAction _buildMembersMenuItem(
         Navigator.push(
             context,
             platformPageRoute(
+                context: context,
                 builder: (context) => ChannelUsersPage(
                     channelBloc.network, channelBloc.channel)));
       });
@@ -117,7 +115,6 @@ PlatformAwarePopupMenuAction _buildMembersMenuItem(
 
 PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.channel.action.user_information"),
       iconData: Icons.account_box,
@@ -128,7 +125,6 @@ PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
 
 PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.channel.action.list_banned"),
       iconData: Icons.list,
@@ -139,7 +135,6 @@ PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
 
 PlatformAwarePopupMenuAction _buildEditTopicMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.channel.action.topic"),
       iconData: Icons.edit,

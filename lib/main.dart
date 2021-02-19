@@ -528,10 +528,10 @@ class _AppIrc extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      android: (_) => MaterialAppData(
+      material: (context, platform) => MaterialAppData(
         theme: appSkinTheme.androidThemeDataCreator(),
       ),
-      ios: (_) => CupertinoAppData(
+      cupertino: (context, platform) => CupertinoAppData(
         theme: appSkinTheme.iosThemeDataCreator(),
       ),
       home: child,

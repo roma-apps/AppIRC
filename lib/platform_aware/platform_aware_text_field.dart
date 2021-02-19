@@ -32,8 +32,8 @@ PlatformTextField buildPlatformTextField({
   VoidCallback onEditingComplete,
   ValueChanged<String> onSubmitted,
 }) {
-  var androidBuilder;
-  var iosBuilder;
+  PlatformBuilder<MaterialTextFieldData> materialBuilder;
+  PlatformBuilder<CupertinoTextFieldData> cupertinoBuilder;
 
   assert(enabled != null);
 
@@ -41,7 +41,7 @@ PlatformTextField buildPlatformTextField({
   TextStyle _hintStyle = enabled ? hintStyle : disabledHintStyle;
   TextStyle _labelStyle = enabled ? labelStyle : disabledLabelStyle;
 
-  androidBuilder = (_) {
+  materialBuilder = (_, __) {
     return MaterialTextFieldData(
         enabled: enabled,
         enableInteractiveSelection: true,
@@ -54,7 +54,7 @@ PlatformTextField buildPlatformTextField({
             hintStyle: _hintStyle));
   };
 
-  iosBuilder = (_) => CupertinoTextFieldData(
+  cupertinoBuilder = (_, __) => CupertinoTextFieldData(
       enabled: enabled,
       placeholder: hint,
       padding: EdgeInsets.all(8),
@@ -87,8 +87,8 @@ PlatformTextField buildPlatformTextField({
       expands: expands,
       onEditingComplete: onEditingComplete,
       onSubmitted: onSubmitted,
-      android: androidBuilder,
-      ios: iosBuilder,
+      material: materialBuilder,
+      cupertino: cupertinoBuilder,
       controller: controller,
       onChanged: onChanged);
   return platformTextField;

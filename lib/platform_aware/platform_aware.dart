@@ -1,24 +1,25 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 
 bool _forceMaterial = false;
-void changeToMaterialPlatformAware() {
-  changeToMaterialPlatform();
+void changeToMaterialPlatformAware(BuildContext context) {
+  PlatformProvider.of(context).changeToCupertinoPlatform();
   _forceMaterial = true;
   _forceCupertino = false;
 }
 
 bool _forceCupertino = false;
-void changeToCupertinoPlatformAware() {
-  changeToCupertinoPlatform();
+void changeToCupertinoPlatformAware(BuildContext context) {
+  PlatformProvider.of(context).changeToCupertinoPlatform();
   _forceCupertino = true;
   _forceMaterial = false;
 }
 
-void changeToAutoDetectPlatformAware() {
-  changeToAutoDetectPlatform();
+void changeToAutoDetectPlatformAware(BuildContext context) {
+  PlatformProvider.of(context).changeToAutoDetectPlatform();
   _forceMaterial = false;
   _forceCupertino = false;
 }

@@ -78,7 +78,7 @@ class _ChatPageState extends State<ChatPage> {
           if (platform_aware.isMaterial) {
             return buildPlatformScaffold(
                 context,
-                android: (context) => MaterialScaffoldData(
+                material: (context, platform) => MaterialScaffoldData(
                     widgetKey: _scaffoldKey,
                     appBar: AppBar(
                       title: _buildAppBarChild(context),
@@ -102,6 +102,7 @@ class _ChatPageState extends State<ChatPage> {
                     Navigator.push(
                         context,
                         platformPageRoute(
+                            context: context,
                             builder: (context) => ChatDrawerPage()));
                   }),
                   trailingActions: [_buildTrailing(context)],
@@ -138,9 +139,9 @@ class _ChatPageState extends State<ChatPage> {
             // badge hide part of button clickable area
             double rightMargin = 15.0;
 
-            if (isMaterial) {
+            if (isMaterial(context)) {
               rightMargin = 15;
-            } else if (isCupertino) {
+            } else if (isCupertino(context)) {
               rightMargin = 5;
             }
             return GestureDetector(
@@ -231,6 +232,7 @@ class _ChatPageState extends State<ChatPage> {
     Navigator.push(
         context,
         platformPageRoute(
+            context: context,
             builder: (context) {
               return Provider(
                   providable: ChatSearchBloc(databaseProvider.db, channel),

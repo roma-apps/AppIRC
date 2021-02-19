@@ -19,23 +19,20 @@ Widget buildNetworkPopupMenuButton(
     @required NetworkBloc networkBloc,
     @required Color iconColor}) {
   return StreamBuilder<bool>(
-    stream: networkBloc.networkConnectedStream,
-    initialData: networkBloc.networkConnected,
-    builder: (context, snapshot) {
-      var connected = snapshot.data ?? false;
-      return createPlatformPopupMenuButton(
-        context,
-        child: Icon(
-          Icons.more_vert,
-          color: iconColor,
-        ),
-        actions: _buildDropdownItems(
-            context: context,
-            connected: connected,
-            networkBloc: networkBloc),
-      );
-    }
-  );
+      stream: networkBloc.networkConnectedStream,
+      initialData: networkBloc.networkConnected,
+      builder: (context, snapshot) {
+        var connected = snapshot.data ?? false;
+        return createPlatformPopupMenuButton(
+          context,
+          child: Icon(
+            Icons.more_vert,
+            color: iconColor,
+          ),
+          actions: _buildDropdownItems(
+              context: context, connected: connected, networkBloc: networkBloc),
+        );
+      });
 }
 
 List<PlatformAwarePopupMenuAction> _buildDropdownItems(
@@ -64,7 +61,6 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
 
 void _buildLeaveAction(BuildContext context,
     List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
-
   return items.add(PlatformAwarePopupMenuAction(
       text: tr("chat.network.action.exit"),
       iconData: Icons.clear,
@@ -75,7 +71,6 @@ void _buildLeaveAction(BuildContext context,
 
 void _buildConnectAction(BuildContext context,
     List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
-
   return items.add(PlatformAwarePopupMenuAction(
       text: tr("chat.network.action.connect"),
       iconData: Icons.cloud,
@@ -86,7 +81,6 @@ void _buildConnectAction(BuildContext context,
 
 void _buildDisconnectionAction(BuildContext context,
     List<PlatformAwarePopupMenuAction> items, NetworkBloc networkBloc) {
-
   return items.add(PlatformAwarePopupMenuAction(
       text: tr("chat.network.action.disconnect"),
       iconData: Icons.cloud_off,
@@ -97,7 +91,6 @@ void _buildDisconnectionAction(BuildContext context,
 
 PlatformAwarePopupMenuAction _buildIgnoredUsersListAction(
     BuildContext context, NetworkBloc networkBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.network.action.list_ignored_users"),
       iconData: Icons.list,
@@ -108,7 +101,6 @@ PlatformAwarePopupMenuAction _buildIgnoredUsersListAction(
 
 PlatformAwarePopupMenuAction _buildChannelsListAction(
     BuildContext context, NetworkBloc networkBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.network.action.list_all_channels"),
       iconData: Icons.list,
@@ -119,21 +111,22 @@ PlatformAwarePopupMenuAction _buildChannelsListAction(
 
 PlatformAwarePopupMenuAction _buildJoinChannelAction(
     BuildContext context, NetworkBloc networkBloc) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.network.action.join_channel"),
       iconData: Icons.add,
       actionCallback: (action) {
         Navigator.push(
-            context,
-            platformPageRoute(
-                builder: (_) => NetworkJoinChannelPage(networkBloc.network)));
+          context,
+          platformPageRoute(
+            context: context,
+            builder: (_) => NetworkJoinChannelPage(networkBloc.network),
+          ),
+        );
       });
 }
 
 PlatformAwarePopupMenuAction _buildEditAction(BuildContext context,
     NetworkBloc networkBloc, ChatBackendService backendService) {
-
   return PlatformAwarePopupMenuAction(
       text: tr("chat.network.action.edit"),
       iconData: Icons.edit,
@@ -141,6 +134,7 @@ PlatformAwarePopupMenuAction _buildEditAction(BuildContext context,
         Navigator.push(
             context,
             platformPageRoute(
+                context: context,
                 builder: (_) => Provider(
                       providable: NetworkBlocProvider(networkBloc),
                       child: EditNetworkPreferencesPage(

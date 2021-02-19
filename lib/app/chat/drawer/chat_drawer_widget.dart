@@ -54,24 +54,36 @@ class ChatDrawerWidget extends StatelessWidget {
         onPressed: () {
           ChatBackendService backendService = Provider.of(context);
 
-          Navigator.push(context, platformPageRoute(builder: (context) {
-            var networkEnabled = !backendService.chatConfig.lockNetwork;
-            var newChatNetworkPage = NewNetworkPreferencesPage.name(
-              context: context,
-              startValues:
-                  backendService.chatConfig.createDefaultNetworkPreferences(),
-              serverPreferencesEnabled: networkEnabled,
-              serverPreferencesVisible:
-                  backendService.chatConfig.displayNetwork,
-              outerCallback: () {
-                Navigator.pop(context);
-              },
-            );
-            return newChatNetworkPage;
-          }));
+          Navigator.push(
+              context,
+              platformPageRoute(
+                  context: context,
+                  builder: (context) {
+                    var networkEnabled = !backendService.chatConfig.lockNetwork;
+                    var newChatNetworkPage = NewNetworkPreferencesPage.name(
+                      context: context,
+                      startValues: backendService.chatConfig
+                          .createDefaultNetworkPreferences(),
+                      serverPreferencesEnabled: networkEnabled,
+                      serverPreferencesVisible:
+                          backendService.chatConfig.displayNetwork,
+                      outerCallback: () {
+                        Navigator.pop(context);
+                      },
+                    );
+                    return newChatNetworkPage;
+                  }));
         },
-        androidIcon: Icon(Icons.add),
-        iosIcon: Icon(CupertinoIcons.add),
+        material: (context, platform) => MaterialIconButtonData(
+          icon: Icon(
+            Icons.add,
+          ),
+        ),
+        cupertino: (context, platform) => CupertinoIconButtonData(
+          icon: Icon(
+            CupertinoIcons.add,
+          ),
+        ),
       );
 
   Widget _buildLoungeSettingsButton(BuildContext context) => PlatformIconButton(
@@ -81,19 +93,26 @@ class ChatDrawerWidget extends StatelessWidget {
           Navigator.push(
               context,
               platformPageRoute(
+                  context: context,
                   builder: (context) {
                     var connectionBloc = LoungeConnectionBloc(
-                          Provider.of<SocketIOManagerProvider>(context).manager,
-                          settings.hostPreferences, settings.authPreferences);
+                        Provider.of<SocketIOManagerProvider>(context).manager,
+                        settings.hostPreferences,
+                        settings.authPreferences);
                     return Provider(
-                      providable: connectionBloc,
-                      child: Provider(
-                          providable: LoungeConnectionFormBloc(connectionBloc),
-                          child: EditLoungeConnectionPage()));
+                        providable: connectionBloc,
+                        child: Provider(
+                            providable:
+                                LoungeConnectionFormBloc(connectionBloc),
+                            child: EditLoungeConnectionPage()));
                   }));
         },
         icon: Icon(Icons.settings),
-        iosIcon: Icon(CupertinoIcons.settings),
+        cupertino: (context, platform) => CupertinoIconButtonData(
+          icon: Icon(
+            CupertinoIcons.settings,
+          ),
+        ),
       );
 
   Widget _buildSignOutButton(BuildContext context) => PlatformIconButton(

@@ -24,12 +24,12 @@ Widget createSkinnedPlatformButton(BuildContext context,
     child: PlatformButton(
       child: child,
       onPressed: onPressed,
-      androidFlat: (context) => MaterialFlatButtonData(
-          color: buttonSkinBloc.enabledColor,
-          disabledColor: buttonSkinBloc.disabledColor,
+      materialFlat: (context, platform) => MaterialFlatButtonData(
+        color: buttonSkinBloc.enabledColor,
+        disabledColor: buttonSkinBloc.disabledColor,
 
       ),
-      ios: (context) => CupertinoButtonData(
+      cupertino: (context, platform) => CupertinoButtonData(
         color: buttonSkinBloc.enabledColor,
         disabledColor: buttonSkinBloc.disabledColor
       ),
