@@ -38,8 +38,8 @@ class MessageListBloc extends Providable {
 
   MessageListState get listState => _listStateSubject.value;
 
-  BehaviorSubject<MessageListJumpDestination> _listJumpDestinationSubject =
-      BehaviorSubject();
+  final BehaviorSubject<MessageListJumpDestination>
+      _listJumpDestinationSubject = BehaviorSubject();
 
   Stream<MessageListJumpDestination> get listJumpDestinationStream =>
       _listJumpDestinationSubject.stream;
@@ -218,12 +218,15 @@ class MessageListBloc extends Providable {
     return initScrollPositionItem;
   }
 
-  jumpToLatestMessage() {
+  void jumpToLatestMessage() {
     if (listState.items?.isNotEmpty == true) {
-      _listJumpDestinationSubject.add(MessageListJumpDestination(
+      _listJumpDestinationSubject.add(
+        MessageListJumpDestination(
           items: listState.items,
           selectedFoundItem: listState.items.last,
-          alignment: 0.9));
+          alignment: 0.9,
+        ),
+      );
     }
   }
 }

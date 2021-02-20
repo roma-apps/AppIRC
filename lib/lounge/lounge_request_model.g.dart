@@ -84,8 +84,8 @@ Map<String, dynamic> _$NamesLoungeJsonRequestToJson(
 RegistrationLoungeJsonRequest _$RegistrationLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return RegistrationLoungeJsonRequest(
-    json['user'] as String,
-    json['password'] as String,
+    user: json['user'] as String,
+    password: json['password'] as String,
   );
 }
 

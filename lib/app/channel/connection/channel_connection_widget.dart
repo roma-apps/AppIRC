@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-buildConnectionIcon(
+StreamBuilder<bool> buildConnectionIcon(
     BuildContext context, Color foregroundColor, bool connected) {
   ChatConnectionBloc chatConnectionBloc = Provider.of(context);
 

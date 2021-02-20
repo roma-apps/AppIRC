@@ -21,11 +21,11 @@ class ChannelListBloc extends Providable {
       _networksChannelsSubject.stream;
 
   // ignore: close_sinks
-  var _networksChannelsSubject =
+  final _networksChannelsSubject =
       BehaviorSubject<List<Channel>>.seeded([]);
 
   final List<ChannelListener> _joinListeners = [];
-  final Map<Channel, List<VoidCallback>> _leaveListeners = Map();
+  final Map<Channel, List<VoidCallback>> _leaveListeners = {};
 
   int get _nextChannelLocalId => _nextChannelIdGenerator();
 
@@ -59,9 +59,7 @@ class ChannelListBloc extends Providable {
   void _onChannelJoined(ChannelWithState channelWithState) {
     var channel = channelWithState.channel;
 
-    if (channel.localId == null) {
-      channel.localId = _nextChannelLocalId;
-    }
+    channel.localId ??= _nextChannelLocalId;
 
     _joinListeners.forEach((listener) => listener(channelWithState));
 

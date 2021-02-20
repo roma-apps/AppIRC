@@ -46,8 +46,7 @@ abstract class SpecialMessageDao {
   }
 
   @transaction
-  Future upsertSpecialMessages(
-      List<SpecialMessage> messages) async {
+  Future upsertSpecialMessages(List<SpecialMessage> messages) async {
     return await Future.wait(
         messages.map((message) async => await upsertSpecialMessage(message)));
   }
@@ -77,16 +76,20 @@ class SpecialMessageDB implements ChatMessageDB {
   @PrimaryKey(autoGenerate: true)
   int localId;
 
+  @override
   int channelLocalId;
 
+  @override
   final int chatMessageTypeId;
 
+  @override
   final int channelRemoteId;
 
   final String dataJsonEncoded;
   int specialTypeId;
 
   final int dateMicrosecondsSinceEpoch;
+  @override
   final String linksJsonEncoded;
 
   static DateTime date(SpecialMessageDB message) =>
@@ -170,13 +173,15 @@ SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
       break;
   }
 
-  return SpecialMessage.name(
-      messageLocalId: messageDB.localId,
-      channelRemoteId: messageDB.channelRemoteId,
-      data: body,
-      specialType: type,
-      linksInMessage:
-          messageDB.linksJsonEncoded != null ? convertLinks(messageDB) : null,
-      date: DateTime.fromMicrosecondsSinceEpoch(
-          messageDB.dateMicrosecondsSinceEpoch));
+  return SpecialMessage(
+    messageLocalId: messageDB.localId,
+    channelRemoteId: messageDB.channelRemoteId,
+    data: body,
+    specialType: type,
+    linksInMessage:
+        messageDB.linksJsonEncoded != null ? convertLinks(messageDB) : null,
+    date: DateTime.fromMicrosecondsSinceEpoch(
+      messageDB.dateMicrosecondsSinceEpoch,
+    ),
+  );
 }

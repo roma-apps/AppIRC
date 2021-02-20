@@ -24,7 +24,7 @@ class ChatInitBloc extends Providable {
   bool get isInitFinished => state == ChatInitState.finished;
 
   // ignore: close_sinks
-  BehaviorSubject<ChatInitState> _stateSubject =
+  final BehaviorSubject<ChatInitState> _stateSubject =
       BehaviorSubject.seeded(ChatInitState.notStarted);
 
   Stream<ChatInitState> get stateStream => _stateSubject.stream;

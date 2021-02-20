@@ -151,7 +151,7 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   }
 }
 
-var _timeFormatter = new DateFormat().add_Hm();
+var _timeFormatter = DateFormat().add_Hm();
 
 WidgetSpan buildHighlightedNicknameButtonWidgetSpan(
     {@required BuildContext context, @required String nick}) {
@@ -203,7 +203,7 @@ RichText buildMessageRichText(List<InlineSpan> spans) {
   );
 }
 
-var _dateFormatter = new DateFormat().add_yMd().add_Hms();
+var _dateFormatter = DateFormat().add_yMd().add_Hms();
 
 Widget buildMessageRawBody(
     BuildContext context, ChatMessage message, String text) {

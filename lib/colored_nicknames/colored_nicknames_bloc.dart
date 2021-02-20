@@ -11,7 +11,7 @@ class ColoredNicknamesBloc extends Providable {
   ColoredNicknamesBloc(this.nicknameColorsData);
 
   int _currentColorIndex = 0;
-  Map<String, Color> _nickToColor = Map();
+  final Map<String, Color> _nickToColor = {};
 
   Color getColorForNick(String nick) {
     if (!_nickToColor.containsKey(nick)) {

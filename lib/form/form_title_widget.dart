@@ -3,7 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/form/form_title_skin_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-buildFormTitle({@required BuildContext context, @required String title}) {
+Widget buildFormTitle(
+    {@required BuildContext context, @required String title}) {
   var formTitleSkinBloc = Provider.of<FormTitleSkinBloc>(context);
 
   return Padding(

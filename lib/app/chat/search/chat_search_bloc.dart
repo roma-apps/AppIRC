@@ -29,7 +29,7 @@ class ChatSearchBloc extends Providable {
     addDisposable(disposable: searchFieldBloc);
   }
 
-  search() async {
+  Future search() async {
     var searchTerm = searchFieldBloc.value;
 
     if (searchTerm?.isNotEmpty == true) {

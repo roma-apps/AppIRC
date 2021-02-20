@@ -7,5 +7,6 @@ class AppIRCPopupMenuSkinBloc extends PopupMenuSkinBloc {
   final AppIRCSkinTheme theme;
   AppIRCPopupMenuSkinBloc(this.theme);
 
+  @override
   Color get backgroundColor => theme.backgroundColor;
 }

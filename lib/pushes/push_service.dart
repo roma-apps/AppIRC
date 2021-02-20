@@ -28,16 +28,20 @@ class PushesService extends Providable {
     addDisposable(subject: _messageSubject);
   }
 
-  init() async {
+  void init() async {
     _fcm = FirebaseMessaging();
     _logger.d(() => "init");
   }
 
-  configure() async {
+  Future configure() async {
     _logger.d(() => "configure");
-    addDisposable(streamSubscription: _fcm.onTokenRefresh.listen((newToken) {
-      _onNewToken(newToken);
-    }));
+    addDisposable(
+      streamSubscription: _fcm.onTokenRefresh.listen(
+        (newToken) {
+          _onNewToken(newToken);
+        },
+      ),
+    );
 
     _fcm.configure(
         onMessage: (data) async =>
@@ -47,7 +51,7 @@ class PushesService extends Providable {
         onResume: (data) async =>
             _onNewMessage(PushMessage(PushMessageType.resume, data)));
 
-    _fcm.setAutoInitEnabled(true);
+    await _fcm.setAutoInitEnabled(true);
 
     await _updateToken();
   }
@@ -69,7 +73,7 @@ class PushesService extends Providable {
     }
   }
 
-  askPermissions() async {
+  void askPermissions() {
     // TODO: show ios dialog with own dialog. Add option to settings
     _fcm.requestNotificationPermissions(IosNotificationSettings());
   }

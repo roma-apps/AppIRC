@@ -60,7 +60,7 @@ Widget buildFormTextField(
   );
 }
 
-buildFormTextRow({
+Widget buildFormTextRow({
   @required BuildContext context,
   @required FormValueFieldBloc<String> bloc,
   @required TextEditingController controller,
@@ -93,7 +93,7 @@ buildFormTextRow({
   if (textInputAction == TextInputAction.done) {
     assert(onSubmitted == null);
     onSubmitted = (_) {
-      FocusScope.of(context).requestFocus(new FocusNode());
+      FocusScope.of(context).requestFocus(FocusNode());
     };
   }
 

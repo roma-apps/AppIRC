@@ -19,7 +19,7 @@ class MessageAudioPreviewWidget extends StatefulWidget {
 }
 
 class MessageAudioPreviewWidgetState extends State<MessageAudioPreviewWidget> {
-  String _audioURL;
+  final String _audioURL;
 
   MessageAudioPreviewWidgetState(this._audioURL);
 

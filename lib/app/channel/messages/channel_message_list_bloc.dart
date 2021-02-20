@@ -13,7 +13,7 @@ class ChannelMessageListBloc extends Providable {
   final Channel channel;
 
   // ignore: close_sinks
-  BehaviorSubject<MessageListVisibleBounds> _visibleMessagesBoundsSubject =
+  final BehaviorSubject<MessageListVisibleBounds> _visibleMessagesBoundsSubject =
       BehaviorSubject.seeded(null);
 
   Stream<MessageListVisibleBounds> get visibleMessagesBoundsStream =>
@@ -39,7 +39,7 @@ class ChannelMessageListBloc extends Providable {
   }
 
   void onVisibleMessagesBounds(MessageListVisibleBounds visibleMessagesBounds) {
-    this._visibleMessagesBoundsSubject.add(visibleMessagesBounds);
+    _visibleMessagesBoundsSubject.add(visibleMessagesBounds);
     _logger.d(() => "visibleMessagesBounds $visibleMessagesBounds");
   }
 }

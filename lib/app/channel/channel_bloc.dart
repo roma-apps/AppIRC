@@ -28,6 +28,7 @@ class ChannelBloc extends DisposableOwner {
 
   final Network network;
   Channel _channel;
+
   Channel get channel => _channel;
   final ChannelStatesBloc _channelsStatesBloc;
 
@@ -42,21 +43,19 @@ class ChannelBloc extends DisposableOwner {
   ChannelBloc(this._backendService, this.chatPushesService, this.network,
       ChannelWithState channelWithState, this._channelsStatesBloc) {
     _channel = channelWithState.channel;
-    _usersSubject =
-        BehaviorSubject.seeded(channelWithState.initUsers ?? []);
+    _usersSubject = BehaviorSubject.seeded(channelWithState.initUsers ?? []);
 
     _messagesBloc = ChannelMessageListBloc(chatPushesService, channel);
     addDisposable(disposable: _messagesBloc);
 
     addDisposable(subject: _usersSubject);
     addDisposable(
-        disposable: _backendService
-            .listenForChannelNames(network, channel, (newUsers) {
+        disposable:
+            _backendService.listenForChannelNames(network, channel, (newUsers) {
       _usersSubject.add(newUsers);
     }));
     addDisposable(
-        disposable:
-            _backendService.listenForChannelUsers(network, channel, () {
+        disposable: _backendService.listenForChannelUsers(network, channel, () {
       _backendService.requestChannelUsers(network, channel);
     }));
     _inputMessageBloc = ChatInputMessageBloc(_backendService.chatConfig, this);
@@ -71,7 +70,9 @@ class ChannelBloc extends DisposableOwner {
   List<ChannelUser> get users => _usersSubject.value;
   DateTime _lastUsersRefreshDate;
 
-  Future<List<ChannelUser>> retrieveUsers({forceRefresh: false}) async {
+  Future<List<ChannelUser>> retrieveUsers({
+    forceRefresh = false,
+  }) async {
     if (forceRefresh || _lastUsersRefreshDate == null) {
       await requestUsersListUpdate();
     } else {
@@ -79,17 +80,20 @@ class ChannelBloc extends DisposableOwner {
 
       var differenceDuration = now.difference(_lastUsersRefreshDate);
       if (differenceDuration > _usersListOutDateDuration) {
-        requestUsersListUpdate();
+        await requestUsersListUpdate();
       }
     }
 
     return _usersSubject.value;
   }
 
-  requestUsersListUpdate() async {
+  Future requestUsersListUpdate() async {
     _lastUsersRefreshDate = DateTime.now();
-    await _backendService.requestChannelUsers(network, channel,
-        waitForResult: false);
+    await _backendService.requestChannelUsers(
+      network,
+      channel,
+      waitForResult: false,
+    );
   }
 
   ChannelState get channelState =>
@@ -105,14 +109,12 @@ class ChannelBloc extends DisposableOwner {
 
   // Lounge bug?
   // Sometimes lounge moreHistory is null but actually history exist
-  bool get moreHistoryAvailable =>
-      channelState?.moreHistoryAvailable ?? true;
+  bool get moreHistoryAvailable => channelState?.moreHistoryAvailable ?? true;
 
   // Lounge bug?
   // Sometimes lounge moreHistory is null but actually history exist
   Stream<bool> get moreHistoryAvailableStream =>
-      _channelStateStream
-          .map((state) => state?.moreHistoryAvailable);
+      _channelStateStream.map((state) => state?.moreHistoryAvailable);
 
   int get channelUnreadCount => channelState.unreadCount;
 
@@ -124,23 +126,29 @@ class ChannelBloc extends DisposableOwner {
   Stream<String> get channelTopicStream =>
       _channelStateStream.map((state) => state?.topic).distinct();
 
-  Future<RequestResult<bool>> leaveChannel(
-          {bool waitForResult: false}) async =>
+  Future<RequestResult<bool>> leaveChannel({
+    bool waitForResult = false,
+  }) async =>
       await _backendService.leaveChannel(network, channel,
           waitForResult: waitForResult);
 
-  Future<RequestResult<ChannelUser>> printUserInfo(String userNick,
-          {bool waitForResult: false}) async =>
+  Future<RequestResult<ChannelUser>> printUserInfo(
+    String userNick, {
+    bool waitForResult = false,
+  }) async =>
       await _backendService.requestUserInfo(network, channel, userNick,
           waitForResult: waitForResult);
 
-  Future<RequestResult<ChatMessage>> printChannelBannedUsers(
-          {bool waitForResult: false}) async =>
+  Future<RequestResult<ChatMessage>> printChannelBannedUsers({
+    bool waitForResult = false,
+  }) async =>
       await _backendService.printChannelBannedUsers(network, channel,
           waitForResult: waitForResult);
 
-  Future<RequestResult<bool>> editChannelTopic(String newTopic,
-          {bool waitForResult: false}) async =>
+  Future<RequestResult<bool>> editChannelTopic(
+    String newTopic, {
+    bool waitForResult = false,
+  }) async =>
       await _backendService.editChannelTopic(network, channel, newTopic,
           waitForResult: waitForResult);
 
@@ -148,10 +156,10 @@ class ChannelBloc extends DisposableOwner {
       await _backendService.sendChannelOpenedEventToServer(network, channel);
 
   Future<RequestResult<ChatMessage>> sendChannelRawMessage(
-          String rawMessage,
-          {bool waitForResult: false}) async =>
-      await _backendService.sendChannelRawMessage(
-          network, channel, rawMessage,
+    String rawMessage, {
+    bool waitForResult = false,
+  }) async =>
+      await _backendService.sendChannelRawMessage(network, channel, rawMessage,
           waitForResult: waitForResult);
 
   Future<RequestResult<ChannelWithState>> openDirectMessagesChannel(
@@ -163,9 +171,9 @@ class ChannelBloc extends DisposableOwner {
   }
 
   Future<RequestResult<MessageListLoadMore>> loadMoreHistory(
-      RegularMessage oldestMessage) async => await _backendService
-      .loadMoreHistory(
-        network, channel, oldestMessage?.messageRemoteId);
+          RegularMessage oldestMessage) async =>
+      await _backendService.loadMoreHistory(
+          network, channel, oldestMessage?.messageRemoteId);
 
   Future<RequestResult<ToggleMessagePreviewData>> togglePreview(
       RegularMessage message, MessagePreview preview) {

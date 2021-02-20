@@ -150,7 +150,7 @@ class _InitAppIRCAppState extends State<_InitAppIRCApp> {
 
   LoungePreferences _loungePreferences;
 
-  PushesService _pushesService = PushesService();
+  final _pushesService = PushesService();
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +236,7 @@ class _InitAppIRCAppState extends State<_InitAppIRCApp> {
           return newestMessage?.messageRemoteId;
         });
 
-    this._loungeBackendService = loungeBackendService;
+    _loungeBackendService = loungeBackendService;
 
     var chatPreferencesBloc = ChatPreferencesBloc(preferencesService);
 
@@ -299,12 +299,12 @@ class _InitAppIRCAppState extends State<_InitAppIRCApp> {
       await messageManagerBloc.clearAllMessages();
 
       chatPreferencesSaverBloc.reset();
-      this._loungeBackendService.dispose();
-      this._loungeBackendService = null;
-      this._loungePreferences = LoungePreferences.empty;
+      _loungeBackendService.dispose();
+      _loungeBackendService = null;
+      _loungePreferences = LoungePreferences.empty;
 
       var loungePreferencesBloc = Provider.of<LoungePreferencesBloc>(context);
-      loungePreferencesBloc.setValue(_loungePreferences);
+      await loungePreferencesBloc.setValue(_loungePreferences);
 
       signOutListener.dispose();
 

@@ -12,7 +12,7 @@ var _logger = MyLogger(logTag: "network_states_bloc.dart", enabled: true);
 
 class NetworkStatesBloc extends NetworkListListenerBloc {
   final ChatBackendService _backendService;
-  final Map<String, BehaviorSubject<NetworkState>> _states = Map();
+  final Map<String, BehaviorSubject<NetworkState>> _states = {};
 
   Stream<NetworkState> getNetworkStateStream(Network network) =>
       _states[_calculateNetworkKey(network)].stream;

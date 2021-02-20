@@ -12,7 +12,7 @@ class MessagesListJumpToNewestBloc extends Providable {
   final MessageListBloc _messageListBloc;
 
   // ignore: close_sinks
-  BehaviorSubject<MessagesListJumpToNewestState> _stateSubject =
+  final BehaviorSubject<MessagesListJumpToNewestState> _stateSubject =
       BehaviorSubject.seeded(
     MessagesListJumpToNewestState.name(
       isLastMessageShown: true,
@@ -41,7 +41,7 @@ class MessagesListJumpToNewestBloc extends Providable {
     }));
   }
 
-  onVisibleAreaChanged(bool isLastMessageShown) {
+  void onVisibleAreaChanged(bool isLastMessageShown) {
     _logger
         .d(() => "onVisibleAreaChanged isLastMessageShown $isLastMessageShown");
     if (isLastMessageShown) {
@@ -52,7 +52,7 @@ class MessagesListJumpToNewestBloc extends Providable {
     _stateSubject.add(state);
   }
 
-  onNewMessagesAdded(int newMessagesCount) {
+  void onNewMessagesAdded(int newMessagesCount) {
     _logger.d(() => "onNewMessagesAdded newMessagesCount $newMessagesCount");
     if (newMessagesCount == 0) {
       return;
@@ -64,7 +64,7 @@ class MessagesListJumpToNewestBloc extends Providable {
     _stateSubject.add(state);
   }
 
-  jumpToLatestMessage() {
+  void jumpToLatestMessage() {
     _messageListBloc.jumpToLatestMessage();
   }
 }

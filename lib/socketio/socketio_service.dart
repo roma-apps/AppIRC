@@ -17,7 +17,7 @@ class SocketIOService extends Providable {
   final String uri;
 
   // ignore: close_sinks
-  BehaviorSubject<SocketConnectionState> _connectionStateController =
+  final BehaviorSubject<SocketConnectionState> _connectionStateController =
       BehaviorSubject.seeded(
     SocketConnectionState.disconnected,
   );
@@ -163,19 +163,20 @@ class SocketIOService extends Providable {
     });
   }
 
-  connect() async {
+  Future connect() async {
     return await _socketIO.connect();
   }
 
   Future<bool> connectAndWaitForResult() async => await _connect(_socketIO);
 
-  emit(SocketIOCommand command) async =>
+  Future emit(SocketIOCommand command) async =>
       await _socketIO.emit(command.eventName, command.parameters);
 
-  disconnect() async {
+  Future disconnect() async {
     return await _manager.clearInstance(_socketIO);
   }
 
+  @override
   var disposed = false;
 
   @override
@@ -223,9 +224,7 @@ class SocketIOService extends Providable {
 
       // library timeout sometimes not works
       Future.delayed(_connectTimeout, () {
-        if (connected == null) {
-          connected = false;
-        }
+        connected ??= false;
       });
     } finally {
       if (socketIO != null) {

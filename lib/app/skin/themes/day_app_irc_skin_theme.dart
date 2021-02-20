@@ -12,6 +12,7 @@ class DayAppSkinTheme extends AppIRCSkinTheme {
       : super(ID, ColoredNicknamesData(Colors.primaries), () => _themeData,
             () => MaterialBasedCupertinoThemeData(materialTheme: _themeData));
 
+  @override
   Color findMessageColorByType(RegularMessageType regularMessageType) {
     Color color;
     switch (regularMessageType) {

@@ -78,7 +78,7 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
 
   Widget _buildCondensedTitleMessage(
       BuildContext context, CondensedMessageListItem condensedMessageListItem) {
-    Map<RegularMessageType, List<ChatMessage>> groupedByType = Map();
+    Map<RegularMessageType, List<ChatMessage>> groupedByType = {};
 
     condensedMessageListItem.messages.forEach((message) {
       if (message is RegularMessage) {

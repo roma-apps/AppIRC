@@ -88,24 +88,30 @@ class ChatDrawerWidget extends StatelessWidget {
 
   Widget _buildLoungeSettingsButton(BuildContext context) => PlatformIconButton(
         onPressed: () async {
-          var settings = Provider.of<LoungePreferencesBloc>(context)
-              .getValue(defaultValue: createDefaultLoungePreferences(context));
-          Navigator.push(
+          var settings = Provider.of<LoungePreferencesBloc>(context).getValue(
+            defaultValue: createDefaultLoungePreferences(
               context,
-              platformPageRoute(
-                  context: context,
-                  builder: (context) {
-                    var connectionBloc = LoungeConnectionBloc(
-                        Provider.of<SocketIOManagerProvider>(context).manager,
-                        settings.hostPreferences,
-                        settings.authPreferences);
-                    return Provider(
-                        providable: connectionBloc,
-                        child: Provider(
-                            providable:
-                                LoungeConnectionFormBloc(connectionBloc),
-                            child: EditLoungeConnectionPage()));
-                  }));
+            ),
+          );
+          await Navigator.push(
+            context,
+            platformPageRoute(
+              context: context,
+              builder: (context) {
+                var connectionBloc = LoungeConnectionBloc(
+                    Provider.of<SocketIOManagerProvider>(context).manager,
+                    settings.hostPreferences,
+                    settings.authPreferences);
+                return Provider(
+                  providable: connectionBloc,
+                  child: Provider(
+                    providable: LoungeConnectionFormBloc(connectionBloc),
+                    child: EditLoungeConnectionPage(),
+                  ),
+                );
+              },
+            ),
+          );
         },
         icon: Icon(Icons.settings),
         cupertino: (context, platform) => CupertinoIconButtonData(

@@ -29,9 +29,9 @@ class ChatConnectionBloc extends Providable {
             connectionStateStream.listen((newBackendState) async {}));
   }
 
-  reconnect() => _reconnectIfNeeded();
+  Future reconnect() => _reconnectIfNeeded();
 
-  void _reconnectIfNeeded() async {
+  Future _reconnectIfNeeded() async {
 //    _logger.d(() => "_reconnectIfNeeded = $connectionState "
 //        "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
     if (connectionState == ChatConnectionState.disconnected) {
@@ -51,7 +51,7 @@ class ChatConnectionBloc extends Providable {
       }
       if (connected) {
         if (backendService.isReadyToConnect) {
-          backendService.connectChat();
+          await backendService.connectChat();
         }
       }
     }

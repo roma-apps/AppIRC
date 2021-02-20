@@ -171,7 +171,7 @@ bool _calculateIsNeedToDisplayMessageText(RegularMessage message) {
   return isNeedDisplay;
 }
 
-isHighlightedByServer(RegularMessage message) =>
+bool isHighlightedByServer(RegularMessage message) =>
     message.highlight == true ||
     message.regularMessageType == RegularMessageType.unknown;
 

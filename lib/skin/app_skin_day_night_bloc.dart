@@ -9,7 +9,7 @@ class AppSkinDayNightBloc extends Providable {
 
   AppSkinDayNightBloc(this.preferenceBloc, this.dayTheme, this.nightSkin);
 
-  toggleTheme() {
+  void toggleTheme() {
     var newSkin;
     if(isDay) {
       newSkin = nightSkin;

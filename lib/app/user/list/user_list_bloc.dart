@@ -43,7 +43,7 @@ class ChannelUsersListBloc extends Providable {
     addDisposable(subject: _usersSubject);
   }
 
-  _onNeedChangeUsersList() {
+  void _onNeedChangeUsersList() {
     var filter = filterFieldBloc.value;
     var filteredUsers = _channelBloc.users.where((user) {
       return user.nick.contains(RegExp(filter, caseSensitive: false));

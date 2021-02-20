@@ -47,7 +47,7 @@ class ChatDeepLinkBloc extends Providable {
     }));
   }
 
-  _initUniLinks() async {
+  Future _initUniLinks() async {
     _logger.d(() => "initUniLinks()");
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
@@ -85,8 +85,8 @@ class ChatDeepLinkBloc extends Providable {
 
       _logger.d(() => "onNewDeepLink networkForDeepLink $networkForDeepLink");
 
-      var channelPreferences = ChannelPreferences.name(
-          name: chatDeepLink.channel, password: null);
+      var channelPreferences =
+          ChannelPreferences.name(name: chatDeepLink.channel, password: null);
       if (networkForDeepLink != null) {
         _joinChannelFromDeepLink(
             networkForDeepLink, chatDeepLink, channelPreferences);
@@ -96,8 +96,8 @@ class ChatDeepLinkBloc extends Providable {
     }
   }
 
-  void _joinNetworkWithChannelFromDeepLink(ChatDeepLink chatDeepLink,
-      ChannelPreferences channelPreferences) {
+  void _joinNetworkWithChannelFromDeepLink(
+      ChatDeepLink chatDeepLink, ChannelPreferences channelPreferences) {
     var defaultNetwork = _backendService.chatConfig.defaultNetwork;
     var serverPreferences = NetworkPreferences(
         NetworkConnectionPreferences(
@@ -114,12 +114,9 @@ class ChatDeepLinkBloc extends Providable {
     _networksListBloc.joinNetwork(serverPreferences);
   }
 
-  void _joinChannelFromDeepLink(
-      Network networkForDeepLink,
-      ChatDeepLink chatDeepLink,
-      ChannelPreferences channelPreferences) {
-    var channelsBloc =
-        _networksListBloc.getChannelListBloc(networkForDeepLink);
+  void _joinChannelFromDeepLink(Network networkForDeepLink,
+      ChatDeepLink chatDeepLink, ChannelPreferences channelPreferences) {
+    var channelsBloc = _networksListBloc.getChannelListBloc(networkForDeepLink);
     var channelForDeepLink = channelsBloc.channels.firstWhere((channel) {
       return channel.name == chatDeepLink.channel;
     }, orElse: () => null);

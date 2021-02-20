@@ -1,8 +1,8 @@
 import 'package:url_launcher/url_launcher.dart';
 
-dynamic handleLinkClick(String url) async {
+Future<bool> handleLinkClick(String url) async {
   if (await canLaunch(url)) {
-    await launch(url);
+    return await launch(url);
   } else {
     throw 'Could not launch $url';
   }

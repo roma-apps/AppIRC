@@ -7,7 +7,7 @@ import 'package:rxdart/subjects.dart';
 abstract class FormFieldBloc<T> extends Providable {
   T get value;
 
-  var _validationErrorController = BehaviorSubject<ValidationError>();
+  final _validationErrorController = BehaviorSubject<ValidationError>();
 
   Stream<ValidationError> get errorStream =>
       _validationErrorController.stream.distinct();

@@ -19,6 +19,7 @@ class FormValueFieldBloc<T> extends FormFieldBloc<T> {
 
   Stream<T> get valueStream => _valueController.stream;
 
+  @override
   T get value => _valueController.value;
 
   FormValueFieldBloc(

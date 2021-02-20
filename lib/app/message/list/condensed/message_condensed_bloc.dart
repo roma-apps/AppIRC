@@ -3,12 +3,12 @@ import 'package:flutter_appirc/app/message/list/condensed/message_condensed_mode
 import 'package:flutter_appirc/provider/provider.dart';
 
 class MessageCondensedBloc extends Providable {
-  Map<Channel, Map<int, bool>> _states = Map();
+  final Map<Channel, Map<int, bool>> _states = {};
 
   void onCondensedStateChanged(
       Channel channel, CondensedMessageListItem item) {
     if (!_states.containsKey(channel)) {
-      _states[channel] = Map();
+      _states[channel] = {};
     }
 
     var remoteId = item.oldestRegularMessage.messageRemoteId;

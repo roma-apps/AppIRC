@@ -21,7 +21,7 @@ class NetworkListBloc extends Providable {
   final ChatBackendService backendService;
 
   final Map<Network, ChannelListBloc> _networksChannelListBlocs =
-      Map<Network, ChannelListBloc>();
+      <Network, ChannelListBloc>{};
 
   ChannelListBloc getChannelListBloc(Network network) =>
       _networksChannelListBlocs[network];
@@ -31,22 +31,21 @@ class NetworkListBloc extends Providable {
       @required this.nextChannelIdGenerator}) {
     addDisposable(subject: _networksSubject);
 
-    addDisposable(disposable:
-        backendService.listenForNetworkJoin((networkWithState) async {
-      onNetworkJoined(networkWithState);
-    }));
+    addDisposable(
+      disposable: backendService.listenForNetworkJoin(
+        (networkWithState) {
+          onNetworkJoined(networkWithState);
+        },
+      ),
+    );
   }
 
-  onNetworkJoined(NetworkWithState networkWithState) async {
+  Future onNetworkJoined(NetworkWithState networkWithState) async {
     var network = networkWithState.network;
 
-    if (network.localId == null) {
-      network.localId = await _nextNetworkLocalId;
-    }
+    network.localId ??= await _nextNetworkLocalId;
     for (var channel in network.channels) {
-      if (channel.localId == null) {
-        channel.localId = await _nextChannelLocalId;
-      }
+      channel.localId ??= await _nextChannelLocalId;
     }
 
     _networksChannelListBlocs[network] = ChannelListBloc(backendService,
@@ -95,10 +94,10 @@ class NetworkListBloc extends Providable {
 
   Future<int> get _nextChannelLocalId async => nextChannelIdGenerator();
 
-  var _networksSubject = BehaviorSubject<List<Network>>.seeded([]);
+  final _networksSubject = BehaviorSubject<List<Network>>.seeded([]);
 
   final List<NetworkListener> _joinListeners = [];
-  final Map<Network, List<VoidCallback>> _leaveListeners = Map();
+  final Map<Network, List<VoidCallback>> _leaveListeners = {};
 
   Disposable listenForNetworkJoin(NetworkListener listener) {
     _joinListeners.add(listener);
@@ -148,7 +147,7 @@ class NetworkListBloc extends Providable {
       });
 
   Future<List<Channel>> get allNetworksChannels async {
-    var allChannels = List<Channel>();
+    var allChannels = <Channel>[];
     networks.forEach((network) {
       allChannels.addAll(network.channels);
     });
@@ -158,12 +157,12 @@ class NetworkListBloc extends Providable {
 
   Future<RequestResult<NetworkWithState>> joinNetwork(
           NetworkPreferences preferences,
-          {bool waitForResult: false}) async =>
+          {bool waitForResult = false}) async =>
       await backendService.joinNetwork(preferences,
           waitForResult: waitForResult);
 
   Future<RequestResult<bool>> leaveNetwork(Network network,
-          {bool waitForResult: false}) async =>
+          {bool waitForResult = false}) async =>
       await backendService.leaveNetwork(network, waitForResult: waitForResult);
 
   Network findNetworkWithChannel(Channel channel) =>

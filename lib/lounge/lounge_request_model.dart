@@ -242,16 +242,35 @@ class RegistrationLoungeJsonRequest extends LoungeJsonRequest {
   final String user;
   final String password;
 
-  RegistrationLoungeJsonRequest(this.user, this.password);
-
-  RegistrationLoungeJsonRequest.name(
-      {@required this.user, @required this.password});
+  RegistrationLoungeJsonRequest({
+    @required this.user,
+    @required this.password,
+  });
 
   @override
   Map<String, dynamic> toJson() => _$RegistrationLoungeJsonRequestToJson(this);
 
   factory RegistrationLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
       _$RegistrationLoungeJsonRequestFromJson(json);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RegistrationLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          user == other.user &&
+          password == other.password;
+
+  @override
+  int get hashCode => user.hashCode ^ password.hashCode;
+
+  @override
+  String toString() {
+    return 'RegistrationLoungeJsonRequest{'
+        'user: $user, '
+        'password: $password'
+        '}';
+  }
 }
 
 @JsonSerializable()
@@ -354,6 +373,7 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
       : super(host, name, nick, port, realname, password, rejectUnauthorized,
             tls, username, commands);
 
+  @override
   Map<String, dynamic> toJson() => _$NetworkEditLoungeJsonRequestToJson(this);
 
   factory NetworkEditLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
@@ -407,6 +427,7 @@ class NetworkNewLoungeJsonRequest extends NetworkLoungeJsonRequest {
       : super(host, name, nick, port, realname, password, rejectUnauthorized,
             tls, username, commands);
 
+  @override
   Map<String, dynamic> toJson() => _$NetworkNewLoungeJsonRequestToJson(this);
 
   factory NetworkNewLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>

@@ -15,7 +15,7 @@ import 'package:rxdart/subjects.dart';
 class ChannelStatesBloc extends ChannelListListenerBloc {
   final ChatDatabase _db;
 
-  final Map<String, Map<int, BehaviorSubject<ChannelState>>> _statesMap = Map();
+  final Map<String, Map<int, BehaviorSubject<ChannelState>>> _statesMap = {};
 
   List<ChannelState> get allStates {
     var states = <ChannelState>[];
@@ -99,7 +99,7 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
     var network = networkWithState.network;
     var networkKey = _calculateNetworkKey(network);
     if (!_statesMap.containsKey(networkKey)) {
-      _statesMap[networkKey] = Map<int, BehaviorSubject<ChannelState>>();
+      _statesMap[networkKey] = <int, BehaviorSubject<ChannelState>>{};
     }
 
     super.onNetworkJoined(networkWithState);

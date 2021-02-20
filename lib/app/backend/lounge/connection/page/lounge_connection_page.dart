@@ -12,7 +12,7 @@ typedef LoungePreferencesActionCallback = void Function(
 
 abstract class LoungeConnectionPage extends StatefulWidget {
   @protected
-  onSuccessTestConnectionWithGivenPreferences(
+  void onSuccessTestConnectionWithGivenPreferences(
       BuildContext context, LoungePreferences preferences);
 
   @override

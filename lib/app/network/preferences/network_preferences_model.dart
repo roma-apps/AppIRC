@@ -13,7 +13,7 @@ class NetworkPreferences extends JsonPreferences {
   static const String channelsSeparator = " ";
   int get localId => networkConnectionPreferences?.localId;
 
-  int get localIdOrUndefined => localId != null ? localId : -1;
+  int get localIdOrUndefined => localId ?? -1;
 
   NetworkConnectionPreferences networkConnectionPreferences;
 
@@ -59,7 +59,7 @@ class NetworkConnectionPreferences extends JsonPreferences {
         @required this.userPreferences,
         this.localId});
 
-  get name => serverPreferences.name;
+  String get name => serverPreferences.name;
 
   @override
   String toString() {

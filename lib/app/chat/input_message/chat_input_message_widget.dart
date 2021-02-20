@@ -188,9 +188,11 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
         });
   }
 
-  _buildAttachMenuItems(BuildContext context, ChatUploadBloc chatUploadBloc,
-      ChatInputMessageBloc inputMessageBloc) {
-    return <PlatformAwarePopupMenuAction>[
+  List<PlatformAwarePopupMenuAction> _buildAttachMenuItems(
+    BuildContext context,
+    ChatUploadBloc chatUploadBloc,
+    ChatInputMessageBloc inputMessageBloc,
+  ) => <PlatformAwarePopupMenuAction>[
       PlatformAwarePopupMenuAction(
         text: tr("chat.new_message.attach.action.file"),
         iconData: Icons.insert_drive_file,
@@ -219,13 +221,11 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
         text: tr("chat.new_message.attach.action.camera"),
         iconData: Icons.camera_alt,
         actionCallback: (PlatformAwarePopupMenuAction action) async {
-
-
           var pickedPhotoFile = await ImagePicker().getImage(
             source: ImageSource.camera,
           );
           if (pickedPhotoFile?.path != null) {
-            _uploadFile(
+            await _uploadFile(
               context,
               chatUploadBloc,
               File(pickedPhotoFile.path),
@@ -243,14 +243,13 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
         },
       ),
     ];
-  }
 
   Future pickAndUploadFile(
       FileType fileType,
       BuildContext context,
       ChatUploadBloc chatUploadBloc,
       ChatInputMessageBloc inputMessageBloc) async {
-    FilePicker.platform.pickFiles().then((result) {
+    await FilePicker.platform.pickFiles().then((result) {
       if (result != null) {
         try {
           File pickedFile = File(result.files.single.path);

@@ -25,7 +25,8 @@ class MessageLoaderBloc extends Providable {
   final Channel _channel;
 
   // ignore: close_sinks
-  BehaviorSubject<bool> _isInitFinishedSubject = BehaviorSubject.seeded(false);
+  final BehaviorSubject<bool> _isInitFinishedSubject =
+      BehaviorSubject.seeded(false);
 
   Stream<bool> get isInitFinishedStream => _isInitFinishedSubject.stream;
 
@@ -42,7 +43,7 @@ class MessageLoaderBloc extends Providable {
     addDisposable(subject: _messagesListSubject);
     addDisposable(subject: _isInitFinishedSubject);
 
-    Timer.run(() async {
+    Timer.run(() {
       _loadStartMessagesFromDatabaseAndSubscribe();
     });
   }
@@ -87,7 +88,7 @@ class MessageLoaderBloc extends Providable {
     _messagesListSubject.add(messagesList);
   }
 
-  _removeUnnecessarySpecialLoadingMessages(List<ChatMessage> messages) {
+  void _removeUnnecessarySpecialLoadingMessages(List<ChatMessage> messages) {
     var lastTextSpecialMessage = findLatestTextSpecialMessage(messages);
 
     if (lastTextSpecialMessage != null) {
@@ -115,7 +116,7 @@ class MessageLoaderBloc extends Providable {
     }
   }
 
-  _loadStartMessagesFromDatabaseAndSubscribe() async {
+  Future _loadStartMessagesFromDatabaseAndSubscribe() async {
     _logger.d(() => "init start $disposed");
 
     var receivedMessages = <List<ChatMessage>>[];
@@ -137,7 +138,7 @@ class MessageLoaderBloc extends Providable {
         initMessages.addAll(messages);
       });
     }
-    _messagesListSubject = new BehaviorSubject<MessagesList>.seeded(
+    _messagesListSubject = BehaviorSubject<MessagesList>.seeded(
       MessagesList(
         allMessages: initMessages,
         lastAddedMessages: initMessages,
@@ -213,7 +214,7 @@ class MessageLoaderBloc extends Providable {
       _checkAdditionalLoadMore(network, channel, messagesForChannel);
     }
 
-    var messages = this.messagesList.allMessages;
+    var messages = messagesList.allMessages;
 
     var newMessages = messagesForChannel.messages;
 
@@ -259,8 +260,11 @@ class MessageLoaderBloc extends Providable {
     _onMessagesChanged(messages, newMessages, messageListUpdateType);
   }
 
-  _checkAdditionalLoadMore(Network network, Channel channel,
-      MessagesForChannel messagesForChannel) async {
+  Future<void> _checkAdditionalLoadMore(
+    Network network,
+    Channel channel,
+    MessagesForChannel messagesForChannel,
+  ) async {
     // lounge send maximum 100 newest messages on start
     // AppIRC should check local storage to identify missed and load them
 
@@ -303,8 +307,11 @@ class MessageLoaderBloc extends Providable {
               "newestLocalMessage $newestLocalMessage"
               "oldestRemoteMessage $oldestRemoteMessage");
 
-          _backendService.loadMoreHistory(
-              network, channel, oldestRemoteMessage.messageRemoteId);
+          await _backendService.loadMoreHistory(
+            network,
+            channel,
+            oldestRemoteMessage.messageRemoteId,
+          );
         }
         return;
       } else {

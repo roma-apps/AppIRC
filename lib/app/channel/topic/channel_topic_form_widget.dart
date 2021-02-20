@@ -16,7 +16,7 @@ class ChannelTopicWidget extends StatefulWidget {
 }
 
 class ChannelTopicWidgetState extends State<ChannelTopicWidget> {
-  String _initTopicString;
+  final String _initTopicString;
 
   ChannelTopicWidgetState(this._initTopicString);
 

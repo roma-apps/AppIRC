@@ -15,17 +15,20 @@ class AppIRCMessageSkinBloc extends MessageSkinBloc {
   @override
   TextStyle linkTextStyle;
 
+  @override
   TextStyle createDateTextStyle(Color color) =>
       _getSubTitleTextStyleForColor(color);
 
+  @override
   TextStyle createMessageSubTitleTextStyle(Color color) =>
       _getSubTitleTextStyleForColor(color);
 
+  @override
   TextStyle createNickTextStyle(Color color) =>
       _getNicknameTextStyleForColor(color);
 
-  Map<Color, TextStyle> _subTitleColorToTextStyle = Map();
-  Map<Color, TextStyle> _nicknameColorToTextStyle = Map();
+  final Map<Color, TextStyle> _subTitleColorToTextStyle = {};
+  final Map<Color, TextStyle> _nicknameColorToTextStyle = {};
 
   TextStyle _getSubTitleTextStyleForColor(Color color) {
     if (!_subTitleColorToTextStyle.containsKey(color)) {
@@ -52,6 +55,7 @@ class AppIRCMessageSkinBloc extends MessageSkinBloc {
     linkTextStyle = messageBodyTextStyle.copyWith(color: theme.linkColor);
   }
 
+  @override
   Color findTitleColorDataForMessage(RegularMessageType messageType) =>
       theme.findMessageColorByType(messageType);
 

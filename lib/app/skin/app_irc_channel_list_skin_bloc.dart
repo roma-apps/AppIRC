@@ -28,6 +28,7 @@ class AppIRCChannelListSkinBloc extends ChannelListSkinBloc {
   }
 
 
+  @override
   TextStyle getChannelItemTextStyle(bool isChannelActive) {
     if (isChannelActive) {
       return _activeChannelItemTextStyle;
@@ -36,6 +37,7 @@ class AppIRCChannelListSkinBloc extends ChannelListSkinBloc {
     }
   }
 
+  @override
   Color getChannelItemBackgroundColor(bool isChannelActive) {
     if (isChannelActive) {
       return theme.activeListItemColor;
@@ -44,6 +46,7 @@ class AppIRCChannelListSkinBloc extends ChannelListSkinBloc {
     }
   }
 
+  @override
   Color getChannelItemIconColor(bool isChannelActive) {
     if (isChannelActive) {
       return theme.onActiveListItemColor;
@@ -52,6 +55,7 @@ class AppIRCChannelListSkinBloc extends ChannelListSkinBloc {
     }
   }
 
+  @override
   TextStyle getChannelUnreadTextStyle(bool isChannelActive) {
     if (!isChannelActive) {
       return _activeChannelUnreadTextStyle;
@@ -60,6 +64,7 @@ class AppIRCChannelListSkinBloc extends ChannelListSkinBloc {
     }
   }
 
+  @override
   Color getChannelUnreadItemBackgroundColor(bool isChannelActive) {
     if (isChannelActive) {
       return theme.platformSkinTheme.primaryVariantColor;

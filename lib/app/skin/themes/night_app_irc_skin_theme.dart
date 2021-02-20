@@ -61,6 +61,7 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
           return materialBasedCupertinoThemeData;
         });
 
+  @override
   Color findMessageColorByType(RegularMessageType regularMessageType) {
     Color color;
     switch (regularMessageType) {

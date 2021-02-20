@@ -16,7 +16,7 @@ class NetworkBlocsBloc extends NetworkListListenerBloc {
     return Provider.of<NetworkBlocsBloc>(context);
   }
 
-  Map<Network, NetworkBloc> _blocs = Map();
+  final Map<Network, NetworkBloc> _blocs = {};
   final ChatBackendService _backendService;
   final NetworkStatesBloc _networkStatesBloc;
   final ChannelStatesBloc _channelsStatesBloc;

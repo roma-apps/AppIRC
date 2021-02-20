@@ -104,62 +104,61 @@ class LoungeConnectionFormWidgetState
     LoungeConnectionBloc connectionBloc = Provider.of(context);
 
     return StreamBuilder<bool>(
-        stream: connectionBloc.connectedStream,
-        initialData: connectionBloc.connected,
-        builder: (context, snapshot) {
-          var connected = snapshot.data;
+      stream: connectionBloc.connectedStream,
+      initialData: connectionBloc.connected,
+      builder: (context, snapshot) {
+        var connected = snapshot.data;
 
-          if (connected) {
-            return SizedBox.shrink();
-          } else {
-            return createSkinnedPlatformButton(context, onPressed: () async {
-              var extractData = formBloc.extractData();
-              AsyncDialogResult<RequestResult<LoungeHostInformation>>
-                  asyncResult = await doAsyncOperationWithDialog(
-                      context: context,
-                      asyncCode: () {
-                        return retrieveLoungeHostInformation(
-                            Provider.of<SocketIOManagerProvider>(context)
-                                .manager,
-                            extractData.hostPreferences);
-                      },
-                      cancellationValue: null,
-                      isDismissible: true);
+        if (connected) {
+          return SizedBox.shrink();
+        } else {
+          return createSkinnedPlatformButton(context, onPressed: () async {
+            var extractData = formBloc.extractData();
+            AsyncDialogResult<RequestResult<LoungeHostInformation>>
+                asyncResult = await doAsyncOperationWithDialog(
+                    context: context,
+                    asyncCode: () {
+                      return retrieveLoungeHostInformation(
+                          Provider.of<SocketIOManagerProvider>(context).manager,
+                          extractData.hostPreferences);
+                    },
+                    cancellationValue: null,
+                    isDismissible: true);
 
-              if (asyncResult.isNotCanceled) {
-                var requestResult = asyncResult.result;
+            if (asyncResult.isNotCanceled) {
+              var requestResult = asyncResult.result;
 
-                if (requestResult.isTimeout) {
-                  showLoungeTimeoutAlertDialog(context);
-                } else {
-                  if (requestResult.isResponseReceived) {
-                    var hostInformation = requestResult.result;
+              if (requestResult.isTimeout) {
+                await showLoungeTimeoutAlertDialog(context);
+              } else {
+                if (requestResult.isResponseReceived) {
+                  var hostInformation = requestResult.result;
 
-                    if (hostInformation.connected &&
-                        !hostInformation.authRequired) {
-                      successCallback(context, extractData);
-                    } else {
-                      connectionBloc.onHostConnectionResult(
-                          extractData.hostPreferences, hostInformation);
-
-                      if (!hostInformation.connected) {
-                        showLoungeConnectionErrorAlertDialog(
-                            context, requestResult.error);
-                      }
-                    }
+                  if (hostInformation.connected &&
+                      !hostInformation.authRequired) {
+                    successCallback(context, extractData);
                   } else {
-                    showLoungeConnectionErrorAlertDialog(
-                        context, requestResult.error);
+                    connectionBloc.onHostConnectionResult(
+                        extractData.hostPreferences, hostInformation);
+
+                    if (!hostInformation.connected) {
+                      await showLoungeConnectionErrorAlertDialog(
+                          context, requestResult.error);
+                    }
                   }
+                } else {
+                  await showLoungeConnectionErrorAlertDialog(
+                      context, requestResult.error);
                 }
               }
-            },
-                child: Text(
-                    tr('lounge.preferences.host'
-                        '.action'
-                        '.connect')));
-          }
-        });
+            }
+          },
+              child: Text(tr('lounge.preferences.host'
+                  '.action'
+                  '.connect')));
+        }
+      },
+    );
   }
 
   Widget _buildLoginForm(BuildContext context) {
@@ -190,7 +189,7 @@ class LoungeConnectionFormWidgetState
                   connectionBloc.switchToRegistration();
                 },
                   child: Text(tr("lounge.preferences.action"
-                          ".switch_to_sign_up")))
+                      ".switch_to_sign_up")))
               : SizedBox.shrink();
         });
   }
@@ -225,7 +224,7 @@ class LoungeConnectionFormWidgetState
                         var requestResult = asyncResult.result;
 
                         if (requestResult.isTimeout) {
-                          showLoungeTimeoutAlertDialog(context);
+                          await showLoungeTimeoutAlertDialog(context);
                         } else {
                           if (requestResult.isResponseReceived) {
                             ChatLoginResult loginResult = requestResult.result;
@@ -233,11 +232,13 @@ class LoungeConnectionFormWidgetState
                             if (loginResult.success) {
                               successCallback(context, extractData);
                             } else {
-                              showLoungeLoginFailAlertDialog(context);
+                              await showLoungeLoginFailAlertDialog(context);
                             }
                           } else {
-                            showLoungeConnectionErrorAlertDialog(
-                                context, requestResult.error);
+                            await showLoungeConnectionErrorAlertDialog(
+                              context,
+                              requestResult.error,
+                            );
                           }
                         }
                       }
@@ -294,7 +295,7 @@ class LoungeConnectionFormWidgetState
                         var requestResult = asyncResult.result;
 
                         if (requestResult.isTimeout) {
-                          showLoungeTimeoutAlertDialog(context);
+                          await showLoungeTimeoutAlertDialog(context);
                         } else {
                           if (requestResult.isResponseReceived) {
                             ChatRegistrationResult registrationResult =
@@ -305,22 +306,24 @@ class LoungeConnectionFormWidgetState
                             } else {
                               switch (registrationResult.errorType) {
                                 case RegistrationErrorType.alreadyExist:
-                                  showLoungeRegistrationAlreadyExistAlertDialog(
+                                  await showLoungeRegistrationAlreadyExistAlertDialog(
                                       context);
                                   break;
                                 case RegistrationErrorType.invalid:
-                                  showLoungeRegistrationInvalidAlertDialog(
+                                  await showLoungeRegistrationInvalidAlertDialog(
                                       context);
                                   break;
                                 case RegistrationErrorType.unknown:
-                                  showLoungeRegistrationUnknownAlertDialog(
+                                  await showLoungeRegistrationUnknownAlertDialog(
                                       context);
                                   break;
                               }
                             }
                           } else {
-                            showLoungeConnectionErrorAlertDialog(
-                                context, requestResult.error);
+                            await showLoungeConnectionErrorAlertDialog(
+                              context,
+                              requestResult.error,
+                            );
                           }
                         }
                       }

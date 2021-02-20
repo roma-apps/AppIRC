@@ -19,7 +19,7 @@ class MessageVideoPreviewWidget extends StatefulWidget {
 }
 
 class MessageVideoPreviewWidgetState extends State<MessageVideoPreviewWidget> {
-  String _videoURL;
+  final String _videoURL;
 
   MessageVideoPreviewWidgetState(this._videoURL);
 

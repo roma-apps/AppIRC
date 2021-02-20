@@ -4,7 +4,7 @@ import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-buildFormBooleanRow(
+Widget buildFormBooleanRow(
     {@required BuildContext context,
     @required String title,
     @required FormValueFieldBloc<bool> bloc}) {

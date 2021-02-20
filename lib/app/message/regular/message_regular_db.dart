@@ -134,10 +134,13 @@ class RegularMessageDB implements ChatMessageDB {
   @PrimaryKey(autoGenerate: true)
   int localId;
 
+  @override
   int channelLocalId;
 
+  @override
   final int chatMessageTypeId;
 
+  @override
   final int channelRemoteId;
 
   final String command;
@@ -171,6 +174,7 @@ class RegularMessageDB implements ChatMessageDB {
       message.highlight != null ? message.highlight != 0 : null;
 
   final String previewsJsonEncoded;
+  @override
   final String linksJsonEncoded;
 
   static List<MessagePreview> previews(RegularMessageDB message) =>

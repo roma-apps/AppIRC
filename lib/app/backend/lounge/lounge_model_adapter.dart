@@ -135,9 +135,7 @@ Future<ChatMessage> toChatMessage(
           : null,
       newNick: msgLoungeResponseBody.new_nick,
       messageRemoteId: msgLoungeResponseBody.id,
-      nicknames: msgLoungeResponseBody.users != null
-          ? msgLoungeResponseBody.users
-          : null,
+      nicknames: msgLoungeResponseBody.users,
       linksInText: null,
     );
   }
@@ -147,12 +145,13 @@ Future<SpecialMessage> toWhoIsSpecialMessage(
     Channel channel, MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
   var whoIsSpecialBody = toWhoIsSpecialMessageBody(msgLoungeResponseBody.whois);
 
-  return SpecialMessage.name(
-      channelRemoteId: channel.remoteId,
-      data: whoIsSpecialBody,
-      specialType: SpecialMessageType.whoIs,
-      date: DateTime.now(),
-      linksInMessage: null);
+  return SpecialMessage(
+    channelRemoteId: channel.remoteId,
+    data: whoIsSpecialBody,
+    specialType: SpecialMessageType.whoIs,
+    date: DateTime.now(),
+    linksInMessage: null,
+  );
 }
 
 // Return list instead of one message
@@ -192,12 +191,15 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
         loungeChannelItem.topic,
         loungeChannelItem.num_users);
 
-    specialMessages.add(SpecialMessage.name(
+    specialMessages.add(
+      SpecialMessage(
         data: channelInfoSpecialMessageBody,
         channelRemoteId: channel.remoteId,
         specialType: messageType,
         date: DateTime.now(),
-        linksInMessage: null));
+        linksInMessage: null,
+      ),
+    );
   }
 
   _logger.d(() => "toChannelsListSpecialMessages ${specialMessages.length}");
@@ -214,7 +216,7 @@ Future<SpecialMessage> toTextSpecialMessage(
     messageSpecialLoungeResponseBody.data,
   );
 
-  return SpecialMessage.name(
+  return SpecialMessage(
     data: TextSpecialMessageBody(
       message: textMessage.text,
     ),

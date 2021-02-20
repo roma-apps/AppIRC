@@ -10,7 +10,7 @@ class NewLoungeConnectionPage extends LoungeConnectionPage {
       : super();
 
   @override
-  onSuccessTestConnectionWithGivenPreferences(
+  void onSuccessTestConnectionWithGivenPreferences(
       BuildContext context, LoungePreferences preferences) async {
     _savePreferences(context, preferences);
   }

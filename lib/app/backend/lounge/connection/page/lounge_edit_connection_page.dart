@@ -15,11 +15,11 @@ class EditLoungeConnectionPage extends LoungeConnectionPage {
   EditLoungeConnectionPage() : super();
 
   @override
-  onSuccessTestConnectionWithGivenPreferences(
+  void onSuccessTestConnectionWithGivenPreferences(
       BuildContext context, LoungePreferences preferences) async {
 
     _logger.d(() => "build");
-    showPlatformDialog(
+    await showPlatformDialog(
         androidBarrierDismissible: true,
         context: context,
         builder: (_) => PlatformAlertDialog(

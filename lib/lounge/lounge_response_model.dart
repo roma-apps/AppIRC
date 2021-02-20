@@ -54,10 +54,10 @@ abstract class LoungeResponseBody extends LoungeResponseBodyPart {}
 abstract class LoungeResponseBodyPart {}
 
 class SignOutLoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.signOut;
+  static String get eventName => LoungeResponseEventNames.signOut;
 }
 class AuthorizedLoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.authorized;
+  static String get eventName => LoungeResponseEventNames.authorized;
 }
 
 class UploadAuthLoungeResponseBody {
@@ -67,7 +67,7 @@ class UploadAuthLoungeResponseBody {
     uploadAuthToken = raw?.toString();
   }
 
-  static get eventName => LoungeResponseEventNames.uploadAuth;
+  static String get eventName => LoungeResponseEventNames.uploadAuth;
 }
 
 class CommandsLoungeResponseBody {
@@ -76,19 +76,19 @@ class CommandsLoungeResponseBody {
   CommandsLoungeResponseBody.fromRaw(dynamic raw) {
     var iterable = (raw as Iterable);
 
-    commands = List<String>();
+    commands = <String>[];
 
     iterable.forEach((obj) {
       commands.add(obj.toString());
     });
   }
 
-  static get eventName => LoungeResponseEventNames.commands;
+  static String get eventName => LoungeResponseEventNames.commands;
 }
 
 @JsonSerializable()
 class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.msgPreview;
+  static String get eventName => LoungeResponseEventNames.msgPreview;
 
   final int target;
   final int msgId;
@@ -114,7 +114,7 @@ class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class MoreLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.more;
+  static String get eventName => LoungeResponseEventNames.more;
 
   final int chan;
   final List<MsgLoungeResponseBodyPart> messages;
@@ -138,7 +138,7 @@ class MoreLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class ChangelogLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.changelog;
+  static String get eventName => LoungeResponseEventNames.changelog;
 
   final dynamic current;
   final dynamic latest;
@@ -160,7 +160,7 @@ class ChangelogLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class SyncSortLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.syncSort;
+  static String get eventName => LoungeResponseEventNames.syncSort;
   final List<int> order;
   final String type;
   final String target;
@@ -180,7 +180,7 @@ class SyncSortLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class SettingsNewLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.settingNew;
+  static String get eventName => LoungeResponseEventNames.settingNew;
   final String name;
   final dynamic value;
 
@@ -199,7 +199,7 @@ class SettingsNewLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
-  static get eventName => LoungeResponseEventNames.sessionsList;
+  static String get eventName => LoungeResponseEventNames.sessionsList;
 
   final bool current;
   final int active;
@@ -221,7 +221,7 @@ class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class MsgLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.msg;
+  static String get eventName => LoungeResponseEventNames.msg;
 
   final int chan;
   final int highlight;
@@ -244,7 +244,7 @@ class MsgLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class MsgSpecialLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.msgSpecial;
+  static String get eventName => LoungeResponseEventNames.msgSpecial;
 
   final int chan;
   final dynamic data;
@@ -304,7 +304,7 @@ class DefaultsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class ConfigurationLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.configuration;
+  static String get eventName => LoungeResponseEventNames.configuration;
 
   final String defaultTheme;
   final DefaultsLoungeResponseBodyPart defaults;
@@ -355,7 +355,7 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class AuthLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.auth;
+  static String get eventName => LoungeResponseEventNames.auth;
 
   final bool success;
   final int serverHash;
@@ -387,7 +387,7 @@ class RegistrationResponseBody extends LoungeResponseBody {
   static const errorTypeInvalid = "invalid";
   static const errorTypeAlreadyExist= "already_exist";
 
-  static get eventName => LoungeResponseEventNames.signedUp;
+  static String get eventName => LoungeResponseEventNames.signedUp;
 
   final bool success;
   final String errorType;
@@ -410,7 +410,7 @@ class RegistrationResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.join;
+  static String get eventName => LoungeResponseEventNames.join;
 
   final ChannelLoungeResponseBodyPart chan;
   final int index;
@@ -431,7 +431,7 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class PartLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.part;
+  static String get eventName => LoungeResponseEventNames.part;
 
   final int chan;
 
@@ -445,7 +445,7 @@ class PartLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class QuitLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.quit;
+  static String get eventName => LoungeResponseEventNames.quit;
 
   final String network;
 
@@ -464,7 +464,7 @@ class QuitLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.networkStatus;
+  static String get eventName => LoungeResponseEventNames.networkStatus;
 
   final bool connected;
   final String network;
@@ -487,7 +487,7 @@ class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.networkOptions;
+  static String get eventName => LoungeResponseEventNames.networkOptions;
 
   final String network;
   final ServerOptionsLoungeResponseBodyPart serverOptions;
@@ -538,7 +538,7 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class ChannelStateLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.channelState;
+  static String get eventName => LoungeResponseEventNames.channelState;
   final int chan;
   final int state;
 
@@ -557,7 +557,7 @@ class ChannelStateLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class UsersLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.users;
+  static String get eventName => LoungeResponseEventNames.users;
   final int chan;
   final int unread;
   final int highlight;
@@ -579,7 +579,7 @@ class UsersLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class NickLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.nick;
+  static String get eventName => LoungeResponseEventNames.nick;
 
   final String network;
   final String nick;
@@ -761,7 +761,7 @@ class MsgPreviewLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class MsgPreviewLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.msgPreview;
+  static String get eventName => LoungeResponseEventNames.msgPreview;
 
   final int id;
   final int chan;
@@ -783,7 +783,7 @@ class MsgPreviewLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class InitLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.init;
+  static String get eventName => LoungeResponseEventNames.init;
 
   static final int undefinedActiveID = -1;
 
@@ -833,7 +833,7 @@ class PushSubscriptionLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class NamesLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.names;
+  static String get eventName => LoungeResponseEventNames.names;
 
   final int id;
   final List<UserLoungeResponseBodyPart> users;
@@ -853,7 +853,7 @@ class NamesLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class TopicLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.topic;
+  static String get eventName => LoungeResponseEventNames.topic;
 
   final int chan;
   final String topic;
@@ -938,7 +938,7 @@ class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
 @JsonSerializable()
 class NetworkLoungeResponseBody extends LoungeResponseBody {
-  static get eventName => LoungeResponseEventNames.network;
+  static String get eventName => LoungeResponseEventNames.network;
 
   final List<NetworkLoungeResponseBodyPart> networks;
 

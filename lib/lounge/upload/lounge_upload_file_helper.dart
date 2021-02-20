@@ -67,7 +67,7 @@ Future<String> uploadFileToLounge(String loungeURL, File file,
       await Future.delayed(_durationToCheckResponseDecode);
     }
 
-    listener.cancel();
+    await listener.cancel();
 
     if (timeout) {
       throw TimeoutHttpLoungeUploadException(file, loungeURL,

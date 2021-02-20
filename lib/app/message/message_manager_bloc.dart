@@ -24,12 +24,11 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
   final ChatDatabase _db;
 
-  final Map<int, Disposable> _channelsListeners = Map();
-  final Map<int, List<ChannelMessageListener>> _channelsMessagesListeners =
-      Map();
+  final Map<int, Disposable> _channelsListeners = {};
+  final Map<int, List<ChannelMessageListener>> _channelsMessagesListeners = {};
 
   // ignore: close_sinks
-  BehaviorSubject<ChatMessage> _messageUpdateSubject = BehaviorSubject();
+  final BehaviorSubject<ChatMessage> _messageUpdateSubject = BehaviorSubject();
 
   Stream<ChatMessage> get messageUpdateStream => _messageUpdateSubject.stream;
 
@@ -45,14 +44,16 @@ class MessageManagerBloc extends ChannelListListenerBloc {
       Network network, Channel channel, ChannelMessageListener listener) {
     var key = channel.remoteId;
     if (!_channelsMessagesListeners.containsKey(key)) {
-      _channelsMessagesListeners[key] = List();
+      _channelsMessagesListeners[key] = [];
     }
 
     _channelsMessagesListeners[key].add(listener);
 
-    return CustomDisposable(() {
-      _channelsMessagesListeners[key].remove(listener);
-    });
+    return CustomDisposable(
+      () {
+        _channelsMessagesListeners[key].remove(listener);
+      },
+    );
   }
 
   @override
@@ -116,7 +117,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     var newMessageDB = toRegularMessageDB(message);
     newMessageDB.localId = oldMessageDB.localId;
-    _db.regularMessagesDao.updateRegularMessage(newMessageDB);
+    await _db.regularMessagesDao.updateRegularMessage(newMessageDB);
 
     return message;
   }
@@ -132,7 +133,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     var newMessageDB = toRegularMessageDB(message);
     newMessageDB.localId = oldMessageDB.localId;
-    _db.regularMessagesDao.updateRegularMessage(newMessageDB);
+    await _db.regularMessagesDao.updateRegularMessage(newMessageDB);
 
     return message;
   }
@@ -184,7 +185,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 //    _realtimeMessagesSubject.add(messagesForChannel);
 
     // don't await
-    _extractLinks(messagesForChannel);
+    await _extractLinks(messagesForChannel);
   }
 
   Future _insertMessages(List<ChatMessage> newMessages) async {
@@ -248,8 +249,8 @@ class MessageManagerBloc extends ChannelListListenerBloc {
       }
     }
 
-    _db.regularMessagesDao.updateRegularMessages(regularMessagesToUpdate);
-    _db.specialMessagesDao.updateSpecialMessages(specialMessagesToUpdate);
+    await _db.regularMessagesDao.updateRegularMessages(regularMessagesToUpdate);
+    await _db.specialMessagesDao.updateSpecialMessages(specialMessagesToUpdate);
   }
 
   Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>
@@ -274,9 +275,7 @@ Future<List<List<String>>> extractLinks(List<ChatMessage> messages) async {
 
 void updatePreview(RegularMessage oldMessage,
     MessagePreviewForRemoteMessageId previewForMessage) {
-  if (oldMessage.previews == null) {
-    oldMessage.previews = [];
-  }
+  oldMessage.previews ??= [];
 
   oldMessage.previews.clear();
   oldMessage.previews.add(previewForMessage.messagePreview);

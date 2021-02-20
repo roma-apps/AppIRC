@@ -16,7 +16,7 @@ class ChannelBlocsBloc extends ChannelListListenerBloc {
     return Provider.of<ChannelBlocsBloc>(context);
   }
 
-  Map<Channel, ChannelBloc> _blocs = Map();
+  final Map<Channel, ChannelBloc> _blocs = {};
   final ChatBackendService _backendService;
   final ChatPushesService chatPushesService;
   final ChannelStatesBloc _channelsStatesBloc;

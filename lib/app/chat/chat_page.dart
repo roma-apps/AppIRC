@@ -52,7 +52,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext outerContext) {
@@ -148,12 +148,12 @@ class _ChatPageState extends State<ChatPage> {
               onTap: onPressed,
               child: Stack(children: <Widget>[
                 platformIconButton,
-                new Positioned(
+                Positioned(
                   right: rightMargin,
                   top: 10,
-                  child: new Container(
+                  child: Container(
                     padding: EdgeInsets.all(2),
-                    decoration: new BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -161,9 +161,9 @@ class _ChatPageState extends State<ChatPage> {
                       minWidth: 16,
                       minHeight: 16,
                     ),
-                    child: new Text(
+                    child: Text(
                       "$unreadCount",
-                      style: new TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 10,
                       ),

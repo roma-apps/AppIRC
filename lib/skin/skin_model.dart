@@ -10,9 +10,9 @@ typedef IOSThemeDataCreator = CupertinoThemeData Function();
 class AppSkinTheme {
   final String id;
 
-  get textColor => platformSkinTheme.onBackgroundColor;
+  Color get textColor => platformSkinTheme.onBackgroundColor;
 
-  get backgroundColor => platformSkinTheme.backgroundColor;
+  Color get backgroundColor => platformSkinTheme.backgroundColor;
 
   @override
   bool operator ==(Object other) =>
@@ -105,6 +105,7 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
     textInputDecorationErrorStyle = textTheme.bodyText2.copyWith(color: Colors.red);
   }
 
+  @override
   Color get buttonColor => theme.buttonColor;
 
   @override
@@ -156,6 +157,7 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
 
   CupertinoTextThemeData get textTheme => theme.textTheme;
 
+  @override
   Color get buttonColor => androidAppSkinTheme.theme.buttonColor;
 
   @override
@@ -218,6 +220,7 @@ class MaterialBasedIOSAppSkinTheme extends PlatformSkinTheme {
   @override
   TextStyle get textTitleStyle => textTheme.navTitleTextStyle;
 
+  @override
   Color get onBackgroundColor =>
       androidAppSkinTheme.theme.colorScheme.onPrimary;
 

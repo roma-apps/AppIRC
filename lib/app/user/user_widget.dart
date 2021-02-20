@@ -8,41 +8,52 @@ import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 
-Widget buildUserNickWithPopupMenu(
-    {@required BuildContext context,
-    @required String nick,
-    @required Function(PlatformAwarePopupMenuAction action) actionCallback}) {
+Widget buildUserNickWithPopupMenu({
+  @required BuildContext context,
+  @required String nick,
+  @required Function(PlatformAwarePopupMenuAction action) actionCallback,
+}) {
   var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
   var messagesSkin = Provider.of<MessageSkinBloc>(context);
 
-
   Widget child = Text(
     nick,
-
     style:
-    messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
+        messagesSkin.createNickTextStyle(nickNamesBloc.getColorForNick(nick)),
   );
 
-  return createPlatformPopupMenuButton(context,
-      child: child,
-      isNeedPadding: false,
-      actions: buildUserNickPopupMenuActions(
-          context: context, nick: nick, actionCallback: actionCallback));
+  return createPlatformPopupMenuButton(
+    context,
+    child: child,
+    isNeedPadding: false,
+    actions: buildUserNickPopupMenuActions(
+      context: context,
+      nick: nick,
+      actionCallback: actionCallback,
+    ),
+  );
 }
 
-showPopupMenuForUser(BuildContext context, RelativeRect position, String nick,
-        ChannelBloc channelBloc) =>
+Future showPopupMenuForUser(
+  BuildContext context,
+  RelativeRect position,
+  String nick,
+  ChannelBloc channelBloc,
+) =>
     showPlatformAwarePopup(
-        context,
-        position,
-        buildUserNickPopupMenuActions(
-            context: context, nick: nick, actionCallback: null));
+      context,
+      position,
+      buildUserNickPopupMenuActions(
+        context: context,
+        nick: nick,
+        actionCallback: null,
+      ),
+    );
 
 List<PlatformAwarePopupMenuAction> buildUserNickPopupMenuActions(
     {@required BuildContext context,
     @required String nick,
     @required actionCallback(PlatformAwarePopupMenuAction action)}) {
-
   ChannelBloc channelBloc = ChannelBloc.of(context);
   return <PlatformAwarePopupMenuAction>[
     PlatformAwarePopupMenuAction(

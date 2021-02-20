@@ -66,7 +66,7 @@ Widget _buildCupertinoPopupButton(
   }
 }
 
-showPlatformAwarePopup(BuildContext context, RelativeRect position,
+Future showPlatformAwarePopup(BuildContext context, RelativeRect position,
     List<PlatformAwarePopupMenuAction> actions) {
   switch (detectCurrentUIPlatform()) {
     case UIPlatform.material:
@@ -79,34 +79,43 @@ showPlatformAwarePopup(BuildContext context, RelativeRect position,
   throw Exception("invalid platform");
 }
 
-showMaterialPopup(BuildContext context, RelativeRect position,
-    List<PlatformAwarePopupMenuAction> actions) async {
-  showMenu(
-          context: context,
-          position: position,
-          items: _convertToMaterialActions(actions))
-      .then((selected) {
-    selected?.actionCallback(selected);
-  });
+Future showMaterialPopup<T>(BuildContext context, RelativeRect position,
+    List<PlatformAwarePopupMenuAction> actions) {
+  return showMenu(
+    context: context,
+    position: position,
+    items: _convertToMaterialActions(
+      actions,
+    ),
+  ).then(
+    (selectedAction) {
+      selectedAction?.actionCallback(selectedAction);
+    },
+  );
 }
 
-showCupertinoPopup(
-    BuildContext context, List<PlatformAwarePopupMenuAction> actions) {
+Future showCupertinoPopup<T>(
+  BuildContext context,
+  List<PlatformAwarePopupMenuAction> actions,
+) {
   return showCupertinoModalPopup(
-      context: context,
-      builder: (_) {
-        return CupertinoActionSheet(
-          actions: actions
-              .map((action) => CupertinoActionSheetAction(
-                    child: _buildRow(action.iconData, action.text),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      action.actionCallback(action);
-                    },
-                  ))
-              .toList(),
-        );
-      });
+    context: context,
+    builder: (_) {
+      return CupertinoActionSheet(
+        actions: actions
+            .map(
+              (action) => CupertinoActionSheetAction(
+                child: _buildRow(action.iconData, action.text),
+                onPressed: () {
+                  Navigator.pop(context);
+                  action.actionCallback(action);
+                },
+              ),
+            )
+            .toList(),
+      );
+    },
+  );
 }
 
 Widget _buildMaterialPopupButton(

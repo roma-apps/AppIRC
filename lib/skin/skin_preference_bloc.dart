@@ -29,9 +29,7 @@ class AppSkinPreferenceBloc<T extends AppSkinTheme> extends Providable {
     } else {
       var skin = allAvailableSkins.firstWhere((skin) => skin.id == skinId,
           orElse: () => null);
-      if (skin == null) {
-        skin = defaultSkin;
-      }
+      skin ??= defaultSkin;
 
       return skin;
     }

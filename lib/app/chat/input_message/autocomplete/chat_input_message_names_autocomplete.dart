@@ -9,6 +9,7 @@ class NamesAutoCompleter extends AutoCompleter {
 
   NamesAutoCompleter(this.channelBloc);
 
+  @override
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern) async {
     String lastWord = findLastWord(pattern);
 

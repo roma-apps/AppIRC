@@ -17,8 +17,7 @@ class NewNetworkPreferencesPage extends NetworkPreferencesPage {
       @required bool serverPreferencesVisible,
       this.outerCallback})
       : super.name(
-            titleText:
-                tr('irc.connection.new.title'),
+            titleText: tr('irc.connection.new.title'),
             startValues: startValues,
             isNeedShowChannels: true,
             isNeedShowCommands: false,
@@ -27,10 +26,11 @@ class NewNetworkPreferencesPage extends NetworkPreferencesPage {
             buttonText: tr('irc.connection.new.action.connect'));
 
   @override
-  successCallback(
-      BuildContext context, NetworkPreferences preferences) async {
-    final NetworkListBloc chatBloc =
-        Provider.of<NetworkListBloc>(context);
+  Future successCallback(
+    BuildContext context,
+    NetworkPreferences preferences,
+  ) async {
+    final NetworkListBloc chatBloc = Provider.of<NetworkListBloc>(context);
 
     var dialogResult = await doAsyncOperationWithDialog(
         context: context,

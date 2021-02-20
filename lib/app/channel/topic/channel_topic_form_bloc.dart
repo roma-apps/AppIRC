@@ -9,7 +9,7 @@ class ChannelTopicFormBloc extends FormBloc {
   FormValueFieldBloc<String> get topicFieldBloc => _topicFieldBloc;
 
   // ignore: close_sinks
-  BehaviorSubject<bool> _isPossibleToChangeTopicSubject =
+  final BehaviorSubject<bool> _isPossibleToChangeTopicSubject =
       BehaviorSubject.seeded(false);
 
   final String _initTopic;

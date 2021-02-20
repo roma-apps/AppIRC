@@ -6,12 +6,12 @@ import 'package:flutter_appirc/url/url_launcher.dart';
 
 final String _mailToPrefix = "mailto:";
 
-_openEmail(String word) {
+Future<bool> _openEmail(String word) {
   // email
   if (!word.contains(_mailToPrefix)) {
     word = _mailToPrefix + word;
   }
-  _openURL(word);
+  return _openURL(word);
 }
 
 bool _isEmail(String word) => word.contains("@");
@@ -34,4 +34,4 @@ SpanBuilder buildLinkHighlighter(
       });
 }
 
-void _openURL(String word) => handleLinkClick(word);
+Future<bool> _openURL(String word) => handleLinkClick(word);

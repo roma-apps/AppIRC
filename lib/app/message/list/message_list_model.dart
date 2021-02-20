@@ -58,7 +58,7 @@ class SimpleMessageListItem extends MessageListItem {
 
   @override
   bool isContainsMessageWithRemoteId(int firstUnreadRemoteMessageId) {
-    return isHaveMessageRemoteId(this.message, firstUnreadRemoteMessageId);
+    return isHaveMessageRemoteId(message, firstUnreadRemoteMessageId);
   }
 
   @override
@@ -83,8 +83,6 @@ abstract class MessageListItem {
 class MessageListState {
   final List<MessageListItem> items;
   final List<ChatMessage> newItems;
-
-//  final bool moreHistoryAvailable;
   final MessageListUpdateType updateType;
 
   MessageListState.name(
@@ -92,8 +90,11 @@ class MessageListState {
       @required this.newItems,
       @required this.updateType});
 
-  static get empty => MessageListState.name(
-      items: [], newItems: [], updateType: MessageListUpdateType.notUpdated);
+  static MessageListState get empty => MessageListState.name(
+        items: [],
+        newItems: [],
+        updateType: MessageListUpdateType.notUpdated,
+      );
 
   @override
   String toString() {
@@ -103,6 +104,18 @@ class MessageListState {
         ' updateType: $updateType'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessageListState &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          newItems == other.newItems &&
+          updateType == other.updateType;
+
+  @override
+  int get hashCode => items.hashCode ^ newItems.hashCode ^ updateType.hashCode;
 }
 
 class MessageListLoadMore {

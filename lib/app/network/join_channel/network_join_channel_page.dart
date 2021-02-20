@@ -42,37 +42,41 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
         title: Text(tr('chat.network.join_channel.title')),
       ),
       body: SafeArea(
-          child: Provider(
-        providable: NetworkBlocProvider(networkBloc),
-        child: Provider<NetworkJoinChannelFormBloc>(
-          providable: channelJoinFormBloc,
-          child: ListView(children: <Widget>[
-            NetworkJoinChannelFormWidget(
-              startChannelName: "",
-              startPassword: "",
-            ),
-            StreamBuilder<bool>(
-                stream: channelJoinFormBloc.dataValidStream,
-                builder: (context, snapshot) {
-                  var dataValid = snapshot.data == true;
+        child: Provider(
+          providable: NetworkBlocProvider(networkBloc),
+          child: Provider<NetworkJoinChannelFormBloc>(
+            providable: channelJoinFormBloc,
+            child: ListView(
+              children: <Widget>[
+                NetworkJoinChannelFormWidget(
+                  startChannelName: "",
+                  startPassword: "",
+                ),
+                StreamBuilder<bool>(
+                  stream: channelJoinFormBloc.dataValidStream,
+                  builder: (context, snapshot) {
+                    var dataValid = snapshot.data == true;
 
-                  var pressed = dataValid
-                      ? () async {
-                          _onJoinClicked(
-                              context, channelJoinFormBloc, networkBloc);
-                        }
-                      : null;
-                  return createSkinnedPlatformButton(
-                    context,
-                    child: Text(
-                      tr('chat.network.join_channel.action.join'),
-                    ),
-                    onPressed: pressed,
-                  );
-                })
-          ]),
+                    var pressed = dataValid
+                        ? () async {
+                            await _onJoinClicked(
+                                context, channelJoinFormBloc, networkBloc);
+                          }
+                        : null;
+                    return createSkinnedPlatformButton(
+                      context,
+                      child: Text(
+                        tr('chat.network.join_channel.action.join'),
+                      ),
+                      onPressed: pressed,
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
         ),
-      )),
+      ),
     );
   }
 

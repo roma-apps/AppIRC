@@ -7,9 +7,11 @@ class AppIRCChatInputMessageSkinBloc extends ChatInputMessageSkinBloc {
 
   AppIRCChatInputMessageSkinBloc(this.theme);
 
+  @override
   TextStyle get inputMessageHintTextStyle =>
       theme.platformSkinTheme.textInputDecorationHintStyle;
 
+  @override
   TextStyle get inputMessageTextStyle =>
       theme.platformSkinTheme.textEditTextStyle;
 

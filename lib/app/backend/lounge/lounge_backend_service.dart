@@ -52,30 +52,36 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   final SocketIOManager socketIOManager;
   SocketIOService _socketIOService;
 
+  @override
   Stream<bool> get isChatConfigExistStream => chatConfigStream.map(
         (chatConfig) => chatConfig != null,
       );
 
+  @override
   bool get isConnected => connectionState == ChatConnectionState.connected;
 
+  @override
   Stream<bool> get isConnectedStream => connectionStateStream
       .map((state) => state == ChatConnectionState.connected)
       .distinct();
 
   // ignore: close_sinks
-  BehaviorSubject<ChatConnectionState> _connectionStateSubject =
+  final BehaviorSubject<ChatConnectionState> _connectionStateSubject =
       BehaviorSubject.seeded(
     ChatConnectionState.disconnected,
   );
 
+  @override
   Stream<ChatConnectionState> get connectionStateStream =>
       _connectionStateSubject.stream.distinct();
 
+  @override
   ChatConnectionState get connectionState => _connectionStateSubject.value;
 
   // ignore: close_sinks
-  BehaviorSubject<ChatConfig> _chatConfigSubject = BehaviorSubject();
+  final BehaviorSubject<ChatConfig> _chatConfigSubject = BehaviorSubject();
 
+  @override
   Stream<ChatConfig> get chatConfigStream => _chatConfigSubject.stream;
 
   @override
@@ -85,11 +91,12 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   ChatInitInformation chatInit;
 
   // ignore: close_sinks
-  BehaviorSubject<bool> _signOutSubject = BehaviorSubject();
+  final BehaviorSubject<bool> _signOutSubject = BehaviorSubject();
 
   // lounge don't response properly to edit request
   // ignore: close_sinks
-  BehaviorSubject<NetworkPreferences> _editNetworkRequests = BehaviorSubject();
+  final BehaviorSubject<NetworkPreferences> _editNetworkRequests =
+      BehaviorSubject();
 
   bool get isSocketIOServiceExist => _socketIOService != null;
 
@@ -209,8 +216,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     ChatLoginResult loginResult = requestResult.result;
 
     if (loginResult.config != null) {
-      this._chatConfigSubject.add(loginResult.config);
-      this.chatInit = loginResult.chatInit;
+      _chatConfigSubject.add(loginResult.config);
+      chatInit = loginResult.chatInit;
 
       // socket io callback very slow
       _connectionStateSubject.add(ChatConnectionState.connected);
@@ -653,7 +660,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       data.msg.whois,
     );
 
-    return SpecialMessage.name(
+    return SpecialMessage(
       channelRemoteId: data.chan,
       data: whoIsSpecialBody,
       specialType: SpecialMessageType.whoIs,
@@ -837,6 +844,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     return disposable;
   }
 
+  @override
   Disposable listenForChannelUsers(
     Network network,
     Channel channel,
@@ -980,6 +988,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     );
   }
 
+  @override
   Disposable listenForNetworkState(
       Network network,
       NetworkState Function() currentStateExtractor,
@@ -1273,7 +1282,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     @required int activeChannelId,
     @required int lastMessageId,
     @required String user,
-    bool waitForResult: false,
+    bool waitForResult = false,
   }) async {
     _logger.d(() => "authAfterReconnect "
         "token = $token "
@@ -1376,9 +1385,10 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   }
 
   // ignore: close_sinks
-  BehaviorSubject<ToggleMessagePreviewData> _messageTogglePreviewSubject =
+  final BehaviorSubject<ToggleMessagePreviewData> _messageTogglePreviewSubject =
       BehaviorSubject();
 
+  @override
   Disposable listenForMessagePreviewToggle(Network network, Channel channel,
       Function(ToggleMessagePreviewData) callback) {
     return StreamSubscriptionDisposable(
@@ -1393,9 +1403,10 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   }
 
   // ignore: close_sinks
-  BehaviorSubject<ToggleChannelPreviewData> _channelTogglePreviewSubject =
+  final BehaviorSubject<ToggleChannelPreviewData> _channelTogglePreviewSubject =
       BehaviorSubject();
 
+  @override
   Disposable listenForChannelPreviewToggle(
     Network network,
     Channel channel,
@@ -1739,9 +1750,7 @@ Future<LoungeHostInformation> _retrieveHostInformation(
   Future.delayed(
     _connectTimeout,
     () {
-      if (result == null) {
-        result = LoungeHostInformation.notConnected();
-      }
+      result ??= LoungeHostInformation.notConnected();
     },
   );
 
@@ -1759,7 +1768,7 @@ Future<LoungeHostInformation> _retrieveHostInformation(
     ),
   );
 
-  socketIOService.connect();
+  await socketIOService.connect();
 
   _logger.d(() => "_retrieveHostInformation socketConnected");
 
@@ -1778,8 +1787,11 @@ Future<RequestResult<ChatRegistrationResult>> _register(
 ) async {
   var authPreferences = preferences.authPreferences;
   var registrationCommand = toSocketIOCommand(
-      RegistrationLoungeJsonRequest.name(
-          user: authPreferences.username, password: authPreferences.password));
+    RegistrationLoungeJsonRequest(
+      user: authPreferences.username,
+      password: authPreferences.password,
+    ),
+  );
   _logger.d(() => "_register $registrationCommand");
 
   var disposable = CompositeDisposable([]);
@@ -1790,11 +1802,16 @@ Future<RequestResult<ChatRegistrationResult>> _register(
 
   await socketIOService.connect();
 
-  disposable.add(_listenForRegistration(socketIOService, (result) {
-    registrationResult = result;
-  }));
+  disposable.add(
+    _listenForRegistration(
+      socketIOService,
+      (result) {
+        registrationResult = result;
+      },
+    ),
+  );
 
-  socketIOService.emit(registrationCommand);
+  await socketIOService.emit(registrationCommand);
 
   var requestResult = await _doWaitForResult(() => registrationResult);
 
@@ -1919,7 +1936,7 @@ Future<RequestResult<ChatLoginResult>> _connectAndLogin(
         );
 
         authResponse = null;
-        socketIOService.emit(
+        await socketIOService.emit(
           toSocketIOCommand(
             authRequest,
           ),

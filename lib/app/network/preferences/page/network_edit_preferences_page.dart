@@ -1,10 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
+import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_preferences_page.dart';
 import 'package:flutter_appirc/async/async_dialog.dart';
+import 'package:flutter_appirc/async/async_dialog_model.dart';
 
 class EditNetworkPreferencesPage extends NetworkPreferencesPage {
   EditNetworkPreferencesPage(
@@ -25,7 +28,7 @@ class EditNetworkPreferencesPage extends NetworkPreferencesPage {
                     '.save'));
 
   @override
-  successCallback(
+  Future<AsyncDialogResult<RequestResult<Network>>> successCallback(
       BuildContext context, NetworkPreferences preferences) async {
     final NetworkBloc networkBloc = NetworkBloc.of(context);
 

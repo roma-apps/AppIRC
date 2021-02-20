@@ -118,12 +118,12 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
     }, orElse: () => null);
   }
 
-  reset() {
+  void reset() {
     _currentPreferences = ChatPreferences.empty;
     _onPreferencesChanged();
 
   }
 }
 
-_isNeedSaveChannel(Channel channel) =>
+bool _isNeedSaveChannel(Channel channel) =>
     channel.type == ChannelType.channel;

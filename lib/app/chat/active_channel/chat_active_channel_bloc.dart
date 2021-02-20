@@ -31,7 +31,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   Channel get activeChannel => _activeChannelSubject.value;
 
   // ignore: close_sinks
-  final BehaviorSubject<Channel> _activeChannelSubject = new BehaviorSubject();
+  final BehaviorSubject<Channel> _activeChannelSubject = BehaviorSubject();
 
   Stream<Channel> get activeChannelStream => _activeChannelSubject.stream;
 
@@ -44,32 +44,39 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
       : super(_networksListBloc) {
     _preferenceBloc = createActiveChannelPreferenceBloc(preferencesService);
 
-    addDisposable(streamSubscription:
-        pushesService.chatPushMessageStream.listen((chatPushMessage) async {
-      _logger.d(() => "chatPushMessageStream $chatPushMessage");
+    addDisposable(
+      streamSubscription: pushesService.chatPushMessageStream.listen(
+        (chatPushMessage) async {
+          _logger.d(() => "chatPushMessageStream $chatPushMessage");
 
-      var channelRemoteId = chatPushMessage.data?.chanId;
-      if (channelRemoteId != null) {
-        if (chatPushMessage.type == PushMessageType.resume) {
-          var channel = await findChannelWithRemoteID(channelRemoteId);
+          var channelRemoteId = chatPushMessage.data?.chanId;
+          if (channelRemoteId != null) {
+            if (chatPushMessage.type == PushMessageType.resume) {
+              var channel = await findChannelWithRemoteID(channelRemoteId);
 
-          changeActiveChanel(channel);
-        } else if (chatPushMessage.type == PushMessageType.launch) {
-          _channelRemoteIdFromLaunchPushMessage = channelRemoteId;
-        }
-      } else {
-        _logger.e(() => "Error during handling $chatPushMessage");
-      }
-    }));
+              await changeActiveChanel(channel);
+            } else if (chatPushMessage.type == PushMessageType.launch) {
+              _channelRemoteIdFromLaunchPushMessage = channelRemoteId;
+            }
+          } else {
+            _logger.e(() => "Error during handling $chatPushMessage");
+          }
+        },
+      ),
+    );
 
     _logger.i(() => "start creating");
 
-    addDisposable(streamSubscription: _chatInitBloc.stateStream.listen((state) {
-      if (state == ChatInitState.finished &&
-          _networksListBloc.networks.isNotEmpty) {
-        tryRestoreActiveChannel();
-      }
-    }));
+    addDisposable(
+      streamSubscription: _chatInitBloc.stateStream.listen(
+        (state) {
+          if (state == ChatInitState.finished &&
+              _networksListBloc.networks.isNotEmpty) {
+            tryRestoreActiveChannel();
+          }
+        },
+      ),
+    );
 
     addDisposable(disposable: _preferenceBloc);
 
@@ -88,7 +95,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     }
 
     if (_channelRemoteIdFromLaunchPushMessage != null) {
-      _restoreFromLaunchPushMessage();
+      await _restoreFromLaunchPushMessage();
     } else if (_backendService.chatInit.activeChannelRemoteId != null) {
       await _restoreFromChatInitMessage();
     } else {
@@ -96,11 +103,13 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     }
   }
 
-  Future _restoreFromLaunchPushMessage() async =>
-      await _restoreByRemoteID(_channelRemoteIdFromLaunchPushMessage);
+  Future _restoreFromLaunchPushMessage() async => await _restoreByRemoteID(
+        _channelRemoteIdFromLaunchPushMessage,
+      );
 
-  Future _restoreFromChatInitMessage() async =>
-      await _restoreByRemoteID(_backendService.chatInit.activeChannelRemoteId);
+  Future _restoreFromChatInitMessage() async => await _restoreByRemoteID(
+        _backendService.chatInit.activeChannelRemoteId,
+      );
 
   Future _restoreByRemoteID(int chatInitActiveChannelRemoteID) async {
     Channel newActiveChannel =
@@ -117,7 +126,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
       }
     }
 
-    changeActiveChanel(newActiveChannel);
+    await changeActiveChanel(newActiveChannel);
   }
 
   Future<Channel> findChannelWithRemoteID(int remoteId) async {
@@ -148,13 +157,13 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
         }
 
         if (foundActiveChannel != null) {
-          changeActiveChanel(foundActiveChannel);
+          await changeActiveChanel(foundActiveChannel);
         }
       }
     }
   }
 
-  changeActiveChanel(Channel newActiveChannel) async {
+  Future<void> changeActiveChanel(Channel newActiveChannel) async {
     if (_chatInitBloc.state != ChatInitState.finished) {
       return;
     }
@@ -164,20 +173,21 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     }
 
     _logger.i(() => "changeActiveChanel $newActiveChannel");
-    _preferenceBloc.setValue(newActiveChannel.localId);
+    await _preferenceBloc.setValue(newActiveChannel.localId);
     _activeChannelSubject.sink.add(newActiveChannel);
 
     Network network =
         _networksListBloc.findNetworkWithChannel(newActiveChannel);
-    _backendService.sendChannelOpenedEventToServer(network, newActiveChannel);
-    _backendService.requestChannelUsers(network, newActiveChannel);
+    await _backendService.sendChannelOpenedEventToServer(
+        network, newActiveChannel);
+    await _backendService.requestChannelUsers(network, newActiveChannel);
   }
 
-  _onActiveChannelLeaved() async {
+  Future _onActiveChannelLeaved() async {
     var allChannels = await _networksListBloc.allNetworksChannels;
 
-    if (allChannels.length > 0) {
-      changeActiveChanel(allChannels.first);
+    if (allChannels.isNotEmpty) {
+      await changeActiveChanel(allChannels.first);
     }
   }
 

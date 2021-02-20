@@ -46,9 +46,9 @@ List<TextSpan> createSpans(
     @required String text,
     @required TextStyle defaultTextStyle,
     @required List<SpanBuilder> spanBuilders}) {
-  var builderToRegExpMatches = Map<SpanBuilder, Iterable<RegExpMatch>>();
+  var builderToRegExpMatches = <SpanBuilder, Iterable<RegExpMatch>>{};
 
-  Map<int, List<SpanMatch>> spanHighlightsStartToList = Map();
+  Map<int, List<SpanMatch>> spanHighlightsStartToList = {};
 
   spanBuilders.forEach((spanBuilder) {
     Iterable<RegExpMatch> allMatches = spanBuilder.findAllMatches(text);
@@ -64,7 +64,7 @@ List<TextSpan> createSpans(
     });
   });
 
-  if (spanHighlightsStartToList.length > 0) {
+  if (spanHighlightsStartToList.isNotEmpty) {
     var spans = <TextSpan>[];
 
     var sortedIndexes = spanHighlightsStartToList.keys.toList();

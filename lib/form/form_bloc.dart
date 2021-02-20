@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
 
-
 abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
   var listeners = <StreamSubscription>[];
 
@@ -38,7 +37,7 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
     listeners.forEach((listener) => listener.cancel());
   }
 
-  onDataChanged() {
+  void onDataChanged() {
     var error;
     for (var child in children) {
       error = child.error;
@@ -50,5 +49,3 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
     onNewError(error);
   }
 }
-
-

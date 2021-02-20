@@ -17,8 +17,8 @@ class AppIRCRegularMessageSkinBloc extends RegularMessageSkinBloc {
   TextStyle createNickTextStyle(Color color) =>
       _getNicknameTextStyleForColor(color);
 
-  Map<Color, TextStyle> _subTitleColorToTextStyle = Map();
-  Map<Color, TextStyle> _nicknameColorToTextStyle = Map();
+  final Map<Color, TextStyle> _subTitleColorToTextStyle = {};
+  final Map<Color, TextStyle> _nicknameColorToTextStyle = {};
 
   TextStyle _getSubTitleTextStyleForColor(Color color) {
     if (!_subTitleColorToTextStyle.containsKey(color)) {
@@ -46,6 +46,7 @@ class AppIRCRegularMessageSkinBloc extends RegularMessageSkinBloc {
   AppIRCRegularMessageSkinBloc(this.theme);
 
 
+  @override
   Color getColorForMessageType(RegularMessageType messageType) =>
       theme.findMessageColorByType(messageType);
 

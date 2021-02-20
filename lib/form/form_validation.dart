@@ -20,6 +20,7 @@ abstract class ValidationError {
 }
 
 class FormFieldsValidator extends Validator<List<FormFieldBloc>> {
+  @override
   Future<ValidationError> validate(List<FormFieldBloc> value) {
     var error;
     for (var bloc in value) {

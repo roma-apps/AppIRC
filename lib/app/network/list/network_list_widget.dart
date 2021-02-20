@@ -98,7 +98,7 @@ class NetworkListWidget extends StatelessWidget {
     );
   }
 
-  _buildNetworkRow(BuildContext context, Network network, bool isChannelActive,
+  Widget _buildNetworkRow(BuildContext context, Network network, bool isChannelActive,
       bool expanded) {
     var channel = network.lobbyChannel;
     var channelItemRow = _buildChannelItemWidget(
@@ -187,7 +187,7 @@ class NetworkListWidget extends StatelessWidget {
 
           var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
 
-          activeChannelBloc.changeActiveChanel(channel);
+          await activeChannelBloc.changeActiveChanel(channel);
         },
         child: StreamBuilder<NetworkTitle>(
             stream: networkBloc.networkTitleStream,

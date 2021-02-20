@@ -11,7 +11,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 abstract class NetworkPreferencesPage extends StatefulWidget {
   final NetworkPreferences startValues;
 
-  successCallback(BuildContext context, NetworkPreferences preferences);
+  Future successCallback(BuildContext context, NetworkPreferences preferences);
 
   final bool isNeedShowChannels;
   final bool isNeedShowCommands;
@@ -82,11 +82,14 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
   void initState() {
     super.initState();
 
-    new Future.delayed(Duration.zero, () {
-      // we need valid context
-      final NetworkListBloc chatBloc = Provider.of<NetworkListBloc>(context);
-      _networkValidator = buildNetworkValidator(chatBloc).validator;
-    });
+    Future.delayed(
+      Duration.zero,
+      () {
+        // we need valid context
+        final NetworkListBloc chatBloc = Provider.of<NetworkListBloc>(context);
+        _networkValidator = buildNetworkValidator(chatBloc).validator;
+      },
+    );
   }
 
   @override

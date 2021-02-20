@@ -5,7 +5,7 @@ import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:intl/intl.dart';
 
-var _onlyDateFormatter = new DateFormat().add_yMd();
+var _onlyDateFormatter = DateFormat().add_yMd();
 
 class DaysDateSeparatorMessageListItemWidget extends StatelessWidget {
   final DaysDateSeparatorMessageListItem item;

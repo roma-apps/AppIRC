@@ -17,8 +17,10 @@ class AppIRCNetworkListSkinBloc extends AppIRCChannelListSkinBloc
         .copyWith(color: theme.onNotActiveListItemColor);
   }
 
+  @override
   Color get separatorColor => theme.platformSkinTheme.secondaryColor;
 
+  @override
   TextStyle getNetworkItemTextStyle(bool isChannelActive) {
     if (isChannelActive) {
       return _activeChannelItemTextStyle;
@@ -27,9 +29,11 @@ class AppIRCNetworkListSkinBloc extends AppIRCChannelListSkinBloc
     }
   }
 
+  @override
   Color getNetworkItemIconColor(bool isChannelActive) =>
       getChannelItemIconColor(isChannelActive);
 
+  @override
   Color getNetworkItemBackgroundColor(bool isChannelActive) =>
       getChannelItemBackgroundColor(isChannelActive);
 }

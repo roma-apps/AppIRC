@@ -69,11 +69,11 @@ class LoungeConnectionBloc extends Providable {
         hostInformation?.registrationSupported == true;
   }
 
-  onAuthPreferencesChanged(LoungeAuthPreferences authPreferences) {
+  void onAuthPreferencesChanged(LoungeAuthPreferences authPreferences) {
     this.authPreferences = authPreferences;
   }
 
-  onHostPreferencesChanged(LoungeHostPreferences hostPreferences) {
+  void onHostPreferencesChanged(LoungeHostPreferences hostPreferences) {
     var isNewValue = hostPreferences.host != this.hostPreferences.host;
     _logger.d(() => "onHostPreferencesChanged isNewValue $isNewValue"
         " hostPreferences $hostPreferences");
@@ -86,7 +86,7 @@ class LoungeConnectionBloc extends Providable {
     _stateSubject.add(null);
   }
 
-  onHostConnectionResult(LoungeHostPreferences hostPreferences,
+  void onHostConnectionResult(LoungeHostPreferences hostPreferences,
       LoungeHostInformation hostInformation) {
     _logger.d(() => "onHostConnectionResult "
         "hostInformation $hostInformation");

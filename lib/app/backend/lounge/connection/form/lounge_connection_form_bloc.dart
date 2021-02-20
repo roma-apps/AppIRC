@@ -14,7 +14,7 @@ class LoungeConnectionFormBloc extends FormBloc {
   LoungeLoginFormBloc loginFormBloc;
   LoungeRegistrationFormBloc registrationFormBloc;
 
-  get isRegistrationSupported =>
+  bool get isRegistrationSupported =>
       hostFormBloc?.hostInformation?.registrationSupported ?? false;
 
   LoungeConnectionFormBloc(this.connectionBloc) {
@@ -43,7 +43,7 @@ class LoungeConnectionFormBloc extends FormBloc {
 
   }
 
-  _onAuthChanged(_) {
+  void _onAuthChanged(_) {
     connectionBloc.onAuthPreferencesChanged(_extractCurrentAuthPreferences());
   }
 
