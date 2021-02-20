@@ -219,10 +219,18 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
         text: tr("chat.new_message.attach.action.camera"),
         iconData: Icons.camera_alt,
         actionCallback: (PlatformAwarePopupMenuAction action) async {
-          var pickedPhoto =
-              await ImagePicker.pickImage(source: ImageSource.camera);
-          if (pickedPhoto != null) {
-            _uploadFile(context, chatUploadBloc, pickedPhoto, inputMessageBloc);
+
+
+          var pickedPhotoFile = await ImagePicker().getImage(
+            source: ImageSource.camera,
+          );
+          if (pickedPhotoFile?.path != null) {
+            _uploadFile(
+              context,
+              chatUploadBloc,
+              File(pickedPhotoFile.path),
+              inputMessageBloc,
+            );
           }
         },
       ),
