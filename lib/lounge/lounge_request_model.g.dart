@@ -9,7 +9,7 @@ part of 'lounge_request_model.dart';
 PushFCMTokenLoungeJsonRequest _$PushFCMTokenLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return PushFCMTokenLoungeJsonRequest(
-    json['token'] as String,
+    token: json['token'] as String,
   );
 }
 
@@ -22,8 +22,8 @@ Map<String, dynamic> _$PushFCMTokenLoungeJsonRequestToJson(
 InputLoungeJsonRequest _$InputLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return InputLoungeJsonRequest(
-    json['target'] as int,
-    json['text'] as String,
+    target: json['target'] as int,
+    text: json['text'] as String,
   );
 }
 
@@ -37,8 +37,8 @@ Map<String, dynamic> _$InputLoungeJsonRequestToJson(
 MoreLoungeJsonRequest _$MoreLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return MoreLoungeJsonRequest(
-    json['target'] as int,
-    json['lastId'] as int,
+    target: json['target'] as int,
+    lastId: json['lastId'] as int,
   );
 }
 
@@ -71,7 +71,7 @@ Map<String, dynamic> _$MsgPreviewToggleLoungeJsonRequestToJson(
 NamesLoungeJsonRequest _$NamesLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return NamesLoungeJsonRequest(
-    json['target'] as int,
+    target: json['target'] as int,
   );
 }
 
@@ -114,10 +114,10 @@ Map<String, dynamic> _$AuthLoginLoungeJsonRequestBodyToJson(
 AuthReconnectLoungeJsonRequestBody _$AuthReconnectLoungeJsonRequestBodyFromJson(
     Map<String, dynamic> json) {
   return AuthReconnectLoungeJsonRequestBody(
-    json['lastMessage'] as int,
-    json['openChannel'] as int,
-    json['user'] as String,
-    json['token'] as String,
+    lastMessageId: json['lastMessage'] as int,
+    openChannelId: json['openChannel'] as int,
+    user: json['user'] as String,
+    token: json['token'] as String,
   );
 }
 

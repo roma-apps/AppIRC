@@ -10,10 +10,7 @@ class ChatInitInformation {
   List<NetworkWithState> networksWithState;
   List<ChannelWithState> channelsWithState;
 
-  ChatInitInformation(this.activeChannelRemoteId, this.authToken,
-      this.networksWithState, this.channelsWithState);
-
-  ChatInitInformation.name({
+  ChatInitInformation({
     @required this.activeChannelRemoteId,
     @required this.networksWithState,
     @required this.channelsWithState,
@@ -22,11 +19,28 @@ class ChatInitInformation {
 
   @override
   String toString() {
-    return 'ChatInitInformation{activeChannelRemoteId: $activeChannelRemoteId,'
-        ' authToken: $authToken,'
-        ' networksWithState: $networksWithState,'
-        ' channelsWithState: $channelsWithState}';
+    return 'ChatInitInformation{'
+        'activeChannelRemoteId: $activeChannelRemoteId, '
+        'authToken: $authToken, '
+        'networksWithState: $networksWithState, '
+        'channelsWithState: $channelsWithState'
+        '}';
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatInitInformation &&
+          runtimeType == other.runtimeType &&
+          activeChannelRemoteId == other.activeChannelRemoteId &&
+          authToken == other.authToken &&
+          networksWithState == other.networksWithState &&
+          channelsWithState == other.channelsWithState;
 
+  @override
+  int get hashCode =>
+      activeChannelRemoteId.hashCode ^
+      authToken.hashCode ^
+      networksWithState.hashCode ^
+      channelsWithState.hashCode;
 }

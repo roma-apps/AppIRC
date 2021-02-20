@@ -4,13 +4,24 @@ import 'package:flutter_appirc/socketio/socketio_model.dart';
 
 SocketIOCommand toSocketIOCommand(LoungeRequest request) {
   if (request is LoungeJsonRequest) {
-    return SocketIOCommand.name(
-        eventName: request.eventName, parameters: [request.toJson()]);
+    return SocketIOCommand(
+      eventName: request.eventName,
+      parameters: [
+        request.toJson(),
+      ],
+    );
   } else if (request is LoungeRawRequest) {
-    return SocketIOCommand.name(
-        eventName: request.eventName, parameters: [request.body]);
+    return SocketIOCommand(
+      eventName: request.eventName,
+      parameters: [
+        request.body,
+      ],
+    );
   } else if (request is LoungeEmptyRequest) {
-    return SocketIOCommand.name(eventName: request.eventName, parameters: []);
+    return SocketIOCommand(
+      eventName: request.eventName,
+      parameters: [],
+    );
   } else {
     throw "Unsupported type $request";
   }

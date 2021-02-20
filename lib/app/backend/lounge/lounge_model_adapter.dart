@@ -42,7 +42,7 @@ Future<ChatInitInformation> toChatInitInformation(
   if (isUndefinedActiveId) {
     activeChannelRemoteId = null;
   }
-  return ChatInitInformation.name(
+  return ChatInitInformation(
     activeChannelRemoteId: activeChannelRemoteId,
     networksWithState: networksWithState,
     channelsWithState: channelsWithState,
@@ -206,18 +206,23 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
 }
 
 Future<SpecialMessage> toTextSpecialMessage(
-    MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
-    Channel channel,
-    SpecialMessageType messageType) async {
+  MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
+  Channel channel,
+  SpecialMessageType messageType,
+) async {
   var textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(
-      messageSpecialLoungeResponseBody.data);
+    messageSpecialLoungeResponseBody.data,
+  );
 
   return SpecialMessage.name(
-      data: TextSpecialMessageBody(textMessage.text),
-      channelRemoteId: channel.remoteId,
-      specialType: messageType,
-      date: DateTime.now(),
-      linksInMessage: null);
+    data: TextSpecialMessageBody(
+      message: textMessage.text,
+    ),
+    channelRemoteId: channel.remoteId,
+    specialType: messageType,
+    date: DateTime.now(),
+    linksInMessage: null,
+  );
 }
 
 // Lounge don't provide type field in response
@@ -416,7 +421,9 @@ RegularMessageType detectRegularMessageType(String stringType) {
 
 String toLoungeBoolean(bool boolValue) {
   return boolValue != null
-      ? boolValue ? BooleanLoungeConstants.on : BooleanLoungeConstants.off
+      ? boolValue
+          ? BooleanLoungeConstants.on
+          : BooleanLoungeConstants.off
       : null;
 }
 

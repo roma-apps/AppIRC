@@ -34,7 +34,6 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
 
   @override
   Widget build(BuildContext context) {
-
     var channelJoinFormBloc = NetworkJoinChannelFormBloc();
     var networkBloc = NetworkBlocsBloc.of(context).getNetworkBloc(network);
     return buildPlatformScaffold(
@@ -48,8 +47,10 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
         child: Provider<NetworkJoinChannelFormBloc>(
           providable: channelJoinFormBloc,
           child: ListView(children: <Widget>[
-            NetworkJoinChannelFormWidget.name(
-                startChannelName: "", startPassword: ""),
+            NetworkJoinChannelFormWidget(
+              startChannelName: "",
+              startPassword: "",
+            ),
             StreamBuilder<bool>(
                 stream: channelJoinFormBloc.dataValidStream,
                 builder: (context, snapshot) {
@@ -82,13 +83,11 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
     var dialogResult = await doAsyncOperationWithDialog(
         context: context,
         asyncCode: () async {
-          var chatChannelPreferences =
-              ChannelPreferences.name(
-                  name: channelJoinFormBloc.extractChannel(),
-                  password: channelJoinFormBloc.extractPassword());
+          var chatChannelPreferences = ChannelPreferences.name(
+              name: channelJoinFormBloc.extractChannel(),
+              password: channelJoinFormBloc.extractPassword());
           _logger.d(() => "startJoinChannel $chatChannelPreferences");
-          var joinResult = await networkBloc.joinChannel(
-              chatChannelPreferences,
+          var joinResult = await networkBloc.joinChannel(chatChannelPreferences,
               waitForResult: true);
           _logger.d(() => "startJoinChannel result $joinResult");
         },

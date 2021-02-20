@@ -9,7 +9,7 @@ part of 'lounge_model.dart';
 LoungeHostPreferences _$LoungeHostPreferencesFromJson(
     Map<String, dynamic> json) {
   return LoungeHostPreferences(
-    json['host'] as String,
+    host: json['host'] as String,
   );
 }
 

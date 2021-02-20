@@ -17,7 +17,9 @@ class ChatSearchBloc extends Providable {
 
   // ignore: close_sinks
   final BehaviorSubject<SearchState> _searchStateSubject = BehaviorSubject();
+
   Stream<SearchState> get searchStateStream => _searchStateSubject.stream;
+
   SearchState get searchState => _searchStateSubject.value;
 
   ChatSearchBloc(this._db, this.channel) {
@@ -29,16 +31,31 @@ class ChatSearchBloc extends Providable {
     var searchTerm = searchFieldBloc.value;
 
     if (searchTerm?.isNotEmpty == true) {
-      _searchStateSubject.add(SearchState.name(
-          searchTerm: searchTerm, messages: [], isLoading: true));
+      _searchStateSubject.add(
+        SearchState(
+          searchTerm: searchTerm,
+          messages: [],
+          isLoading: true,
+        ),
+      );
 
       var results = await _search(searchTerm);
 
-      _searchStateSubject.add(SearchState.name(
-          searchTerm: searchTerm, messages: results, isLoading: false));
+      _searchStateSubject.add(
+        SearchState(
+          searchTerm: searchTerm,
+          messages: results,
+          isLoading: false,
+        ),
+      );
     } else {
-      _searchStateSubject.add(SearchState.name(
-          searchTerm: searchTerm, messages: [], isLoading: false));
+      _searchStateSubject.add(
+        SearchState(
+          searchTerm: searchTerm,
+          messages: [],
+          isLoading: false,
+        ),
+      );
     }
   }
 

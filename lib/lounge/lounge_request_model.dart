@@ -49,16 +49,15 @@ abstract class LoungeJsonRequest extends LoungeRequest {
 abstract class LoungeRawRequest<T> extends LoungeRequest {
   final T body;
 
-  LoungeRawRequest(this.body) : super();
-
-  LoungeRawRequest.name({@required this.body});
+  LoungeRawRequest({@required this.body});
 }
 
 class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
-  ChannelOpenedLoungeRawRequest(int body) : super(body);
-
-  ChannelOpenedLoungeRawRequest.name({@required int channelRemoteId})
-      : super(channelRemoteId);
+  ChannelOpenedLoungeRawRequest({
+    @required int channelRemoteId,
+  }) : super(
+          body: channelRemoteId,
+        );
 
   @override
   String get eventName => RequestLoungeEventNames.open;
@@ -68,9 +67,9 @@ class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
 class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
   final String token;
 
-  PushFCMTokenLoungeJsonRequest(this.token) : super();
-
-  PushFCMTokenLoungeJsonRequest.name({@required this.token}) : super();
+  PushFCMTokenLoungeJsonRequest({
+    @required this.token,
+  }) : super();
 
   @override
   String get eventName => RequestLoungeEventNames.pushFCMToken;
@@ -85,6 +84,16 @@ class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
   String toString() {
     return 'PushFCMTokenLoungeJsonRequest{token: $token}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PushFCMTokenLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          token == other.token;
+
+  @override
+  int get hashCode => token.hashCode;
 }
 
 @JsonSerializable()
@@ -95,9 +104,10 @@ class InputLoungeJsonRequest extends LoungeJsonRequest {
   final int target;
   final String text;
 
-  InputLoungeJsonRequest(this.target, this.text);
-
-  InputLoungeJsonRequest.name({@required this.target, @required this.text});
+  InputLoungeJsonRequest({
+    @required this.target,
+    @required this.text,
+  });
 
   factory InputLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
       _$InputLoungeJsonRequestFromJson(json);
@@ -109,6 +119,17 @@ class InputLoungeJsonRequest extends LoungeJsonRequest {
   String toString() {
     return 'InputLoungeJsonRequest{target: $target, content: $text}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is InputLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          target == other.target &&
+          text == other.text;
+
+  @override
+  int get hashCode => target.hashCode ^ text.hashCode;
 }
 
 @JsonSerializable()
@@ -119,9 +140,10 @@ class MoreLoungeJsonRequest extends LoungeJsonRequest {
   final int target;
   final int lastId;
 
-  MoreLoungeJsonRequest(this.target, this.lastId);
-
-  MoreLoungeJsonRequest.name({@required this.target, @required this.lastId});
+  MoreLoungeJsonRequest({
+    @required this.target,
+    @required this.lastId,
+  });
 
   @override
   Map<String, dynamic> toJson() => _$MoreLoungeJsonRequestToJson(this);
@@ -133,6 +155,17 @@ class MoreLoungeJsonRequest extends LoungeJsonRequest {
   String toString() {
     return 'MoreLoungeJsonRequest{target: $target, lastId: $lastId}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MoreLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          target == other.target &&
+          lastId == other.lastId;
+
+  @override
+  int get hashCode => target.hashCode ^ lastId.hashCode;
 }
 
 @JsonSerializable()
@@ -176,20 +209,30 @@ class NamesLoungeJsonRequest extends LoungeJsonRequest {
 
   final int target;
 
-  @override
-  String toString() {
-    return 'NamesLoungeJsonRequest{target: $target}';
-  }
-
-  NamesLoungeJsonRequest(this.target);
-
-  NamesLoungeJsonRequest.name({@required this.target});
+  NamesLoungeJsonRequest({
+    @required this.target,
+  });
 
   @override
   Map<String, dynamic> toJson() => _$NamesLoungeJsonRequestToJson(this);
 
   factory NamesLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
       _$NamesLoungeJsonRequestFromJson(json);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NamesLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          target == other.target;
+
+  @override
+  int get hashCode => target.hashCode;
+
+  @override
+  String toString() {
+    return 'NamesLoungeJsonRequest{target: $target}';
+  }
 }
 
 @JsonSerializable()
@@ -201,7 +244,8 @@ class RegistrationLoungeJsonRequest extends LoungeJsonRequest {
 
   RegistrationLoungeJsonRequest(this.user, this.password);
 
-  RegistrationLoungeJsonRequest.name({@required this.user, @required this.password});
+  RegistrationLoungeJsonRequest.name(
+      {@required this.user, @required this.password});
 
   @override
   Map<String, dynamic> toJson() => _$RegistrationLoungeJsonRequestToJson(this);
@@ -241,28 +285,25 @@ class AuthReconnectLoungeJsonRequestBody extends LoungeJsonRequest {
   String get eventName => RequestLoungeEventNames.auth;
 
   @JsonKey(name: "lastMessage")
-   int lastMessageId;
+  int lastMessageId;
   @JsonKey(name: "openChannel")
-   int openChannelId;
+  int openChannelId;
   final String user;
   final String token;
 
-  AuthReconnectLoungeJsonRequestBody(
-      this.lastMessageId, this.openChannelId,
-      this.user, this.token);
-
-  AuthReconnectLoungeJsonRequestBody.name(
-      {
-        @required this.lastMessageId,
-        @required this.openChannelId,
-        @required this.user,
-        @required this.token,
-      });
+  AuthReconnectLoungeJsonRequestBody({
+    @required this.lastMessageId,
+    @required this.openChannelId,
+    @required this.user,
+    @required this.token,
+  });
 
   @override
-  Map<String, dynamic> toJson() => _$AuthReconnectLoungeJsonRequestBodyToJson(this);
+  Map<String, dynamic> toJson() =>
+      _$AuthReconnectLoungeJsonRequestBodyToJson(this);
 
-  factory AuthReconnectLoungeJsonRequestBody.fromJson(Map<dynamic, dynamic> json) =>
+  factory AuthReconnectLoungeJsonRequestBody.fromJson(
+          Map<dynamic, dynamic> json) =>
       _$AuthReconnectLoungeJsonRequestBodyFromJson(json);
 }
 

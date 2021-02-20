@@ -12,7 +12,6 @@ class LoungeConstants {
 class ClientSideLoungeIRCCommandConstants {
   static const String expand = "/expand";
   static const String collapse = "/collapse";
-
 }
 
 class BooleanLoungeConstants {
@@ -57,19 +56,17 @@ class MessageTypeLoungeConstants {
   static const ctcp = "ctcp";
   static const chghost = "chghost";
   static const kick = "kick";
-
 }
 
 @JsonSerializable()
 class LoungeHostPreferences extends JsonPreferences {
-  String host;
+  final String host;
 
-  LoungeHostPreferences(this.host);
+  const LoungeHostPreferences({
+    @required this.host,
+  });
 
-  LoungeHostPreferences.name({@required this.host});
-
-  static LoungeHostPreferences empty =
-      LoungeHostPreferences.name(host: null);
+  static const LoungeHostPreferences empty = LoungeHostPreferences(host: null);
 
   @override
   bool operator ==(Object other) =>
@@ -139,8 +136,8 @@ class LoungePreferences extends JsonPreferences {
   LoungePreferences.name(
       {@required this.hostPreferences, @required this.authPreferences});
 
-  static LoungePreferences empty = LoungePreferences.name(
-      hostPreferences: null, authPreferences: null);
+  static LoungePreferences empty =
+      LoungePreferences.name(hostPreferences: null, authPreferences: null);
 
   @override
   Map<String, dynamic> toJson() => _$LoungePreferencesToJson(this);

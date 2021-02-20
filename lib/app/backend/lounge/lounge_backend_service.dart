@@ -274,7 +274,9 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     _sendInputRequest(
       network,
       channel,
-      TopicIRCCommand.name(newTopic: newTopic).asRawString,
+      TopicIRCCommand(
+        newTopic: newTopic,
+      ).asRawString,
     );
     return const RequestResult.notWaitForResponse();
   }
@@ -345,8 +347,13 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       throw NotImplementedYetLoungeException();
     }
 
-    var request = NamesLoungeJsonRequest.name(target: channel.remoteId);
-    _sendRequest(request, isNeedAddRequestToPending: false);
+    var request = NamesLoungeJsonRequest(
+      target: channel.remoteId,
+    );
+    _sendRequest(
+      request,
+      isNeedAddRequestToPending: false,
+    );
 
     return RequestResult.notWaitForResponse();
   }
@@ -377,8 +384,10 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     var channelsWithoutPassword = networkPreferences.channelsWithoutPassword;
     var channelNames = channelsWithoutPassword.map((channel) => channel.name);
     String join = channelNames.join(LoungeConstants.channelsNamesSeparator);
-    var request = ChatNetworkNewLoungeJsonRequest.name(
-        networkPreferences: networkPreferences, join: join);
+    var request = ChatNetworkNewLoungeJsonRequest(
+      networkPreferences: networkPreferences,
+      join: join,
+    );
 
     var result;
     Disposable networkListener;
@@ -441,8 +450,10 @@ class LoungeBackendService extends Providable implements ChatBackendService {
   }) async {
     _logger.d(() => "joinChannel $preferences waitForResult $waitForResult");
 
-    var request = ChatJoinChannelInputLoungeJsonRequest.name(
-        preferences, network.lobbyChannel.remoteId);
+    var request = ChatJoinChannelInputLoungeJsonRequest(
+      preferences: preferences,
+      target: network.lobbyChannel.remoteId,
+    );
 
     var result;
     Disposable channelListener;
@@ -471,9 +482,12 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     String nick, {
     bool waitForResult = false,
   }) async {
-    var request = InputLoungeJsonRequest.name(
-        target: channel.remoteId, // private channel name is equal to nickname
-        text: JoinIRCCommand.name(channelName: nick).asRawString);
+    var request = InputLoungeJsonRequest(
+      target: channel.remoteId, // private channel name is equal to nickname
+      text: JoinIRCCommand(
+        channelName: nick,
+      ).asRawString,
+    );
 
     var result;
     Disposable channelListener;
@@ -1041,10 +1055,15 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
   @override
   Future<RequestResult<bool>> sendChannelOpenedEventToServer(
-      Network network, Channel channel) async {
+    Network network,
+    Channel channel,
+  ) async {
     _sendRequest(
-        ChannelOpenedLoungeRawRequest.name(channelRemoteId: channel.remoteId),
-        isNeedAddRequestToPending: false);
+      ChannelOpenedLoungeRawRequest(
+        channelRemoteId: channel.remoteId,
+      ),
+      isNeedAddRequestToPending: false,
+    );
     return RequestResult.notWaitForResponse();
   }
 
@@ -1053,8 +1072,12 @@ class LoungeBackendService extends Providable implements ChatBackendService {
       {bool waitForResult = false}) async {
     _logger.d(() => "sendDevicePushFCMTokenToServer $newToken");
 
-    _sendRequest(PushFCMTokenLoungeJsonRequest.name(token: newToken),
-        isNeedAddRequestToPending: false);
+    _sendRequest(
+      PushFCMTokenLoungeJsonRequest(
+        token: newToken,
+      ),
+      isNeedAddRequestToPending: false,
+    );
 
     return RequestResult.notWaitForResponse();
   }
@@ -1155,15 +1178,29 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
   void _sendInputRequest(Network network, Channel channel, String message) {
     if (_isCollapseClientSideCommand(message)) {
-      _channelTogglePreviewSubject
-          .add(ToggleChannelPreviewData(network, channel, false));
+      _channelTogglePreviewSubject.add(
+        ToggleChannelPreviewData(
+          network,
+          channel,
+          false,
+        ),
+      );
     } else if (_isExpandClientSideCommand(message)) {
-      _channelTogglePreviewSubject
-          .add(ToggleChannelPreviewData(network, channel, true));
+      _channelTogglePreviewSubject.add(
+        ToggleChannelPreviewData(
+          network,
+          channel,
+          true,
+        ),
+      );
     } else {
       _sendRequest(
-          InputLoungeJsonRequest.name(target: channel.remoteId, text: message),
-          isNeedAddRequestToPending: false);
+        InputLoungeJsonRequest(
+          target: channel.remoteId,
+          text: message,
+        ),
+        isNeedAddRequestToPending: false,
+      );
     }
   }
 
@@ -1243,11 +1280,12 @@ class LoungeBackendService extends Providable implements ChatBackendService {
         "lastMessageId = $lastMessageId "
         "waitForResult $waitForResult");
 
-    var request = AuthReconnectLoungeJsonRequestBody.name(
-        lastMessageId: lastMessageId,
-        openChannelId: activeChannelId,
-        user: user,
-        token: token);
+    var request = AuthReconnectLoungeJsonRequestBody(
+      lastMessageId: lastMessageId,
+      openChannelId: activeChannelId,
+      user: user,
+      token: token,
+    );
     Disposable disposable;
     var result;
     disposable = _listenForInit(_socketIOService, (chatInit) async {
@@ -1322,7 +1360,7 @@ class LoungeBackendService extends Providable implements ChatBackendService {
     );
 
     _sendRequest(
-      MoreLoungeJsonRequest.name(
+      MoreLoungeJsonRequest(
         target: channel.remoteId,
         lastId: lastMessageId,
       ),

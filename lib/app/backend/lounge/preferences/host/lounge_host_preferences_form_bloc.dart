@@ -29,11 +29,13 @@ class LoungeHostPreferencesFormBloc extends FormBloc {
 
   LoungeHostPreferencesFormBloc(LoungeHostPreferences startPreferences,
       LoungeHostInformation startHostInformation) {
-    hostFieldBloc = FormValueFieldBloc<String>(startPreferences.host,
-        validators: [
-          NotEmptyTextValidator.instance,
-          NoWhitespaceTextValidator.instance
-        ]);
+    hostFieldBloc = FormValueFieldBloc<String>(
+      startPreferences.host,
+      validators: [
+        NotEmptyTextValidator.instance,
+        NoWhitespaceTextValidator.instance
+      ],
+    );
 
     _hostInformationSubject = BehaviorSubject(seedValue: startHostInformation);
 
@@ -41,8 +43,11 @@ class LoungeHostPreferencesFormBloc extends FormBloc {
   }
 
   @override
-  List<FormFieldBloc> get children => [hostFieldBloc];
+  List<FormFieldBloc> get children => [
+        hostFieldBloc,
+      ];
 
-  LoungeHostPreferences extractData() =>
-      LoungeHostPreferences.name(host: hostFieldBloc.value);
+  LoungeHostPreferences extractData() => LoungeHostPreferences(
+        host: hostFieldBloc.value,
+      );
 }

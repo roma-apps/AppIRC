@@ -21,20 +21,33 @@ class InvalidResponseException extends LoungeException {
 }
 
 class NotImplementedYetLoungeException implements LoungeException {
-
   const NotImplementedYetLoungeException();
 }
 
 class ChatJoinChannelInputLoungeJsonRequest extends InputLoungeJsonRequest {
   ChannelPreferences preferences;
 
-  ChatJoinChannelInputLoungeJsonRequest.name(this.preferences, int target)
-      : super(
-            target,
-            JoinIRCCommand.name(
-                    channelName: preferences.name,
-                    password: preferences.password)
-                .asRawString);
+  ChatJoinChannelInputLoungeJsonRequest({
+    @required this.preferences,
+    @required int target,
+  }) : super(
+          target: target,
+          text: JoinIRCCommand(
+            channelName: preferences.name,
+            password: preferences.password,
+          ).asRawString,
+        );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is ChatJoinChannelInputLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          preferences == other.preferences;
+
+  @override
+  int get hashCode => super.hashCode ^ preferences.hashCode;
 
   @override
   String toString() {
@@ -45,9 +58,10 @@ class ChatJoinChannelInputLoungeJsonRequest extends InputLoungeJsonRequest {
 class ChatNetworkNewLoungeJsonRequest extends NetworkNewLoungeJsonRequest {
   final NetworkPreferences networkPreferences;
 
-  ChatNetworkNewLoungeJsonRequest.name(
-      {@required this.networkPreferences, @required String join})
-      : super.name(
+  ChatNetworkNewLoungeJsonRequest({
+    @required this.networkPreferences,
+    @required String join,
+  }) : super.name(
           username: networkPreferences
               .networkConnectionPreferences.userPreferences.username,
           nick: networkPreferences
@@ -61,12 +75,14 @@ class ChatNetworkNewLoungeJsonRequest extends NetworkNewLoungeJsonRequest {
               .networkConnectionPreferences.serverPreferences.serverHost,
           port: networkPreferences
               .networkConnectionPreferences.serverPreferences.serverPort,
-          rejectUnauthorized: toLoungeBoolean(networkPreferences
-              .networkConnectionPreferences
-              .serverPreferences
-              .useOnlyTrustedCertificates),
-          tls: toLoungeBoolean(networkPreferences
-              .networkConnectionPreferences.serverPreferences.useTls),
+          rejectUnauthorized: toLoungeBoolean(
+            networkPreferences.networkConnectionPreferences.serverPreferences
+                .useOnlyTrustedCertificates,
+          ),
+          tls: toLoungeBoolean(
+            networkPreferences
+                .networkConnectionPreferences.serverPreferences.useTls,
+          ),
           name: networkPreferences
               .networkConnectionPreferences.serverPreferences.name,
           commands: null, // set command only via edit interface

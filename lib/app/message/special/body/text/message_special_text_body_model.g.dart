@@ -9,7 +9,7 @@ part of 'message_special_text_body_model.dart';
 TextSpecialMessageBody _$TextSpecialMessageBodyFromJson(
     Map<String, dynamic> json) {
   return TextSpecialMessageBody(
-    json['message'] as String,
+    message: json['message'] as String,
   );
 }
 

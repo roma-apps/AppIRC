@@ -9,12 +9,16 @@ class NetworkJoinChannelFormWidget extends StatefulWidget {
   final String startChannelName;
   final String startPassword;
 
-  NetworkJoinChannelFormWidget.name({@required this.startChannelName, @required  this
-      .startPassword});
+  NetworkJoinChannelFormWidget({
+    @required this.startChannelName,
+    @required this.startPassword,
+  });
 
   @override
-  State<StatefulWidget> createState() =>
-      NetworkJoinChannelFormWidgetState(startChannelName, startPassword);
+  State<StatefulWidget> createState() => NetworkJoinChannelFormWidgetState(
+        startChannelName,
+        startPassword,
+      );
 }
 
 class NetworkJoinChannelFormWidgetState
@@ -41,7 +45,6 @@ class NetworkJoinChannelFormWidgetState
   Widget build(BuildContext context) {
     NetworkJoinChannelFormBloc formBloc =
         Provider.of<NetworkJoinChannelFormBloc>(context);
-
 
     return Column(
       children: <Widget>[

@@ -11,17 +11,24 @@ class TextSpecialMessageBody extends SpecialMessageBody {
   final String message;
 
   @override
-  bool isContainsText(String searchTerm, {@required bool ignoreCase}) =>
-      isContainsSearchTerm(message, searchTerm, ignoreCase: ignoreCase);
-
-  TextSpecialMessageBody(this.message);
+  bool isContainsText(
+    String searchTerm, {
+    @required bool ignoreCase,
+  }) =>
+      isContainsSearchTerm(
+        message,
+        searchTerm,
+        ignoreCase: ignoreCase,
+      );
 
   @override
   String toString() {
     return 'LoadingSpecialMessageBody{message: $message}';
   }
 
-  TextSpecialMessageBody.name({@required this.message});
+  TextSpecialMessageBody({
+    @required this.message,
+  });
 
   factory TextSpecialMessageBody.fromJson(Map<String, dynamic> json) =>
       _$TextSpecialMessageBodyFromJson(json);
@@ -30,10 +37,9 @@ class TextSpecialMessageBody extends SpecialMessageBody {
   Map<String, dynamic> toJson() => _$TextSpecialMessageBodyToJson(this);
 
   @override
-  Future<List<String>> extractLinks() async {
-    return await findUrls([
-      message
-    ]);
-  }
-
+  Future<List<String>> extractLinks() => findUrls(
+        [
+          message,
+        ],
+      );
 }

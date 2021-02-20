@@ -7,19 +7,39 @@ abstract class IRCCommand {
 class JoinIRCCommand extends IRCCommand {
   final String channelName;
   final String password;
-  JoinIRCCommand(this.channelName, this.password);
 
-  JoinIRCCommand.name({@required this.channelName, this.password});
+  JoinIRCCommand({
+    @required this.channelName,
+    this.password,
+  });
 
   @override
   String get asRawString => "/join $channelName $password";
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JoinIRCCommand &&
+          runtimeType == other.runtimeType &&
+          channelName == other.channelName &&
+          password == other.password;
+
+  @override
+  int get hashCode => channelName.hashCode ^ password.hashCode;
+
+  @override
+  String toString() {
+    return 'JoinIRCCommand{'
+        'channelName: $channelName, '
+        'password: $password'
+        '}';
+  }
 }
 
 class TopicIRCCommand extends IRCCommand {
   final String newTopic;
-  TopicIRCCommand(this.newTopic);
 
-  TopicIRCCommand.name({@required this.newTopic});
+  TopicIRCCommand({@required this.newTopic});
 
   @override
   String get asRawString => "/topic $newTopic";
@@ -27,9 +47,10 @@ class TopicIRCCommand extends IRCCommand {
 
 class WhoIsIRCCommand extends IRCCommand {
   final String userNick;
-  WhoIsIRCCommand(this.userNick);
 
-  WhoIsIRCCommand.name({@required this.userNick});
+  WhoIsIRCCommand.name({
+    @required this.userNick,
+  });
 
   @override
   String get asRawString => "/whois $userNick";
