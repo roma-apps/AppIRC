@@ -145,7 +145,7 @@ class NightAppSkinTheme extends AppIRCSkinTheme {
   Color get searchBackgroundColor => _themeData.primaryColorDark;
 
   @override
-  TextStyle get defaultTextStyle => _themeData.textTheme.body1;
+  TextStyle get defaultTextStyle => _themeData.textTheme.bodyText2;
 
   @override
   Color get disabledColor => Colors.grey;
@@ -229,55 +229,55 @@ ThemeData _themeData = ThemeData(
       ),
     ),
     textTheme: TextTheme(
-      display4: TextStyle(
+      headline1: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display3: TextStyle(
+      headline2: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display2: TextStyle(
+      headline3: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display1: TextStyle(
+      headline4: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      headline: TextStyle(
+      headline5: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      title: TextStyle(
+      headline6: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      subhead: TextStyle(
+      subtitle1: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body2: TextStyle(
+      bodyText1: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body1: TextStyle(
+      bodyText2: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
@@ -295,7 +295,7 @@ ThemeData _themeData = ThemeData(
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      subtitle: TextStyle(
+      subtitle2: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
@@ -309,55 +309,55 @@ ThemeData _themeData = ThemeData(
       ),
     ),
     primaryTextTheme: TextTheme(
-      display4: TextStyle(
+      headline1: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display3: TextStyle(
+      headline2: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display2: TextStyle(
+      headline3: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display1: TextStyle(
+      headline4: TextStyle(
         color: Color(0xb3ffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      headline: TextStyle(
+      headline5: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      title: TextStyle(
+      headline6: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      subhead: TextStyle(
+      subtitle1: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body2: TextStyle(
+      bodyText1: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body1: TextStyle(
+      bodyText2: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
@@ -375,7 +375,7 @@ ThemeData _themeData = ThemeData(
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      subtitle: TextStyle(
+      subtitle2: TextStyle(
         color: Color(0xffffffff),
         fontSize: null,
         fontWeight: FontWeight.w400,
@@ -389,55 +389,55 @@ ThemeData _themeData = ThemeData(
       ),
     ),
     accentTextTheme: TextTheme(
-      display4: TextStyle(
+      headline1: TextStyle(
         color: Color(0x8a000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display3: TextStyle(
+      headline2: TextStyle(
         color: Color(0x8a000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display2: TextStyle(
+      headline3: TextStyle(
         color: Color(0x8a000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display1: TextStyle(
+      headline4: TextStyle(
         color: Color(0x8a000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      headline: TextStyle(
+      headline5: TextStyle(
         color: Color(0xdd000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      title: TextStyle(
+      headline6: TextStyle(
         color: Color(0xdd000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      subhead: TextStyle(
+      subtitle1: TextStyle(
         color: Color(0xdd000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body2: TextStyle(
+      bodyText1: TextStyle(
         color: Color(0xdd000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body1: TextStyle(
+      bodyText2: TextStyle(
         color: Color(0xdd000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
@@ -455,7 +455,7 @@ ThemeData _themeData = ThemeData(
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      subtitle: TextStyle(
+      subtitle2: TextStyle(
         color: Color(0xff000000),
         fontSize: null,
         fontWeight: FontWeight.w400,
@@ -494,7 +494,6 @@ ThemeData _themeData = ThemeData(
         fontStyle: FontStyle.normal,
       ),
       errorMaxLines: null,
-      hasFloatingPlaceholder: true,
       isDense: false,
       contentPadding: EdgeInsets.only(top: 12, bottom: 12, left: 0, right: 0),
       isCollapsed: false,

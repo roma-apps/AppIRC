@@ -100,9 +100,9 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   AndroidAppSkinTheme(this.theme) {
     textInputDecorationHintStyle =
         textEditTextStyle.copyWith(color: theme.hintColor);
-    textTitleStyle = textTheme.headline.copyWith(color: onPrimaryColor);
-    textRegularSmallStyle = textTheme.body2.copyWith(fontSize: 14);
-    textInputDecorationErrorStyle = textTheme.body1.copyWith(color: Colors.red);
+    textTitleStyle = textTheme.headline5.copyWith(color: onPrimaryColor);
+    textRegularSmallStyle = textTheme.bodyText1.copyWith(fontSize: 14);
+    textInputDecorationErrorStyle = textTheme.bodyText2.copyWith(color: Colors.red);
   }
 
   Color get buttonColor => theme.buttonColor;
@@ -111,16 +111,16 @@ class AndroidAppSkinTheme extends PlatformSkinTheme {
   TextStyle get textBoldMediumStyle => textTheme.caption;
 
   @override
-  TextStyle get textBoldSmallStyle => textTheme.body2;
+  TextStyle get textBoldSmallStyle => textTheme.bodyText1;
 
   @override
-  TextStyle get textEditTextStyle => textTheme.body1;
+  TextStyle get textEditTextStyle => textTheme.bodyText2;
 
   @override
-  TextStyle get textInputDecorationLabelStyle => textTheme.body1;
+  TextStyle get textInputDecorationLabelStyle => textTheme.bodyText2;
 
   @override
-  TextStyle get textRegularMediumStyle => textTheme.body1;
+  TextStyle get textRegularMediumStyle => textTheme.bodyText2;
 
   @override
   Color get primaryColor => theme.colorScheme.primary;
