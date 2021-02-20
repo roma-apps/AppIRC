@@ -55,19 +55,19 @@ dependencies:
   scrollable_positioned_list: ^0.1.9
 
   # open links in messages
-  url_launcher: ^5.1.2
+  url_launcher: ^5.7.10
 
   # checking network connection
-  connectivity: ^0.4.4
+  connectivity: ^2.0.2
 
   # FCM for push notifications
   firebase_messaging: 5.1.8
 
   # required by firebase_crashlytics
-  firebase_core: "^0.7.0"
+  firebase_core: ^0.7.0
 
   # crash reporting
-  firebase_crashlytics: "^0.4.0+1"
+  firebase_crashlytics: ^0.4.0+1
 
   # handle click on irc:// links
   uni_links: ^0.2.0
@@ -75,6 +75,7 @@ dependencies:
   # sqlite orm to store messages in DB instead of RAM
   floor: ^0.18.0
 
+  # required direct dependency for floor to avoid strange compile error
   sqflite: ^1.3.2+3
 
   # Platform aware widgets wrapper for iOS & Android
