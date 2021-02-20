@@ -99,19 +99,23 @@ PlatformAwarePopupMenuAction _buildCloseMenuItem(
 }
 
 PlatformAwarePopupMenuAction _buildMembersMenuItem(
-    BuildContext context, ChannelBloc channelBloc) {
-  return PlatformAwarePopupMenuAction(
-      text: tr("chat.channel.action.users"),
-      iconData: Icons.group,
-      actionCallback: (action) {
-        Navigator.push(
-            context,
-            platformPageRoute(
-                context: context,
-                builder: (context) => ChannelUsersPage(
-                    channelBloc.network, channelBloc.channel)));
-      });
-}
+  BuildContext context,
+  ChannelBloc channelBloc,
+) => PlatformAwarePopupMenuAction(
+    text: tr("chat.channel.action.users"),
+    iconData: Icons.group,
+    actionCallback: (action) {
+      Navigator.push(
+        context,
+        platformPageRoute(
+          context: context,
+          builder: (context) => ChannelUsersPage(
+            channel: channelBloc.channel,
+          ),
+        ),
+      );
+    },
+  );
 
 PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
     BuildContext context, ChannelBloc channelBloc) {
