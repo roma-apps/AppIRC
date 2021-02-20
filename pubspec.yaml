@@ -94,9 +94,8 @@ dependencies:
   # better lint, should be in main dependencies to ignore async/await unnecessary warnings
   pedantic: ^1.9.2
 
-  # logging wrapper for Android/iOS
-  logger: ^0.9.4
-
+  # advanced logging
+  logging: ^0.11.4
 
 #
 #  # cache images locally
@@ -106,8 +105,7 @@ dependencies:
 #
 
 #
-#  # advanced logging
-#  logging: ^0.11.4
+
 #
 #  # dependency injection framework
 #  provider: ^4.3.3

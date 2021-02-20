@@ -139,7 +139,9 @@ class ChatDeepLinkBloc extends Providable {
         fragment = "#" + fragment;
       }
       deepLink = ChatDeepLink(uri.host, uri.port, fragment);
-    } on Exception {}
+    } catch (e, stackTrace) {
+      _logger.w(() => "_parseLink", e, stackTrace);
+    }
     return deepLink;
   }
 }

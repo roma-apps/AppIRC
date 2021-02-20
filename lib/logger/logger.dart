@@ -1,6 +1,6 @@
-import 'package:flutter/widgets.dart';
-import 'package:logger/logger.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 
 const bool logEnabled = true;
 
@@ -10,63 +10,76 @@ const bool logEnabled = true;
 class MyLogger {
   final bool enabled;
   final String logTag;
-  final int methodCount;
-  final int errorMethodCount;
-  final bool printTime;
-  final bool printEmojis;
-  final bool colors;
-  final int lineLength;
 
-  bool get globalAndLoggerEnabled => enabled && logEnabled && !kReleaseMode;
+  bool get globalAndLoggerEnabled =>
+      enabled && logEnabled && !(kReleaseMode || kProfileMode);
 
   Logger _logger;
 
-  MyLogger(
-      {@required this.logTag,
-      @required this.enabled,
-      this.methodCount = 0,
-      this.errorMethodCount = 8,
-      this.printTime = true,
-      this.printEmojis = true,
-      this.colors = true,
-      this.lineLength = 120}) {
+  MyLogger({
+    @required this.logTag,
+    @required this.enabled,
+  }) {
     if (globalAndLoggerEnabled) {
       _logger = Logger(
-          printer: PrettyPrinter(
-              methodCount: methodCount,
-              errorMethodCount: errorMethodCount,
-              lineLength: lineLength,
-              colors: colors,
-              printEmojis: printEmojis,
-              printTime: printTime));
+        logTag,
+      );
     }
   }
 
-  void i(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+  void i(
+    dynamic message(), [
+    Object error,
+    StackTrace stackTrace,
+  ]) {
     if (globalAndLoggerEnabled) {
-      _logger.i("'$logTag': ${message()}", error != null ? error() : null,
-          stackTrace != null ? stackTrace() : null);
+      _logger.finest(
+        message,
+        error,
+        stackTrace,
+      );
     }
   }
 
-  void d(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+  void d(
+    dynamic message(), [
+    Object error,
+    StackTrace stackTrace,
+  ]) {
     if (globalAndLoggerEnabled) {
-      _logger.d("'$logTag': ${message()}", error != null ? error() : null,
-          stackTrace != null ? stackTrace() : null);
+      _logger.fine(
+        message,
+        error,
+        stackTrace,
+      );
     }
   }
 
-  void w(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+  void w(
+    dynamic message(), [
+    Object error,
+    StackTrace stackTrace,
+  ]) {
     if (globalAndLoggerEnabled) {
-      _logger.w("'$logTag': ${message()}", error != null ? error() : null,
-          stackTrace != null ? stackTrace() : null);
+      _logger.warning(
+        message,
+        error,
+        stackTrace,
+      );
     }
   }
 
-  void e(dynamic message(), [dynamic error(), StackTrace stackTrace()]) {
+  void e(
+    dynamic message(), [
+    Object error,
+    StackTrace stackTrace,
+  ]) {
     if (globalAndLoggerEnabled) {
-      _logger.e("'$logTag': ${message()}", error != null ? error() : null,
-          stackTrace != null ? stackTrace() : null);
+      _logger.shout(
+        message,
+        error,
+        stackTrace,
+      );
     }
   }
 }

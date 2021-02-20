@@ -1649,14 +1649,16 @@ Future<RequestResult<ChatLoginResult>> tryLoginToLounge(
         SocketIOService(socketIOManager, preferences.hostPreferences.host);
     await socketIOService.init();
     requestResult = await _connectAndLogin(preferences, socketIOService);
-  } catch (e) {
-    _logger.d(() => "error during tryLoginToLounge = $e");
+  } catch (e, stackTrace) {
+    _logger.e(() => "error during tryLoginToLounge", e, stackTrace);
   } finally {
     try {
       if (socketIOService != null) {
         socketIOService.dispose();
       }
-    } on Exception {}
+    } catch (e, stackTrace) {
+      _logger.w(() => "socketIOService.dispose()", e, stackTrace);
+    }
   }
 
   return requestResult;
@@ -1684,7 +1686,9 @@ Future<RequestResult<ChatRegistrationResult>> registerOnLounge(
       if (socketIOService != null) {
         socketIOService.dispose();
       }
-    } on Exception {}
+    } catch (e, stackTrace) {
+      _logger.w(() => "socketIOService.dispose()", e, stackTrace);
+    }
   }
 
   return requestResult;
@@ -1701,14 +1705,20 @@ Future<RequestResult<LoungeHostInformation>> retrieveLoungeHostInformation(
     socketIOService = SocketIOService(socketIOManager, hostPreferences.host);
     await socketIOService.init();
     result = await _retrieveHostInformation(socketIOService, hostPreferences);
-  } catch (e) {
-    _logger.d(() => "error during tryConnectWithDifferentPreferences = $e");
+  } catch (e, stackTrace) {
+    _logger.e(
+      () => "error during tryConnectWithDifferentPreferences",
+      e,
+      stackTrace,
+    );
   } finally {
     try {
       if (socketIOService != null) {
         socketIOService.dispose();
       }
-    } on Exception {}
+    } catch (e, stackTrace) {
+      _logger.w(() => "socketIOService.dispose()", e, stackTrace);
+    }
   }
 
   return RequestResult.withResponse(result);
