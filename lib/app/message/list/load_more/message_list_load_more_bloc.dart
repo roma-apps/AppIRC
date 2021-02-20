@@ -5,7 +5,7 @@ import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "message_list_load_more_bloc.dart", enabled: true);
@@ -13,25 +13,28 @@ MyLogger _logger =
 class MessageListLoadMoreBloc extends Providable {
   // ignore: close_sinks
   BehaviorSubject<LoadMoreState> _stateSubject = BehaviorSubject();
+
   Stream<LoadMoreState> get stateStream => _stateSubject.stream;
+
   LoadMoreState get state => _stateSubject.value;
 
   final ChannelBloc channelBloc;
   MessageListBloc messageListBloc;
+
   MessageListLoadMoreBloc(this.channelBloc, this.messageListBloc) {
     addDisposable(subject: _stateSubject);
 
-    _stateSubject = BehaviorSubject(
-        seedValue: (channelBloc?.channelState?.moreHistoryAvailable ?? false)
-            ? LoadMoreState.available
-            : LoadMoreState.notAvailable);
+    _stateSubject = BehaviorSubject.seeded(
+      (channelBloc?.channelState?.moreHistoryAvailable ?? false)
+          ? LoadMoreState.available
+          : LoadMoreState.notAvailable,
+    );
 
     addDisposable(streamSubscription:
         channelBloc.moreHistoryAvailableStream.listen((moreHistoryAvailable) {
-          Future.delayed(Duration(seconds: 1),() {
-
-            _updateLoadMoreState(moreHistoryAvailable);
-          });
+      Future.delayed(Duration(seconds: 1), () {
+        _updateLoadMoreState(moreHistoryAvailable);
+      });
     }));
   }
 
@@ -48,7 +51,6 @@ class MessageListLoadMoreBloc extends Providable {
       var oldestRegularMessage = oldestRegularItem.oldestRegularMessage;
 
       await channelBloc.loadMoreHistory(oldestRegularMessage);
-
     } else {
       _logger.w(() => "can't loadMore() because state = $state");
     }

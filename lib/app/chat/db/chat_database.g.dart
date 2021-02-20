@@ -42,9 +42,12 @@ class _$ChatDatabaseBuilder {
 
   /// Creates the database and initializes it.
   Future<ChatDatabase> build() async {
+    final path = name != null
+        ? await sqfliteDatabaseFactory.getDatabasePath(name)
+        : ':memory:';
     final database = _$ChatDatabase();
     database.database = await database.open(
-      name ?? ':memory:',
+      path,
       _migrations,
       _callback,
     );
@@ -61,12 +64,9 @@ class _$ChatDatabase extends ChatDatabase {
 
   SpecialMessageDao _specialMessagesDaoInstance;
 
-  Future<sqflite.Database> open(String name, List<Migration> migrations,
+  Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
-    final path = join(await sqflite.getDatabasesPath(), name);
-
-    return sqflite.openDatabase(
-      path,
+    final databaseOptions = sqflite.OpenDatabaseOptions(
       version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
@@ -75,7 +75,7 @@ class _$ChatDatabase extends ChatDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        MigrationAdapter.runMigrations(
+        await MigrationAdapter.runMigrations(
             database, startVersion, endVersion, migrations);
 
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
@@ -89,6 +89,7 @@ class _$ChatDatabase extends ChatDatabase {
         await callback?.onCreate?.call(database, version);
       },
     );
+    return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
   }
 
   @override
@@ -167,29 +168,6 @@ class _$RegularMessageDao extends RegularMessageDao {
 
   final QueryAdapter _queryAdapter;
 
-  static final _regularMessageDBMapper = (Map<String, dynamic> row) =>
-      RegularMessageDB(
-          row['localId'] as int,
-          row['channelLocalId'] as int,
-          row['chatMessageTypeId'] as int,
-          row['channelRemoteId'] as int,
-          row['command'] as String,
-          row['hostMask'] as String,
-          row['text'] as String,
-          row['paramsJsonEncoded'] as String,
-          row['nicknamesJsonEncoded'] as String,
-          row['regularMessageTypeId'] as int,
-          row['self'] as int,
-          row['highlight'] as int,
-          row['previewsJsonEncoded'] as String,
-          row['linksJsonEncoded'] as String,
-          row['dateMicrosecondsSinceEpoch'] as int,
-          row['fromRemoteId'] as int,
-          row['fromNick'] as String,
-          row['fromMode'] as String,
-          row['newNick'] as String,
-          row['messageRemoteId'] as int);
-
   final InsertionAdapter<RegularMessageDB> _regularMessageDBInsertionAdapter;
 
   final UpdateAdapter<RegularMessageDB> _regularMessageDBUpdateAdapter;
@@ -197,7 +175,27 @@ class _$RegularMessageDao extends RegularMessageDao {
   @override
   Future<List<RegularMessageDB>> getAllMessages() async {
     return _queryAdapter.queryList('SELECT * FROM RegularMessageDB',
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -205,7 +203,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ?',
         arguments: <dynamic>[messageRemoteId],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -214,7 +232,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.query(
         'SELECT localId FROM RegularMessageDB WHERE messageRemoteId = ?',
         arguments: <dynamic>[messageRemoteId],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -223,7 +261,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ? AND channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId, messageRemoteId],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -231,7 +289,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.queryList(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -240,7 +318,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.queryList(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY dateMicrosecondsSinceEpoch ASC',
         arguments: <dynamic>[channelRemoteId],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -249,14 +347,54 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.queryList(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? AND (text LIKE ? OR fromNick LIKE ?) ORDER BY dateMicrosecondsSinceEpoch ASC',
         arguments: <dynamic>[channelRemoteId, search, nickSearch],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
   Future<RegularMessageDB> getNewestAllChannelsMessage() async {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1',
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -264,7 +402,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY messageRemoteId DESC LIMIT 1',
         arguments: <dynamic>[channelRemoteId],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -272,7 +430,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY messageRemoteId ASC LIMIT 1',
         arguments: <dynamic>[channelRemoteId],
-        mapper: _regularMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -280,8 +458,29 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.queryListStream(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId],
-        tableName: 'RegularMessageDB',
-        mapper: _regularMessageDBMapper);
+        queryableName: 'RegularMessageDB',
+        isView: false,
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -290,8 +489,29 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.queryListStream(
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY dateMicrosecondsSinceEpoch ASC',
         arguments: <dynamic>[channelRemoteId],
-        tableName: 'RegularMessageDB',
-        mapper: _regularMessageDBMapper);
+        queryableName: 'RegularMessageDB',
+        isView: false,
+        mapper: (Map<String, dynamic> row) => RegularMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['command'] as String,
+            row['hostMask'] as String,
+            row['text'] as String,
+            row['paramsJsonEncoded'] as String,
+            row['nicknamesJsonEncoded'] as String,
+            row['regularMessageTypeId'] as int,
+            row['self'] as int,
+            row['highlight'] as int,
+            row['previewsJsonEncoded'] as String,
+            row['linksJsonEncoded'] as String,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['fromRemoteId'] as int,
+            row['fromNick'] as String,
+            row['fromMode'] as String,
+            row['newNick'] as String,
+            row['messageRemoteId'] as int));
   }
 
   @override
@@ -309,70 +529,70 @@ class _$RegularMessageDao extends RegularMessageDao {
   @override
   Future<int> insertRegularMessage(RegularMessageDB regularMessage) {
     return _regularMessageDBInsertionAdapter.insertAndReturnId(
-        regularMessage, sqflite.ConflictAlgorithm.abort);
+        regularMessage, OnConflictStrategy.abort);
   }
 
   @override
   Future<int> updateRegularMessage(RegularMessageDB regularMessage) {
     return _regularMessageDBUpdateAdapter.updateAndReturnChangedRows(
-        regularMessage, sqflite.ConflictAlgorithm.abort);
+        regularMessage, OnConflictStrategy.abort);
   }
 
   @override
-  Future upsertRegularMessage(RegularMessage regularMessage) async {
+  Future<dynamic> upsertRegularMessage(RegularMessage regularMessage) async {
     if (database is sqflite.Transaction) {
-      await super.upsertRegularMessage(regularMessage);
+      return super.upsertRegularMessage(regularMessage);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.regularMessagesDao
+        return transactionDatabase.regularMessagesDao
             .upsertRegularMessage(regularMessage);
       });
     }
   }
 
   @override
-  Future upsertRegularMessages(List<RegularMessage> messages) async {
+  Future<dynamic> upsertRegularMessages(List<RegularMessage> messages) async {
     if (database is sqflite.Transaction) {
-      await super.upsertRegularMessages(messages);
+      return super.upsertRegularMessages(messages);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.regularMessagesDao
+        return transactionDatabase.regularMessagesDao
             .upsertRegularMessages(messages);
       });
     }
   }
 
   @override
-  Future insertRegularMessages(List<RegularMessageDB> messages) async {
+  Future<dynamic> insertRegularMessages(List<RegularMessageDB> messages) async {
     if (database is sqflite.Transaction) {
-      await super.insertRegularMessages(messages);
+      return super.insertRegularMessages(messages);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.regularMessagesDao
+        return transactionDatabase.regularMessagesDao
             .insertRegularMessages(messages);
       });
     }
   }
 
   @override
-  Future updateRegularMessages(List<RegularMessageDB> messages) async {
+  Future<dynamic> updateRegularMessages(List<RegularMessageDB> messages) async {
     if (database is sqflite.Transaction) {
-      await super.updateRegularMessages(messages);
+      return super.updateRegularMessages(messages);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.regularMessagesDao
+        return transactionDatabase.regularMessagesDao
             .updateRegularMessages(messages);
       });
     }
@@ -418,17 +638,6 @@ class _$SpecialMessageDao extends SpecialMessageDao {
 
   final QueryAdapter _queryAdapter;
 
-  static final _specialMessageDBMapper = (Map<String, dynamic> row) =>
-      SpecialMessageDB(
-          row['localId'] as int,
-          row['channelLocalId'] as int,
-          row['chatMessageTypeId'] as int,
-          row['channelRemoteId'] as int,
-          row['dataJsonEncoded'] as String,
-          row['specialTypeId'] as int,
-          row['dateMicrosecondsSinceEpoch'] as int,
-          row['linksJsonEncoded'] as String);
-
   final InsertionAdapter<SpecialMessageDB> _specialMessageDBInsertionAdapter;
 
   final UpdateAdapter<SpecialMessageDB> _specialMessageDBUpdateAdapter;
@@ -436,7 +645,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
   @override
   Future<List<SpecialMessageDB>> getAllMessages() async {
     return _queryAdapter.queryList('SELECT * FROM SpecialMessageDB',
-        mapper: _specialMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => SpecialMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['dataJsonEncoded'] as String,
+            row['specialTypeId'] as int,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -444,7 +661,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
     return _queryAdapter.queryList(
         'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId],
-        mapper: _specialMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => SpecialMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['dataJsonEncoded'] as String,
+            row['specialTypeId'] as int,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -453,7 +678,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
     return _queryAdapter.queryList(
         'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = ? AND dataJsonEncoded LIKE ? ORDER BY dateMicrosecondsSinceEpoch ASC',
         arguments: <dynamic>[channelRemoteId, search],
-        mapper: _specialMessageDBMapper);
+        mapper: (Map<String, dynamic> row) => SpecialMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['dataJsonEncoded'] as String,
+            row['specialTypeId'] as int,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -461,8 +694,17 @@ class _$SpecialMessageDao extends SpecialMessageDao {
     return _queryAdapter.queryListStream(
         'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId],
-        tableName: 'SpecialMessageDB',
-        mapper: _specialMessageDBMapper);
+        queryableName: 'SpecialMessageDB',
+        isView: false,
+        mapper: (Map<String, dynamic> row) => SpecialMessageDB(
+            row['localId'] as int,
+            row['channelLocalId'] as int,
+            row['chatMessageTypeId'] as int,
+            row['channelRemoteId'] as int,
+            row['dataJsonEncoded'] as String,
+            row['specialTypeId'] as int,
+            row['dateMicrosecondsSinceEpoch'] as int,
+            row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -480,70 +722,70 @@ class _$SpecialMessageDao extends SpecialMessageDao {
   @override
   Future<int> insertSpecialMessage(SpecialMessageDB specialMessage) {
     return _specialMessageDBInsertionAdapter.insertAndReturnId(
-        specialMessage, sqflite.ConflictAlgorithm.abort);
+        specialMessage, OnConflictStrategy.abort);
   }
 
   @override
   Future<int> updateSpecialMessage(SpecialMessageDB specialMessage) {
     return _specialMessageDBUpdateAdapter.updateAndReturnChangedRows(
-        specialMessage, sqflite.ConflictAlgorithm.abort);
+        specialMessage, OnConflictStrategy.abort);
   }
 
   @override
-  Future upsertSpecialMessage(SpecialMessage specialMessage) async {
+  Future<dynamic> upsertSpecialMessage(SpecialMessage specialMessage) async {
     if (database is sqflite.Transaction) {
-      await super.upsertSpecialMessage(specialMessage);
+      return super.upsertSpecialMessage(specialMessage);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.specialMessagesDao
+        return transactionDatabase.specialMessagesDao
             .upsertSpecialMessage(specialMessage);
       });
     }
   }
 
   @override
-  Future upsertSpecialMessages(List<SpecialMessage> messages) async {
+  Future<dynamic> upsertSpecialMessages(List<SpecialMessage> messages) async {
     if (database is sqflite.Transaction) {
-      await super.upsertSpecialMessages(messages);
+      return super.upsertSpecialMessages(messages);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.specialMessagesDao
+        return transactionDatabase.specialMessagesDao
             .upsertSpecialMessages(messages);
       });
     }
   }
 
   @override
-  Future insertSpecialMessages(List<SpecialMessageDB> messages) async {
+  Future<dynamic> insertSpecialMessages(List<SpecialMessageDB> messages) async {
     if (database is sqflite.Transaction) {
-      await super.insertSpecialMessages(messages);
+      return super.insertSpecialMessages(messages);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.specialMessagesDao
+        return transactionDatabase.specialMessagesDao
             .insertSpecialMessages(messages);
       });
     }
   }
 
   @override
-  Future updateSpecialMessages(List<SpecialMessageDB> messages) async {
+  Future<dynamic> updateSpecialMessages(List<SpecialMessageDB> messages) async {
     if (database is sqflite.Transaction) {
-      await super.updateSpecialMessages(messages);
+      return super.updateSpecialMessages(messages);
     } else {
-      await (database as sqflite.Database)
-          .transaction<void>((transaction) async {
+      return (database as sqflite.Database)
+          .transaction<dynamic>((transaction) async {
         final transactionDatabase = _$ChatDatabase(changeListener)
           ..database = transaction;
-        await transactionDatabase.specialMessagesDao
+        return transactionDatabase.specialMessagesDao
             .updateSpecialMessages(messages);
       });
     }

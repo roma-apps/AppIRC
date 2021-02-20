@@ -11,7 +11,7 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_model
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 typedef LocalIdGenerator = int Function();
 
@@ -49,11 +49,8 @@ class NetworkListBloc extends Providable {
       }
     }
 
-    _networksChannelListBlocs[network] = ChannelListBloc(
-        backendService,
-        network,
-        networkWithState.channelsWithState,
-        nextChannelIdGenerator);
+    _networksChannelListBlocs[network] = ChannelListBloc(backendService,
+        network, networkWithState.channelsWithState, nextChannelIdGenerator);
 
     Disposable listenForNetworkExit;
     listenForNetworkExit = backendService.listenForNetworkLeave(network, () {
@@ -98,19 +95,24 @@ class NetworkListBloc extends Providable {
 
   Future<int> get _nextChannelLocalId async => nextChannelIdGenerator();
 
-  var _networksSubject = BehaviorSubject<List<Network>>(seedValue: []);
+  var _networksSubject = BehaviorSubject<List<Network>>.seeded([]);
 
   final List<NetworkListener> _joinListeners = [];
   final Map<Network, List<VoidCallback>> _leaveListeners = Map();
 
   Disposable listenForNetworkJoin(NetworkListener listener) {
     _joinListeners.add(listener);
-    return CustomDisposable(() {
-      _joinListeners.remove(listener);
-    });
+    return CustomDisposable(
+      () {
+        _joinListeners.remove(listener);
+      },
+    );
   }
 
-  Disposable listenForNetworkLeave(Network network, VoidCallback listener) {
+  Disposable listenForNetworkLeave(
+    Network network,
+    VoidCallback listener,
+  ) {
     if (!_leaveListeners.containsKey(network)) {
       _leaveListeners[network] = [];
     }

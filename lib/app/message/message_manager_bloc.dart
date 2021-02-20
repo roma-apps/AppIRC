@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
@@ -14,7 +16,7 @@ import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "message_saver_bloc.dart", enabled: true);
 
@@ -31,16 +33,11 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
   Stream<ChatMessage> get messageUpdateStream => _messageUpdateSubject.stream;
 
-//  // ignore: close_sinks
-//  BehaviorSubject<MessagesForChannel> _realtimeMessagesSubject =
-//      BehaviorSubject();
-
   MessageManagerBloc(
       this._backendService, NetworkListBloc networksListBloc, this._db)
       : super(networksListBloc) {
     _logger.d(() => "Create ChannelMessagesSaverBloc");
 
-//    addDisposable(subject: _realtimeMessagesSubject);
     addDisposable(subject: _messageUpdateSubject);
   }
 

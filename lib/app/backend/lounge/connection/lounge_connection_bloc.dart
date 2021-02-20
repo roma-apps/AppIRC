@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "lounge_connection_form_bloc.dart", enabled: true);
@@ -44,13 +46,13 @@ class LoungeConnectionBloc extends Providable {
 
     if (authPreferences == null &&
         authPreferences == LoungeAuthPreferences.empty) {
-      _stateSubject = BehaviorSubject(seedValue: LoungeAuthState.login);
+      _stateSubject = BehaviorSubject.seeded(LoungeAuthState.login);
     } else {
-      _stateSubject = BehaviorSubject(seedValue: null);
+      _stateSubject = BehaviorSubject();
     }
 
     _hostInformationSubject =
-        BehaviorSubject(seedValue: LoungeHostInformation.notConnected());
+        BehaviorSubject.seeded(LoungeHostInformation.notConnected());
 
     addDisposable(subject: _stateSubject);
     addDisposable(subject: _hostInformationSubject);

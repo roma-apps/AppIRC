@@ -1,21 +1,23 @@
 import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/disposable/rx_disposable.dart';
 import 'package:flutter_appirc/disposable/ui_disposable.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 class DisposableOwner extends Disposable {
   bool disposed = false;
   final CompositeDisposable _compositeDisposable = CompositeDisposable([]);
 
-  void addDisposable(
-      {Disposable disposable,
-        StreamSubscription streamSubscription,
-        TextEditingController textEditingController,
-        Subject subject,
-        Timer timer}) {
+  void addDisposable({
+    Disposable disposable,
+    StreamSubscription streamSubscription,
+    TextEditingController textEditingController,
+    Subject subject,
+    Timer timer,
+  }) {
     if (disposable != null) {
       _compositeDisposable.children.add(disposable);
     }

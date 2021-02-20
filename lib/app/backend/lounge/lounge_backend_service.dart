@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
 import 'dart:io';
 import 'dart:ui';
 
@@ -35,7 +36,7 @@ import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_helper.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_service.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "lounge_backend_service.dart", enabled: true);
 
@@ -63,8 +64,8 @@ class LoungeBackendService extends Providable implements ChatBackendService {
 
   // ignore: close_sinks
   BehaviorSubject<ChatConnectionState> _connectionStateSubject =
-      BehaviorSubject(
-    seedValue: ChatConnectionState.disconnected,
+      BehaviorSubject.seeded(
+    ChatConnectionState.disconnected,
   );
 
   Stream<ChatConnectionState> get connectionStateStream =>

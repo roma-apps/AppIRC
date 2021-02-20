@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter_appirc/app/backend/backend_service.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 class ChannelListBloc extends Providable {
   final ChatBackendService _backendService;
@@ -21,7 +22,7 @@ class ChannelListBloc extends Providable {
 
   // ignore: close_sinks
   var _networksChannelsSubject =
-      BehaviorSubject<List<Channel>>(seedValue: []);
+      BehaviorSubject<List<Channel>>.seeded([]);
 
   final List<ChannelListener> _joinListeners = [];
   final Map<Channel, List<VoidCallback>> _leaveListeners = Map();

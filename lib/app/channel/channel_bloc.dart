@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
@@ -16,7 +18,7 @@ import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 final Duration _usersListOutDateDuration = Duration(seconds: 15);
 
@@ -41,7 +43,7 @@ class ChannelBloc extends DisposableOwner {
       ChannelWithState channelWithState, this._channelsStatesBloc) {
     _channel = channelWithState.channel;
     _usersSubject =
-        BehaviorSubject(seedValue: channelWithState.initUsers ?? []);
+        BehaviorSubject.seeded(channelWithState.initUsers ?? []);
 
     _messagesBloc = ChannelMessageListBloc(chatPushesService, channel);
     addDisposable(disposable: _messagesBloc);

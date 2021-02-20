@@ -77,10 +77,33 @@ class MessagesList {
   List<ChatMessage> lastAddedMessages;
   MessageListUpdateType messageListUpdateType;
 
-  MessagesList.name(
-      {@required this.allMessages,
-      @required this.lastAddedMessages,
-      @required this.messageListUpdateType});
+  MessagesList({
+    @required this.allMessages,
+    @required this.lastAddedMessages,
+    @required this.messageListUpdateType,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessagesList &&
+          runtimeType == other.runtimeType &&
+          allMessages == other.allMessages &&
+          lastAddedMessages == other.lastAddedMessages &&
+          messageListUpdateType == other.messageListUpdateType;
+
+  @override
+  int get hashCode =>
+      allMessages.hashCode ^
+      lastAddedMessages.hashCode ^
+      messageListUpdateType.hashCode;
+
+  @override
+  String toString() => 'MessagesList{'
+        'allMessages: $allMessages, '
+        'lastAddedMessages: $lastAddedMessages, '
+        'messageListUpdateType: $messageListUpdateType'
+        '}';
 }
 
 enum MessageListUpdateType {

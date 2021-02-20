@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/messages/channel_message_list_bloc.dart';
+import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_model.dart';
@@ -12,9 +13,7 @@ import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
-
-import 'condensed/message_condensed_bloc.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "message_list_bloc.dart", enabled: true);
 
@@ -89,13 +88,11 @@ class MessageListBloc extends Providable {
         updateType: MessageListUpdateType.loadedFromLocalDatabase);
     _logger.d(() => "init messages $initListState");
 
-    _listStateSubject = BehaviorSubject(seedValue: initListState);
+    _listStateSubject = BehaviorSubject.seeded(initListState);
   }
 
-  void _onMessagesChanged(
-      List<ChatMessage> newMessages,
-      List<ChatMessage> lastAddedMessages,
-      MessageListUpdateType updateType) {
+  void _onMessagesChanged(List<ChatMessage> newMessages,
+      List<ChatMessage> lastAddedMessages, MessageListUpdateType updateType) {
     _logger.d(() => "newMessages = ${newMessages.length} ");
 
     var messageListItems = _convertMessagesToMessageListItems(newMessages);
@@ -103,10 +100,8 @@ class MessageListBloc extends Providable {
     _updateMessageListItems(messageListItems, lastAddedMessages, updateType);
   }
 
-  void _updateMessageListItems(
-      List<MessageListItem> messageListItems,
-      List<ChatMessage> newMessages,
-      MessageListUpdateType updateType) {
+  void _updateMessageListItems(List<MessageListItem> messageListItems,
+      List<ChatMessage> newMessages, MessageListUpdateType updateType) {
     var visibleMessagesBounds = channelMessagesListBloc.visibleMessagesBounds;
 
     MessageListItem initScrollPositionItem = calculateInitScrollPositionMessage(
@@ -127,9 +122,7 @@ class MessageListBloc extends Providable {
     }
 
     var messageListState = MessageListState.name(
-        items: messageListItems,
-        newItems: newMessages,
-        updateType: updateType);
+        items: messageListItems, newItems: newMessages, updateType: updateType);
     _logger.d(() => "_updateMessageListItems $messageListState");
     _listStateSubject.add(messageListState);
   }

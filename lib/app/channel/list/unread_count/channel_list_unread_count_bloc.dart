@@ -1,20 +1,24 @@
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
-MyLogger _logger = MyLogger(logTag: "channel_list_unread_count_bloc.dart", enabled: true);
+MyLogger _logger =
+    MyLogger(logTag: "channel_list_unread_count_bloc.dart", enabled: true);
 
 class ChannelListUnreadCountBloc extends Providable {
   // ignore: close_sinks
   final BehaviorSubject<int> _channelsWithUnreadMessagesCountController =
-      BehaviorSubject(seedValue: 0);
+      BehaviorSubject.seeded(0);
+
   Stream<int> get channelsWithUnreadMessagesCountStream =>
       _channelsWithUnreadMessagesCountController.stream.distinct();
+
   int get channelsWithUnreadMessagesCount =>
       _channelsWithUnreadMessagesCountController.value;
 
   final ChannelStatesBloc channelsStateBloc;
+
   ChannelListUnreadCountBloc(this.channelsStateBloc) : super() {
     addDisposable(subject: _channelsWithUnreadMessagesCountController);
 

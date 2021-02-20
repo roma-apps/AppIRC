@@ -3,7 +3,7 @@ import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notificatio
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "channel_message_list_bloc.dart", enabled: true);
 
@@ -14,7 +14,7 @@ class ChannelMessageListBloc extends Providable {
 
   // ignore: close_sinks
   BehaviorSubject<MessageListVisibleBounds> _visibleMessagesBoundsSubject =
-      BehaviorSubject(seedValue: null);
+      BehaviorSubject.seeded(null);
 
   Stream<MessageListVisibleBounds> get visibleMessagesBoundsStream =>
       _visibleMessagesBoundsSubject.stream.distinct();

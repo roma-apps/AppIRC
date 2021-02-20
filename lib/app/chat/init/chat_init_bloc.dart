@@ -7,7 +7,7 @@ import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart'
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "chat_init_bloc.dart", enabled: true);
 
@@ -25,7 +25,7 @@ class ChatInitBloc extends Providable {
 
   // ignore: close_sinks
   BehaviorSubject<ChatInitState> _stateSubject =
-      BehaviorSubject(seedValue: ChatInitState.notStarted);
+      BehaviorSubject.seeded(ChatInitState.notStarted);
 
   Stream<ChatInitState> get stateStream => _stateSubject.stream;
 
@@ -50,7 +50,8 @@ class ChatInitBloc extends Providable {
     _logger.d(() => "_subscribeForConnectEvent");
     // ignore: cancel_subscriptions
     StreamSubscription<bool> subscription;
-    subscription = _backendService.isChatConfigExistStream.listen((configExist) {
+    subscription =
+        _backendService.isChatConfigExistStream.listen((configExist) {
       _logger.d(() => "_subscribeForConnectEvent configExist $configExist");
       if (configExist) {
         _sendStartRequests();

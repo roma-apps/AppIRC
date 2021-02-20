@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "form_value_field_bloc.dart", enabled: true);
@@ -21,15 +21,22 @@ class FormValueFieldBloc<T> extends FormFieldBloc<T> {
 
   T get value => _valueController.value;
 
-  FormValueFieldBloc(T startValue,
-      {List<Validator<T>> validators = const [],
-      this.enabled = true,
-      this.visible = true})
-      : super(validators) {
-    _valueController = BehaviorSubject<T>(seedValue: startValue);
-    Timer.run(() async {
-      onNewError(await validate(startValue));
-    });
+  FormValueFieldBloc(
+    T startValue, {
+    List<Validator<T>> validators = const [],
+    this.enabled = true,
+    this.visible = true,
+  }) : super(validators) {
+    _valueController = BehaviorSubject<T>.seeded(startValue);
+    Timer.run(
+      () async {
+        onNewError(
+          await validate(
+            startValue,
+          ),
+        );
+      },
+    );
 
     addDisposable(streamSubscription: valueStream.listen((newValue) async {
       onNewError(await validate(newValue));

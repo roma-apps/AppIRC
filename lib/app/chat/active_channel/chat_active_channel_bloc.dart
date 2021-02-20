@@ -14,7 +14,7 @@ import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
 import 'package:flutter_appirc/local_preferences/preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _preferenceKey = "chat.activeChannel";
 var _logger = MyLogger(logTag: "chat_active_channel_bloc.dart", enabled: true);
@@ -31,11 +31,9 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   Channel get activeChannel => _activeChannelSubject.value;
 
   // ignore: close_sinks
-  final BehaviorSubject<Channel> _activeChannelSubject =
-      new BehaviorSubject();
+  final BehaviorSubject<Channel> _activeChannelSubject = new BehaviorSubject();
 
-  Stream<Channel> get activeChannelStream =>
-      _activeChannelSubject.stream;
+  Stream<Channel> get activeChannelStream => _activeChannelSubject.stream;
 
   ChatActiveChannelBloc(
       this._backendService,
@@ -188,8 +186,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
       IntPreferencesBloc(preferencesService, _preferenceKey);
 
   @override
-  void onChannelJoined(
-      Network network, ChannelWithState channelWithState) {
+  void onChannelJoined(Network network, ChannelWithState channelWithState) {
     var channel = channelWithState.channel;
     changeActiveChanel(channel);
   }

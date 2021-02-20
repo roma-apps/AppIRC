@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "push_service.dart", enabled: true);
 
@@ -11,12 +13,16 @@ class PushesService extends Providable {
 
   // ignore: close_sinks
   final BehaviorSubject<String> _tokenSubject = BehaviorSubject();
+
   Stream<String> get tokenStream => _tokenSubject.stream;
+
   String get token => _tokenSubject.value;
 
   // ignore: close_sinks
   final BehaviorSubject<PushMessage> _messageSubject = BehaviorSubject();
+
   Stream<PushMessage> get messageStream => _messageSubject.stream;
+
   PushesService() {
     addDisposable(subject: _tokenSubject);
     addDisposable(subject: _messageSubject);

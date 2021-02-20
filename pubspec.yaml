@@ -21,20 +21,22 @@ dependencies:
     sdk: flutter
 
   # ios icons
-  cupertino_icons: ^0.1.2
+  cupertino_icons: ^1.0.0
 
   # socket io protocol implementation for lounge
-  adhara_socket_io: ^0.4.1
+  adhara_socket_io: ^0.4.2+1
+
   # Support different languages
   easy_localization: ^2.0.2
-  # date formatter & locales
-#  intl: ^0.16.1
+
   # for lounge commands serialization & local settings serialization
-  json_annotation: ^3.0.0
+  json_annotation: ^3.1.1
+
   # logging wrapper for Android/iOS
-  logger: ^0.7.0+2
+  logger: ^0.9.4
+
   # Reactive programming
-  rxdart: ^0.18.1
+  rxdart: ^0.25.0
 
   # file picker UI for upload
   file_picker: ^2.1.6
@@ -71,8 +73,9 @@ dependencies:
   uni_links: ^0.2.0
 
   # sqlite orm to store messages in DB instead of RAM
-  floor: ^0.8.0
+  floor: ^0.18.0
 
+  sqflite: ^1.3.2+3
 
   # Platform aware widgets wrapper for iOS & Android
   flutter_platform_widgets: ^0.72.0
@@ -99,13 +102,12 @@ dev_dependencies:
     sdk: flutter
 
   # run dev tools like JSON or ORM code generators
-  build_runner: ^1.0.0
+  build_runner: ^1.10.3
 
   # for socket io commands serialization
-  json_serializable: ^3.2.0
+  json_serializable: ^3.5.1
   # sqlite orm
-  floor_generator: ^0.8.0
-
+  floor_generator: ^0.18.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

@@ -3,29 +3,32 @@ import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
-MyLogger _logger = MyLogger(logTag: "message_list_jump_to_newest_bloc.dart",
-    enabled: true);
+MyLogger _logger =
+    MyLogger(logTag: "message_list_jump_to_newest_bloc.dart", enabled: true);
 
 class MessagesListJumpToNewestBloc extends Providable {
-
   final MessageListBloc _messageListBloc;
 
   // ignore: close_sinks
-  BehaviorSubject<MessagesListJumpToNewestState> _stateSubject
-  = BehaviorSubject(
-      seedValue: MessagesListJumpToNewestState.name(
-          isLastMessageShown: true, newMessagesCount: 0));
+  BehaviorSubject<MessagesListJumpToNewestState> _stateSubject =
+      BehaviorSubject.seeded(
+    MessagesListJumpToNewestState.name(
+      isLastMessageShown: true,
+      newMessagesCount: 0,
+    ),
+  );
 
   Stream<MessagesListJumpToNewestState> get stateStream => _stateSubject.stream;
+
   MessagesListJumpToNewestState get state => _stateSubject.value;
 
   MessagesListJumpToNewestBloc(this._messageListBloc) {
     addDisposable(subject: _stateSubject);
 
-    addDisposable(streamSubscription: _messageListBloc.listStateStream.listen((
-        newListState) {
+    addDisposable(streamSubscription:
+        _messageListBloc.listStateStream.listen((newListState) {
       switch (newListState.updateType) {
         case MessageListUpdateType.newMessagesFromBackend:
           onNewMessagesAdded(newListState.newItems.length);
@@ -39,7 +42,8 @@ class MessagesListJumpToNewestBloc extends Providable {
   }
 
   onVisibleAreaChanged(bool isLastMessageShown) {
-    _logger.d(() => "onVisibleAreaChanged isLastMessageShown $isLastMessageShown");
+    _logger
+        .d(() => "onVisibleAreaChanged isLastMessageShown $isLastMessageShown");
     if (isLastMessageShown) {
       state.newMessagesCount = 0;
     }

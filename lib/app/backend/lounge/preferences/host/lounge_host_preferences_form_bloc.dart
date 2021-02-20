@@ -1,17 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
 import 'package:flutter_appirc/form/form_bloc.dart';
 import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 class LoungeHostPreferencesFormBloc extends FormBloc {
   FormValueFieldBloc<String> hostFieldBloc;
 
   // ignore: close_sinks
   BehaviorSubject<LoungeHostInformation> _hostInformationSubject =
-      BehaviorSubject(seedValue: null);
+      BehaviorSubject.seeded(null);
 
   Stream<LoungeHostInformation> get hostInformationStream =>
       _hostInformationSubject.stream;
@@ -37,7 +39,7 @@ class LoungeHostPreferencesFormBloc extends FormBloc {
       ],
     );
 
-    _hostInformationSubject = BehaviorSubject(seedValue: startHostInformation);
+    _hostInformationSubject = BehaviorSubject.seeded(startHostInformation);
 
     addDisposable(subject: _hostInformationSubject);
   }

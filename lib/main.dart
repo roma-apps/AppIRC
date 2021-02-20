@@ -406,8 +406,7 @@ class _InitAppIRCAppState extends State<_InitAppIRCApp> {
           child: StreamBuilder<AppIRCSkinTheme>(
               stream: isPreferencesReady
                   ? appSkinPreferenceBloc.appSkinStream
-                  : BehaviorSubject<AppIRCSkinTheme>(
-                      seedValue: defaultSkinTheme),
+                  : BehaviorSubject<AppIRCSkinTheme>.seeded(defaultSkinTheme),
               initialData: isPreferencesReady
                   ? appSkinPreferenceBloc.currentAppSkinTheme
                   : defaultSkinTheme,

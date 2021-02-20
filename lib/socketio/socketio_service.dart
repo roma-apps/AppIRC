@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "socketio_service.dart", enabled: true);
 
@@ -16,7 +18,9 @@ class SocketIOService extends Providable {
 
   // ignore: close_sinks
   BehaviorSubject<SocketConnectionState> _connectionStateController =
-      BehaviorSubject(seedValue: SocketConnectionState.disconnected);
+      BehaviorSubject.seeded(
+    SocketConnectionState.disconnected,
+  );
 
   Stream<SocketConnectionState> get connectionStateStream =>
       _connectionStateController.stream;
@@ -114,8 +118,6 @@ class SocketIOService extends Providable {
       _logger.d(() => "onNewState => $socketState eventName = $eventName");
       _connectionStateController.add(socketState);
     }));
-
-
   }
 
   Disposable _listenConnectionState(
@@ -175,6 +177,7 @@ class SocketIOService extends Providable {
   }
 
   var disposed = false;
+
   @override
   void dispose() {
     if (!disposed) {

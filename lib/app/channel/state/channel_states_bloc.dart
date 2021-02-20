@@ -10,17 +10,16 @@ import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 class ChannelStatesBloc extends ChannelListListenerBloc {
   final ChatDatabase _db;
 
-  final Map<String, Map<int, BehaviorSubject<ChannelState>>> _statesMap =
-      Map();
+  final Map<String, Map<int, BehaviorSubject<ChannelState>>> _statesMap = Map();
+
   List<ChannelState> get allStates {
     var states = <ChannelState>[];
-    _statesMap.values
-        .forEach((Map<int, BehaviorSubject<ChannelState>> entry) {
+    _statesMap.values.forEach((Map<int, BehaviorSubject<ChannelState>> entry) {
       states.addAll(entry.values.map((subject) => subject.value));
     });
     return List.unmodifiable(states);
@@ -29,6 +28,7 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
   // ignore: close_sinks
   final BehaviorSubject<ChannelState> _anyStateChangedSubject =
       BehaviorSubject();
+
   Stream<ChannelState> get anyStateChangedStream =>
       _anyStateChangedSubject.stream;
 
@@ -61,8 +61,7 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
     return _statesMap[networkKey][channelKey];
   }
 
-  void _updateState(
-      Network network, Channel channel, ChannelState state) {
+  void _updateState(Network network, Channel channel, ChannelState state) {
     if (_activeChannelBloc.activeChannel == channel) {
       state.unreadCount = 0;
     }
@@ -86,15 +85,13 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
 
   BehaviorSubject<ChannelState> getChannelStateSubject(
           Network network, Channel channel) =>
-      _statesMap[_calculateNetworkKey(network)]
-          [_calculateChannelKey(channel)];
+      _statesMap[_calculateNetworkKey(network)][_calculateChannelKey(channel)];
 
   Stream<ChannelState> getChannelStateStream(
           Network network, Channel channel) =>
       getChannelStateSubject(network, channel).stream;
 
-  ChannelState getChannelState(
-          Network network, Channel channel) =>
+  ChannelState getChannelState(Network network, Channel channel) =>
       getChannelStateSubject(network, channel)?.value;
 
   @override
@@ -118,35 +115,36 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
   }
 
   @override
-  void onChannelJoined(
-      Network network, ChannelWithState channelWithState) {
+  void onChannelJoined(Network network, ChannelWithState channelWithState) {
     var channel = channelWithState.channel;
     var networkKey = _calculateNetworkKey(network);
     var channelKey = _calculateChannelKey(channel);
 
     if (!_statesMap[networkKey].containsKey(channelKey)) {
-      _statesMap[networkKey][channelKey] = BehaviorSubject<ChannelState>(
-          seedValue: ChannelState.empty);
+      _statesMap[networkKey][channelKey] = BehaviorSubject<ChannelState>.seeded(
+        ChannelState.empty,
+      );
     }
 
     var state = channelWithState.state;
     _updateState(network, channel, state);
     addDisposable(
-        disposable: _backendService.listenForChannelState(
-            network,
-            channel,
-            () => _getStateSubjectForChannel(network, channel).value,
-            () => calculateChannelMessagesCount(channel),
-            (state) {
-      _updateState(network, channel, state);
-    }));
+      disposable: _backendService.listenForChannelState(
+        network,
+        channel,
+        () => _getStateSubjectForChannel(network, channel).value,
+        () => calculateChannelMessagesCount(channel),
+        (state) {
+          _updateState(network, channel, state);
+        },
+      ),
+    );
   }
 
   @override
   void onChannelLeaved(Network network, Channel channel) {
 //    Future.delayed(Duration(microseconds:  1000), () {
-    var stateSubject =
-        _getStateSubjectForChannel(network, channel);
+    var stateSubject = _getStateSubjectForChannel(network, channel);
     var state = stateSubject.value;
     stateSubject.close();
     // ignore: close_sinks
@@ -159,12 +157,9 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
   }
 
   Future<int> calculateChannelMessagesCount(Channel channel) async {
-
-    var result = await _db.database.rawQuery(RegularMessageDao
-        .createChannelMessagesCountQuery
-      (channel));
+    var result = await _db.database
+        .rawQuery(RegularMessageDao.createChannelMessagesCountQuery(channel));
 
     return RegularMessageDao.extractCountFromQueryResult(result);
   }
-
 }

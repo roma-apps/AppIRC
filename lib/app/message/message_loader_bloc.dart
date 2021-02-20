@@ -13,7 +13,7 @@ import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "message_loader_bloc.dart", enabled: true);
 
@@ -25,8 +25,7 @@ class MessageLoaderBloc extends Providable {
   final Channel _channel;
 
   // ignore: close_sinks
-  BehaviorSubject<bool> _isInitFinishedSubject =
-      BehaviorSubject(seedValue: false);
+  BehaviorSubject<bool> _isInitFinishedSubject = BehaviorSubject.seeded(false);
 
   Stream<bool> get isInitFinishedStream => _isInitFinishedSubject.stream;
 
@@ -76,13 +75,15 @@ class MessageLoaderBloc extends Providable {
   }
 
   void _onMessagesChanged(
-      List<ChatMessage> allMessages,
-      List<ChatMessage> newMessages,
-      MessageListUpdateType newMessagesPosition) {
-    var messagesList = MessagesList.name(
-        allMessages: allMessages,
-        lastAddedMessages: newMessages,
-        messageListUpdateType: newMessagesPosition);
+    List<ChatMessage> allMessages,
+    List<ChatMessage> newMessages,
+    MessageListUpdateType newMessagesPosition,
+  ) {
+    var messagesList = MessagesList(
+      allMessages: allMessages,
+      lastAddedMessages: newMessages,
+      messageListUpdateType: newMessagesPosition,
+    );
     _messagesListSubject.add(messagesList);
   }
 
@@ -136,12 +137,13 @@ class MessageLoaderBloc extends Providable {
         initMessages.addAll(messages);
       });
     }
-    _messagesListSubject = new BehaviorSubject<MessagesList>(
-        seedValue: MessagesList.name(
-            allMessages: initMessages,
-            lastAddedMessages: initMessages,
-            messageListUpdateType:
-                MessageListUpdateType.loadedFromLocalDatabase));
+    _messagesListSubject = new BehaviorSubject<MessagesList>.seeded(
+      MessagesList(
+        allMessages: initMessages,
+        lastAddedMessages: initMessages,
+        messageListUpdateType: MessageListUpdateType.loadedFromLocalDatabase,
+      ),
+    );
     _logger.d(() => "init finish");
     _isInitFinishedSubject.add(true);
 

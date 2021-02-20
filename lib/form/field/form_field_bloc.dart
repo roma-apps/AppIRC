@@ -1,13 +1,13 @@
+import 'dart:async';
 
 import 'package:flutter_appirc/form/form_validation.dart';
 import 'package:flutter_appirc/provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 abstract class FormFieldBloc<T> extends Providable {
   T get value;
 
-  var _validationErrorController =
-  BehaviorSubject<ValidationError>(seedValue: null);
+  var _validationErrorController = BehaviorSubject<ValidationError>();
 
   Stream<ValidationError> get errorStream =>
       _validationErrorController.stream.distinct();

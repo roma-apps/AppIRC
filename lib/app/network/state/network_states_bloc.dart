@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "network_states_bloc.dart", enabled: true);
 
@@ -20,8 +22,7 @@ class NetworkStatesBloc extends NetworkListListenerBloc {
 
   String _calculateNetworkKey(Network network) => network.remoteId;
 
-  NetworkStatesBloc(
-      this._backendService, NetworkListBloc networksListBloc)
+  NetworkStatesBloc(this._backendService, NetworkListBloc networksListBloc)
       : super(networksListBloc);
 
   @override
@@ -29,7 +30,7 @@ class NetworkStatesBloc extends NetworkListListenerBloc {
     var network = networkWithState.network;
 
     _states[_calculateNetworkKey(network)] =
-        BehaviorSubject<NetworkState>(seedValue: networkWithState.state);
+        BehaviorSubject<NetworkState>.seeded( networkWithState.state);
 
     addDisposable(
         disposable: _backendService.listenForNetworkState(
