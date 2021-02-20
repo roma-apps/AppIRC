@@ -20,7 +20,10 @@ class InvalidResponseException extends LoungeException {
       this.configReceived, this.commandReceived, this.chatInitReceived);
 }
 
-class NotImplementedYetLoungeException implements LoungeException {}
+class NotImplementedYetLoungeException implements LoungeException {
+
+  const NotImplementedYetLoungeException();
+}
 
 class ChatJoinChannelInputLoungeJsonRequest extends InputLoungeJsonRequest {
   ChannelPreferences preferences;

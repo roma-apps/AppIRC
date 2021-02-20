@@ -11,7 +11,7 @@ class RequestResult<T> {
   final T result;
   final dynamic error;
 
-  RequestResult._name({
+  const RequestResult._private({
     @required this.isSentSuccessfully,
     @required this.isTimeout,
     @required this.result,
@@ -19,51 +19,76 @@ class RequestResult<T> {
     @required this.isResponseReceived,
   });
 
-  RequestResult.notWaitForResponse()
-      : this._name(
-            isSentSuccessfully: true,
-            isTimeout: false,
-            result: null,
-            error: null,
-            isResponseReceived: true);
+  const RequestResult.notWaitForResponse()
+      : this._private(
+          isSentSuccessfully: true,
+          isTimeout: false,
+          result: null,
+          error: null,
+          isResponseReceived: true,
+        );
 
-  RequestResult.withResponse(T result)
-      : this._name(
-            isSentSuccessfully: true,
-            isTimeout: false,
-            result: result,
-            error: null,
-            isResponseReceived: true);
+  const RequestResult.withResponse(T result)
+      : this._private(
+          isSentSuccessfully: true,
+          isTimeout: false,
+          result: result,
+          error: null,
+          isResponseReceived: true,
+        );
 
-  RequestResult.notSend()
-      : this._name(
+  const RequestResult.notSend()
+      : this._private(
             isSentSuccessfully: false,
             isTimeout: false,
             result: null,
             error: null,
             isResponseReceived: false);
 
-  RequestResult.timeout()
-      : this._name(
-            isSentSuccessfully: true,
-            isTimeout: true,
-            result: null,
-            error: null,
-            isResponseReceived: false);
+  const RequestResult.timeout()
+      : this._private(
+          isSentSuccessfully: true,
+          isTimeout: true,
+          result: null,
+          error: null,
+          isResponseReceived: false,
+        );
 
-  RequestResult.error(error)
-      : this._name(
-            isSentSuccessfully: true,
-            isTimeout: true,
-            result: null,
-            error: error,
-            isResponseReceived: false);
+  const RequestResult.error(error)
+      : this._private(
+          isSentSuccessfully: true,
+          isTimeout: true,
+          result: null,
+          error: error,
+          isResponseReceived: false,
+        );
 
   @override
   String toString() {
-    return 'RequestResult{isSentSuccessfully: $isSentSuccessfully,'
-        ' result: $result}';
+    return 'RequestResult{'
+        'isSentSuccessfully: $isSentSuccessfully,'
+        ' result: $result'
+        '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RequestResult &&
+          runtimeType == other.runtimeType &&
+          isSentSuccessfully == other.isSentSuccessfully &&
+          isTimeout == other.isTimeout &&
+          isResponseReceived == other.isResponseReceived &&
+          result == other.result &&
+          error == other.error;
+
+  @override
+  int get hashCode =>
+      isSentSuccessfully.hashCode ^
+      isTimeout.hashCode ^
+      isResponseReceived.hashCode ^
+      result.hashCode ^
+      error.hashCode;
 }
 
 class ChatLoginResult<T> {
@@ -81,14 +106,14 @@ class ChatRegistrationResult<T> {
 
   final RegistrationErrorType errorType;
 
-  ChatRegistrationResult._name(
+  ChatRegistrationResult._private(
       {@required this.success, @required this.errorType});
 
   ChatRegistrationResult.success()
-      : this._name(success: true, errorType: null);
+      : this._private(success: true, errorType: null);
 
   ChatRegistrationResult.fail(RegistrationErrorType errorType)
-      : this._name(success: false, errorType: errorType);
+      : this._private(success: false, errorType: errorType);
 }
 
 enum RegistrationErrorType { alreadyExist, invalid, unknown }

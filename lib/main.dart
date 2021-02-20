@@ -110,25 +110,25 @@ Future main() async {
 
   // runZoned<Future<void>>(
   //   () async {
-      runApp(
-        EasyLocalization(
-          supportedLocales: [
-            Locale('en', 'US'),
-          ],
-          path: 'assets/langs',
-          fallbackLocale: Locale('en', 'US'),
+  runApp(
+    EasyLocalization(
+      supportedLocales: [
+        Locale('en', 'US'),
+      ],
+      path: 'assets/langs',
+      fallbackLocale: Locale('en', 'US'),
+      child: Provider(
+        providable: SocketIOManagerProvider(socketIOManager),
+        child: Provider(
           child: Provider(
-            providable: SocketIOManagerProvider(socketIOManager),
-            child: Provider(
-              child: Provider(
-                providable: preferencesService,
-                child: _InitAppIRCApp(),
-              ),
-              providable: loungePreferencesBloc,
-            ),
+            providable: preferencesService,
+            child: _InitAppIRCApp(),
           ),
+          providable: loungePreferencesBloc,
         ),
-      );
+      ),
+    ),
+  );
   //   },
   //   onError: Crashlytics.instance.recordError,
   // );
@@ -215,8 +215,10 @@ class _InitAppIRCAppState extends State<_InitAppIRCApp> {
 
     var preferencesService = Provider.of<PreferencesService>(context);
     var socketManagerProvider = Provider.of<SocketIOManagerProvider>(context);
-    var loungeBackendService =
-        LoungeBackendService(socketManagerProvider.manager, _loungePreferences);
+    var loungeBackendService = LoungeBackendService(
+      socketIOManager: socketManagerProvider.manager,
+      loungePreferences: _loungePreferences,
+    );
 
     ChatActiveChannelBloc activeChannelBloc;
     Channel Function() currentChannelExtractor = () {

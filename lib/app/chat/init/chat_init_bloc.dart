@@ -50,7 +50,7 @@ class ChatInitBloc extends Providable {
     _logger.d(() => "_subscribeForConnectEvent");
     // ignore: cancel_subscriptions
     StreamSubscription<bool> subscription;
-    subscription = _backendService.chatConfigExistStream.listen((configExist) {
+    subscription = _backendService.isChatConfigExistStream.listen((configExist) {
       _logger.d(() => "_subscribeForConnectEvent configExist $configExist");
       if (configExist) {
         _sendStartRequests();

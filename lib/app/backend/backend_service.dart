@@ -41,7 +41,7 @@ abstract class ChatBackendService implements Providable {
 
   Stream<ChatConfig> get chatConfigStream;
 
-  Stream<bool> get chatConfigExistStream;
+  Stream<bool> get isChatConfigExistStream;
 
   ChatInitInformation get chatInit;
 
