@@ -91,16 +91,20 @@ dependencies:
   # required by chewie
   video_player: ^1.0.1
 
+  # better lint, should be in main dependencies to ignore async/await unnecessary warnings
+  pedantic: ^1.9.2
+
   # logging wrapper for Android/iOS
   logger: ^0.9.4
+
+
 #
 #  # cache images locally
 #  cached_network_image: ^2.5.0
 #  # cache manager for cached_network_image. Use to set up cache settings
 #  flutter_cache_manager: ^2.1.1
 #
-#  # better lint, should be in main dependencies to ignore async/await unnecessary warnings
-#  pedantic: ^1.9.2
+
 #
 #  # advanced logging
 #  logging: ^0.11.4
