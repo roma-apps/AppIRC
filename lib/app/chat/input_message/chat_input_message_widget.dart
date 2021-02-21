@@ -53,7 +53,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
   Container _buildContainer(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: IAppIrcUiColorTheme.of(context).primaryDark,
+        color: IAppIrcUiColorTheme.of(context).primary,
       ),
       child: Padding(
         padding: const EdgeInsets.all(4.0),
@@ -92,7 +92,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
         }
 //          return TextField();
 
-        var hintStyle = IAppIrcUiTextTheme.of(context).mediumLightGrey;
+        var hintStyle = IAppIrcUiTextTheme.of(context).mediumGrey;
         return createPlatformTypeAhead(
           context,
           keepSuggestionsOnSuggestionSelected: true,
@@ -125,7 +125,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
                 onSubmitted: submitted,
                 focusNode: inputMessageBloc.focusNode,
                 controller: inputMessageBloc.messageController,
-                style: hintStyle,
+                style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
                 decoration: InputDecoration(
                   hintText: hintText,
                   hintStyle: hintStyle,
@@ -142,7 +142,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
                 textInputAction: inputAction,
                 onSubmitted: submitted,
                 focusNode: inputMessageBloc.focusNode,
-                style: hintStyle,
+                style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
                 placeholder: hintText,
               ),
             );

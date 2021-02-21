@@ -10,6 +10,10 @@ import 'package:flutter_appirc/app/default_values.dart';
 import 'package:flutter_appirc/app/instance/current/current_auth_instance_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_widget.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_new_preferences_page.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
+import 'package:flutter_appirc/app/ui/theme/current/current_appirc_ui_theme_bloc.dart';
+import 'package:flutter_appirc/app/ui/theme/dark/dark_appirc_ui_theme_model.dart';
+import 'package:flutter_appirc/app/ui/theme/light/light_appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/disposable_provider.dart';
 import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -36,10 +40,10 @@ class ChatDrawerWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: _buildLoungeSettingsButton(context),
             ),
-            Padding(padding: const EdgeInsets.all(8.0), child: Text("missqewd")
-                // child:
-                // AppSkinDayNightIconButton(),
-                ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AppSkinDayNightIconButton(),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _buildSignOutButton(context),
@@ -132,4 +136,48 @@ class ChatDrawerWidget extends StatelessWidget {
         loungeBackendService.signOut();
       },
       icon: Icon(Icons.exit_to_app));
+}
+
+class AppSkinDayNightIconButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var currentAppIrcUiThemeBloc = ICurrentAppIrcUiThemeBloc.of(context);
+
+    IconData iconData;
+
+    return StreamBuilder<IAppIrcUiTheme>(
+      stream: currentAppIrcUiThemeBloc.currentThemeStream,
+      initialData: currentAppIrcUiThemeBloc.currentTheme,
+      builder: (context, snapshot) {
+        var theme = snapshot.data;
+        if (theme == null) {
+          iconData = Icons.brightness_4;
+        } else if (theme == lightAppIrcUiTheme) {
+          iconData = Icons.brightness_5;
+        } else if (theme == darkAppIrcUiTheme) {
+          iconData = Icons.brightness_3;
+        } else {
+          throw "Unknown theme $theme";
+        }
+        return PlatformIconButton(
+          icon: Icon(iconData),
+          onPressed: () {
+            IAppIrcUiTheme newTheme;
+
+            if (theme == null) {
+              newTheme = lightAppIrcUiTheme;
+            } else if (theme == lightAppIrcUiTheme) {
+              newTheme = darkAppIrcUiTheme;
+            } else if (theme == darkAppIrcUiTheme) {
+              newTheme = null;
+            } else {
+              throw "Unknown theme $theme";
+            }
+
+            currentAppIrcUiThemeBloc.changeTheme(newTheme);
+          },
+        );
+      },
+    );
+  }
 }

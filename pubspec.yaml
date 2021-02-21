@@ -100,20 +100,14 @@ dependencies:
   # dependency injection framework
   provider: ^4.3.3
 
+  # Provides internationalization and localization facilities
+  intl: ^0.16.1
 #
 #  # cache images locally
 #  cached_network_image: ^2.5.0
 #  # cache manager for cached_network_image. Use to set up cache settings
 #  flutter_cache_manager: ^2.1.1
-#
 
-#
-
-#
-
-#
-#  # Provides internationalization and localization facilities
-#  intl: ^0.16.1
 #
 #  # disable wakelock for video player
 #  wakelock: ^0.1.4+2
@@ -147,8 +141,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  assets:
-    - assets/langs/en-US.json
   fonts:
     - family: CourierNew
       fonts:

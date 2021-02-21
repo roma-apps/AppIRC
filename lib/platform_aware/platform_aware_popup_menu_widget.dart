@@ -13,24 +13,37 @@ class PlatformAwarePopupMenuAction {
   final String text;
   final Function(PlatformAwarePopupMenuAction action) actionCallback;
 
-  PlatformAwarePopupMenuAction(
-      {@required this.iconData,
-      @required this.text,
-      @required this.actionCallback});
+  PlatformAwarePopupMenuAction({
+    @required this.iconData,
+    @required this.text,
+    @required this.actionCallback,
+  });
 }
 
-Widget createPlatformPopupMenuButton(BuildContext context,
-    {@required Widget child,
-    @required List<PlatformAwarePopupMenuAction> actions,
-    bool enabled = true,
-    bool isNeedPadding = true}) {
+Widget createPlatformPopupMenuButton(
+  BuildContext context, {
+  @required Widget child,
+  @required List<PlatformAwarePopupMenuAction> actions,
+  bool enabled = true,
+  bool isNeedPadding = true,
+}) {
   switch (detectCurrentUIPlatform()) {
     case UIPlatform.material:
-      return _buildMaterialPopupButton(child, actions, enabled, isNeedPadding);
+      return _buildMaterialPopupButton(
+        child,
+        actions,
+        enabled,
+        isNeedPadding,
+      );
       break;
     case UIPlatform.cupertino:
       return _buildCupertinoPopupButton(
-          context, child, actions, enabled, isNeedPadding);
+        context,
+        child,
+        actions,
+        enabled,
+        isNeedPadding,
+      );
       break;
   }
   throw Exception("invalid platform");
@@ -119,10 +132,11 @@ Future showCupertinoPopup<T>(
 }
 
 Widget _buildMaterialPopupButton(
-    Widget child,
-    List<PlatformAwarePopupMenuAction> actions,
-    bool enabled,
-    bool isNeedPadding) {
+  Widget child,
+  List<PlatformAwarePopupMenuAction> actions,
+  bool enabled,
+  bool isNeedPadding,
+) {
   _logger.d(() => "_buildMaterialPopupButton $enabled");
 
   if (child is Icon && !enabled) {

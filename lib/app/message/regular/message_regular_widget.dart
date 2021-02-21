@@ -72,8 +72,13 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
     var title = _getMessageTitleString(context, message);
 
     if (title?.isNotEmpty == true) {
-      spans.add(buildMessageTitleTextSpan(
-          context: context, title: title, color: color));
+      spans.add(
+        buildMessageTitleTextSpan(
+          context: context,
+          title: title,
+          color: color,
+        ),
+      );
     }
 
     var isNeedDisplayText = true;
@@ -165,13 +170,14 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
   }
 }
 
-TextSpan buildMessageTitleTextSpan(
-    {@required BuildContext context,
-    @required String title,
-    @required Color color}) {
+TextSpan buildMessageTitleTextSpan({
+  @required BuildContext context,
+  @required String title,
+  @required Color color,
+}) {
   return TextSpan(
     text: "$title ",
-    style: IAppIrcUiTextTheme.of(context).subHeaderDarkGrey,
+    style: IAppIrcUiTextTheme.of(context).mediumBoldDarkGrey,
   );
 }
 

@@ -159,7 +159,7 @@ void runNotInitializedSplashApp() {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashPage(),
+      home: const SplashPage(),
     ),
   );
 }

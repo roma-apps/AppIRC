@@ -139,16 +139,16 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
         // context always valid, because this function used only when widget is
         // visible
-        ChannelBloc channelBloc = ChannelBloc.of(context);
+        ChannelBloc channelBloc = ChannelBloc.of(context, listen: false);
 
         channelBloc.messagesBloc.onVisibleMessagesBounds(
-            MessageListVisibleBounds.fromUi(
-                minRegularMessageRemoteId: _lastBuildItems[minIndex]
-                    .oldestRegularMessage
-                    ?.messageRemoteId,
-                maxRegularMessageRemoteId: _lastBuildItems[maxIndex]
-                    .oldestRegularMessage
-                    ?.messageRemoteId));
+          MessageListVisibleBounds.fromUi(
+            minRegularMessageRemoteId:
+                _lastBuildItems[minIndex].oldestRegularMessage?.messageRemoteId,
+            maxRegularMessageRemoteId:
+                _lastBuildItems[maxIndex].oldestRegularMessage?.messageRemoteId,
+          ),
+        );
       }
     }
   }
