@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:provider/provider.dart';
 
-import 'platform_aware.dart' as platform_aware;
 
 Widget buildPlatformScaffold(
   BuildContext context, {
@@ -17,7 +18,9 @@ Widget buildPlatformScaffold(
   bool iosContentPadding = false,
   bool iosContentBottomPadding = false,
 }) {
-  if (platform_aware.isMaterial) {
+  var platformProviderState = PlatformProvider.of(context);
+
+  if (platformProviderState.platform == TargetPlatform.android) {
     return PlatformScaffold(
       key: key,
       widgetKey: widgetKey,
@@ -31,10 +34,14 @@ Widget buildPlatformScaffold(
       iosContentBottomPadding: iosContentBottomPadding,
     );
   } else {
+    var currentThee = Provider.of<IAppIrcUiTheme>(context);
     return PlatformScaffold(
       key: key,
       widgetKey: widgetKey,
-      body: body,
+      body: Theme(
+        child: body,
+        data: currentThee.themeData,
+      ),
       backgroundColor: backgroundColor,
       appBar: appBar,
       bottomNavBar: bottomNavBar,

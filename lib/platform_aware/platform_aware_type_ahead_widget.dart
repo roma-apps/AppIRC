@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/platform_aware/platform_aware.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart'
     as cupertino_flutter_typeahead;
 import 'package:flutter_typeahead/flutter_typeahead.dart' as flutter_typeahead;
@@ -73,8 +73,10 @@ Widget createPlatformTypeAhead<T>(
   bool keepSuggestionsOnSuggestionSelected = false,
   bool autoFlipDirection = false,
 }) {
-  switch (detectCurrentUIPlatform()) {
-    case UIPlatform.material:
+  var platformProviderState = PlatformProvider.of(context);
+
+  switch (platformProviderState.platform) {
+    case TargetPlatform.android:
       var data = android();
       return flutter_typeahead.TypeAheadField(
           suggestionsCallback: (pattern) => suggestionsCallback(pattern),
@@ -102,7 +104,7 @@ Widget createPlatformTypeAhead<T>(
               keepSuggestionsOnSuggestionSelected,
           autoFlipDirection: autoFlipDirection);
       break;
-    case UIPlatform.cupertino:
+    case TargetPlatform.iOS:
       var data = ios();
 
       return cupertino_flutter_typeahead.CupertinoTypeAheadField(
@@ -131,6 +133,7 @@ Widget createPlatformTypeAhead<T>(
               keepSuggestionsOnSuggestionSelected,
           autoFlipDirection: autoFlipDirection);
       break;
+    default:
+      throw Exception("invalid platform");
   }
-  throw Exception("invalid platform");
 }

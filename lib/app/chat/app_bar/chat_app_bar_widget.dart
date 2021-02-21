@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
-import 'package:flutter_appirc/platform_aware/platform_aware.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ChatAppBarWidget extends StatelessWidget {
   final String title;
@@ -12,7 +12,8 @@ class ChatAppBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(title != null && title.isNotEmpty);
-
+    var providerState = PlatformProvider.of(context);
+    var isMaterial = providerState.platform == TargetPlatform.android;
     if (subTitle != null && subTitle.isNotEmpty) {
       return Column(
         //        mainAxisAlignment: MainAxisAlignment.end,
@@ -27,8 +28,12 @@ class ChatAppBarWidget extends StatelessWidget {
       );
     } else {
       return Align(
-          alignment: isMaterial ? Alignment.centerLeft : Alignment.center,
-          child: _buildTitle(context, title));
+        alignment: isMaterial ? Alignment.centerLeft : Alignment.center,
+        child: _buildTitle(
+          context,
+          title,
+        ),
+      );
     }
   }
 }
@@ -42,5 +47,5 @@ Widget _buildSubTitle(BuildContext context, String subTitle) => Text(
 
 Widget _buildTitle(BuildContext context, String title) => Text(
       title,
-  style: IAppIrcUiTextTheme.of(context).dialogTitleBoldDarkGrey,
+      style: IAppIrcUiTextTheme.of(context).dialogTitleBoldDarkGrey,
     );

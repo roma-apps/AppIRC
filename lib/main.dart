@@ -31,6 +31,7 @@ import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:flutter_appirc/ui/theme/system/brightness/ui_theme_system_brightness_handler_widget.dart';
 import 'package:flutter_appirc/ui/theme/ui_theme_proxy_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:provider/provider.dart';
@@ -157,30 +158,34 @@ Future runInitializedCurrentInstanceApp({
 
 void runNotInitializedSplashApp() {
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const SplashPage(),
+    PlatformProvider(
+      builder: (context) => PlatformApp(
+        debugShowCheckedModeBanner: false,
+        home: const SplashPage(),
+      ),
     ),
   );
 }
 
 void runInitFailedApp() {
   runApp(
-    MaterialApp(
-      localizationsDelegates: [
-        S.delegate,
-      ],
-      home: Scaffold(
-        backgroundColor: Colors.red,
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Builder(
-              builder: (context) {
-                return Text(
-                  S.of(context).app_init_fail,
-                );
-              },
+    PlatformProvider(
+      builder: (context) => PlatformApp(
+        localizationsDelegates: [
+          S.delegate,
+        ],
+        home: Scaffold(
+          backgroundColor: Colors.red,
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Builder(
+                builder: (context) {
+                  return Text(
+                    S.of(context).app_init_fail,
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -240,25 +245,35 @@ class AppIrcApp extends StatelessWidget {
                   );
                 }
                 _logger.finest(() => "locale $locale");
-                return MaterialApp(
-                  // checkerboardRasterCacheImages: true,
-                  // checkerboardOffscreenLayers: true,
-                  debugShowCheckedModeBanner: false,
-                  title: "AppIRC",
-                  localizationsDelegates: [
-                    S.delegate,
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalCupertinoLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                  ],
-                  supportedLocales: S.delegate.supportedLocales,
-                  locale: locale,
-                  theme: lightAppIrcUiTheme.themeData,
-                  darkTheme: darkAppIrcUiTheme.themeData,
-                  themeMode: themeMode,
-                  initialRoute: "/",
-                  home: child,
-                  navigatorKey: navigatorKey,
+                return PlatformProvider(
+                  builder: (context) => PlatformApp(
+                    // checkerboardRasterCacheImages: true,
+                    // checkerboardOffscreenLayers: true,
+                    debugShowCheckedModeBanner: false,
+                    title: "AppIRC",
+                    localizationsDelegates: [
+                      S.delegate,
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                    ],
+                    supportedLocales: S.delegate.supportedLocales,
+                    locale: locale,
+                    material: (context, platform) => MaterialAppData(
+                      theme: (currentTheme ?? lightAppIrcUiTheme).themeData,
+                      darkTheme: darkAppIrcUiTheme.themeData,
+                      themeMode: themeMode,
+                    ),
+                    cupertino: (context, platform) => CupertinoAppData(
+                      theme: MaterialBasedCupertinoThemeData(
+                        materialTheme:
+                            (currentTheme ?? lightAppIrcUiTheme).themeData,
+                      ),
+                    ),
+                    initialRoute: "/",
+                    home: child,
+                    navigatorKey: navigatorKey,
+                  ),
                 );
               },
             ),

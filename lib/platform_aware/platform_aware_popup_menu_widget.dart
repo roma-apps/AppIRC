@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/platform_aware/platform_aware.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 MyLogger _logger =
@@ -27,8 +26,10 @@ Widget createPlatformPopupMenuButton(
   bool enabled = true,
   bool isNeedPadding = true,
 }) {
-  switch (detectCurrentUIPlatform()) {
-    case UIPlatform.material:
+  var platformProviderState = PlatformProvider.of(context);
+
+  switch (platformProviderState.platform) {
+    case TargetPlatform.android:
       return _buildMaterialPopupButton(
         child,
         actions,
@@ -36,7 +37,7 @@ Widget createPlatformPopupMenuButton(
         isNeedPadding,
       );
       break;
-    case UIPlatform.cupertino:
+    case TargetPlatform.iOS:
       return _buildCupertinoPopupButton(
         context,
         child,
@@ -45,8 +46,9 @@ Widget createPlatformPopupMenuButton(
         isNeedPadding,
       );
       break;
+    default:
+      throw Exception("invalid platform");
   }
-  throw Exception("invalid platform");
 }
 
 Widget _buildCupertinoPopupButton(
@@ -79,17 +81,23 @@ Widget _buildCupertinoPopupButton(
   }
 }
 
-Future showPlatformAwarePopup(BuildContext context, RelativeRect position,
-    List<PlatformAwarePopupMenuAction> actions) {
-  switch (detectCurrentUIPlatform()) {
-    case UIPlatform.material:
+Future showPlatformAwarePopup(
+  BuildContext context,
+  RelativeRect position,
+  List<PlatformAwarePopupMenuAction> actions,
+) {
+  var platformProviderState = PlatformProvider.of(context);
+
+  switch (platformProviderState.platform) {
+    case TargetPlatform.android:
       return showMaterialPopup(context, position, actions);
       break;
-    case UIPlatform.cupertino:
+    case TargetPlatform.iOS:
       return showCupertinoPopup(context, actions);
       break;
+    default:
+      throw Exception("invalid platform");
   }
-  throw Exception("invalid platform");
 }
 
 Future showMaterialPopup<T>(BuildContext context, RelativeRect position,

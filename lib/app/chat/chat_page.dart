@@ -33,8 +33,6 @@ import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/disposable_provider.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/platform_aware/platform_aware.dart'
-    as platform_aware;
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
@@ -53,58 +51,63 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext outerContext) {
-    if (platform_aware.isMaterial) {
-      return buildPlatformScaffold(
-        context,
-        material: (context, platform) => MaterialScaffoldData(
-          widgetKey: _scaffoldKey,
-          appBar: AppBar(
-            title: _buildAppBarChild(context),
+    var platformProviderState = PlatformProvider.of(context);
+
+    switch (platformProviderState.platform) {
+      case TargetPlatform.android:
+        return buildPlatformScaffold(
+          context,
+          material: (context, platform) => MaterialScaffoldData(
+            widgetKey: _scaffoldKey,
+            appBar: AppBar(
+              title: _buildAppBarChild(context),
+              leading: buildLeading(
+                context,
+                () {
+                  _scaffoldKey.currentState.openDrawer();
+                },
+              ),
+              actions: <Widget>[
+                _buildTrailing(context),
+              ],
+            ),
+            drawer: Drawer(
+              child: ChatDrawerWidget(),
+            ),
+            body: _buildBody(context),
+          ),
+        );
+        break;
+      case TargetPlatform.iOS:
+        return buildPlatformScaffold(
+          context,
+          iosContentBottomPadding: true,
+          iosContentPadding: false,
+          appBar: PlatformAppBar(
             leading: buildLeading(
               context,
               () {
-                _scaffoldKey.currentState.openDrawer();
+                Navigator.push(
+                  context,
+                  platformPageRoute(
+                    context: context,
+                    builder: (context) => ChatDrawerPage(),
+                  ),
+                );
               },
             ),
-            actions: <Widget>[
+            trailingActions: [
               _buildTrailing(context),
             ],
+            title: _buildAppBarChild(context),
           ),
-          drawer: Drawer(
-            child: ChatDrawerWidget(),
-          ),
-          body: _buildBody(context),
-        ),
-      );
-    } else if (platform_aware.isCupertino) {
-      return buildPlatformScaffold(
-        context,
-        iosContentBottomPadding: true,
-        iosContentPadding: false,
-        appBar: PlatformAppBar(
-          leading: buildLeading(
+          body: _buildBody(
             context,
-            () {
-              Navigator.push(
-                context,
-                platformPageRoute(
-                  context: context,
-                  builder: (context) => ChatDrawerPage(),
-                ),
-              );
-            },
           ),
-          trailingActions: [
-            _buildTrailing(context),
-          ],
-          title: _buildAppBarChild(context),
-        ),
-        body: _buildBody(
-          context,
-        ),
-      );
-    } else {
-      throw "NotSupportedPlatform";
+        );
+        break;
+      default:
+        throw "NotSupportedPlatform";
     }
   }
 
