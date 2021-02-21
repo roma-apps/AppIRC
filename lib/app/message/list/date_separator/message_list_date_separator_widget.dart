@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_model.dart';
-import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:intl/intl.dart';
 
 var _onlyDateFormatter = DateFormat().add_yMd();
@@ -26,7 +25,6 @@ Container _buildDateWidget(BuildContext context, DateTime date) {
 }
 
 Container buildMessageDateWidget(BuildContext context, String dateString) {
-  MessageSkinBloc messageSkinBloc = Provider.of(context);
   var borderSide = BorderSide(color: Colors.grey);
   return Container(
     decoration: BoxDecoration(border: Border(top: borderSide)),
@@ -34,7 +32,7 @@ Container buildMessageDateWidget(BuildContext context, String dateString) {
       padding: const EdgeInsets.all(4.0),
       child: Text(
         dateString,
-        style: messageSkinBloc.messageBodyTextStyle,
+        style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
         textAlign: TextAlign.center,
       ),
     ),

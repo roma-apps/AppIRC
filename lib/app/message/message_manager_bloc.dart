@@ -24,7 +24,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
   final ChatDatabase _db;
 
-  final Map<int, Disposable> _channelsListeners = {};
+  final Map<int, IDisposable> _channelsListeners = {};
   final Map<int, List<ChannelMessageListener>> _channelsMessagesListeners = {};
 
   // ignore: close_sinks
@@ -40,7 +40,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     addDisposable(subject: _messageUpdateSubject);
   }
 
-  Disposable listenForMessages(
+  IDisposable listenForMessages(
       Network network, Channel channel, ChannelMessageListener listener) {
     var key = channel.remoteId;
     if (!_channelsMessagesListeners.containsKey(key)) {

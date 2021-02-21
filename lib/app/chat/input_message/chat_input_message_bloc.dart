@@ -6,12 +6,12 @@ import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/input_message/autocomplete/chat_input_message_commands_autocomplete.dart';
 import 'package:flutter_appirc/app/chat/input_message/autocomplete/chat_input_message_names_autocomplete.dart';
 import 'package:flutter_appirc/autocomplete/autocomplete.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 
 var _logger = MyLogger(logTag: "chat_input_message_bloc.dart", enabled: true);
 
-class ChatInputMessageBloc extends Providable {
+class ChatInputMessageBloc extends DisposableOwner {
   final ChatConfig chatConfig;
   final ChannelBloc channelBloc;
 
@@ -34,9 +34,9 @@ class ChatInputMessageBloc extends Providable {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    autoCompleters.forEach((autoCompleter) => autoCompleter.dispose());
+  Future dispose() async {
+    await super.dispose();
+    await autoCompleters.forEach((autoCompleter) => autoCompleter.dispose(),);
   }
 
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern) async {
@@ -70,8 +70,8 @@ class ChatInputMessageBloc extends Providable {
         TextSelection.fromPosition(TextPosition(offset: newMessage.length));
 
     _logger.d(() =>
-        "after onAutoCompleteSelected $currentMessage "
-            "replaceText = $replaceText newMessage = $newMessage");
+    "after onAutoCompleteSelected $currentMessage "
+        "replaceText = $replaceText newMessage = $newMessage");
   }
 
   void appendText(String remoteURL) {

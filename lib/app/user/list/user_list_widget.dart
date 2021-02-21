@@ -1,12 +1,12 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/app/user/list/user_list_bloc.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/text_skin_bloc.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
+import 'package:provider/provider.dart';
 
 class ChannelUsersListWidget extends StatefulWidget {
   @override
@@ -30,15 +30,14 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    ColoredNicknamesBloc coloredNicknamesBloc = Provider.of(context);
-    ChannelUsersListBloc channelUsersListBloc =
-        Provider.of<ChannelUsersListBloc>(context);
+    var coloredNicknamesBloc = Provider.of<ColoredNicknamesBloc>(context);
+    var channelUsersListBloc = Provider.of<ChannelUsersListBloc>(context);
 
     return StreamBuilder<List<ChannelUser>>(
         stream: channelUsersListBloc.usersStream,
         initialData: channelUsersListBloc.users,
-        builder: (BuildContext context,
-            AsyncSnapshot<List<ChannelUser>> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<List<ChannelUser>> snapshot) {
           var users = snapshot.data;
 
           if (users != null) {
@@ -57,12 +56,13 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
   }
 
   Center _buildLoadingWidget(BuildContext context) {
-
-
-    TextSkinBloc textSkinBloc = Provider.of(context);
+    var appIrcUiTextTheme = IAppIrcUiTextTheme.of(context);
     return Center(
-        child: Text(tr("chat.users_list.loading"),
-            style: textSkinBloc.defaultTextStyle));
+      child: Text(
+        S.of(context).chat_users_list_loading,
+        style: appIrcUiTextTheme.mediumDarkGrey,
+      ),
+    );
   }
 
   Column _buildSearchableUserListWidget(BuildContext context,
@@ -73,36 +73,38 @@ class ChannelUsersListWidgetState extends State<ChannelUsersListWidget> {
           context: context,
           bloc: channelUsersListBloc.filterFieldBloc,
           controller: _filterController,
-          label: tr("chat.users_list.search.field.filter.label"),
-          hint: tr("chat.users_list.search.field.filter.hint"),
+          label: S.of(context).chat_users_list_search_field_filter_label,
+          hint: S.of(context).chat_users_list_search_field_filter_hint,
         ),
         body,
       ],
     );
   }
 
-  Flexible _buildUserListWidget(List<ChannelUser> users,
-      ColoredNicknamesBloc coloredNicknamesBloc) {
+  Flexible _buildUserListWidget(
+      List<ChannelUser> users, ColoredNicknamesBloc coloredNicknamesBloc) {
     return Flexible(
       child: ListView.builder(
-          itemCount: users.length,
-          itemBuilder: (BuildContext context, int index) {
-            return _buildUserListItem(
-                context, users[index], coloredNicknamesBloc);
-          }),
+        itemCount: users.length,
+        itemBuilder: (BuildContext context, int index) => _buildUserListItem(
+          context,
+          users[index],
+          coloredNicknamesBloc,
+        ),
+      ),
     );
   }
 
   Padding _buildEmptyListWidget(BuildContext context) {
-
-
-    TextSkinBloc textSkinBloc = Provider.of(context);
+    var appIrcUiTextTheme = IAppIrcUiTextTheme.of(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Center(
-          child: Text(
-              tr("chat.users_list.search.users_not_found"),
-              style: textSkinBloc.defaultTextStyle)),
+        child: Text(
+          S.of(context).chat_users_list_search_users_not_found,
+          style: appIrcUiTextTheme.mediumDarkGrey,
+        ),
+      ),
     );
   }
 }

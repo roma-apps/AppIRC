@@ -12,10 +12,12 @@ class ChannelWithState {
   ChannelWithState(this.channel, this.state, this.initMessages, this.initUsers);
 
   @override
-  String toString() {
-    return 'ChannelWithState{channel: $channel, state: $state,'
-        ' initMessages: $initMessages, initUsers: $initUsers}';
-  }
+  String toString() => 'ChannelWithState{'
+        'channel: $channel, '
+        'state: $state,'
+        'initMessages: $initMessages, '
+        'initUsers: $initUsers'
+        '}';
 }
 
 class ChannelState {

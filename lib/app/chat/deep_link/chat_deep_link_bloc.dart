@@ -9,13 +9,13 @@ import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
 
 var _logger = MyLogger(logTag: "chat_deep_link_bloc.dart", enabled: true);
 
-class ChatDeepLinkBloc extends Providable {
+class ChatDeepLinkBloc extends DisposableOwner {
   final ChatBackendService _backendService;
   final NetworkBlocsBloc _networksBlocsBloc;
   final ChatActiveChannelBloc _activeChannelBloc;
@@ -37,14 +37,18 @@ class ChatDeepLinkBloc extends Providable {
     var linksStream = getLinksStream();
     _logger.d(() => "ChatDeepLinkBloc linksStream $linksStream");
     addDisposable(
-        streamSubscription: linksStream.listen((String link) {
-      // Parse the link and warn the user, if it is not correct
-      _logger.d(() => "linksStream link $link");
-      _onNewDeepLink(link);
-    }, onError: (err) {
-      _logger.d(() => "linksStream err $err");
-      // Handle exception by warning the user their action did not succeed
-    }));
+      streamSubscription: linksStream.listen(
+        (String link) {
+          // Parse the link and warn the user, if it is not correct
+          _logger.d(() => "linksStream link $link");
+          _onNewDeepLink(link);
+        },
+        onError: (err) {
+          _logger.d(() => "linksStream err $err");
+          // Handle exception by warning the user their action did not succeed
+        },
+      ),
+    );
   }
 
   Future _initUniLinks() async {

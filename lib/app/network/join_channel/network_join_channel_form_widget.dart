@@ -1,9 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons, TextInputAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
+import 'package:provider/provider.dart';
 
 class NetworkJoinChannelFormWidget extends StatefulWidget {
   final String startChannelName;
@@ -43,8 +43,7 @@ class NetworkJoinChannelFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    NetworkJoinChannelFormBloc formBloc =
-        Provider.of<NetworkJoinChannelFormBloc>(context);
+    var formBloc = Provider.of<NetworkJoinChannelFormBloc>(context);
 
     return Column(
       children: <Widget>[
@@ -53,20 +52,21 @@ class NetworkJoinChannelFormWidgetState
           bloc: formBloc.channelFieldBloc,
           controller: _channelController,
           icon: Icons.add,
-          label: tr('chat.network.join_channel.field.channel.label'),
-          hint: tr('chat.network.join_channel.field.channel.hint'),
+          label: S.of(context).chat_network_join_channel_field_channel_label,
+          hint: S.of(context).chat_network_join_channel_field_channel_hint,
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.passwordFieldBloc,
         ),
         buildFormTextRow(
-            context: context,
-            bloc: formBloc.passwordFieldBloc,
-            controller: _passwordController,
-            icon: Icons.lock,
-            label: tr('chat.network.join_channel.field.password.label'),
-            hint: tr('chat.network.join_channel.field.password.hint'),
-            textInputAction: TextInputAction.done,
-            obscureText: true),
+          context: context,
+          bloc: formBloc.passwordFieldBloc,
+          controller: _passwordController,
+          icon: Icons.lock,
+          label: S.of(context).chat_network_join_channel_field_password_label,
+          hint: S.of(context).chat_network_join_channel_field_password_hint,
+          textInputAction: TextInputAction.done,
+          obscureText: true,
+        ),
       ],
     );
   }

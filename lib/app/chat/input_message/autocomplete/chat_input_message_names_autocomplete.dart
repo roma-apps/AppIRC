@@ -40,9 +40,6 @@ class NamesAutoCompleter extends AutoCompleter {
       // when nick fully entered
     }).map((nick) => "$_nicknamePrefix$nick").toList();
   }
-
-  @override
-  void dispose() {}
 }
 
 class NamesAutoCompleteRequest {

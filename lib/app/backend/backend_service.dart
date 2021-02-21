@@ -17,7 +17,6 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 
 typedef void NetworkListener(NetworkWithState network);
 typedef void NetworkConnectionListener(NetworkPreferences networkPreferences);
@@ -28,7 +27,7 @@ typedef void ChannelMessageListener(MessagesForChannel messagesForChannel);
 typedef void ChannelMessagePreviewListener(
     MessagePreviewForRemoteMessageId previewForMessage);
 
-abstract class ChatBackendService implements Providable {
+abstract class ChatBackendService implements IDisposable {
   Stream<ChatConnectionState> get connectionStateStream;
 
   bool get isConnected;
@@ -176,38 +175,38 @@ abstract class ChatBackendService implements Providable {
     File file,
   );
 
-  Disposable listenForNetworkState(
+  IDisposable listenForNetworkState(
     Network network,
     NetworkState Function() currentStateExtractor,
     NetworkStateListener listener,
   );
 
-  Disposable listenForNetworkJoin(
+  IDisposable listenForNetworkJoin(
     NetworkListener listener,
   );
 
-  Disposable listenForNetworkLeave(
+  IDisposable listenForNetworkLeave(
     Network network,
     VoidCallback listener,
   );
 
-  Disposable listenForNetworkEdit(
+  IDisposable listenForNetworkEdit(
     Network network,
     NetworkConnectionListener listener,
   );
 
-  Disposable listenForChannelJoin(
+  IDisposable listenForChannelJoin(
     Network network,
     ChannelListener listener,
   );
 
-  Disposable listenForChannelLeave(
+  IDisposable listenForChannelLeave(
     Network network,
     Channel channel,
     VoidCallback listener,
   );
 
-  Disposable listenForChannelState(
+  IDisposable listenForChannelState(
     Network network,
     Channel channel,
     ChannelState Function() currentStateExtractor,
@@ -215,37 +214,37 @@ abstract class ChatBackendService implements Providable {
     ChannelStateListener listener,
   );
 
-  Disposable listenForChannelNames(
+  IDisposable listenForChannelNames(
     Network network,
     Channel channel,
     Function(List<ChannelUser>) listener,
   );
 
-  Disposable listenForChannelUsers(
+  IDisposable listenForChannelUsers(
     Network network,
     Channel channel,
     VoidCallback listener,
   );
 
-  Disposable listenForMessages(
+  IDisposable listenForMessages(
     Network network,
     Channel channel,
     ChannelMessageListener listener,
   );
 
-  Disposable listenForMessagePreviews(
+  IDisposable listenForMessagePreviews(
     Network network,
     Channel channel,
     ChannelMessagePreviewListener listener,
   );
 
-  Disposable listenForMessagePreviewToggle(
+  IDisposable listenForMessagePreviewToggle(
     Network network,
     Channel channel,
     Function(ToggleMessagePreviewData) callback,
   );
 
-  Disposable listenForChannelPreviewToggle(
+  IDisposable listenForChannelPreviewToggle(
     Network network,
     Channel channel,
     Function(ToggleChannelPreviewData) callback,

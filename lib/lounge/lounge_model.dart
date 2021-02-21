@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/local_preferences/preferences_model.dart';
+import 'package:flutter_appirc/json/json_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'lounge_model.g.dart';
@@ -59,7 +59,7 @@ class MessageTypeLoungeConstants {
 }
 
 @JsonSerializable()
-class LoungeHostPreferences extends JsonPreferences {
+class LoungeHostPreferences implements IJsonObject {
   final String host;
 
   const LoungeHostPreferences({
@@ -91,7 +91,7 @@ class LoungeHostPreferences extends JsonPreferences {
 }
 
 @JsonSerializable()
-class LoungeAuthPreferences extends JsonPreferences {
+class LoungeAuthPreferences extends IJsonObject {
   final String username;
   final String password;
 
@@ -116,7 +116,7 @@ class LoungeAuthPreferences extends JsonPreferences {
 }
 
 @JsonSerializable()
-class LoungePreferences extends JsonPreferences {
+class LoungePreferences implements IJsonObject {
   LoungeHostPreferences hostPreferences;
   LoungeAuthPreferences authPreferences;
 

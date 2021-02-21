@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/local_preferences/preferences_model.dart';
+import 'package:flutter_appirc/json/json_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'channel_preferences_model.g.dart';
 
 @JsonSerializable()
-class ChannelPreferences extends JsonPreferences {
+class ChannelPreferences extends IJsonObject {
   int localId;
   final String name;
   final String password;

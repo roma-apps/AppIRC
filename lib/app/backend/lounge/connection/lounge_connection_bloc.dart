@@ -1,18 +1,18 @@
 import 'dart:async';
 
-import 'package:adhara_socket_io/adhara_socket_io.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:rxdart/subjects.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "lounge_connection_form_bloc.dart", enabled: true);
 
-class LoungeConnectionBloc extends Providable {
-  final SocketIOManager socketIOManager;
+class LoungeConnectionBloc extends DisposableOwner {
+  final SocketIOService socketIOService;
 
   LoungePreferences get preferences => LoungePreferences.name(
       hostPreferences: hostPreferences, authPreferences: authPreferences);
@@ -41,7 +41,10 @@ class LoungeConnectionBloc extends Providable {
       .map((hostInformation) => hostInformation?.connected ?? false);
 
   LoungeConnectionBloc(
-      this.socketIOManager, this.hostPreferences, this.authPreferences) {
+    this.socketIOService,
+    this.hostPreferences,
+    this.authPreferences,
+  ) {
     addDisposable(subject: _stateSubject);
 
     if (authPreferences == null &&

@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "message_list_load_more_bloc.dart", enabled: true);
 
-class MessageListLoadMoreBloc extends Providable {
+class MessageListLoadMoreBloc extends DisposableOwner {
   // ignore: close_sinks
   BehaviorSubject<LoadMoreState> _stateSubject = BehaviorSubject();
 

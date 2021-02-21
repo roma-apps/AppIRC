@@ -1,14 +1,14 @@
 import 'package:flutter_appirc/app/message/list/jump_to_newest/message_list_jump_to_newest_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "message_list_jump_to_newest_bloc.dart", enabled: true);
 
-class MessagesListJumpToNewestBloc extends Providable {
+class MessagesListJumpToNewestBloc extends DisposableOwner {
   final MessageListBloc _messageListBloc;
 
   // ignore: close_sinks

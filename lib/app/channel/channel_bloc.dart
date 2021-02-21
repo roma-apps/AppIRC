@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/messages/channel_message_list_bloc.dart';
 import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
@@ -17,7 +16,7 @@ import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 final Duration _usersListOutDateDuration = Duration(seconds: 15);
@@ -166,17 +165,29 @@ class ChannelBloc extends DisposableOwner {
           String nick) async =>
       await _backendService.openDirectMessagesChannel(network, channel, nick);
 
-  static ChannelBloc of(BuildContext context) {
-    return Provider.of<ChannelBlocProvider>(context).channelBloc;
-  }
+  static ChannelBloc of(
+    BuildContext context, {
+    bool listen = true,
+  }) =>
+      Provider.of<ChannelBloc>(
+        context,
+        listen: listen,
+      );
 
   Future<RequestResult<MessageListLoadMore>> loadMoreHistory(
           RegularMessage oldestMessage) async =>
       await _backendService.loadMoreHistory(
-          network, channel, oldestMessage?.messageRemoteId);
+        network,
+        channel,
+        oldestMessage?.messageRemoteId,
+      );
 
   Future<RequestResult<ToggleMessagePreviewData>> togglePreview(
-      RegularMessage message, MessagePreview preview) {
-    return _backendService.togglePreview(network, channel, message, preview);
-  }
+          RegularMessage message, MessagePreview preview) =>
+      _backendService.togglePreview(
+        network,
+        channel,
+        message,
+        preview,
+      );
 }

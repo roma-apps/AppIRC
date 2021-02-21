@@ -14,10 +14,13 @@ description: App IRC Flutter Client
 version: 1.0.25+25
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   flutter:
+    sdk: flutter
+
+  flutter_localizations:
     sdk: flutter
 
   # ios icons
@@ -25,9 +28,6 @@ dependencies:
 
   # socket io protocol implementation for lounge
   adhara_socket_io: ^0.4.2+1
-
-  # Support different languages
-  easy_localization: ^2.0.2
 
   # for lounge commands serialization & local settings serialization
   json_annotation: ^3.1.1
@@ -97,6 +97,9 @@ dependencies:
   # advanced logging
   logging: ^0.11.4
 
+  # dependency injection framework
+  provider: ^4.3.3
+
 #
 #  # cache images locally
 #  cached_network_image: ^2.5.0
@@ -107,8 +110,7 @@ dependencies:
 #
 
 #
-#  # dependency injection framework
-#  provider: ^4.3.3
+
 #
 #  # Provides internationalization and localization facilities
 #  intl: ^0.16.1
@@ -125,6 +127,7 @@ dev_dependencies:
 
   # run dev tools like JSON or ORM code generators
   build_runner: ^1.10.3
+  # flutter pub run build_runner build --delete-conflicting-outputs
 
   # for socket io commands serialization
   json_serializable: ^3.5.1
@@ -182,3 +185,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.io/custom-fonts/#from-packages
+flutter_intl:
+  enabled: true

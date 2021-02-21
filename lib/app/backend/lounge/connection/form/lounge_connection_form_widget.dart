@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
@@ -11,13 +10,14 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_dialog_widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_preferences_form_widget.dart';
-import 'package:flutter_appirc/async/async_dialog.dart';
-import 'package:flutter_appirc/async/async_dialog_model.dart';
+import 'package:flutter_appirc/dialog/async/async_dialog.dart';
+import 'package:flutter_appirc/dialog/async/async_dialog_model.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/button_skin_bloc.dart';
-import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
+import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:provider/provider.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "lounge_connection_form_widget.dart", enabled: true);
@@ -112,50 +112,53 @@ class LoungeConnectionFormWidgetState
         if (connected) {
           return SizedBox.shrink();
         } else {
-          return createSkinnedPlatformButton(context, onPressed: () async {
-            var extractData = formBloc.extractData();
-            AsyncDialogResult<RequestResult<LoungeHostInformation>>
-                asyncResult = await doAsyncOperationWithDialog(
-                    context: context,
-                    asyncCode: () {
-                      return retrieveLoungeHostInformation(
-                          Provider.of<SocketIOManagerProvider>(context).manager,
-                          extractData.hostPreferences);
-                    },
-                    cancellationValue: null,
-                    isDismissible: true);
+          return PlatformButton(
+            onPressed: () async {
+              var extractData = formBloc.extractData();
+              AsyncDialogResult<RequestResult<LoungeHostInformation>>
+                  asyncResult = await doAsyncOperationWithDialog(
+                context: context,
+                asyncCode: () {
+                  return retrieveLoungeHostInformation(
+                    SocketIOService.of(context, listen: false),
+                    extractData.hostPreferences,
+                  );
+                },
+                cancelable: true,
+              );
 
-            if (asyncResult.isNotCanceled) {
-              var requestResult = asyncResult.result;
+              if (!asyncResult.canceled) {
+                var requestResult = asyncResult.result;
 
-              if (requestResult.isTimeout) {
-                await showLoungeTimeoutAlertDialog(context);
-              } else {
-                if (requestResult.isResponseReceived) {
-                  var hostInformation = requestResult.result;
-
-                  if (hostInformation.connected &&
-                      !hostInformation.authRequired) {
-                    successCallback(context, extractData);
-                  } else {
-                    connectionBloc.onHostConnectionResult(
-                        extractData.hostPreferences, hostInformation);
-
-                    if (!hostInformation.connected) {
-                      await showLoungeConnectionErrorAlertDialog(
-                          context, requestResult.error);
-                    }
-                  }
+                if (requestResult.isTimeout) {
+                  await showLoungeTimeoutAlertDialog(context);
                 } else {
-                  await showLoungeConnectionErrorAlertDialog(
-                      context, requestResult.error);
+                  if (requestResult.isResponseReceived) {
+                    var hostInformation = requestResult.result;
+
+                    if (hostInformation.connected &&
+                        !hostInformation.authRequired) {
+                      successCallback(context, extractData);
+                    } else {
+                      connectionBloc.onHostConnectionResult(
+                          extractData.hostPreferences, hostInformation);
+
+                      if (!hostInformation.connected) {
+                        await showLoungeConnectionErrorAlertDialog(
+                            context, requestResult.error);
+                      }
+                    }
+                  } else {
+                    await showLoungeConnectionErrorAlertDialog(
+                        context, requestResult.error);
+                  }
                 }
               }
-            }
-          },
-              child: Text(tr('lounge.preferences.host'
-                  '.action'
-                  '.connect')));
+            },
+            child: Text(
+              S.of(context).lounge_preferences_host_action_connect,
+            ),
+          );
         }
       },
     );
@@ -180,73 +183,80 @@ class LoungeConnectionFormWidgetState
   Widget _buildSwitchToRegistrationButton(BuildContext context) {
     LoungeConnectionBloc connectionBloc = Provider.of(context);
     return StreamBuilder<bool>(
-        stream: connectionBloc.isRegistrationSupportedStream,
-        initialData: connectionBloc.isRegistrationSupported,
-        builder: (context, snapshot) {
-          var registrationSupported = snapshot.data;
-          return registrationSupported
-              ? createSkinnedPlatformButton(context, onPressed: () {
+      stream: connectionBloc.isRegistrationSupportedStream,
+      initialData: connectionBloc.isRegistrationSupported,
+      builder: (context, snapshot) {
+        var registrationSupported = snapshot.data;
+        return registrationSupported
+            ? PlatformButton(
+                onPressed: () {
                   connectionBloc.switchToRegistration();
                 },
-                  child: Text(tr("lounge.preferences.action"
-                      ".switch_to_sign_up")))
-              : SizedBox.shrink();
-        });
+                child: Text(
+                  S.of(context).lounge_preferences_action_switch_to_sign_up,
+                ),
+              )
+            : SizedBox.shrink();
+      },
+    );
   }
 
   StreamBuilder<bool> _buildLoginButton(BuildContext context) {
     LoungeConnectionFormBloc formBloc = Provider.of(context);
     var loginFormBloc = formBloc.loginFormBloc;
     return StreamBuilder<bool>(
-        initialData: loginFormBloc.isDataValid,
-        stream: loginFormBloc.dataValidStream,
-        builder: (context, snapshot) {
-          var dataValid = snapshot.data;
+      initialData: loginFormBloc.isDataValid,
+      stream: loginFormBloc.dataValidStream,
+      builder: (context, snapshot) {
+        var dataValid = snapshot.data;
 
-          return createSkinnedPlatformButton(context,
-              onPressed: dataValid
-                  ? () async {
-                      var connectionFormBloc =
-                          Provider.of<LoungeConnectionFormBloc>(context);
-                      var extractData = connectionFormBloc.extractData();
-                      var asyncResult = await doAsyncOperationWithDialog(
-                          context: context,
-                          asyncCode: () async {
-                            return await tryLoginToLounge(
-                                Provider.of<SocketIOManagerProvider>(context)
-                                    .manager,
-                                extractData);
-                          },
-                          cancellationValue: null,
-                          isDismissible: true);
+        return PlatformButton(
+          onPressed: dataValid
+              ? () async {
+                  var connectionFormBloc =
+                      Provider.of<LoungeConnectionFormBloc>(context);
+                  var extractData = connectionFormBloc.extractData();
+                  var asyncResult = await doAsyncOperationWithDialog(
+                    context: context,
+                    asyncCode: () async {
+                      return await tryLoginToLounge(
+                        Provider.of<SocketIOService>(context),
+                        extractData,
+                      );
+                    },
+                    cancelable: true,
+                  );
 
-                      if (asyncResult.isNotCanceled) {
-                        var requestResult = asyncResult.result;
+                  if (!asyncResult.canceled) {
+                    var requestResult = asyncResult.result;
 
-                        if (requestResult.isTimeout) {
-                          await showLoungeTimeoutAlertDialog(context);
+                    if (requestResult.isTimeout) {
+                      await showLoungeTimeoutAlertDialog(context);
+                    } else {
+                      if (requestResult.isResponseReceived) {
+                        ChatLoginResult loginResult = requestResult.result;
+
+                        if (loginResult.success) {
+                          successCallback(context, extractData);
                         } else {
-                          if (requestResult.isResponseReceived) {
-                            ChatLoginResult loginResult = requestResult.result;
-
-                            if (loginResult.success) {
-                              successCallback(context, extractData);
-                            } else {
-                              await showLoungeLoginFailAlertDialog(context);
-                            }
-                          } else {
-                            await showLoungeConnectionErrorAlertDialog(
-                              context,
-                              requestResult.error,
-                            );
-                          }
+                          await showLoungeLoginFailAlertDialog(context);
                         }
+                      } else {
+                        await showLoungeConnectionErrorAlertDialog(
+                          context,
+                          requestResult.error,
+                        );
                       }
                     }
-                  : null,
-              child: Text(tr("lounge"
-                  ".preferences.login.action.login")));
-        });
+                  }
+                }
+              : null,
+          child: Text(
+            S.of(context).lounge_preferences_login_action_login,
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildRegistrationForm(BuildContext context) {
@@ -269,77 +279,83 @@ class LoungeConnectionFormWidgetState
     LoungeConnectionFormBloc formBloc = Provider.of(context);
     var registrationFormBloc = formBloc.registrationFormBloc;
     return StreamBuilder<bool>(
-        initialData: registrationFormBloc.isDataValid,
-        stream: registrationFormBloc.dataValidStream,
-        builder: (context, snapshot) {
-          var dataValid = snapshot.data;
+      initialData: registrationFormBloc.isDataValid,
+      stream: registrationFormBloc.dataValidStream,
+      builder: (context, snapshot) {
+        var dataValid = snapshot.data;
 
-          return createSkinnedPlatformButton(context,
-              onPressed: dataValid
-                  ? () async {
-                      var connectionFormBloc =
-                          Provider.of<LoungeConnectionFormBloc>(context);
-                      var extractData = connectionFormBloc.extractData();
-                      var asyncResult = await doAsyncOperationWithDialog(
-                          context: context,
-                          asyncCode: () async {
-                            return await registerOnLounge(
-                                Provider.of<SocketIOManagerProvider>(context)
-                                    .manager,
-                                extractData);
-                          },
-                          cancellationValue: null,
-                          isDismissible: true);
+        return PlatformButton(
+          onPressed: dataValid
+              ? () async {
+                  var connectionFormBloc =
+                      Provider.of<LoungeConnectionFormBloc>(context);
+                  var extractData = connectionFormBloc.extractData();
+                  var asyncResult = await doAsyncOperationWithDialog(
+                    context: context,
+                    asyncCode: () async {
+                      return await registerOnLounge(
+                        Provider.of<SocketIOService>(context),
+                        extractData,
+                      );
+                    },
+                    cancelable: true,
+                  );
 
-                      if (asyncResult.isNotCanceled) {
-                        var requestResult = asyncResult.result;
+                  if (!asyncResult.canceled) {
+                    var requestResult = asyncResult.result;
 
-                        if (requestResult.isTimeout) {
-                          await showLoungeTimeoutAlertDialog(context);
+                    if (requestResult.isTimeout) {
+                      await showLoungeTimeoutAlertDialog(context);
+                    } else {
+                      if (requestResult.isResponseReceived) {
+                        ChatRegistrationResult registrationResult =
+                            requestResult.result;
+
+                        if (registrationResult.success) {
+                          successCallback(context, extractData);
                         } else {
-                          if (requestResult.isResponseReceived) {
-                            ChatRegistrationResult registrationResult =
-                                requestResult.result;
-
-                            if (registrationResult.success) {
-                              successCallback(context, extractData);
-                            } else {
-                              switch (registrationResult.errorType) {
-                                case RegistrationErrorType.alreadyExist:
-                                  await showLoungeRegistrationAlreadyExistAlertDialog(
-                                      context);
-                                  break;
-                                case RegistrationErrorType.invalid:
-                                  await showLoungeRegistrationInvalidAlertDialog(
-                                      context);
-                                  break;
-                                case RegistrationErrorType.unknown:
-                                  await showLoungeRegistrationUnknownAlertDialog(
-                                      context);
-                                  break;
-                              }
-                            }
-                          } else {
-                            await showLoungeConnectionErrorAlertDialog(
-                              context,
-                              requestResult.error,
-                            );
+                          switch (registrationResult.errorType) {
+                            case RegistrationErrorType.alreadyExist:
+                              await showLoungeRegistrationAlreadyExistAlertDialog(
+                                  context);
+                              break;
+                            case RegistrationErrorType.invalid:
+                              await showLoungeRegistrationInvalidAlertDialog(
+                                  context);
+                              break;
+                            case RegistrationErrorType.unknown:
+                              await showLoungeRegistrationUnknownAlertDialog(
+                                  context);
+                              break;
                           }
                         }
+                      } else {
+                        await showLoungeConnectionErrorAlertDialog(
+                          context,
+                          requestResult.error,
+                        );
                       }
                     }
-                  : null,
-              child: Text(tr("lounge"
-                  ".preferences.registration.action.register")));
-        });
+                  }
+                }
+              : null,
+          child: Text(
+            S.of(context).lounge_preferences_registration_action_register,
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildSwitchToRegisterButton(BuildContext context) {
     LoungeConnectionBloc connectionBloc = Provider.of(context);
-    return createSkinnedPlatformButton(context, onPressed: () {
-      connectionBloc.switchToLogin();
-    },
-        child: Text(tr("lounge.preferences.action"
-            ".switch_to_sign_in")));
+    return PlatformButton(
+      onPressed: () {
+        connectionBloc.switchToLogin();
+      },
+      child: Text(
+        S.of(context).lounge_preferences_action_switch_to_sign_in,
+      ),
+    );
   }
 }

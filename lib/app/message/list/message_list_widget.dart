@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
@@ -15,20 +14,18 @@ import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/text_skin_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 var _logger = MyLogger(logTag: "message_list_widget.dart", enabled: true);
 
 class MessageListWidget extends StatefulWidget {
-  final MessageListLoadMoreBloc loadMoreBloc;
-  final MessagesListJumpToNewestBloc messagesListJumpToNewestBloc;
-
-  MessageListWidget(this.loadMoreBloc, this.messagesListJumpToNewestBloc);
+  MessageListWidget();
 
   @override
   _MessageListWidgetState createState() => _MessageListWidgetState();
@@ -46,33 +43,57 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   @override
   void dispose() {
     super.dispose();
-    _positionsListener.itemPositions.removeListener(onVisiblePositionsChanged);
+    _positionsListener.itemPositions.removeListener(
+      positionsListenerFunction,
+    );
     disposable.dispose();
   }
 
   CompositeDisposable disposable = CompositeDisposable([]);
 
+  VoidCallback positionsListenerFunction;
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    _positionsListener.itemPositions.addListener(onVisiblePositionsChanged);
+    positionsListenerFunction = () {
+      onVisiblePositionsChanged(context);
+    };
+    _positionsListener.itemPositions.addListener(positionsListenerFunction);
 
-    Timer.run(() {
-      MessageListBloc messageListBloc = Provider.of(context);
+    Timer.run(
+      () {
+        MessageListBloc messageListBloc = Provider.of(context, listen: false);
 
-      disposable.add(StreamSubscriptionDisposable(messageListBloc
-          .listJumpDestinationStream
-          .listen((newJumpDestination) {
-        nextJumpDestination = newJumpDestination;
-        Timer.run(() {
-          _jumpToMessage();
-        });
-      })));
-    });
+        disposable.add(
+          StreamSubscriptionDisposable(
+            messageListBloc.listJumpDestinationStream.listen(
+              (newJumpDestination) {
+                nextJumpDestination = newJumpDestination;
+                Timer.run(
+                  () {
+                    _jumpToMessage();
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  void onVisiblePositionsChanged() {
+  void onVisiblePositionsChanged(BuildContext context) {
+    var loadMoreBloc = Provider.of<MessageListLoadMoreBloc>(
+      context,
+      listen: false,
+    );
+    var messagesListJumpToNewestBloc =
+        Provider.of<MessagesListJumpToNewestBloc>(
+      context,
+      listen: false,
+    );
     if (_lastBuildItems != null) {
       var visiblePositions = _positionsListener.itemPositions.value;
       _logger.d(() => "visiblePositions $visiblePositions"
@@ -92,7 +113,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           }
         });
         if (minIndex == 0) {
-          widget.loadMoreBloc.loadMore();
+          loadMoreBloc.loadMore();
         }
 
         minIndex -= _lastBuildMessagesStartIndex;
@@ -107,9 +128,9 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         }
 
         if (maxIndex == _lastBuildItems.length - 1) {
-          widget.messagesListJumpToNewestBloc.onVisibleAreaChanged(true);
+          messagesListJumpToNewestBloc.onVisibleAreaChanged(true);
         } else {
-          widget.messagesListJumpToNewestBloc.onVisibleAreaChanged(false);
+          messagesListJumpToNewestBloc.onVisibleAreaChanged(false);
         }
 
         _logger.d(() => "minIndex $minIndex "
@@ -134,18 +155,19 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    MessageListBloc chatListMessagesBloc = Provider.of(context);
+    var chatListMessagesBloc = Provider.of<MessageListBloc>(context);
 
     _logger.d(() => "build for ${chatListMessagesBloc.listState}");
 
     return StreamBuilder<MessageListState>(
-        stream: chatListMessagesBloc.listStateStream,
-        initialData: chatListMessagesBloc.listState,
-        builder:
-            (BuildContext context, AsyncSnapshot<MessageListState> snapshot) {
-          MessageListState chatMessageListState = snapshot.data;
-          return _buildMessagesList(context, chatMessageListState);
-        });
+      stream: chatListMessagesBloc.listStateStream,
+      initialData: chatListMessagesBloc.listState,
+      builder:
+          (BuildContext context, AsyncSnapshot<MessageListState> snapshot) {
+        MessageListState chatMessageListState = snapshot.data;
+        return _buildMessagesList(context, chatMessageListState);
+      },
+    );
   }
 
   Widget _buildMessagesList(
@@ -262,7 +284,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
                 var item = items[index];
                 return _buildListItem(
-                  context, item,
+                  context,
+                  item,
                 );
               }),
         ),
@@ -272,16 +295,16 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   }
 
   Widget _buildJumpWidget(BuildContext context) {
-
     ChannelBloc channelBloc = ChannelBloc.of(context);
 
-    return channelBloc.channel.type != ChannelType.special ? Align(
-          alignment: Alignment.bottomCenter,
-          child: MessageListJumpToNewestWidget()) : SizedBox.shrink();
+    return channelBloc.channel.type != ChannelType.special
+        ? Align(
+            alignment: Alignment.bottomCenter,
+            child: MessageListJumpToNewestWidget())
+        : SizedBox.shrink();
   }
 
   StreamBuilder<bool> _buildListViewEmptyWidget(BuildContext context) {
-    TextSkinBloc textSkinBloc = Provider.of(context);
     var channelBloc = ChannelBloc.of(context);
     return StreamBuilder<bool>(
       stream: channelBloc.channelConnectedStream,
@@ -291,14 +314,18 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
         if (connected) {
           return Center(
-              child: Text(
-                  tr("chat.messages_list.empty.connected"),
-                  style: textSkinBloc.defaultTextStyle));
+            child: Text(
+              S.of(context).chat_messages_list_empty_connected,
+              style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+            ),
+          );
         } else {
           return Center(
-              child: Text(
-                  tr("chat.messages_list.empty.not_connected"),
-                  style: textSkinBloc.defaultTextStyle));
+            child: Text(
+              S.of(context).chat_messages_list_empty_not_connected,
+              style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+            ),
+          );
         }
       },
     );

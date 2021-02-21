@@ -6,8 +6,9 @@ import 'package:flutter_appirc/app/message/list/jump_to_newest/message_list_jump
 import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_widget.dart';
+import 'package:flutter_appirc/disposable/disposable_provider.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:provider/provider.dart';
 
 MyLogger _logger = MyLogger(logTag: "chat_channel_widget.dart", enabled: true);
 
@@ -24,23 +25,26 @@ class _ChannelWidgetState extends State<ChannelWidget> {
     _logger.d(() => "build");
 
     var channelBloc = ChannelBloc.of(context);
-    MessageListBloc messageListBloc = Provider.of(context);
-    var messageListLoadMoreBloc =
-        MessageListLoadMoreBloc(channelBloc, messageListBloc);
-    var messagesListJumpToNewestBloc = MessagesListJumpToNewestBloc(messageListBloc);
+    // whe listen false here?
+    var messageListBloc = Provider.of<MessageListBloc>(context, listen: false);
 
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Expanded(
-              child: Provider(
-                  providable: messageListLoadMoreBloc,
-                  child: Provider(
-                      providable: messagesListJumpToNewestBloc,
-                      child: MessageListWidget(messageListLoadMoreBloc,
-                          messagesListJumpToNewestBloc)))),
-          ChannelNewMessageWidget()
-        ]);
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          child: DisposableProvider<MessageListLoadMoreBloc>(
+            create: (context) =>
+                MessageListLoadMoreBloc(channelBloc, messageListBloc),
+            child: DisposableProvider<MessagesListJumpToNewestBloc>(
+              create: (context) =>
+                  MessagesListJumpToNewestBloc(messageListBloc),
+              child: MessageListWidget(),
+            ),
+          ),
+        ),
+        ChannelNewMessageWidget()
+      ],
+    );
   }
 }

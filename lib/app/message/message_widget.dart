@@ -1,23 +1,22 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/date_separator/message_list_date_separator_widget.dart';
-import 'package:flutter_appirc/app/message/list/message_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_page.dart';
-import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_widget.dart';
 import 'package:flutter_appirc/app/message/special/message_special_widget.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 MyLogger _logger = MyLogger(logTag: "message_widget.dart", enabled: true);
 
@@ -104,30 +103,36 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   }
 
   void _showMessagePopup(BuildContext context, RelativeRect tapPosition) {
-    showPlatformAwarePopup(context, tapPosition, [
-      PlatformAwarePopupMenuAction(
-          text: tr("chat.message.action.copy"),
+    showPlatformAwarePopup(
+      context,
+      tapPosition,
+      [
+        PlatformAwarePopupMenuAction(
+          text: S.of(context).chat_message_action_copy,
           iconData: Icons.content_copy,
           actionCallback: (action) {
             Clipboard.setData(ClipboardData(text: getBodyRawText(context)));
-          }),
-    ]);
+          },
+        ),
+      ],
+    );
   }
 
   Widget _buildDecoratedBody(BuildContext context) {
-    MessageManagerBloc messageSaverBloc = Provider.of(context);
+    var messageSaverBloc = Provider.of<MessageManagerBloc>(context);
 
     return StreamBuilder<ChatMessage>(
-        stream: messageSaverBloc.getMessageUpdateStream(message),
-        initialData: message,
-        builder: (context, snapshot) {
-          ChatMessage message = snapshot.data;
+      stream: messageSaverBloc.getMessageUpdateStream(message),
+      initialData: message,
+      builder: (context, snapshot) {
+        ChatMessage message = snapshot.data;
 
-          _logger.d(() => "StreamBuilder messageState =$message");
-          return Container(
-              decoration: _createMessageDecoration(context: context),
-              child: buildMessageBody(context, message));
-        });
+        _logger.d(() => "StreamBuilder messageState =$message");
+        return Container(
+            decoration: _createMessageDecoration(context: context),
+            child: buildMessageBody(context, message));
+      },
+    );
   }
 
   Widget buildMessageBody(BuildContext context, ChatMessage message);
@@ -141,10 +146,10 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
       isHighlightByServer = isHighlightedByServer(currentMessage);
     }
 
-    var messagesSkin = Provider.of<MessageListSkinBloc>(context);
-
     if (isHighlightByServer ??= false) {
-      decoration = messagesSkin.highlightServerDecoration;
+      decoration = BoxDecoration(
+        color: IAppIrcUiColorTheme.of(context).primaryDark,
+      );
     }
 
     return decoration;
@@ -178,11 +183,11 @@ WidgetSpan buildMessageIconWidgetSpan(
   );
 }
 
-TextSpan buildMessageDateTextSpan(
-    {@required BuildContext context,
-    @required DateTime date,
-    @required Color color}) {
-  var messagesSkin = Provider.of<MessageSkinBloc>(context);
+TextSpan buildMessageDateTextSpan({
+  @required BuildContext context,
+  @required DateTime date,
+  @required Color color,
+}) {
   var dateString = _timeFormatter.format(date);
 
   var dateTextSpan = TextSpan(
@@ -190,7 +195,9 @@ TextSpan buildMessageDateTextSpan(
     // hack, but using additional space is better for performance
     // than additional empty span for space
     text: "$dateString",
-    style: messagesSkin.createDateTextStyle(color),
+    style: IAppIrcUiTextTheme.of(context).mediumDarkGrey.copyWith(
+          color: color,
+        ),
   );
   return dateTextSpan;
 }
@@ -207,8 +214,6 @@ var _dateFormatter = DateFormat().add_yMd().add_Hms();
 
 Widget buildMessageRawBody(
     BuildContext context, ChatMessage message, String text) {
-  MessageSkinBloc messageSkinBloc = Provider.of(context);
-
   return Column(
     mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,10 +228,16 @@ Widget buildMessageRawBody(
       Card(
           child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: SelectableText(text,
-            toolbarOptions: ToolbarOptions(
-                copy: true, selectAll: true, cut: false, paste: false),
-            style: messageSkinBloc.messageBodyTextStyle),
+        child: SelectableText(
+          text,
+          toolbarOptions: ToolbarOptions(
+            copy: true,
+            selectAll: true,
+            cut: false,
+            paste: false,
+          ),
+          style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+        ),
       )),
     ],
   );

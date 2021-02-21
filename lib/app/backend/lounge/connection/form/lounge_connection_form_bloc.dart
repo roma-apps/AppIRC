@@ -8,7 +8,7 @@ import 'package:flutter_appirc/form/form_bloc.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 
 class LoungeConnectionFormBloc extends FormBloc {
-  final LoungeConnectionBloc connectionBloc;
+  final LoungeConnectionBloc loungeConnectionBloc;
 
   LoungeHostPreferencesFormBloc hostFormBloc;
   LoungeLoginFormBloc loginFormBloc;
@@ -17,11 +17,11 @@ class LoungeConnectionFormBloc extends FormBloc {
   bool get isRegistrationSupported =>
       hostFormBloc?.hostInformation?.registrationSupported ?? false;
 
-  LoungeConnectionFormBloc(this.connectionBloc) {
-    var startPreferences = connectionBloc.preferences;
+  LoungeConnectionFormBloc(this.loungeConnectionBloc) {
+    var startPreferences = loungeConnectionBloc.preferences;
 
     hostFormBloc = LoungeHostPreferencesFormBloc(
-        startPreferences.hostPreferences, connectionBloc.hostInformation);
+        startPreferences.hostPreferences, loungeConnectionBloc.hostInformation);
     loginFormBloc = LoungeLoginFormBloc(startPreferences.authPreferences);
     registrationFormBloc =
         LoungeRegistrationFormBloc(startPreferences.authPreferences);
@@ -38,20 +38,20 @@ class LoungeConnectionFormBloc extends FormBloc {
 
     addDisposable(
         streamSubscription: hostFormBloc.hostFieldBloc.valueStream.listen((_) {
-      connectionBloc.onHostPreferencesChanged(extractHostPreferences());
+      loungeConnectionBloc.onHostPreferencesChanged(extractHostPreferences());
     }));
 
   }
 
   void _onAuthChanged(_) {
-    connectionBloc.onAuthPreferencesChanged(_extractCurrentAuthPreferences());
+    loungeConnectionBloc.onAuthPreferencesChanged(_extractCurrentAuthPreferences());
   }
 
   @override
   List<FormFieldBloc> get children {
     var children = <FormFieldBloc>[hostFormBloc];
 
-    switch (connectionBloc.state) {
+    switch (loungeConnectionBloc.state) {
       case LoungeAuthState.login:
         children.add(loginFormBloc);
         break;
@@ -67,7 +67,7 @@ class LoungeConnectionFormBloc extends FormBloc {
       authPreferences: _extractCurrentAuthPreferences());
 
   LoungeAuthPreferences _extractCurrentAuthPreferences() {
-    switch (connectionBloc.state) {
+    switch (loungeConnectionBloc.state) {
       case LoungeAuthState.login:
         return loginFormBloc.extractData();
         break;

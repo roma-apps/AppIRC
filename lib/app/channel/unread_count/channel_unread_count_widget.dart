@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
-import 'package:flutter_appirc/app/channel/list/channel_list_skin_bloc.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 
 Widget _buildChannelUnreadBadgeCount(
   BuildContext context,
@@ -9,20 +8,19 @@ Widget _buildChannelUnreadBadgeCount(
   int unreadCount,
 ) {
   if (unreadCount > 0) {
-    var channelSkinBloc = Provider.of<ChannelListSkinBloc>(context);
     return Container(
       decoration: BoxDecoration(
-        color: channelSkinBloc.getChannelUnreadItemBackgroundColor(
-          isChannelActive,
-        ),
+        color: isChannelActive
+            ? IAppIrcUiColorTheme.of(context).primary
+            : IAppIrcUiColorTheme.of(context).primaryDark,
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
           unreadCount.toString(),
-          style: channelSkinBloc.getChannelUnreadTextStyle(
-            isChannelActive,
-          ),
+          style: isChannelActive
+              ? IAppIrcUiTextTheme.of(context).mediumDarkGrey
+              : IAppIrcUiTextTheme.of(context).mediumWhite,
         ),
       ),
     );

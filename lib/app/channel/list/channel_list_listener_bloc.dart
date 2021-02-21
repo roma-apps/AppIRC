@@ -46,11 +46,11 @@ abstract class ChannelListListenerBloc
     network.channels.forEach((channel) => onChannelLeaved(network, channel));
   }
 
-  Disposable _subscribeForChannelLeave(
+  IDisposable _subscribeForChannelLeave(
       ChannelListBloc chatChannelsListBloc,
       Network network,
       Channel channel) {
-    Disposable leaveListener;
+    IDisposable leaveListener;
     leaveListener =
         chatChannelsListBloc.listenForChannelLeave(channel, () {
       onChannelLeaved(network, channel);

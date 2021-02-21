@@ -8,13 +8,12 @@ import 'package:flutter_appirc/app/chat/active_channel/chat_active_channel_bloc.
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
-import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/app/network/state/network_states_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:provider/provider.dart';
 
 class NetworkBloc extends DisposableOwner {
   final ChatBackendService _backendService;
@@ -80,8 +79,9 @@ class NetworkBloc extends DisposableOwner {
           waitForResult: waitForResult);
 
   Future<RequestResult<ChannelWithState>> joinChannel(
-      ChannelPreferences preferences,
-      {bool waitForResult = false}) async {
+    ChannelPreferences preferences, {
+    bool waitForResult = false,
+  }) async {
     var alreadyJoinedChannel = network.channels.firstWhere(
         (channel) => channel.name == preferences.name,
         orElse: () => null);
@@ -93,18 +93,36 @@ class NetworkBloc extends DisposableOwner {
           _channelsStateBloc.getChannelState(network, alreadyJoinedChannel);
       var initMessages = <ChatMessage>[];
       var initUsers = <ChannelUser>[];
-      return RequestResult.withResponse(ChannelWithState(
-          alreadyJoinedChannel, channelState, initMessages, initUsers));
+      return RequestResult.withResponse(
+        ChannelWithState(
+          alreadyJoinedChannel,
+          channelState,
+          initMessages,
+          initUsers,
+        ),
+      );
     } else {
-      return await _backendService.joinChannel(network, preferences,
-          waitForResult: waitForResult);
+      return await _backendService.joinChannel(
+        network,
+        preferences,
+        waitForResult: waitForResult,
+      );
     }
   }
 
-  Future<RequestResult<bool>> leaveNetwork({bool waitForResult = false}) async =>
-      await _backendService.leaveNetwork(network, waitForResult: waitForResult);
+  Future<RequestResult<bool>> leaveNetwork(
+          {bool waitForResult = false}) async =>
+      await _backendService.leaveNetwork(
+        network,
+        waitForResult: waitForResult,
+      );
 
-  static NetworkBloc of(BuildContext context) {
-    return Provider.of<NetworkBlocProvider>(context).networkBloc;
-  }
+  static NetworkBloc of(
+    BuildContext context, {
+    bool listen = true,
+  }) =>
+      Provider.of<NetworkBloc>(
+        context,
+        listen: listen,
+      );
 }

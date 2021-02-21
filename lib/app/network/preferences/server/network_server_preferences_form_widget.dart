@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons, TextInputAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_form_bloc.dart';
@@ -6,7 +5,8 @@ import 'package:flutter_appirc/app/network/preferences/server/network_server_pre
 import 'package:flutter_appirc/form/field/boolean/form_boolean_field_widget.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
+import 'package:provider/provider.dart';
 
 class NetworkServerPreferencesFormWidget extends StatefulWidget {
   final NetworkServerPreferences startValues;
@@ -42,23 +42,22 @@ class NetworkServerPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-
     var formBloc = Provider.of<NetworkServerPreferencesFormBloc>(context);
 
     return Column(
       children: <Widget>[
         buildFormTitle(
-            context: context,
-            title:
-                tr('irc.connection.preferences.server.title')),
+          context: context,
+          title: S.of(context).irc_connection_preferences_server_title,
+        ),
         buildFormTextRow(
           context: context,
           bloc: formBloc.nameFieldBloc,
           controller: _nameController,
           icon: Icons.account_circle,
-          label: tr('irc.connection.preferences.server'
-              '.field.name.label'),
-          hint: tr('irc.connection.preferences.server.field.name.hint'),
+          label:
+              S.of(context).irc_connection_preferences_server_field_name_label,
+          hint: S.of(context).irc_connection_preferences_server_field_name_hint,
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.hostFieldBloc,
         ),
@@ -67,29 +66,37 @@ class NetworkServerPreferencesFormWidgetState
           bloc: formBloc.hostFieldBloc,
           controller: _hostController,
           icon: Icons.cloud,
-          label: tr('irc.connection.preferences.server.field.host.label'),
-          hint: tr('irc.connection.preferences.server.field.host.hint'),
+          label:
+              S.of(context).irc_connection_preferences_server_field_host_label,
+          hint: S.of(context).irc_connection_preferences_server_field_host_hint,
           textInputAction: TextInputAction.next,
           nextBloc: formBloc.portFieldBloc,
         ),
         buildFormTextRow(
-            context: context,
-            bloc: formBloc.portFieldBloc,
-            controller: _portController,
-            icon: Icons.cloud,
-            label: tr('irc.connection.preferences.server.field.port.label'),
-            hint: tr('irc.connection.preferences.server.field.port.hint'),
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.number),
+          context: context,
+          bloc: formBloc.portFieldBloc,
+          controller: _portController,
+          icon: Icons.cloud,
+          label:
+              S.of(context).irc_connection_preferences_server_field_port_label,
+          hint: S.of(context).irc_connection_preferences_server_field_port_hint,
+          textInputAction: TextInputAction.done,
+          keyboardType: TextInputType.number,
+        ),
         buildFormBooleanRow(
-            context: context,
-            title: tr('irc.connection.preferences.server.field.use_tls.label'),
-            bloc: formBloc.tlsFieldBloc),
+          context: context,
+          title: S
+              .of(context)
+              .irc_connection_preferences_server_field_use_tls_label,
+          bloc: formBloc.tlsFieldBloc,
+        ),
         buildFormBooleanRow(
-            context: context,
-            title: tr(
-                'irc.connection.preferences.server.field.trusted_only.label'),
-            bloc: formBloc.trustedFieldBloc)
+          context: context,
+          title: S
+              .of(context)
+              .irc_connection_preferences_server_field_trusted_only_label,
+          bloc: formBloc.trustedFieldBloc,
+        )
       ],
     );
   }

@@ -5,7 +5,6 @@ import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_db.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'chat_database.g.dart';
@@ -21,10 +20,4 @@ abstract class ChatDatabase extends FloorDatabase {
   RegularMessageDao get regularMessagesDao;
 
   SpecialMessageDao get specialMessagesDao;
-}
-
-class ChatDatabaseProvider extends Providable {
-  final ChatDatabase db;
-
-  ChatDatabaseProvider(this.db);
 }

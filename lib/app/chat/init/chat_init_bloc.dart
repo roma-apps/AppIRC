@@ -5,13 +5,13 @@ import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "chat_init_bloc.dart", enabled: true);
 
-class ChatInitBloc extends Providable {
+class ChatInitBloc extends DisposableOwner {
   final ChatBackendService _backendService;
   final ChatConnectionBloc _connectionBloc;
   final NetworkListBloc _networksListBloc;

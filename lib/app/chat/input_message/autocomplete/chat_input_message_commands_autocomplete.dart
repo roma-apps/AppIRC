@@ -21,9 +21,4 @@ class CommandsAutoCompleter extends AutoCompleter {
         .where((command) => command.startsWith(pattern) && command != pattern)
         .toList();
   }
-
-  @override
-  void dispose() {
-
-  }
 }

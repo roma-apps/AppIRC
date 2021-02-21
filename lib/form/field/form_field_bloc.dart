@@ -1,10 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
-abstract class FormFieldBloc<T> extends Providable {
+abstract class FormFieldBloc<T> extends DisposableOwner {
   T get value;
 
   final _validationErrorController = BehaviorSubject<ValidationError>();

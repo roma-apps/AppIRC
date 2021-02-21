@@ -1,35 +1,35 @@
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/form/field/text/form_text_field_skin_bloc.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_validation_widgets.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
 import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_text_field.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-Widget buildFormTextField(
-    {@required BuildContext context,
-    @required FormValueFieldBloc<String> bloc,
-    @required TextEditingController controller,
-    @required String label,
-    @required String hint,
-    List<TextInputFormatter> formatters,
-    TextInputType keyboardType,
-    int maxLength,
-    int minLines,
-    int maxLines = 1,
-    bool obscureText,
-    bool autoCorrect,
-    TextAlign textAlign,
-    TextCapitalization textCapitalization,
-    TextInputAction textInputAction,
-    bool expands,
-    VoidCallback onEditingComplete,
-    ValueChanged<String> onSubmitted,
-    FormValueFieldBloc nextBloc}) {
-  FormTextFieldSkinBloc skinBloc = Provider.of(context);
+Widget buildFormTextField({
+  @required BuildContext context,
+  @required FormValueFieldBloc<String> bloc,
+  @required TextEditingController controller,
+  @required String label,
+  @required String hint,
+  List<TextInputFormatter> formatters,
+  TextInputType keyboardType,
+  int maxLength,
+  int minLines,
+  int maxLines = 1,
+  bool obscureText,
+  bool autoCorrect,
+  TextAlign textAlign,
+  TextCapitalization textCapitalization,
+  TextInputAction textInputAction,
+  bool expands,
+  VoidCallback onEditingComplete,
+  ValueChanged<String> onSubmitted,
+  FormValueFieldBloc nextBloc,
+}) {
+  var appIrcUiTextTheme = IAppIrcUiTextTheme.of(context);
 
   return buildPlatformTextField(
     context: context,
@@ -51,12 +51,12 @@ Widget buildFormTextField(
     expands: expands,
     onEditingComplete: onEditingComplete,
     onSubmitted: onSubmitted,
-    labelStyle: skinBloc.labelStyle,
-    hintStyle: skinBloc.hintStyle,
-    editStyle: skinBloc.editStyle,
-    disabledLabelStyle: skinBloc.disabledLabelStyle,
-    disabledHintStyle: skinBloc.disabledHintStyle,
-    disabledEditStyle: skinBloc.disabledEditStyle,
+    labelStyle: appIrcUiTextTheme.mediumDarkGrey,
+    hintStyle: appIrcUiTextTheme.mediumGrey,
+    editStyle: appIrcUiTextTheme.mediumDarkGrey,
+    disabledLabelStyle: appIrcUiTextTheme.mediumLightGrey,
+    disabledHintStyle: appIrcUiTextTheme.mediumGrey,
+    disabledEditStyle: appIrcUiTextTheme.mediumDarkGrey,
   );
 }
 
@@ -98,7 +98,7 @@ Widget buildFormTextRow({
   }
 
   if (bloc.visible) {
-    FormTextFieldSkinBloc formTextFieldSkinBloc = Provider.of(context);
+    var appIrcUiTextTheme = IAppIrcUiTextTheme.of(context);
 
     PlatformTextField platformTextField = buildFormTextField(
       context: context,
@@ -146,15 +146,17 @@ Widget buildFormTextRow({
                   : Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: Text(
-                          createDefaultTextValidationErrorDescription(
-                              context, error),
-                          style: formTextFieldSkinBloc.errorStyle));
+                        createDefaultTextValidationErrorDescription(
+                            context, error),
+                        style: appIrcUiTextTheme.mediumError,
+                      ),
+                    );
 
               return notValidWidget;
             }),
       ],
     );
   } else {
-    return SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 }

@@ -1,10 +1,10 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 
@@ -55,24 +55,22 @@ class LoungeHostPreferencesFormWidgetState
   Widget build(BuildContext context) {
     var hostFormBloc = widget._hostPreferencesFormBloc;
 
-
     _logger.d(() => "build");
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         buildFormTitle(
-            context: context,
-            title: tr('lounge.preferences.host.title')),
+          context: context,
+          title: S.of(context).lounge_preferences_host_title,
+        ),
         buildFormTextRow(
           context: context,
           textCapitalization: TextCapitalization.none,
           bloc: hostFormBloc.hostFieldBloc,
           controller: _hostController,
           icon: Icons.cloud,
-          label: tr('lounge.preferences.host.field.host'
-              '.label'),
-          hint: tr('lounge.preferences.host.field.host'
-              '.hint'),
+          label: S.of(context).lounge_preferences_host_field_host_label,
+          hint: S.of(context).lounge_preferences_host_field_host_hint,
           textInputAction: TextInputAction.done,
         )
       ],

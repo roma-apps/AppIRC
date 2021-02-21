@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/material.dart';
@@ -8,19 +7,19 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_bloc.dart';
-import 'package:flutter_appirc/app/chat/input_message/chat_input_message_skin_bloc.dart';
 import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
-import 'package:flutter_appirc/async/async_dialog.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
+import 'package:flutter_appirc/dialog/async/async_dialog.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_model.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_type_ahead_widget.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/popup_menu_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/cupertino_flutter_typeahead.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ChannelNewMessageWidget extends StatefulWidget {
   ChannelNewMessageWidget();
@@ -43,7 +42,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       _buildSendButton(context),
     ];
 
-    ChatUploadBloc chatUploadBloc = Provider.of<ChatUploadBloc>(context);
+    var chatUploadBloc = Provider.of<ChatUploadBloc>(context);
     if (chatUploadBloc.isUploadSupported) {
       children.insert(0, _buildUploadButton(context, chatUploadBloc));
     }
@@ -52,10 +51,10 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
   }
 
   Container _buildContainer(BuildContext context, List<Widget> children) {
-    var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
     return Container(
       decoration: BoxDecoration(
-          color: inputMessageSkinBloc.inputMessageBackgroundColor),
+        color: IAppIrcUiColorTheme.of(context).primaryDark,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Row(
@@ -66,86 +65,91 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
   }
 
   Widget _buildInputMessageField(BuildContext context) {
-    var inputMessageSkinBloc = Provider.of<ChatInputMessageSkinBloc>(context);
-
     var channelBloc = ChannelBloc.of(context);
     ChatInputMessageBloc inputMessageBloc = channelBloc.inputMessageBloc;
 
-    PopupMenuSkinBloc popupMenuSkinBloc = Provider.of(context);
-
-    var popupBackgroundColor = popupMenuSkinBloc.backgroundColor;
-    var hintText = tr("chat.new_message.field.enter_message.hint");
+    var hintText = S.of(context).chat_new_message_field_enter_message_hint;
 
     ChatConnectionBloc chatConnectionBloc = Provider.of(context);
 
     return StreamBuilder<bool>(
-        stream: chatConnectionBloc.isConnectedStream,
-        initialData: chatConnectionBloc.isConnected,
-        builder: (context, snapshot) {
-          var connected = snapshot.data;
+      stream: chatConnectionBloc.isConnectedStream,
+      initialData: chatConnectionBloc.isConnected,
+      builder: (context, snapshot) {
+        var connected = snapshot.data;
 
-          TextInputAction inputAction;
-          if (connected) {
-            inputAction = TextInputAction.send;
-          } else {
-            inputAction = TextInputAction.done;
-          }
-          var submitted;
-          if (connected) {
-            submitted = (_) {
-              inputMessageBloc.sendMessage();
-            };
-          }
+        TextInputAction inputAction;
+        if (connected) {
+          inputAction = TextInputAction.send;
+        } else {
+          inputAction = TextInputAction.done;
+        }
+        var submitted;
+        if (connected) {
+          submitted = (_) {
+            inputMessageBloc.sendMessage();
+          };
+        }
 //          return TextField();
-          return createPlatformTypeAhead(
-            context,
-            keepSuggestionsOnSuggestionSelected: true,
-            direction: AxisDirection.up,
-            noItemsFoundBuilder: (_) => SizedBox.shrink(),
-            suggestionsCallback: (pattern) async {
-              var suggestions = await inputMessageBloc
-                  .calculateAutoCompleteSuggestions(pattern);
-              return suggestions;
-            },
-            itemBuilder: (context, suggestion) {
-              return Container(
-                decoration: BoxDecoration(color: popupBackgroundColor),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(suggestion),
+
+        var hintStyle = IAppIrcUiTextTheme.of(context).mediumLightGrey;
+        return createPlatformTypeAhead(
+          context,
+          keepSuggestionsOnSuggestionSelected: true,
+          direction: AxisDirection.up,
+          noItemsFoundBuilder: (_) => SizedBox.shrink(),
+          suggestionsCallback: (pattern) async {
+            var suggestions = await inputMessageBloc
+                .calculateAutoCompleteSuggestions(pattern);
+            return suggestions;
+          },
+          itemBuilder: (context, suggestion) {
+            return Container(
+              decoration: BoxDecoration(
+                color: IAppIrcUiColorTheme.of(context).offWhite,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(suggestion),
+              ),
+            );
+          },
+          onSuggestionSelected: (suggestion) {
+            inputMessageBloc.onAutoCompleteSelected(suggestion);
+          },
+          android: () {
+            return AndroidTypeAheadData(
+              textFieldConfiguration: TextFieldConfiguration(
+                autofocus: false,
+                textInputAction: inputAction,
+                onSubmitted: submitted,
+                focusNode: inputMessageBloc.focusNode,
+                controller: inputMessageBloc.messageController,
+                style: hintStyle,
+                decoration: InputDecoration(
+                  hintText: hintText,
+                  hintStyle: hintStyle,
                 ),
-              );
-            },
-            onSuggestionSelected: (suggestion) {
-              inputMessageBloc.onAutoCompleteSelected(suggestion);
-            },
-            android: () {
-              return AndroidTypeAheadData(
-                  textFieldConfiguration: TextFieldConfiguration(
-                      autofocus: false,
-                      textInputAction: inputAction,
-                      onSubmitted: submitted,
-                      focusNode: inputMessageBloc.focusNode,
-                      controller: inputMessageBloc.messageController,
-                      style: inputMessageSkinBloc.inputMessageHintTextStyle,
-                      decoration: InputDecoration(
-                          hintText: hintText,
-                          hintStyle:
-                              inputMessageSkinBloc.inputMessageHintTextStyle)));
-            },
-            ios: () {
-              return CupertinoTypeAheadData(
-                  textFieldConfiguration: CupertinoTextFieldConfiguration(
-                      autofocus: false,
-                      controller: inputMessageBloc.messageController,
-                      textInputAction: inputAction,
-                      onSubmitted: submitted,
-                      focusNode: inputMessageBloc.focusNode,
-                      style: inputMessageSkinBloc.inputMessageHintTextStyle,
-                      placeholder: hintText));
-            },
-          );
-        });
+              ),
+            );
+          },
+          ios: () {
+
+            return CupertinoTypeAheadData(
+              textFieldConfiguration: CupertinoTextFieldConfiguration(
+                autofocus: false,
+                controller: inputMessageBloc.messageController,
+                textInputAction: inputAction,
+                onSubmitted: submitted,
+                focusNode: inputMessageBloc.focusNode,
+                style: hintStyle,
+                placeholder: hintText,
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildUploadButton(
@@ -192,57 +196,62 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
     BuildContext context,
     ChatUploadBloc chatUploadBloc,
     ChatInputMessageBloc inputMessageBloc,
-  ) => <PlatformAwarePopupMenuAction>[
-      PlatformAwarePopupMenuAction(
-        text: tr("chat.new_message.attach.action.file"),
-        iconData: Icons.insert_drive_file,
-        actionCallback: (PlatformAwarePopupMenuAction action) {
-          pickAndUploadFile(
-              FileType.any, context, chatUploadBloc, inputMessageBloc);
-        },
-      ),
-      PlatformAwarePopupMenuAction(
-        text: tr("chat.new_message.attach.action.audio"),
-        iconData: Icons.audiotrack,
-        actionCallback: (PlatformAwarePopupMenuAction action) {
-          pickAndUploadFile(
-              FileType.audio, context, chatUploadBloc, inputMessageBloc);
-        },
-      ),
-      PlatformAwarePopupMenuAction(
-        text: tr("chat.new_message.attach.action.image"),
-        iconData: Icons.image,
-        actionCallback: (PlatformAwarePopupMenuAction action) {
-          pickAndUploadFile(
-              FileType.image, context, chatUploadBloc, inputMessageBloc);
-        },
-      ),
-      PlatformAwarePopupMenuAction(
-        text: tr("chat.new_message.attach.action.camera"),
-        iconData: Icons.camera_alt,
-        actionCallback: (PlatformAwarePopupMenuAction action) async {
-          var pickedPhotoFile = await ImagePicker().getImage(
-            source: ImageSource.camera,
-          );
-          if (pickedPhotoFile?.path != null) {
-            await _uploadFile(
+  ) =>
+      <PlatformAwarePopupMenuAction>[
+        PlatformAwarePopupMenuAction(
+          text: S.of(context).chat_new_message_attach_action_file,
+          iconData: Icons.insert_drive_file,
+          actionCallback: (PlatformAwarePopupMenuAction action) {
+            pickAndUploadFile(
+                FileType.any, context, chatUploadBloc, inputMessageBloc);
+          },
+        ),
+        PlatformAwarePopupMenuAction(
+          text: S.of(context).chat_new_message_attach_action_audio,
+          iconData: Icons.audiotrack,
+          actionCallback: (PlatformAwarePopupMenuAction action) {
+            pickAndUploadFile(
+                FileType.audio, context, chatUploadBloc, inputMessageBloc);
+          },
+        ),
+        PlatformAwarePopupMenuAction(
+          text: S.of(context).chat_new_message_attach_action_image,
+          iconData: Icons.image,
+          actionCallback: (PlatformAwarePopupMenuAction action) {
+            pickAndUploadFile(
+                FileType.image, context, chatUploadBloc, inputMessageBloc);
+          },
+        ),
+        PlatformAwarePopupMenuAction(
+          text: S.of(context).chat_new_message_attach_action_camera,
+          iconData: Icons.camera_alt,
+          actionCallback: (PlatformAwarePopupMenuAction action) async {
+            var pickedPhotoFile = await ImagePicker().getImage(
+              source: ImageSource.camera,
+            );
+            if (pickedPhotoFile?.path != null) {
+              await _uploadFile(
+                context,
+                chatUploadBloc,
+                File(pickedPhotoFile.path),
+                inputMessageBloc,
+              );
+            }
+          },
+        ),
+        PlatformAwarePopupMenuAction(
+          text: S.of(context).chat_new_message_attach_action_video,
+          iconData: Icons.video_library,
+          actionCallback: (PlatformAwarePopupMenuAction action) {
+            pickAndUploadFile(
+              FileType.video,
               context,
               chatUploadBloc,
-              File(pickedPhotoFile.path),
               inputMessageBloc,
             );
-          }
-        },
-      ),
-      PlatformAwarePopupMenuAction(
-        text: tr("chat.new_message.attach.action.video"),
-        iconData: Icons.video_library,
-        actionCallback: (PlatformAwarePopupMenuAction action) {
-          pickAndUploadFile(
-              FileType.video, context, chatUploadBloc, inputMessageBloc);
-        },
-      ),
-    ];
+          },
+        ),
+      ];
 
   Future pickAndUploadFile(
       FileType fileType,
@@ -253,14 +262,22 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       if (result != null) {
         try {
           File pickedFile = File(result.files.single.path);
-          _uploadFile(context, chatUploadBloc, pickedFile, inputMessageBloc);
+          _uploadFile(
+            context,
+            chatUploadBloc,
+            pickedFile,
+            inputMessageBloc,
+          );
         } catch (e) {
           showPlatformAlertDialog(
-              context: context,
-              title: Text(tr("chat.new_message.attach"
-                  ".error.title")),
-              content: Text(tr("chat.new_message.attach"
-                  ".error.cant_access_file")));
+            context: context,
+            title: Text(
+              S.of(context).chat_new_message_attach_error_title,
+            ),
+            content: Text(
+              S.of(context).chat_new_message_attach_error_cant_access_file,
+            ),
+          );
         }
       } else {
         // User canceled the picker
@@ -272,17 +289,16 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
     try {
       var asyncDialogResult = await doAsyncOperationWithDialog(
-          context: context,
-          asyncCode: () async {
-            var uploadRequestResult =
-                await chatUploadBloc.uploadFile(pickedFile);
+        context: context,
+        asyncCode: () async {
+          var uploadRequestResult = await chatUploadBloc.uploadFile(pickedFile);
 
-            return uploadRequestResult;
-          },
-          cancellationValue: null,
-          isDismissible: true);
+          return uploadRequestResult;
+        },
+        cancelable: true,
+      );
 
-      if (asyncDialogResult.isNotCanceled) {
+      if (asyncDialogResult.success) {
         var uploadRequestResult = asyncDialogResult.result;
         var remoteURL = uploadRequestResult.result;
 
@@ -292,44 +308,61 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       }
     } on ServerAuthInvalidLoungeUploadException {
       showPlatformAlertDialog(
-          context: context,
-          title: Text(
-            tr("chat.new_message.attach.error.title"),
-          ),
-          content: Text(tr("chat.new_message.attach.error.server_auth")));
+        context: context,
+        title: Text(
+          S.of(context).chat_new_message_attach_error_title,
+        ),
+        content: Text(
+          S.of(context).chat_new_message_attach_error_server_auth,
+        ),
+      );
     } on FileSizeExceededLoungeUploadException catch (e) {
       showPlatformAlertDialog(
-          context: context,
-          title: Text(
-            tr("chat.new_message.attach.error.title"),
-          ),
-          content: Text(tr("chat.new_message.attach.error.file_size", args: [
-            e.maximumPossibleUploadFileSizeInBytes.toString(),
-            e.actualSizeInBytes.toString()
-          ])));
+        context: context,
+        title: Text(
+          S.of(context).chat_new_message_attach_error_title,
+        ),
+        content: Text(
+          S.of(context).chat_new_message_attach_error_file_size(
+                e.maximumPossibleUploadFileSizeInBytes.toString(),
+                e.actualSizeInBytes.toString(),
+              ),
+        ),
+      );
     } on InvalidHttpResponseCodeLoungeUploadException catch (e) {
       showPlatformAlertDialog(
-          context: context,
-          title: Text(
-            tr("chat.new_message.attach.error.title"),
-          ),
-          content: Text(tr("chat.new_message.attach.error.http_code",
-              args: [e.responseCode.toString()])));
+        context: context,
+        title: Text(
+          S.of(context).chat_new_message_attach_error_title,
+        ),
+        content: Text(
+          S.of(context).chat_new_message_attach_error_http_code(
+                e.responseCode.toString(),
+              ),
+        ),
+      );
     } on InvalidHttpResponseBodyLoungeUploadException catch (e) {
       showPlatformAlertDialog(
-          context: context,
-          title: Text(
-            tr("chat.new_message.attach.error.title"),
-          ),
-          content: Text(tr("chat.new_message.attach.error.http_body",
-              args: [e.responseBody])));
+        context: context,
+        title: Text(
+          S.of(context).chat_new_message_attach_error_title,
+        ),
+        content: Text(
+          S.of(context).chat_new_message_attach_error_http_body(
+                e.responseBody,
+              ),
+        ),
+      );
     } on TimeoutHttpLoungeUploadException {
       showPlatformAlertDialog(
-          context: context,
-          title: Text(
-            tr("chat.new_message.attach.error.title"),
-          ),
-          content: Text(tr("chat.new_message.attach.error.http_timeout")));
+        context: context,
+        title: Text(
+          S.of(context).chat_new_message_attach_error_title,
+        ),
+        content: Text(
+          S.of(context).chat_new_message_attach_error_http_timeout,
+        ),
+      );
     }
   }
 }

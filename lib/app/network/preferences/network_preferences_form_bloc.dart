@@ -22,35 +22,46 @@ class NetworkPreferencesFormBloc extends FormBloc {
 
   final NetworkPreferences preferences;
 
-  NetworkPreferencesFormBloc.name(
-      {@required this.preferences,
-      @required this.networkValidator,
-      @required bool isNeedShowChannels,
-      @required bool isNeedShowCommands,
-      @required bool serverPreferencesEnabled,
-      @required this.serverPreferencesVisible}) {
+  NetworkPreferencesFormBloc({
+    @required this.preferences,
+    @required this.networkValidator,
+    @required bool isNeedShowChannels,
+    @required bool isNeedShowCommands,
+    @required bool serverPreferencesEnabled,
+    @required this.serverPreferencesVisible,
+  }) {
     serverFormBloc = NetworkServerPreferencesFormBloc(
-        preferences.networkConnectionPreferences.serverPreferences,
-        networkValidator,
-        serverPreferencesEnabled,
-        serverPreferencesVisible);
+      preferences.networkConnectionPreferences.serverPreferences,
+      networkValidator,
+      serverPreferencesEnabled,
+      serverPreferencesVisible,
+    );
     userFormBloc = NetworkUserPreferencesFormBloc(
-        preferences.networkConnectionPreferences.userPreferences,
-        isNeedShowCommands);
+      preferences.networkConnectionPreferences.userPreferences,
+      isNeedShowCommands,
+    );
 
     channelsFieldBloc = FormValueFieldBloc<String>(
-        preferences.channelsWithoutPassword
-            .map((channel) => channel.name)
-            .join(channelsNamesSeparator),
-        visible: isNeedShowChannels,
-        validators: [NotEmptyTextValidator.instance]);
+      preferences.channelsWithoutPassword
+          .map((channel) => channel.name)
+          .join(channelsNamesSeparator),
+      visible: isNeedShowChannels,
+      validators: [
+        NotEmptyTextValidator.instance,
+      ],
+    );
   }
 
   @override
   List<FormFieldBloc> get children {
     return serverPreferencesVisible
-        ? [serverFormBloc, userFormBloc]
-        : [userFormBloc];
+        ? [
+            serverFormBloc,
+            userFormBloc,
+          ]
+        : [
+            userFormBloc,
+          ];
   }
 
   NetworkPreferences extractData() => NetworkPreferences(
@@ -60,14 +71,15 @@ class NetworkPreferencesFormBloc extends FormBloc {
           userPreferences: userFormBloc.extractData()),
       channelsFieldBloc.value
           .split(NetworkPreferences.channelsSeparator)
-          .map((channelName) => ChannelPreferences.name(
-              name: channelName, password: ""))
+          .map((channelName) =>
+              ChannelPreferences.name(name: channelName, password: ""))
           .toList());
 }
 
-CustomValidator<String> buildNetworkValidator(NetworkListBloc networkListBloc)  {
+CustomValidator<String> buildNetworkValidator(NetworkListBloc networkListBloc) {
   var networkValidator = CustomValidator<String>((networkName) async {
-    var alreadyExist = await networkListBloc.isNetworkWithNameExist(networkName);
+    var alreadyExist =
+        await networkListBloc.isNetworkWithNameExist(networkName);
     ValidationError error;
     if (alreadyExist) {
       error = NotUniqueTextValidationError();

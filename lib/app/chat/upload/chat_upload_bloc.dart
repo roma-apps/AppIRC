@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 
-class ChatUploadBloc extends Providable {
+class ChatUploadBloc extends DisposableOwner {
   final LoungeBackendService _backendService;
 
   bool get isUploadSupported => _backendService.chatConfig.fileUpload;
@@ -14,6 +14,6 @@ class ChatUploadBloc extends Providable {
 
   ChatUploadBloc(this._backendService);
 
-  Future<RequestResult<String>> uploadFile(File file) async =>
-      await _backendService.uploadFile(file);
+  Future<RequestResult<String>> uploadFile(File file) =>
+      _backendService.uploadFile(file);
 }

@@ -5,8 +5,8 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_form_
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:provider/provider.dart';
 
 abstract class NetworkPreferencesPage extends StatefulWidget {
   final NetworkPreferences startValues;
@@ -59,23 +59,27 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
   ValidatorFunction _networkValidator;
 
   NetworkPreferencesPageState(
-      this.titleText,
-      this.startValues,
-      this.callback,
-      this.isNeedShowChannels,
-      this.isNeedShowCommands,
-      this.serverPreferencesEnabled,
-      this.serverPreferencesVisible,
-      this.buttonText) {
-    networkPreferencesFormBloc = NetworkPreferencesFormBloc.name(
-        preferences: startValues,
-        isNeedShowChannels: isNeedShowChannels,
-        isNeedShowCommands: isNeedShowCommands,
-        serverPreferencesEnabled: serverPreferencesEnabled,
-        serverPreferencesVisible: serverPreferencesVisible,
-        networkValidator: CustomValidator((value) {
+    this.titleText,
+    this.startValues,
+    this.callback,
+    this.isNeedShowChannels,
+    this.isNeedShowCommands,
+    this.serverPreferencesEnabled,
+    this.serverPreferencesVisible,
+    this.buttonText,
+  ) {
+    networkPreferencesFormBloc = NetworkPreferencesFormBloc(
+      preferences: startValues,
+      isNeedShowChannels: isNeedShowChannels,
+      isNeedShowCommands: isNeedShowCommands,
+      serverPreferencesEnabled: serverPreferencesEnabled,
+      serverPreferencesVisible: serverPreferencesVisible,
+      networkValidator: CustomValidator(
+        (value) {
           return _networkValidator ?? value ?? false;
-        }));
+        },
+      ),
+    );
   }
 
   @override
@@ -86,7 +90,7 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
       Duration.zero,
       () {
         // we need valid context
-        final NetworkListBloc chatBloc = Provider.of<NetworkListBloc>(context);
+        final chatBloc = Provider.of<NetworkListBloc>(context);
         _networkValidator = buildNetworkValidator(chatBloc).validator;
       },
     );
@@ -110,10 +114,13 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Provider(
-            providable: networkPreferencesFormBloc,
-            child:
-                NetworkPreferencesFormWidget(startValues, callback, buttonText),
+          child: Provider.value(
+            value: networkPreferencesFormBloc,
+            child: NetworkPreferencesFormWidget(
+              startValues,
+              callback,
+              buttonText,
+            ),
           ),
         ),
       ),

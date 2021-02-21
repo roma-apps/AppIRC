@@ -9,12 +9,14 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/app/network/state/network_states_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:provider/provider.dart';
 
 class NetworkBlocsBloc extends NetworkListListenerBloc {
-  static NetworkBlocsBloc of(BuildContext context) {
-    return Provider.of<NetworkBlocsBloc>(context);
-  }
+  static NetworkBlocsBloc of(BuildContext context, {bool listen = true}) =>
+      Provider.of<NetworkBlocsBloc>(
+        context,
+        listen: listen,
+      );
 
   final Map<Network, NetworkBloc> _blocs = {};
   final ChatBackendService _backendService;

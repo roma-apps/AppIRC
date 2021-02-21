@@ -31,10 +31,14 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
   List<FormFieldBloc> get value => children;
 
   @override
-  void dispose() {
-    super.dispose();
-    children.forEach((bloc) => bloc.dispose());
-    listeners.forEach((listener) => listener.cancel());
+  Future dispose() async {
+    await super.dispose();
+    for(var bloc in children) {
+      await bloc.dispose();
+    }
+    for(var listener in listeners) {
+      await listener.cancel();
+    }
   }
 
   void onDataChanged() {

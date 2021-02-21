@@ -10,8 +10,8 @@ import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notificatio
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
-import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
-import 'package:flutter_appirc/local_preferences/preferences_service.dart';
+import 'package:flutter_appirc/local_preferences/local_preference_bloc_impl.dart';
+import 'package:flutter_appirc/local_preferences/local_preferences_service.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:rxdart/subjects.dart';
@@ -24,7 +24,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   final NetworkListBloc _networksListBloc;
   final ChatInitBloc _chatInitBloc;
   final ChatPushesService pushesService;
-  IntPreferencesBloc _preferenceBloc;
+  IntPreferenceBloc _preferenceBloc;
 
   int _channelRemoteIdFromLaunchPushMessage;
 
@@ -36,12 +36,12 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   Stream<Channel> get activeChannelStream => _activeChannelSubject.stream;
 
   ChatActiveChannelBloc(
-      this._backendService,
-      this._chatInitBloc,
-      this._networksListBloc,
-      PreferencesService preferencesService,
-      this.pushesService)
-      : super(_networksListBloc) {
+    this._backendService,
+    this._chatInitBloc,
+    this._networksListBloc,
+    ILocalPreferencesService preferencesService,
+    this.pushesService,
+  ) : super(_networksListBloc) {
     _preferenceBloc = createActiveChannelPreferenceBloc(preferencesService);
 
     addDisposable(
@@ -142,7 +142,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
 
     if (allChannels != null && allChannels.isNotEmpty) {
       var savedLocalId =
-          _preferenceBloc.getValue(defaultValue: allChannels.first.localId);
+          _preferenceBloc.value ?? allChannels.first.localId;
       if (savedLocalId != null) {
         var filtered =
             allChannels.where((channel) => channel.localId == savedLocalId);
@@ -191,9 +191,9 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     }
   }
 
-  IntPreferencesBloc createActiveChannelPreferenceBloc(
-          PreferencesService preferencesService) =>
-      IntPreferencesBloc(preferencesService, _preferenceKey);
+  IntPreferenceBloc createActiveChannelPreferenceBloc(
+          ILocalPreferencesService preferencesService) =>
+      IntPreferenceBloc(preferencesService, _preferenceKey);
 
   @override
   void onChannelJoined(Network network, ChannelWithState channelWithState) {

@@ -1,12 +1,13 @@
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+
 import 'package:rxdart/subjects.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "channel_list_unread_count_bloc.dart", enabled: true);
 
-class ChannelListUnreadCountBloc extends Providable {
+class ChannelListUnreadCountBloc extends DisposableOwner {
   // ignore: close_sinks
   final BehaviorSubject<int> _channelsWithUnreadMessagesCountController =
       BehaviorSubject.seeded(0);

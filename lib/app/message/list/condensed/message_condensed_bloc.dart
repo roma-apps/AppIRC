@@ -1,8 +1,8 @@
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 
-class MessageCondensedBloc extends Providable {
+class MessageCondensedBloc extends DisposableOwner {
   final Map<Channel, Map<int, bool>> _states = {};
 
   void onCondensedStateChanged(

@@ -10,12 +10,12 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:rxdart/subjects.dart';
 
 typedef LocalIdGenerator = int Function();
 
-class NetworkListBloc extends Providable {
+class NetworkListBloc extends DisposableOwner {
   final LocalIdGenerator nextChannelIdGenerator;
   final LocalIdGenerator nextNetworkIdGenerator;
   final ChatBackendService backendService;
@@ -51,7 +51,7 @@ class NetworkListBloc extends Providable {
     _networksChannelListBlocs[network] = ChannelListBloc(backendService,
         network, networkWithState.channelsWithState, nextChannelIdGenerator);
 
-    Disposable listenForNetworkExit;
+    IDisposable listenForNetworkExit;
     listenForNetworkExit = backendService.listenForNetworkLeave(network, () {
       _networksChannelListBlocs.remove(network).dispose();
 
@@ -99,7 +99,7 @@ class NetworkListBloc extends Providable {
   final List<NetworkListener> _joinListeners = [];
   final Map<Network, List<VoidCallback>> _leaveListeners = {};
 
-  Disposable listenForNetworkJoin(NetworkListener listener) {
+  IDisposable listenForNetworkJoin(NetworkListener listener) {
     _joinListeners.add(listener);
     return CustomDisposable(
       () {
@@ -108,7 +108,7 @@ class NetworkListBloc extends Providable {
     );
   }
 
-  Disposable listenForNetworkLeave(
+  IDisposable listenForNetworkLeave(
     Network network,
     VoidCallback listener,
   ) {

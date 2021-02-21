@@ -1,9 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show TextInputAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/topic/channel_topic_form_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
+import 'package:provider/provider.dart';
 
 class ChannelTopicWidget extends StatefulWidget {
   final String _initTopicString;
@@ -33,13 +33,14 @@ class ChannelTopicWidgetState extends State<ChannelTopicWidget> {
     var formBloc = Provider.of<ChannelTopicFormBloc>(context);
 
     return buildFormTextField(
-        context: context,
-        bloc: formBloc.topicFieldBloc,
-        controller: _topicController,
-        label: tr("chat.channel.topic.dialog.field.edit.label"),
-        hint: tr("chat.channel.topic.dialog.field.edit.hint"),
-        minLines: 1,
-        textInputAction: TextInputAction.done);
+      context: context,
+      bloc: formBloc.topicFieldBloc,
+      controller: _topicController,
+      label:S.of(context).chat_channel_topic_dialog_field_edit_label,
+      hint:S.of(context).chat_channel_topic_dialog_field_edit_hint,
+      minLines: 1,
+      textInputAction: TextInputAction.done,
+    );
   }
 
   @override

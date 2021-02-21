@@ -1,18 +1,16 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_bloc.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_form_widget.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
-import 'package:flutter_appirc/app/network/network_bloc_provider.dart';
 import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/async/async_dialog.dart';
+import 'package:flutter_appirc/dialog/async/async_dialog.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/button_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:provider/provider.dart';
 
 var _logger = MyLogger(logTag: "network_join_channel_page.dart", enabled: true);
 
@@ -22,9 +20,7 @@ class NetworkJoinChannelPage extends StatefulWidget {
   NetworkJoinChannelPage(this.network);
 
   @override
-  State<StatefulWidget> createState() {
-    return NetworkJoinChannelPageState(network);
-  }
+  State<StatefulWidget> createState() => NetworkJoinChannelPageState(network);
 }
 
 class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
@@ -39,13 +35,13 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
     return buildPlatformScaffold(
       context,
       appBar: PlatformAppBar(
-        title: Text(tr('chat.network.join_channel.title')),
+        title: Text(S.of(context).chat_network_join_channel_title),
       ),
       body: SafeArea(
-        child: Provider(
-          providable: NetworkBlocProvider(networkBloc),
-          child: Provider<NetworkJoinChannelFormBloc>(
-            providable: channelJoinFormBloc,
+        child: Provider<NetworkBloc>.value(
+          value: networkBloc,
+          child: Provider<NetworkJoinChannelFormBloc>.value(
+            value: channelJoinFormBloc,
             child: ListView(
               children: <Widget>[
                 NetworkJoinChannelFormWidget(
@@ -63,10 +59,9 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
                                 context, channelJoinFormBloc, networkBloc);
                           }
                         : null;
-                    return createSkinnedPlatformButton(
-                      context,
+                    return PlatformButton(
                       child: Text(
-                        tr('chat.network.join_channel.action.join'),
+                        S.of(context).chat_network_join_channel_action_join,
                       ),
                       onPressed: pressed,
                     );
@@ -95,10 +90,9 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
               waitForResult: true);
           _logger.d(() => "startJoinChannel result $joinResult");
         },
-        cancellationValue: null,
-        isDismissible: true);
+        cancelable: true);
 
-    if (dialogResult.isNotCanceled) {
+    if (dialogResult.success) {
       _dismissDialog(context);
       _goBack(context);
     }

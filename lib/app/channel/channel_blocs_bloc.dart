@@ -9,7 +9,7 @@ import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notificatio
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:provider/provider.dart';
 
 class ChannelBlocsBloc extends ChannelListListenerBloc {
   static ChannelBlocsBloc of(BuildContext context) {

@@ -6,14 +6,14 @@ import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connect
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_edit_connection_page.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
-import 'package:flutter_appirc/app/backend/lounge/preferences/lounge_preferences_bloc.dart';
 import 'package:flutter_appirc/app/default_values.dart';
+import 'package:flutter_appirc/app/instance/current/current_auth_instance_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_widget.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_new_preferences_page.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/skin_day_night_widget.dart';
-import 'package:flutter_appirc/socketio/socketio_manager_provider.dart';
+import 'package:flutter_appirc/disposable/disposable_provider.dart';
+import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:provider/provider.dart';
 
 class ChatDrawerWidget extends StatelessWidget {
   final VoidCallback onActionCallback;
@@ -36,10 +36,10 @@ class ChatDrawerWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: _buildLoungeSettingsButton(context),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AppSkinDayNightIconButton(),
-            ),
+            Padding(padding: const EdgeInsets.all(8.0), child: Text("missqewd")
+                // child:
+                // AppSkinDayNightIconButton(),
+                ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _buildSignOutButton(context),
@@ -52,27 +52,30 @@ class ChatDrawerWidget extends StatelessWidget {
 
   Widget _buildNewNetworkButton(BuildContext context) => PlatformIconButton(
         onPressed: () {
-          ChatBackendService backendService = Provider.of(context);
+          var backendService =
+              Provider.of<ChatBackendService>(context, listen: false);
 
           Navigator.push(
-              context,
-              platformPageRoute(
+            context,
+            platformPageRoute(
+              context: context,
+              builder: (context) {
+                var networkEnabled = !backendService.chatConfig.lockNetwork;
+                var newChatNetworkPage = NewNetworkPreferencesPage.name(
                   context: context,
-                  builder: (context) {
-                    var networkEnabled = !backendService.chatConfig.lockNetwork;
-                    var newChatNetworkPage = NewNetworkPreferencesPage.name(
-                      context: context,
-                      startValues: backendService.chatConfig
-                          .createDefaultNetworkPreferences(),
-                      serverPreferencesEnabled: networkEnabled,
-                      serverPreferencesVisible:
-                          backendService.chatConfig.displayNetwork,
-                      outerCallback: () {
-                        Navigator.pop(context);
-                      },
-                    );
-                    return newChatNetworkPage;
-                  }));
+                  startValues: backendService.chatConfig
+                      .createDefaultNetworkPreferences(),
+                  serverPreferencesEnabled: networkEnabled,
+                  serverPreferencesVisible:
+                      backendService.chatConfig.displayNetwork,
+                  outerCallback: () {
+                    Navigator.pop(context);
+                  },
+                );
+                return newChatNetworkPage;
+              },
+            ),
+          );
         },
         material: (context, platform) => MaterialIconButtonData(
           icon: Icon(
@@ -88,24 +91,25 @@ class ChatDrawerWidget extends StatelessWidget {
 
   Widget _buildLoungeSettingsButton(BuildContext context) => PlatformIconButton(
         onPressed: () async {
-          var settings = Provider.of<LoungePreferencesBloc>(context).getValue(
-            defaultValue: createDefaultLoungePreferences(
-              context,
-            ),
-          );
+          var currentAuthInstanceBloc = ICurrentAuthInstanceBloc.of(context);
+
+          var settings = currentAuthInstanceBloc.currentInstance ??
+              createDefaultLoungePreferences();
           await Navigator.push(
             context,
             platformPageRoute(
               context: context,
               builder: (context) {
-                var connectionBloc = LoungeConnectionBloc(
-                    Provider.of<SocketIOManagerProvider>(context).manager,
+                return DisposableProvider<LoungeConnectionBloc>(
+                  create: (context) => LoungeConnectionBloc(
+                    Provider.of<SocketIOService>(context),
                     settings.hostPreferences,
-                    settings.authPreferences);
-                return Provider(
-                  providable: connectionBloc,
-                  child: Provider(
-                    providable: LoungeConnectionFormBloc(connectionBloc),
+                    settings.authPreferences,
+                  ),
+                  child: DisposableProxyProvider<LoungeConnectionBloc,
+                      LoungeConnectionFormBloc>(
+                    update: (context, connectionBloc, previous) =>
+                        LoungeConnectionFormBloc(connectionBloc),
                     child: EditLoungeConnectionPage(),
                   ),
                 );

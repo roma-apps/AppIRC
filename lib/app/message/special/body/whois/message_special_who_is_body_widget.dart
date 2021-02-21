@@ -1,21 +1,20 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/special/body/message_special_body_widget.dart';
 import 'package:flutter_appirc/app/message/special/body/whois/message_special_who_is_body_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
-import 'package:flutter_appirc/app/message/special/message_special_skin_bloc.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 
 class WhoIsSpecialMessageBodyWidget
     extends SpecialMessageBodyWidget<WhoIsSpecialMessageBody> {
-  WhoIsSpecialMessageBodyWidget(
-      {@required SpecialMessage message,
-        @required WhoIsSpecialMessageBody body,
-        @required bool inSearchResults,
-        @required MessageWidgetType messageWidgetType})
-      : super(
+  WhoIsSpecialMessageBodyWidget({
+    @required SpecialMessage message,
+    @required WhoIsSpecialMessageBody body,
+    @required bool inSearchResults,
+    @required MessageWidgetType messageWidgetType,
+  }) : super(
             message: message,
             body: body,
             inSearchResults: inSearchResults,
@@ -25,50 +24,61 @@ class WhoIsSpecialMessageBodyWidget
   Widget build(BuildContext context) {
     String actualHostNameValue = calculateActualHostName(body);
 
-
-
     var child = Column(
       children: <Widget>[
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.hostmask"),
-            "${body.ident}@${body.hostname}"),
+          S.of(context).chat_message_special_who_is_hostmask,
+          "${body.ident}@${body.hostname}",
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.actual_hostname"),
-            actualHostNameValue),
+          S.of(context).chat_message_special_who_is_actual_hostname,
+          actualHostNameValue,
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.real_name"),
-            body.realName),
+          S.of(context).chat_message_special_who_is_real_name,
+          body.realName,
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.channels"),
-            body.channels),
+          S.of(context).chat_message_special_who_is_channels,
+          body.channels,
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.secure_connection"),
-            body.secure.toString()),
+          S.of(context).chat_message_special_who_is_secure_connection,
+          body.secure.toString(),
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.connected_to"),
-            "${body.server} (${body.serverInfo})"),
+          S.of(context).chat_message_special_who_is_connected_to,
+          "${body.server} (${body.serverInfo})",
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.account"),
-            body.account),
+          S.of(context).chat_message_special_who_is_account,
+          body.account,
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.connected_at"),
-            regularDateFormatter.format(body.logonTime)),
+          S.of(context).chat_message_special_who_is_connected_at,
+          regularDateFormatter.format(
+            body.logonTime,
+          ),
+        ),
         _buildWhoIsRow(
-            tr("chat.message.special.who_is.idle_since"),
-            regularDateFormatter.format(body.idleTime)),
+          S.of(context).chat_message_special_who_is_idle_since,
+          regularDateFormatter.format(
+            body.idleTime,
+          ),
+        ),
       ],
     );
-    SpecialMessageSkinBloc messagesSpecialSkinBloc = Provider.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _buildWhoIsSpecialMessageHeaderWidget(
-            context: context,
-            date: message.date,
-            fromNick: body.nick,
-            color: messagesSpecialSkinBloc.specialMessageColor,
-            iconData: Icons.account_box),
+          context: context,
+          date: message.date,
+          fromNick: body.nick,
+          color: IAppIrcUiColorTheme.of(context).primaryDark,
+          iconData: Icons.account_box,
+        ),
         child
       ],
     );
@@ -128,36 +138,46 @@ String _buildWhoIsRawBody(
     @required WhoIsSpecialMessageBody whoIsBody}) {
   String actualHostNameValue = calculateActualHostName(whoIsBody);
 
-
-
   var rawBody = _buildWhoIsRawRow(
-          tr("chat.message.special.who_is"
-              ".hostmask"),
-          "${whoIsBody.ident}@${whoIsBody.hostname}") +
+        S.of(context).chat_message_special_who_is_hostmask,
+        "${whoIsBody.ident}@${whoIsBody.hostname}",
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.actual_hostname"),
-          actualHostNameValue) +
+        S.of(context).chat_message_special_who_is_actual_hostname,
+        actualHostNameValue,
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.real_name"),
-          whoIsBody.realName) +
+        S.of(context).chat_message_special_who_is_real_name,
+        whoIsBody.realName,
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.channels"),
-          whoIsBody.channels) +
+        S.of(context).chat_message_special_who_is_channels,
+        whoIsBody.channels,
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.secure_connection"),
-          whoIsBody.secure.toString()) +
+        S.of(context).chat_message_special_who_is_secure_connection,
+        whoIsBody.secure.toString(),
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.connected_to"),
-          "${whoIsBody.server} (${whoIsBody.serverInfo})") +
+        S.of(context).chat_message_special_who_is_connected_to,
+        "${whoIsBody.server} (${whoIsBody.serverInfo})",
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.account"),
-          whoIsBody.account) +
+        S.of(context).chat_message_special_who_is_account,
+        whoIsBody.account,
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.connected_at"),
-          regularDateFormatter.format(whoIsBody.logonTime)) +
+        S.of(context).chat_message_special_who_is_connected_at,
+        regularDateFormatter.format(
+          whoIsBody.logonTime,
+        ),
+      ) +
       _buildWhoIsRawRow(
-          tr("chat.message.special.who_is.idle_since"),
-          regularDateFormatter.format(whoIsBody.idleTime));
+        S.of(context).chat_message_special_who_is_idle_since,
+        regularDateFormatter.format(
+          whoIsBody.idleTime,
+        ),
+      );
 
   return rawBody;
 }

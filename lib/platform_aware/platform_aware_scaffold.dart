@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/app_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'platform_aware.dart' as platform_aware;
@@ -33,14 +31,10 @@ Widget buildPlatformScaffold(
       iosContentBottomPadding: iosContentBottomPadding,
     );
   } else {
-    AppSkinBloc appSkinBloc = Provider.of(context);
     return PlatformScaffold(
       key: key,
       widgetKey: widgetKey,
-      body: Theme(
-        child: body,
-        data: appSkinBloc.appSkinTheme.androidThemeDataCreator(),
-      ),
+      body: body,
       backgroundColor: backgroundColor,
       appBar: appBar,
       bottomNavBar: bottomNavBar,

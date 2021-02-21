@@ -2,21 +2,27 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
-import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/disposable/rx_disposable.dart';
 import 'package:flutter_appirc/disposable/ui_disposable.dart';
 import 'package:rxdart/subjects.dart';
 
-class DisposableOwner extends Disposable {
-  bool disposed = false;
+import 'disposable.dart';
+
+class DisposableOwner extends IDisposable {
+  @override
+  bool isDisposed = false;
   final CompositeDisposable _compositeDisposable = CompositeDisposable([]);
 
   void addDisposable({
-    Disposable disposable,
+    IDisposable disposable,
     StreamSubscription streamSubscription,
     TextEditingController textEditingController,
+    ScrollController scrollController,
+    FocusNode focusNode,
     Subject subject,
+    StreamController streamController,
     Timer timer,
+    FutureOr Function() custom,
   }) {
     if (disposable != null) {
       _compositeDisposable.children.add(disposable);
@@ -24,6 +30,11 @@ class DisposableOwner extends Disposable {
 
     if (subject != null) {
       _compositeDisposable.children.add(SubjectDisposable(subject));
+    }
+
+    if (streamController != null) {
+      _compositeDisposable.children
+          .add(StreamControllerDisposable(streamController));
     }
 
     if (timer != null) {
@@ -39,12 +50,22 @@ class DisposableOwner extends Disposable {
       _compositeDisposable.children
           .add(TextEditingControllerDisposable(textEditingController));
     }
+    if (focusNode != null) {
+      _compositeDisposable.children.add(FocusNodeDisposable(focusNode));
+    }
+    if (scrollController != null) {
+      _compositeDisposable.children
+          .add(ScrollControllerDisposable(scrollController));
+    }
+    if (custom != null) {
+      _compositeDisposable.children.add(CustomDisposable(custom));
+    }
   }
 
   @override
   @mustCallSuper
-  void dispose() {
-    disposed = true;
-    _compositeDisposable.dispose();
+  Future dispose() async {
+    isDisposed = true;
+    await _compositeDisposable.dispose();
   }
 }

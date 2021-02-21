@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "push_service.dart", enabled: true);
 
-class PushesService extends Providable {
+class PushesService extends DisposableOwner {
   FirebaseMessaging _fcm;
 
   // ignore: close_sinks

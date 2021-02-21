@@ -1,8 +1,8 @@
-import 'package:flutter_appirc/disposable/disposable.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 
 final String splitSeparator = " ";
 
-abstract class AutoCompleter extends Disposable {
+abstract class AutoCompleter extends DisposableOwner {
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern);
 }
 

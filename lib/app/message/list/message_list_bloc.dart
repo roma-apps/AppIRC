@@ -11,13 +11,13 @@ import 'package:flutter_appirc/app/message/message_loader_bloc.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "message_list_bloc.dart", enabled: true);
 
-class MessageListBloc extends Providable {
+class MessageListBloc extends DisposableOwner {
   final ChannelBloc channelBloc;
   final ChannelMessageListBloc _channelMessagesListBloc;
   final MessageCondensedBloc _messageCondensedBloc;

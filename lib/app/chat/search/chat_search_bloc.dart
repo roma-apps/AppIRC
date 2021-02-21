@@ -5,13 +5,13 @@ import 'package:flutter_appirc/app/chat/db/chat_database.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_db.dart';
 import 'package:flutter_appirc/app/message/special/message_special_db.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/form/form_value_field_bloc.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'chat_search_model.dart';
 
-class ChatSearchBloc extends Providable {
+class ChatSearchBloc extends DisposableOwner {
   final ChatDatabase _db;
   final Channel channel;
 

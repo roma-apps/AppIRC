@@ -11,13 +11,13 @@ import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_db.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "message_loader_bloc.dart", enabled: true);
 
-class MessageLoaderBloc extends Providable {
+class MessageLoaderBloc extends DisposableOwner {
   final ChatBackendService _backendService;
   final MessageManagerBloc _messagesSaverBloc;
   final ChatDatabase _db;
@@ -117,19 +117,23 @@ class MessageLoaderBloc extends Providable {
   }
 
   Future _loadStartMessagesFromDatabaseAndSubscribe() async {
-    _logger.d(() => "init start $disposed");
+    _logger.d(() => "init start isDisposed $isDisposed");
 
     var receivedMessages = <List<ChatMessage>>[];
     // socket listener
     addDisposable(
-        disposable: _messagesSaverBloc.listenForMessages(_network, _channel,
-            (messagesForChannel) {
-      if (_messagesListSubject != null) {
-        _addNewMessages(_network, _channel, messagesForChannel);
-      } else {
-        receivedMessages.add(messagesForChannel.messages);
-      }
-    }));
+      disposable: _messagesSaverBloc.listenForMessages(
+        _network,
+        _channel,
+        (messagesForChannel) {
+          if (_messagesListSubject != null) {
+            _addNewMessages(_network, _channel, messagesForChannel);
+          } else {
+            receivedMessages.add(messagesForChannel.messages);
+          }
+        },
+      ),
+    );
 
     var initMessages = await loadInitMessages();
 
@@ -149,23 +153,35 @@ class MessageLoaderBloc extends Providable {
     _isInitFinishedSubject.add(true);
 
     addDisposable(
-        disposable: _backendService.listenForMessagePreviews(_network, _channel,
-            (previewForMessage) {
-      _updatePreview(previewForMessage);
-    }));
+      disposable: _backendService.listenForMessagePreviews(
+        _network,
+        _channel,
+        (previewForMessage) {
+          _updatePreview(previewForMessage);
+        },
+      ),
+    );
 
     addDisposable(
-        disposable: _backendService.listenForMessagePreviewToggle(
-            _network, _channel, (ToggleMessagePreviewData togglePreview) async {
-      _onMessagesChanged(
-          messagesList.allMessages, [], MessageListUpdateType.notUpdated);
-    }));
+      disposable: _backendService.listenForMessagePreviewToggle(
+        _network,
+        _channel,
+        (ToggleMessagePreviewData togglePreview) async {
+          _onMessagesChanged(
+              messagesList.allMessages, [], MessageListUpdateType.notUpdated);
+        },
+      ),
+    );
 
     addDisposable(
-        disposable: _backendService.listenForChannelPreviewToggle(
-            _network, _channel, (channelToggle) async {
-      _toggleMessages(channelToggle);
-    }));
+      disposable: _backendService.listenForChannelPreviewToggle(
+        _network,
+        _channel,
+        (channelToggle) async {
+          _toggleMessages(channelToggle);
+        },
+      ),
+    );
   }
 
   void _toggleMessages(ToggleChannelPreviewData channelToggle) {

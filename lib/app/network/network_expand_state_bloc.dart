@@ -1,24 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter_appirc/app/network/network_model.dart';
-import 'package:flutter_appirc/local_preferences/preferences_bloc.dart';
-import 'package:flutter_appirc/local_preferences/preferences_service.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
+import 'package:flutter_appirc/local_preferences/local_preference_bloc_impl.dart';
+import 'package:flutter_appirc/local_preferences/local_preferences_service.dart';
 
 var _preferenceKeyPrefix = "chat.network";
 
-class NetworkExpandStateBloc extends Providable {
-  BoolPreferencesBloc _preferenceBloc;
+class NetworkExpandStateBloc extends DisposableOwner {
+  BoolLocalPreferenceBloc _preferenceBloc;
 
-  Stream<bool> get expandedStream =>
-      _preferenceBloc.valueStream(defaultValue: true);
-  bool get expanded => _preferenceBloc.getValue(defaultValue: true);
+  Stream<bool> get expandedStream => _preferenceBloc.stream;
+
+  bool get expanded => _preferenceBloc.value ?? true;
 
   NetworkExpandStateBloc(
-      PreferencesService preferencesService, Network network) {
+      ILocalPreferencesService preferencesService, Network network) {
     var networkLocalId = network.localId;
-    _preferenceBloc = BoolPreferencesBloc(
-        preferencesService, "$_preferenceKeyPrefix.$networkLocalId");
+    _preferenceBloc = BoolLocalPreferenceBloc(
+      preferencesService,
+      "$_preferenceKeyPrefix.$networkLocalId",
+    );
+
     addDisposable(disposable: _preferenceBloc);
   }
 
@@ -28,13 +31,5 @@ class NetworkExpandStateBloc extends Providable {
 
   void collapse() {
     _preferenceBloc.setValue(false);
-  }
-
-
-  @override
-  void dispose() {
-
-    super.dispose();
-    _preferenceBloc.dispose();
   }
 }

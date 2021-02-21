@@ -3,13 +3,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_model.dart';
-import 'package:flutter_appirc/local_preferences/preferences_model.dart';
+import 'package:flutter_appirc/json/json_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'network_preferences_model.g.dart';
 
 @JsonSerializable()
-class NetworkPreferences extends JsonPreferences {
+class NetworkPreferences extends IJsonObject {
   static const String channelsSeparator = " ";
   int get localId => networkConnectionPreferences?.localId;
 
@@ -48,7 +48,7 @@ class NetworkPreferences extends JsonPreferences {
 }
 
 @JsonSerializable()
-class NetworkConnectionPreferences extends JsonPreferences {
+class NetworkConnectionPreferences extends IJsonObject {
   int localId;
 
   final NetworkServerPreferences serverPreferences;

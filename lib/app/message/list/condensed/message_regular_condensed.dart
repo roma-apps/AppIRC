@@ -1,7 +1,7 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 
 bool isPossibleToCondenseMessage(ChatMessage message) {
   if (message is RegularMessage) {
@@ -85,52 +85,41 @@ bool isPossibleToCondenseMessage(ChatMessage message) {
   }
 }
 
-const _localizationIdPrefix = "chat.message.regular.condensed";
 String getCondensedStringForRegularMessageTypeAndCount(
     BuildContext context, RegularMessageType type, int count) {
   switch (type) {
     case RegularMessageType.join:
-      return _plural(context, _localizationIdPrefix + ".join", count);
+      return S.of(context).chat_message_regular_condensed_join(count);
       break;
     case RegularMessageType.mode:
-      return _plural(context, _localizationIdPrefix + ".mode", count);
+      return S.of(context).chat_message_regular_condensed_mode(count);
       break;
     case RegularMessageType.modeChannel:
-      return _plural(context, _localizationIdPrefix + ".mode_channel", count);
+      return S.of(context).chat_message_regular_condensed_mode_channel(count);
       break;
     case RegularMessageType.away:
-      return _plural(context, _localizationIdPrefix + ".away", count);
+      return S.of(context).chat_message_regular_condensed_away(count);
       break;
     case RegularMessageType.back:
-      return _plural(context, _localizationIdPrefix + ".back", count);
+      return S.of(context).chat_message_regular_condensed_back(count);
       break;
     case RegularMessageType.quit:
-      return _plural(context, _localizationIdPrefix + ".quit", count);
+      return S.of(context).chat_message_regular_condensed_quit(count);
       break;
     case RegularMessageType.part:
-      return _plural(context, _localizationIdPrefix + ".part", count);
+      return S.of(context).chat_message_regular_condensed_part(count);
       break;
     case RegularMessageType.nick:
-      return _plural(context, _localizationIdPrefix + ".nick", count);
+      return S.of(context).chat_message_regular_condensed_nick(count);
       break;
     case RegularMessageType.chghost:
-      return _plural(context, _localizationIdPrefix + ".chghost", count);
+      return S.of(context).chat_message_regular_condensed_chghost(count);
       break;
     case RegularMessageType.kick:
-      return _plural(context, _localizationIdPrefix + ".kick", count);
+      return S.of(context).chat_message_regular_condensed_kick(count);
       break;
     default:
       break;
   }
   throw "Not supported message type $type";
-}
-
-String _plural(BuildContext context, String key, int count) {
-  if (count == 0) {
-    return tr(key + ".zero", args: [count.toString()]);
-  } else if (count == 1) {
-    return tr(key + ".one", args: [count.toString()]);
-  } else {
-    return tr(key + ".other", args: [count.toString()]);
-  }
 }

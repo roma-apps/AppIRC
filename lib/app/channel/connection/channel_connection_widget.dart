@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:provider/provider.dart';
 
 StreamBuilder<bool> buildConnectionIcon(
     BuildContext context, Color foregroundColor, bool connected) {

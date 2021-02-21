@@ -7,22 +7,20 @@ import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:rxdart/subjects.dart';
 
-class ChannelListBloc extends Providable {
+class ChannelListBloc extends DisposableOwner {
   final ChatBackendService _backendService;
   final Network network;
   final LocalIdGenerator _nextChannelIdGenerator;
 
   List<Channel> get channels => _networksChannelsSubject.value;
 
-  Stream<List<Channel>> get channelsStream =>
-      _networksChannelsSubject.stream;
+  Stream<List<Channel>> get channelsStream => _networksChannelsSubject.stream;
 
   // ignore: close_sinks
-  final _networksChannelsSubject =
-      BehaviorSubject<List<Channel>>.seeded([]);
+  final _networksChannelsSubject = BehaviorSubject<List<Channel>>.seeded([]);
 
   final List<ChannelListener> _joinListeners = [];
   final Map<Channel, List<VoidCallback>> _leaveListeners = {};
@@ -42,8 +40,8 @@ class ChannelListBloc extends Providable {
       _onChannelJoined(channelWithState);
     }
 
-    var listenForChannelJoin = _backendService
-        .listenForChannelJoin(network, (channelWithState) async {
+    var listenForChannelJoin =
+        _backendService.listenForChannelJoin(network, (channelWithState) async {
       var channel = channelWithState.channel;
 
       network.channels.add(channel);
@@ -63,28 +61,31 @@ class ChannelListBloc extends Providable {
 
     _joinListeners.forEach((listener) => listener(channelWithState));
 
-    Disposable listenForChannelLeave;
+    IDisposable listenForChannelLeave;
 
-    listenForChannelLeave = _backendService
-        .listenForChannelLeave(network, channel, () async {
-      var tempListeners = <VoidCallback>[];
-      // additional list required
-      // because we want modify original list during iteration
-      var originalListeners = _leaveListeners[channel];
-      tempListeners.addAll(originalListeners);
-      tempListeners.forEach((listener) {
-        listener();
-      });
+    listenForChannelLeave = _backendService.listenForChannelLeave(
+      network,
+      channel,
+      () async {
+        var tempListeners = <VoidCallback>[];
+        // additional list required
+        // because we want modify original list during iteration
+        var originalListeners = _leaveListeners[channel];
+        tempListeners.addAll(originalListeners);
+        tempListeners.forEach((listener) {
+          listener();
+        });
 
-      // all listeners should dispose itself on leave
-      assert(originalListeners.isEmpty);
+        // all listeners should dispose itself on leave
+        assert(originalListeners.isEmpty);
 
-      network.channels.remove(channel);
+        network.channels.remove(channel);
 
-      _onChannelsChanged(network.channels);
+        _onChannelsChanged(network.channels);
 
-      listenForChannelLeave.dispose();
-    });
+        await listenForChannelLeave.dispose();
+      },
+    );
     addDisposable(disposable: listenForChannelLeave);
   }
 
@@ -92,15 +93,14 @@ class ChannelListBloc extends Providable {
     _networksChannelsSubject.add(channels);
   }
 
-  Disposable listenForChannelJoin(ChannelListener listener) {
+  IDisposable listenForChannelJoin(ChannelListener listener) {
     _joinListeners.add(listener);
     return CustomDisposable(() {
       _joinListeners.remove(listener);
     });
   }
 
-  Disposable listenForChannelLeave(
-      Channel channel, VoidCallback listener) {
+  IDisposable listenForChannelLeave(Channel channel, VoidCallback listener) {
     if (!_leaveListeners.containsKey(channel)) {
       _leaveListeners[channel] = [];
     }

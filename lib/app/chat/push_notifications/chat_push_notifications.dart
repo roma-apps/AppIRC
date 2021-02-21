@@ -5,8 +5,8 @@ import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:flutter_appirc/pushes/push_service.dart';
 
@@ -15,7 +15,7 @@ var _logger = MyLogger(logTag: "chat_push_notifications.dart", enabled: true);
 final String _iosPushMessageNotificationKey = "notification";
 final String _iosPushMessageDataKey = "data";
 
-class ChatPushesService extends Providable {
+class ChatPushesService extends DisposableOwner {
   final PushesService _pushesService;
   final ChatBackendService _backendService;
   final ChatInitBloc _chatInitBloc;
@@ -39,30 +39,39 @@ class ChatPushesService extends Providable {
   }
 
   ChatPushMessage _parseChatPushMessageOnIOS(
-      Map<String, dynamic> data, PushMessage pushMessage) {
+    Map<String, dynamic> data,
+    PushMessage pushMessage,
+  ) {
     // ios notification always have own format
 
-    var messageNotification =
-        _remapForJson(data[_iosPushMessageNotificationKey]);
-    var messageData = _remapForJson(data[_iosPushMessageDataKey]);
+    var messageNotification = _remapForJson(
+      data[_iosPushMessageNotificationKey],
+    );
+    var messageData = _remapForJson(
+      data[_iosPushMessageDataKey],
+    );
     return ChatPushMessage(
-        pushMessage.type,
-        messageNotification?.isNotEmpty == true
-            ? ChatPushMessageNotification.fromJson(messageNotification)
-            : null,
-        messageData?.isNotEmpty == true
-            ? ChatPushMessageData.fromJson(messageData)
-            : null);
+      pushMessage.type,
+      messageNotification?.isNotEmpty == true
+          ? ChatPushMessageNotification.fromJson(messageNotification)
+          : null,
+      messageData?.isNotEmpty == true
+          ? ChatPushMessageData.fromJson(messageData)
+          : null,
+    );
   }
 
   ChatPushMessage _parseChatPushMessageOnAndroid(
-      PushMessage pushMessage, Map<String, dynamic> data) {
+    PushMessage pushMessage,
+    Map<String, dynamic> data,
+  ) {
     return ChatPushMessage(
-        pushMessage.type,
-        data?.isNotEmpty == true
-            ? ChatPushMessageNotification.fromJson(data)
-            : null,
-        data?.isNotEmpty == true ? ChatPushMessageData.fromJson(data) : null);
+      pushMessage.type,
+      data?.isNotEmpty == true
+          ? ChatPushMessageNotification.fromJson(data)
+          : null,
+      data?.isNotEmpty == true ? ChatPushMessageData.fromJson(data) : null,
+    );
   }
 
   // Json serialization accepts Map<String, dynamic>

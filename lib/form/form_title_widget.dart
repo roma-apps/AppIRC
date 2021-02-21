@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart' show Divider;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/form/form_title_skin_bloc.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 
-Widget buildFormTitle(
-    {@required BuildContext context, @required String title}) {
-  var formTitleSkinBloc = Provider.of<FormTitleSkinBloc>(context);
+Widget buildFormTitle({
+  @required BuildContext context,
+  @required String title,
+}) {
+  var appIrcUiTextTheme = IAppIrcUiTextTheme.of(context);
 
   return Padding(
     child: Column(
@@ -14,9 +15,9 @@ Widget buildFormTitle(
       children: <Widget>[
         Text(
           title,
-          style: formTitleSkinBloc.titleTextStyle,
+          style: appIrcUiTextTheme.bigTallMediumGrey,
         ),
-        Divider()
+        const Divider(),
       ],
     ),
     padding: const EdgeInsets.all(4.0),

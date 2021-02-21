@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appirc/app/chat/app_bar/chat_app_bar_skin_bloc.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 
 class ChatAppBarWidget extends StatelessWidget {
   final String title;
@@ -34,11 +33,14 @@ class ChatAppBarWidget extends StatelessWidget {
   }
 }
 
-Widget _buildSubTitle(BuildContext context, String subTitle) => Text(subTitle,
-    overflow: TextOverflow.fade,
-    softWrap: false,
-    style: Provider.of<ChatAppBarSkinBloc>(context).subTitleTextStyle
+Widget _buildSubTitle(BuildContext context, String subTitle) => Text(
+      subTitle,
+      overflow: TextOverflow.fade,
+      softWrap: false,
+      style: IAppIrcUiTextTheme.of(context).subHeaderDarkGrey,
     );
 
-Widget _buildTitle(BuildContext context, String title) => Text(title,
-    style: Provider.of<ChatAppBarSkinBloc>(context).titleTextStyle);
+Widget _buildTitle(BuildContext context, String title) => Text(
+      title,
+  style: IAppIrcUiTextTheme.of(context).dialogTitleBoldDarkGrey,
+    );

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,10 +6,11 @@ import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_model.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_regular_condensed.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
-import 'package:flutter_appirc/app/message/message_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
+import 'package:provider/provider.dart';
 
 class CondensedMessageWidget extends StatefulWidget {
   final CondensedMessageListItem _condensedMessageListItem;
@@ -65,19 +65,19 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: condensedMessageListItem.messages.map((message) {
-
         return buildMessageWidget(
             message: message,
             enableMessageActions: true,
             messageWidgetType: MessageWidgetType.formatted,
-            messageInListState: notInSearchState
-        );
+            messageInListState: notInSearchState);
       }).toList(),
     );
   }
 
   Widget _buildCondensedTitleMessage(
-      BuildContext context, CondensedMessageListItem condensedMessageListItem) {
+    BuildContext context,
+    CondensedMessageListItem condensedMessageListItem,
+  ) {
     Map<RegularMessageType, List<ChatMessage>> groupedByType = {};
 
     condensedMessageListItem.messages.forEach((message) {
@@ -94,33 +94,43 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     });
 
     var textString = groupedByType.keys
-        .map((regularType) => getCondensedStringForRegularMessageTypeAndCount(
-            context, regularType, groupedByType[regularType].length))
-        .join(tr("chat.message.condensed.join_separator"));
+        .map(
+          (regularType) => getCondensedStringForRegularMessageTypeAndCount(
+            context,
+            regularType,
+            groupedByType[regularType].length,
+          ),
+        )
+        .join(
+          S.of(context).chat_message_condensed_join_separator,
+        );
 
-    var messagesSkin = Provider.of<MessageSkinBloc>(context);
     return GestureDetector(
-        onTap: () {
-          _toggleCondensed(context);
-        },
-        child: Text(
-          textString,
-          softWrap: true,
-          style: messagesSkin.messageBodyTextStyle,
-        ));
+      onTap: () {
+        _toggleCondensed(context);
+      },
+      child: Text(
+        textString,
+        softWrap: true,
+        style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+      ),
+    );
   }
 
-  Widget _buildCondensedTitleButton(BuildContext context,
-      CondensedMessageListItem condensedMessageListItem, bool expanded) {
-    var messagesSkin = Provider.of<MessageSkinBloc>(context);
+  Widget _buildCondensedTitleButton(
+    BuildContext context,
+    CondensedMessageListItem condensedMessageListItem,
+    bool expanded,
+  ) {
     return GestureDetector(
-        onTap: () {
-          _toggleCondensed(context);
-        },
-        child: Icon(
-          expanded ? Icons.arrow_drop_down : Icons.arrow_right,
-          color: messagesSkin.messageBodyTextStyle.color,
-        ));
+      onTap: () {
+        _toggleCondensed(context);
+      },
+      child: Icon(
+        expanded ? Icons.arrow_drop_down : Icons.arrow_right,
+        color: IAppIrcUiColorTheme.of(context).darkGrey,
+      ),
+    );
   }
 
   void _toggleCondensed(BuildContext context) {

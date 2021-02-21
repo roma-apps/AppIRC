@@ -3,9 +3,9 @@ import 'package:flutter_appirc/app/channel/list/channel_list_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 
-abstract class NetworkListListenerBloc extends Providable {
+abstract class NetworkListListenerBloc extends DisposableOwner {
   final NetworkListBloc networkListBloc;
 
   NetworkListListenerBloc(this.networkListBloc) {

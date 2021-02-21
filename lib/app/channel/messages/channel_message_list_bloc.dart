@@ -1,20 +1,20 @@
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
+import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 var _logger = MyLogger(logTag: "channel_message_list_bloc.dart", enabled: true);
 
-class ChannelMessageListBloc extends Providable {
+class ChannelMessageListBloc extends DisposableOwner {
   final ChatPushesService chatPushesService;
 
   final Channel channel;
 
   // ignore: close_sinks
-  final BehaviorSubject<MessageListVisibleBounds> _visibleMessagesBoundsSubject =
-      BehaviorSubject.seeded(null);
+  final BehaviorSubject<MessageListVisibleBounds>
+      _visibleMessagesBoundsSubject = BehaviorSubject.seeded(null);
 
   Stream<MessageListVisibleBounds> get visibleMessagesBoundsStream =>
       _visibleMessagesBoundsSubject.stream.distinct();

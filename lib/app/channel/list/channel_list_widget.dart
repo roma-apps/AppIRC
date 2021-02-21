@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/channel/channel_bloc_provider.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_blocs_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/channel_popup_menu.dart';
 import 'package:flutter_appirc/app/channel/connection/channel_connection_widget.dart';
-import 'package:flutter_appirc/app/channel/list/channel_list_skin_bloc.dart';
 import 'package:flutter_appirc/app/channel/unread_count/channel_unread_count_widget.dart';
 import 'package:flutter_appirc/app/chat/active_channel/chat_active_channel_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
+import 'package:provider/provider.dart';
 
 MyLogger _logger = MyLogger(logTag: "channel_list_widget.dart", enabled: true);
 
@@ -29,10 +29,9 @@ class ChannelListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var networksListBloc = Provider.of<NetworkListBloc>(context);
-    var channelsListBloc =
-        networksListBloc.getChannelListBloc(_network);
+    var channelsListBloc = networksListBloc.getChannelListBloc(_network);
 
-    if(channelsListBloc == null) {
+    if (channelsListBloc == null) {
       return SizedBox.shrink();
     }
 
@@ -65,92 +64,114 @@ class ChannelListWidget extends StatelessWidget {
         });
   }
 
-  Widget _channelItem(
-      BuildContext context, Network network, Channel channel) {
+  Widget _channelItem(BuildContext context, Network network, Channel channel) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
 
     return StreamBuilder<Channel>(
-        stream: activeChannelBloc.activeChannelStream,
-        builder:
-            (BuildContext context, AsyncSnapshot<Channel> snapshot) {
-          var activeChannel = snapshot.data;
-          var isChannelActive = activeChannel?.remoteId == channel.remoteId;
+      stream: activeChannelBloc.activeChannelStream,
+      builder: (BuildContext context, AsyncSnapshot<Channel> snapshot) {
+        var activeChannel = snapshot.data;
+        var isChannelActive = activeChannel?.remoteId == channel.remoteId;
 
-          if (isChannelActive) {
-            return Container(
-                decoration: BoxDecoration(
-                    color: Provider.of<ChannelListSkinBloc>(context)
-                        .getChannelItemBackgroundColor(isChannelActive)),
-                child: _buildChannelRow(
-                    context, network, channel, isChannelActive));
-          } else {
-            return Container(
-                child: _buildChannelRow(
-                    context, network, channel, isChannelActive));
-          }
-        });
+        if (isChannelActive) {
+          return Container(
+            decoration: BoxDecoration(
+              color: isChannelActive
+                  ? IAppIrcUiColorTheme.of(context).primary
+                  : IAppIrcUiColorTheme.of(context).darkGrey,
+            ),
+            child: _buildChannelRow(
+              context,
+              network,
+              channel,
+              isChannelActive,
+            ),
+          );
+        } else {
+          return Container(
+            child: _buildChannelRow(
+              context,
+              network,
+              channel,
+              isChannelActive,
+            ),
+          );
+        }
+      },
+    );
   }
 
-  Widget _buildChannelRow(BuildContext context, Network network,
-      Channel channel, bool isChannelActive) {
+  Widget _buildChannelRow(
+    BuildContext context,
+    Network network,
+    Channel channel,
+    bool isChannelActive,
+  ) {
     var networkBloc = NetworkBloc.of(context);
 
     var iconData = _calculateIconForChannelType(channel.type);
 
-    var channelBloc =
-        ChannelBlocsBloc.of(context).getChannelBloc(channel);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Provider(
-        providable: ChannelBlocProvider(channelBloc),
-        child: StreamBuilder(
-            initialData: channelBloc.channelConnected,
-            stream: channelBloc.channelConnectedStream,
-            builder: (context, snapshot) {
-              bool channelConnected = snapshot.data;
+      child: ProxyProvider<ChannelBlocsBloc, ChannelBloc>(
+        update: (context, channelBlocsBloc, _) =>
+            channelBlocsBloc.getChannelBloc(channel),
+        child: Builder(
+          builder: (context) {
+            var channelBloc = ChannelBloc.of(context);
+            return StreamBuilder(
+              initialData: channelBloc.channelConnected,
+              stream: channelBloc.channelConnectedStream,
+              builder: (context, snapshot) {
+                bool channelConnected = snapshot.data;
 
-              var channelsListSkinBloc =
-                  Provider.of<ChannelListSkinBloc>(context);
-
-              return Row(children: <Widget>[
-                _buildChannelIconWidget(context, iconData, isChannelActive),
-                _buildChannelNameWidget(context, channel, isChannelActive),
-                _buildConnectionStateWidget(
-                    context, networkBloc, isChannelActive, channelConnected),
-                buildChannelUnreadCountBadge(
-                    context, channelBloc, isChannelActive),
-                buildChannelPopupMenuButton(
-                    context: context,
-                    networkBloc: networkBloc,
-                    channelBloc: channelBloc,
-                    iconColor: channelsListSkinBloc
-                        .getChannelItemIconColor(isChannelActive))
-              ]);
-            }),
+                return Row(
+                  children: <Widget>[
+                    _buildChannelIconWidget(context, iconData, isChannelActive),
+                    _buildChannelNameWidget(context, channel, isChannelActive),
+                    _buildConnectionStateWidget(context, networkBloc,
+                        isChannelActive, channelConnected),
+                    buildChannelUnreadCountBadge(
+                        context, channelBloc, isChannelActive),
+                    buildChannelPopupMenuButton(
+                      context: context,
+                      networkBloc: networkBloc,
+                      channelBloc: channelBloc,
+                      iconColor: isChannelActive
+                          ? IAppIrcUiColorTheme.of(context).primary
+                          : IAppIrcUiColorTheme.of(context).darkGrey,
+                    )
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
 
   StreamBuilder<bool> _buildConnectionStateWidget(BuildContext context,
       NetworkBloc networkBloc, bool isChannelActive, bool channelConnected) {
-    var channelsListSkinBloc = Provider.of<ChannelListSkinBloc>(context);
-
     return StreamBuilder<bool>(
-        stream: networkBloc.networkConnectedStream,
-        initialData: networkBloc.networkConnected,
-        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          var networkConnected = snapshot.data;
+      stream: networkBloc.networkConnectedStream,
+      initialData: networkBloc.networkConnected,
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        var networkConnected = snapshot.data;
 
-          return buildConnectionIcon(
-              context,
-              channelsListSkinBloc.getChannelItemIconColor(isChannelActive),
-              networkConnected && channelConnected);
-        });
+        return buildConnectionIcon(
+          context,
+          isChannelActive
+              ? IAppIrcUiColorTheme.of(context).primary
+              : IAppIrcUiColorTheme.of(context).white,
+          networkConnected && channelConnected,
+        );
+      },
+    );
   }
 
   Widget _buildChannelNameWidget(
       BuildContext context, Channel channel, bool isChannelActive) {
-    var channelsListSkinBloc = Provider.of<ChannelListSkinBloc>(context);
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
@@ -159,15 +180,19 @@ class ChannelListWidget extends StatelessWidget {
             if (_onActionCallback != null) {
               _onActionCallback();
             }
-            var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+            var activeChannelBloc =
+                Provider.of<ChatActiveChannelBloc>(context, listen: false);
 
             return activeChannelBloc.changeActiveChanel(channel);
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(channel.name,
-                style: channelsListSkinBloc
-                    .getChannelItemTextStyle(isChannelActive)),
+            child: Text(
+              channel.name,
+              style: isChannelActive
+                  ? IAppIrcUiTextTheme.of(context).mediumBoldDarkGrey
+                  : IAppIrcUiTextTheme.of(context).mediumBoldWhite,
+            ),
           ),
         ),
       ),
@@ -176,11 +201,14 @@ class ChannelListWidget extends StatelessWidget {
 
   Widget _buildChannelIconWidget(
       BuildContext context, IconData iconData, bool isChannelActive) {
-    var channelsListSkinBloc = Provider.of<ChannelListSkinBloc>(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
-      child: Icon(iconData,
-          color: channelsListSkinBloc.getChannelItemIconColor(isChannelActive)),
+      child: Icon(
+        iconData,
+        color: isChannelActive
+            ? IAppIrcUiColorTheme.of(context).primary
+            : IAppIrcUiColorTheme.of(context).white,
+      ),
     );
   }
 

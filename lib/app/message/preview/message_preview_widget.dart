@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,30 +8,31 @@ import 'package:flutter_appirc/app/message/preview/message_image_preview_widget.
 import 'package:flutter_appirc/app/message/preview/message_link_preview_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_loading_preview_widget.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
-import 'package:flutter_appirc/app/message/preview/message_preview_skin_bloc.dart';
 import 'package:flutter_appirc/app/message/preview/message_video_preview_widget.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
+import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/provider/provider.dart';
-import 'package:flutter_appirc/skin/text_skin_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 MyLogger _logger =
     MyLogger(logTag: "message_preview_model.dart", enabled: true);
 
 Widget buildPreview(
-    BuildContext context, RegularMessage message, MessagePreview preview) {
+  BuildContext context,
+  RegularMessage message,
+  MessagePreview preview,
+) {
   _logger.d((() => " build preview for $preview"));
-
-  MessagePreviewSkinBloc skinBloc = Provider.of(context);
-
-  TextSkinBloc textSkinBloc = Provider.of(context);
 
   return Padding(
     padding: const EdgeInsets.all(4.0),
     child: Container(
-      decoration:
-          BoxDecoration(border: Border.all(color: skinBloc.previewBorderColor)),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: IAppIrcUiColorTheme.of(context).primary,
+        ),
+      ),
       child: Column(
         children: <Widget>[
           Row(
@@ -40,16 +40,19 @@ Widget buildPreview(
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(tr("chat.message.preview.title"), style: textSkinBloc
-                    .defaultTextStyle),
+                child: Text(
+                  S.of(context).chat_message_preview_title,
+                  style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+                ),
               ),
               PlatformIconButton(
-                  icon: Icon(
-                      preview.shown ? Icons.expand_less : Icons.expand_more),
-                  onPressed: () {
-                    ChannelBloc channelBloc = ChannelBloc.of(context);
-                    channelBloc.togglePreview(message, preview);
-                  })
+                icon:
+                    Icon(preview.shown ? Icons.expand_less : Icons.expand_more),
+                onPressed: () {
+                  ChannelBloc channelBloc = ChannelBloc.of(context);
+                  channelBloc.togglePreview(message, preview);
+                },
+              )
             ],
           ),
           preview.shown
