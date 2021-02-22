@@ -758,7 +758,7 @@ class _$SpecialMessageDao extends SpecialMessageDao {
           ..database = transaction;
         return transactionDatabase.specialMessagesDao
             .upsertSpecialMessage(specialMessage);
-      },);
+      });
     }
   }
 

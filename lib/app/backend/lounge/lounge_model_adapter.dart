@@ -115,7 +115,7 @@ Future<ChatMessage> toChatMessage(
       // todo: add special fields to RegularChatMessage
       if (regularMessageType == RegularMessageType.chghost) {
         text =
-            "${msgLoungeResponseBody.new_ident}@${msgLoungeResponseBody.new_host}";
+            "${msgLoungeResponseBody.newIdent}@${msgLoungeResponseBody.newHost}";
       } else {
         if (regularMessageType == RegularMessageType.kick) {
           text = "${msgLoungeResponseBody?.target?.nick}: "
@@ -153,7 +153,7 @@ Future<ChatMessage> toChatMessage(
       fromMode: msgLoungeResponseBody.from != null
           ? msgLoungeResponseBody.from.mode
           : null,
-      newNick: msgLoungeResponseBody.new_nick,
+      newNick: msgLoungeResponseBody.newNick,
       messageRemoteId: msgLoungeResponseBody.id,
       nicknames: msgLoungeResponseBody.users,
       linksInMessage: null,
@@ -224,7 +224,7 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages({
     var channelInfoSpecialMessageBody = ChannelInfoSpecialMessageBody(
       name: loungeChannelItem.channel,
       topic: loungeChannelItem.topic,
-      usersCount: loungeChannelItem.num_users,
+      usersCount: loungeChannelItem.numUsers,
     );
 
     specialMessages.add(
@@ -527,12 +527,12 @@ WhoIsSpecialMessageBody toWhoIsSpecialMessageBody(
       logonTime: DateTime.fromMillisecondsSinceEpoch(loungeWhoIs.logonTime),
       logon: loungeWhoIs.logon,
       nick: loungeWhoIs.nick,
-      realName: loungeWhoIs.real_name,
+      realName: loungeWhoIs.realName,
       secure: loungeWhoIs.secure,
       server: loungeWhoIs.server,
-      serverInfo: loungeWhoIs.server_info,
-      actualHostname: loungeWhoIs.actual_hostname,
-      actualIp: loungeWhoIs.actual_ip,
+      serverInfo: loungeWhoIs.serverInfo,
+      actualHostname: loungeWhoIs.actualHostname,
+      actualIp: loungeWhoIs.actualIp,
     );
 
 MessagePreview toMessagePreview(

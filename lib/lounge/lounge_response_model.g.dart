@@ -352,9 +352,9 @@ ServerOptionsLoungeResponseBodyPart
 Map<String, dynamic> _$ServerOptionsLoungeResponseBodyPartToJson(
         ServerOptionsLoungeResponseBodyPart instance) =>
     <String, dynamic>{
-      'CHANTYPES': instance.CHANTYPES,
-      'NETWORK': instance.NETWORK,
-      'PREFIX': instance.PREFIX,
+      'CHANTYPES': instance.chanTypes,
+      'NETWORK': instance.network,
+      'PREFIX': instance.prefix,
     };
 
 ChannelStateLoungeResponseBody _$ChannelStateLoungeResponseBodyFromJson(
@@ -453,9 +453,9 @@ Map<String, dynamic> _$MsgLoungeResponseBodyPartToJson(
       'command': instance.command,
       'type': instance.type,
       'time': instance.time,
-      'new_nick': instance.new_nick,
-      'new_host': instance.new_host,
-      'new_ident': instance.new_ident,
+      'new_nick': instance.newNick,
+      'new_host': instance.newHost,
+      'new_ident': instance.newIdent,
       'text': instance.text,
       'ctcpMessage': instance.ctcpMessage,
       'hostmask': instance.hostmask,
@@ -480,13 +480,13 @@ WhoIsLoungeResponseBodyPart _$WhoIsLoungeResponseBodyPartFromJson(
     idleTime: json['idleTime'] as int,
     logonTime: json['logonTime'] as int,
     logon: json['logon'] as String,
-    actual_hostname: json['actual_hostname'] as String,
-    actual_ip: json['actual_ip'] as String,
+    actualHostname: json['actual_hostname'] as String,
+    actualIp: json['actual_ip'] as String,
     nick: json['nick'] as String,
-    real_name: json['real_name'] as String,
+    realName: json['real_name'] as String,
     secure: json['secure'] as bool,
     server: json['server'] as String,
-    server_info: json['server_info'] as String,
+    serverInfo: json['server_info'] as String,
   );
 }
 
@@ -497,17 +497,17 @@ Map<String, dynamic> _$WhoIsLoungeResponseBodyPartToJson(
       'channels': instance.channels,
       'hostname': instance.hostname,
       'ident': instance.ident,
-      'actual_hostname': instance.actual_hostname,
-      'actual_ip': instance.actual_ip,
+      'actual_hostname': instance.actualHostname,
+      'actual_ip': instance.actualIp,
       'idle': instance.idle,
       'idleTime': instance.idleTime,
       'logonTime': instance.logonTime,
       'logon': instance.logon,
       'nick': instance.nick,
-      'real_name': instance.real_name,
+      'real_name': instance.realName,
       'secure': instance.secure,
       'server': instance.server,
-      'server_info': instance.server_info,
+      'server_info': instance.serverInfo,
     };
 
 MsgUserLoungeResponseBodyPart _$MsgUserLoungeResponseBodyPartFromJson(
@@ -686,7 +686,7 @@ Map<String, dynamic>
         <String, dynamic>{
           'channel': instance.channel,
           'topic': instance.topic,
-          'num_users': instance.num_users,
+          'num_users': instance.numUsers,
         };
 
 UserLoungeResponseBodyPart _$UserLoungeResponseBodyPartFromJson(

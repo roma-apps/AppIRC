@@ -600,26 +600,38 @@ class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
-  // ignore: non_constant_identifier_names
-  final List<String> CHANTYPES;
+  @JsonKey(name: "CHANTYPES")
+  final List<String> chanTypes;
 
-  // ignore: non_constant_identifier_names
-  final String NETWORK;
+  @JsonKey(name: "NETWORK")
+  final String network;
 
-  // ignore: non_constant_identifier_names
-  final List<String> PREFIX;
+  @JsonKey(name: "PREFIX")
+  final List<String> prefix;
 
   @override
   String toString() {
     return 'ServerOptionsLoungeResponseBodyPart{'
-        'CHANTYPES: $CHANTYPES, '
-        'NETWORK: $NETWORK, '
-        'PREFIX: $PREFIX'
+        'chanTypes: $chanTypes, '
+        'network: $network, '
+        'prefix: $prefix'
         '}';
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ServerOptionsLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          chanTypes == other.chanTypes &&
+          network == other.network &&
+          prefix == other.prefix;
+
+  @override
+  int get hashCode => chanTypes.hashCode ^ network.hashCode ^ prefix.hashCode;
+
   ServerOptionsLoungeResponseBodyPart(
-      this.CHANTYPES, this.NETWORK, this.PREFIX);
+      this.chanTypes, this.network, this.prefix);
 
   factory ServerOptionsLoungeResponseBodyPart.fromJson(
           Map<String, dynamic> json) =>
@@ -719,14 +731,14 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String type;
   final String time;
 
-  // ignore: non_constant_identifier_names
-  final String new_nick;
+  @JsonKey(name: "new_nick")
+  final String newNick;
 
-  // ignore: non_constant_identifier_names
-  final String new_host;
+  @JsonKey(name: "new_host")
+  final String newHost;
 
-  // ignore: non_constant_identifier_names
-  final String new_ident;
+  @JsonKey(name: "new_ident")
+  final String newIdent;
   final String text;
   final String ctcpMessage;
   final String hostmask;
@@ -745,9 +757,9 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
       this.command,
       this.type,
       this.time,
-      this.new_nick,
-      this.new_host,
-      this.new_ident,
+      this.newNick,
+      this.newHost,
+      this.newIdent,
       this.text,
       this.ctcpMessage,
       this.hostmask,
@@ -768,9 +780,9 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
         'command: $command, '
         'type: $type, '
         'time: $time, '
-        'new_nick: $new_nick, '
-        'new_host: $new_host, '
-        'new_ident: $new_ident, '
+        'new_nick: $newNick, '
+        'new_host: $newHost, '
+        'new_ident: $newIdent, '
         'text: $text, '
         'ctcpMessage: $ctcpMessage,'
         'hostmask: $hostmask, '
@@ -798,24 +810,24 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String hostname;
   final String ident;
 
-  // ignore: non_constant_identifier_names
-  final String actual_hostname;
+  @JsonKey(name: "actual_hostname")
+  final String actualHostname;
 
-  // ignore: non_constant_identifier_names
-  final String actual_ip;
+  @JsonKey(name: "actual_ip")
+  final String actualIp;
   final String idle;
   final int idleTime;
   final int logonTime;
   final String logon;
   final String nick;
 
-  // ignore: non_constant_identifier_names
-  final String real_name;
+  @JsonKey(name: "real_name")
+  final String realName;
   final bool secure;
   final String server;
 
-  // ignore: non_constant_identifier_names
-  final String server_info;
+  @JsonKey(name: "server_info")
+  final String serverInfo;
 
   @override
   String toString() {
@@ -824,31 +836,29 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
         'channels: $channels, hostname: $hostname, '
         'ident: $ident, idle: $idle, idleTime: $idleTime, '
         'logonTime: $logonTime, logon: $logon, nick: $nick, '
-        'realName: $real_name, secure: $secure, '
-        'actual_ip: $actual_ip, actual_hostname: $actual_hostname, '
-        'server: $server, serverInfo: $server_info'
+        'realName: $realName, secure: $secure, '
+        'actualIp: $actualIp, actualHostname: $actualHostname, '
+        'server: $server, serverInfo: $serverInfo'
         '}';
   }
 
-  WhoIsLoungeResponseBodyPart(
-      {@required this.account,
-      @required this.channels,
-      @required this.hostname,
-      @required this.ident,
-      @required this.idle,
-      @required this.idleTime,
-      @required this.logonTime,
-      @required this.logon, // ignore: non_constant_identifier_names
-      @required this.actual_hostname, // ignore: non_constant_identifier_names
-      // ignore: non_constant_identifier_names
-      @required this.actual_ip,
-      @required this.nick, // ignore: non_constant_identifier_names
-      // ignore: non_constant_identifier_names
-      @required this.real_name,
-      @required this.secure,
-      @required this.server, // ignore: non_constant_identifier_names
-      // ignore: non_constant_identifier_names
-      @required this.server_info});
+  WhoIsLoungeResponseBodyPart({
+    @required this.account,
+    @required this.channels,
+    @required this.hostname,
+    @required this.ident,
+    @required this.idle,
+    @required this.idleTime,
+    @required this.logonTime,
+    @required this.logon,
+    @required this.actualHostname,
+    @required this.actualIp,
+    @required this.nick,
+    @required this.realName,
+    @required this.secure,
+    @required this.server,
+    @required this.serverInfo,
+  });
 
   factory WhoIsLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$WhoIsLoungeResponseBodyPartFromJson(json);
@@ -1073,16 +1083,22 @@ class ChannelListItemSpecialMessageLoungeResponseBodyPart
   final String channel;
   final String topic;
 
-  // ignore: non_constant_identifier_names
-  final int num_users;
+  @JsonKey(name:"num_users")
+  final int numUsers;
 
   ChannelListItemSpecialMessageLoungeResponseBodyPart(
-      this.channel, this.topic, this.num_users);
+    this.channel,
+    this.topic,
+    this.numUsers,
+  );
 
   @override
   String toString() {
     return 'ChannelListItemSpecialMessageLoungeResponseBodyPart{'
-        'channel: $channel, topic: $topic, num_users: $num_users}';
+        'channel: $channel, '
+        'topic: $topic, '
+        'numUsers: $numUsers'
+        '}';
   }
 
   factory ChannelListItemSpecialMessageLoungeResponseBodyPart.fromJson(
