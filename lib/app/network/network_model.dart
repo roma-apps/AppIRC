@@ -30,26 +30,21 @@ class NetworkTitle {
 }
 
 class Network {
+  final NetworkConnectionPreferences connectionPreferences;
+  final String remoteId;
+  final List<Channel> channels;
+
+  Network({
+    @required this.connectionPreferences,
+    @required this.remoteId,
+    @required this.channels,
+  });
+
   int get localId => connectionPreferences.localId;
 
   set localId(int newId) => connectionPreferences.localId = newId;
-  NetworkConnectionPreferences connectionPreferences;
 
   String get name => connectionPreferences.name;
-  final String remoteId;
-
-  final List<Channel> channels;
-
-  Network(
-    this.connectionPreferences,
-    this.remoteId,
-    this.channels,
-  );
-
-  Network.name(
-      {@required this.connectionPreferences,
-      @required this.remoteId,
-      @required this.channels});
 
   List<Channel> get channelsWithoutLobby => channels
       .where(
@@ -60,6 +55,30 @@ class Network {
   Channel get lobbyChannel => channels.firstWhere(
         (channel) => channel.isLobby,
       );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Network &&
+          runtimeType == other.runtimeType &&
+          connectionPreferences == other.connectionPreferences &&
+          remoteId == other.remoteId &&
+          channels == other.channels;
+
+  @override
+  int get hashCode =>
+      connectionPreferences.hashCode ^ remoteId.hashCode ^ channels.hashCode;
+
+  Network copyWith({
+    NetworkConnectionPreferences connectionPreferences,
+    String remoteId,
+    List<Channel> channels,
+  }) => Network(
+      connectionPreferences:
+          connectionPreferences ?? this.connectionPreferences,
+      remoteId: remoteId ?? this.remoteId,
+      channels: channels ?? this.channels,
+    );
 
   @override
   String toString() {

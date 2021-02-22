@@ -7,22 +7,22 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_model
 import 'package:flutter_appirc/app/network/preferences/page/network_preferences_page.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog_model.dart';
-import 'package:flutter_appirc/generated/l10n.dart';
 
 class EditNetworkPreferencesPage extends NetworkPreferencesPage {
   EditNetworkPreferencesPage({
-    @required BuildContext context,
     @required NetworkPreferences startValues,
     @required bool serverPreferencesEnabled,
     @required bool serverPreferencesVisible,
-  }) : super.name(
-          titleText: S.of(context).irc_connection_edit_title,
+    @required String titleText,
+    @required String buttonText,
+  }) : super(
           startValues: startValues,
           isNeedShowChannels: false,
           isNeedShowCommands: true,
           serverPreferencesEnabled: serverPreferencesEnabled,
           serverPreferencesVisible: serverPreferencesVisible,
-          buttonText: S.of(context).irc_connection_edit_action_save,
+          titleText: titleText,
+          buttonText: buttonText,
         );
 
   @override

@@ -96,7 +96,7 @@ class ChatNetworkNewLoungeJsonRequest extends NetworkNewLoungeJsonRequest {
   ChatNetworkNewLoungeJsonRequest({
     @required this.networkPreferences,
     @required String join,
-  }) : super.name(
+  }) : super(
           username: networkPreferences
               .networkConnectionPreferences.userPreferences.username,
           nick: networkPreferences

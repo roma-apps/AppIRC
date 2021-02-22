@@ -6,7 +6,8 @@ const String appIRCLoungeInstance = "https://irc.pleroma.social/";
 // const String appIRCLoungeInstance = "https://de1f8af02855.ngrok.io/";
 
 LoungePreferences createDefaultLoungePreferences() => LoungePreferences(
-      LoungeHostPreferences(
+      hostPreferences: LoungeHostPreferences(
         host: appIRCLoungeInstance,
       ),
+      authPreferences: null,
     );

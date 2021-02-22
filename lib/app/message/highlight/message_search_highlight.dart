@@ -7,7 +7,7 @@ SpanBuilder buildSearchSpanHighlighter({
   @required String searchTerm,
 }) {
   var appIrcUiTextTheme = IAppIrcUiTextTheme.of(context);
-  return SpanBuilder.name(
+  return SpanBuilder(
     highlightString: searchTerm,
     highlightTextStyle: appIrcUiTextTheme.mediumBoldDarkGrey,
     tapCallback: null,

@@ -22,7 +22,7 @@ SpanBuilder buildLinkHighlighter({
   @required String link,
 }) {
 
-  return SpanBuilder.name(
+  return SpanBuilder(
     highlightString: link,
     highlightTextStyle: IAppIrcUiTextTheme.of(context).mediumPrimary,
     tapCallback: (word, screenPosition) {

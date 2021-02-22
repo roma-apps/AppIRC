@@ -176,26 +176,27 @@ class _$RegularMessageDao extends RegularMessageDao {
   Future<List<RegularMessageDB>> getAllMessages() async {
     return _queryAdapter.queryList('SELECT * FROM RegularMessageDB',
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -204,26 +205,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ?',
         arguments: <dynamic>[messageRemoteId],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -233,26 +235,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT localId FROM RegularMessageDB WHERE messageRemoteId = ?',
         arguments: <dynamic>[messageRemoteId],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -262,26 +265,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT * FROM RegularMessageDB WHERE messageRemoteId = ? AND channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId, messageRemoteId],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -290,26 +294,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -319,26 +324,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY dateMicrosecondsSinceEpoch ASC',
         arguments: <dynamic>[channelRemoteId],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -348,26 +354,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? AND (text LIKE ? OR fromNick LIKE ?) ORDER BY dateMicrosecondsSinceEpoch ASC',
         arguments: <dynamic>[channelRemoteId, search, nickSearch],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -375,26 +382,27 @@ class _$RegularMessageDao extends RegularMessageDao {
     return _queryAdapter.query(
         'SELECT * FROM RegularMessageDB ORDER BY messageRemoteId DESC LIMIT 1',
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -403,26 +411,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY messageRemoteId DESC LIMIT 1',
         arguments: <dynamic>[channelRemoteId],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -431,26 +440,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         'SELECT * FROM RegularMessageDB WHERE channelRemoteId = ? ORDER BY messageRemoteId ASC LIMIT 1',
         arguments: <dynamic>[channelRemoteId],
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -461,26 +471,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         queryableName: 'RegularMessageDB',
         isView: false,
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -492,26 +503,27 @@ class _$RegularMessageDao extends RegularMessageDao {
         queryableName: 'RegularMessageDB',
         isView: false,
         mapper: (Map<String, dynamic> row) => RegularMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['command'] as String,
-            row['hostMask'] as String,
-            row['text'] as String,
-            row['paramsJsonEncoded'] as String,
-            row['nicknamesJsonEncoded'] as String,
-            row['regularMessageTypeId'] as int,
-            row['self'] as int,
-            row['highlight'] as int,
-            row['previewsJsonEncoded'] as String,
-            row['linksJsonEncoded'] as String,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['fromRemoteId'] as int,
-            row['fromNick'] as String,
-            row['fromMode'] as String,
-            row['newNick'] as String,
-            row['messageRemoteId'] as int));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            messageRemoteId: row['messageRemoteId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            command: row['command'] as String,
+            hostMask: row['hostMask'] as String,
+            text: row['text'] as String,
+            paramsJsonEncoded: row['paramsJsonEncoded'] as String,
+            regularMessageTypeId: row['regularMessageTypeId'] as int,
+            self: row['self'] as int,
+            highlight: row['highlight'] as int,
+            previewsJsonEncoded: row['previewsJsonEncoded'] as String,
+            linksJsonEncoded: row['linksJsonEncoded'] as String,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            fromRemoteId: row['fromRemoteId'] as int,
+            fromNick: row['fromNick'] as String,
+            fromMode: row['fromMode'] as String,
+            newNick: row['newNick'] as String,
+            nicknamesJsonEncoded: row['nicknamesJsonEncoded'] as String));
   }
 
   @override
@@ -646,14 +658,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
   Future<List<SpecialMessageDB>> getAllMessages() async {
     return _queryAdapter.queryList('SELECT * FROM SpecialMessageDB',
         mapper: (Map<String, dynamic> row) => SpecialMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['dataJsonEncoded'] as String,
-            row['specialTypeId'] as int,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['linksJsonEncoded'] as String));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            dataJsonEncoded: row['dataJsonEncoded'] as String,
+            specialTypeId: row['specialTypeId'] as int,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            linksJsonEncoded: row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -662,14 +675,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
         'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = ?',
         arguments: <dynamic>[channelRemoteId],
         mapper: (Map<String, dynamic> row) => SpecialMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['dataJsonEncoded'] as String,
-            row['specialTypeId'] as int,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['linksJsonEncoded'] as String));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            dataJsonEncoded: row['dataJsonEncoded'] as String,
+            specialTypeId: row['specialTypeId'] as int,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            linksJsonEncoded: row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -679,14 +693,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
         'SELECT * FROM SpecialMessageDB WHERE channelRemoteId = ? AND dataJsonEncoded LIKE ? ORDER BY dateMicrosecondsSinceEpoch ASC',
         arguments: <dynamic>[channelRemoteId, search],
         mapper: (Map<String, dynamic> row) => SpecialMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['dataJsonEncoded'] as String,
-            row['specialTypeId'] as int,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['linksJsonEncoded'] as String));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            dataJsonEncoded: row['dataJsonEncoded'] as String,
+            specialTypeId: row['specialTypeId'] as int,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            linksJsonEncoded: row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -697,14 +712,15 @@ class _$SpecialMessageDao extends SpecialMessageDao {
         queryableName: 'SpecialMessageDB',
         isView: false,
         mapper: (Map<String, dynamic> row) => SpecialMessageDB(
-            row['localId'] as int,
-            row['channelLocalId'] as int,
-            row['chatMessageTypeId'] as int,
-            row['channelRemoteId'] as int,
-            row['dataJsonEncoded'] as String,
-            row['specialTypeId'] as int,
-            row['dateMicrosecondsSinceEpoch'] as int,
-            row['linksJsonEncoded'] as String));
+            localId: row['localId'] as int,
+            channelLocalId: row['channelLocalId'] as int,
+            chatMessageTypeId: row['chatMessageTypeId'] as int,
+            channelRemoteId: row['channelRemoteId'] as int,
+            dataJsonEncoded: row['dataJsonEncoded'] as String,
+            specialTypeId: row['specialTypeId'] as int,
+            dateMicrosecondsSinceEpoch:
+                row['dateMicrosecondsSinceEpoch'] as int,
+            linksJsonEncoded: row['linksJsonEncoded'] as String));
   }
 
   @override
@@ -742,7 +758,7 @@ class _$SpecialMessageDao extends SpecialMessageDao {
           ..database = transaction;
         return transactionDatabase.specialMessagesDao
             .upsertSpecialMessage(specialMessage);
-      });
+      },);
     }
   }
 

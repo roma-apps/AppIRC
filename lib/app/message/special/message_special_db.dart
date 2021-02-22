@@ -38,7 +38,11 @@ abstract class SpecialMessageDao {
     if (specialMessage.messageLocalId != null) {
       await updateSpecialMessage(toSpecialMessageDB(specialMessage));
     } else {
-      var id = await insertSpecialMessage(toSpecialMessageDB(specialMessage));
+      var id = await insertSpecialMessage(
+        toSpecialMessageDB(
+          specialMessage,
+        ),
+      );
       specialMessage.messageLocalId = id;
     }
 
@@ -95,20 +99,9 @@ class SpecialMessageDB implements ChatMessageDB {
   static DateTime date(SpecialMessageDB message) =>
       DateTime.fromMicrosecondsSinceEpoch(message.dateMicrosecondsSinceEpoch);
 
-  SpecialMessageDB(
-    this.localId,
-    this.channelLocalId,
-    this.chatMessageTypeId,
-    this.channelRemoteId,
-    this.dataJsonEncoded,
-    this.specialTypeId,
-    this.dateMicrosecondsSinceEpoch,
-    this.linksJsonEncoded,
-  );
-
-  SpecialMessageDB.name({
-    this.localId,
-    this.channelLocalId,
+  SpecialMessageDB({
+    @required this.localId,
+    @required this.channelLocalId,
     this.chatMessageTypeId = chatMessageTypeSpecialId,
     @required this.channelRemoteId,
     @required this.dataJsonEncoded,
@@ -150,16 +143,18 @@ int specialMessageTypeTypeToId(SpecialMessageType type) {
 }
 
 SpecialMessageDB toSpecialMessageDB(SpecialMessage specialMessage) =>
-    SpecialMessageDB.name(
+    SpecialMessageDB(
       channelRemoteId: specialMessage.channelRemoteId,
       dataJsonEncoded: json.encode(specialMessage.data),
       specialTypeId: specialMessageTypeTypeToId(specialMessage.specialType),
-      linksJsonEncoded: specialMessage.linksInText != null
+      linksJsonEncoded: specialMessage.linksInMessage != null
           ? json.encode(
-              specialMessage.linksInText,
+              specialMessage.linksInMessage,
             )
           : null,
       dateMicrosecondsSinceEpoch: specialMessage.date.microsecondsSinceEpoch,
+      localId: null,
+      channelLocalId: null,
     );
 
 SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
@@ -188,5 +183,6 @@ SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
     date: DateTime.fromMicrosecondsSinceEpoch(
       messageDB.dateMicrosecondsSinceEpoch,
     ),
+    channelLocalId: null,
   );
 }

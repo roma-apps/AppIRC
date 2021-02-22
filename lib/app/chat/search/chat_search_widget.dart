@@ -75,7 +75,7 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
                     message: message,
                     enableMessageActions: true,
                     messageWidgetType: MessageWidgetType.formatted,
-                    messageInListState: MessageInListState.name(
+                    messageInListState: MessageInListState(
                       inSearchResult: true,
                       searchTerm: result.searchTerm,
                     ),

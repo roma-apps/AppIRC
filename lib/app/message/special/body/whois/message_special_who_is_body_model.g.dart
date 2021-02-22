@@ -9,25 +9,25 @@ part of 'message_special_who_is_body_model.dart';
 WhoIsSpecialMessageBody _$WhoIsSpecialMessageBodyFromJson(
     Map<String, dynamic> json) {
   return WhoIsSpecialMessageBody(
-    json['account'] as String,
-    json['channels'] as String,
-    json['hostname'] as String,
-    json['actualHostname'] as String,
-    json['actualIp'] as String,
-    json['ident'] as String,
-    json['idle'] as String,
-    json['idleTime'] == null
+    account: json['account'] as String,
+    channels: json['channels'] as String,
+    hostname: json['hostname'] as String,
+    actualHostname: json['actualHostname'] as String,
+    actualIp: json['actualIp'] as String,
+    ident: json['ident'] as String,
+    idle: json['idle'] as String,
+    idleTime: json['idleTime'] == null
         ? null
         : DateTime.parse(json['idleTime'] as String),
-    json['logonTime'] == null
+    logonTime: json['logonTime'] == null
         ? null
         : DateTime.parse(json['logonTime'] as String),
-    json['logon'] as String,
-    json['nick'] as String,
-    json['realName'] as String,
-    json['secure'] as bool,
-    json['server'] as String,
-    json['serverInfo'] as String,
+    logon: json['logon'] as String,
+    nick: json['nick'] as String,
+    realName: json['realName'] as String,
+    secure: json['secure'] as bool,
+    server: json['server'] as String,
+    serverInfo: json['serverInfo'] as String,
   );
 }
 

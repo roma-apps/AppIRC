@@ -3,31 +3,36 @@ import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 
 class NetworkState {
-  static final NetworkState empty = NetworkState.name(
+  static const NetworkState empty = NetworkState(
     connected: false,
     secure: false,
     nick: null,
     name: null,
   );
 
-  bool connected;
-  bool secure;
-  String nick;
-  String name;
+  final bool connected;
+  final bool secure;
+  final String nick;
+  final String name;
 
-  NetworkState(
-    this.connected,
-    this.secure,
-    this.nick,
-    this.name,
-  );
-
-  NetworkState.name({
+  const NetworkState({
     @required this.connected,
     @required this.secure,
     @required this.nick,
     @required this.name,
   });
+
+  NetworkState copyWith({
+    bool connected,
+    bool secure,
+    String nick,
+    String name,
+  }) => NetworkState(
+      connected: connected ?? this.connected,
+      secure: secure ?? this.secure,
+      nick: nick ?? this.nick,
+      name: name ?? this.name,
+    );
 
   @override
   String toString() {
@@ -60,7 +65,11 @@ class NetworkWithState {
 
   final List<ChannelWithState> channelsWithState;
 
-  NetworkWithState(this.network, this.state, this.channelsWithState);
+  NetworkWithState({
+    @required this.network,
+    @required this.state,
+    @required this.channelsWithState,
+  });
 
   @override
   bool operator ==(Object other) =>
@@ -83,4 +92,14 @@ class NetworkWithState {
         'channelsWithState: $channelsWithState'
         '}';
   }
+
+  NetworkWithState copyWith({
+    Network network,
+    NetworkState state,
+    List<ChannelWithState> channelsWithState,
+  }) => NetworkWithState(
+      network: network ?? this.network,
+      state: state ?? this.state,
+      channelsWithState: channelsWithState ?? this.channelsWithState,
+    );
 }

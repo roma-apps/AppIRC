@@ -26,33 +26,18 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
 
   @override
   String toString() {
-    return 'WhoIsSpecialMessageBody{account: $account, '
+    return 'WhoIsSpecialMessageBody{'
+        'account: $account, '
         'channels: $channels, hostname: $hostname, '
         'ident: $ident, idle: $idle, idleTime: $idleTime, '
         'logonTime: $logonTime, logon: $logon, nick: $nick, '
         'realName: $realName, secure: $secure, '
         'actualIp: $actualIp, actualHostname: $actualHostname, '
-        'server: $server, serverInfo: $serverInfo}';
+        'server: $server, serverInfo: $serverInfo'
+        '}';
   }
 
-  WhoIsSpecialMessageBody(
-      this.account,
-      this.channels,
-      this.hostname,
-      this.actualHostname,
-      this.actualIp,
-      this.ident,
-      this.idle,
-      this.idleTime,
-      this.logonTime,
-      this.logon,
-      this.nick,
-      this.realName,
-      this.secure,
-      this.server,
-      this.serverInfo);
-
-  WhoIsSpecialMessageBody.name({
+  WhoIsSpecialMessageBody({
     @required this.account,
     @required this.channels,
     @required this.hostname,

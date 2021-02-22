@@ -95,17 +95,21 @@ class LoungeAuthPreferences extends IJsonObject {
   final String username;
   final String password;
 
-  LoungeAuthPreferences(this.username, this.password);
+  LoungeAuthPreferences({
+    @required this.username,
+    @required this.password,
+  });
 
-  LoungeAuthPreferences.name(
-      {@required this.username, @required this.password});
-
-  static LoungeAuthPreferences empty =
-      LoungeAuthPreferences.name(username: null, password: null);
+  static LoungeAuthPreferences empty = LoungeAuthPreferences(
+    username: null,
+    password: null,
+  );
 
   @override
   String toString() {
-    return 'LoungeAuthPreferences{username: $username, password: $password}';
+    return 'LoungeAuthPreferences{'
+        'username: $username, password: $password'
+        '}';
   }
 
   @override
@@ -131,17 +135,12 @@ class LoungePreferences implements IJsonObject {
   @override
   int get hashCode => hostPreferences.hashCode ^ authPreferences.hashCode;
 
-  LoungePreferences(
-    this.hostPreferences, {
-    this.authPreferences,
-  });
-
-  LoungePreferences.name({
+  LoungePreferences({
     @required this.hostPreferences,
     @required this.authPreferences,
   });
 
-  static LoungePreferences empty = LoungePreferences.name(
+  static LoungePreferences empty = LoungePreferences(
     hostPreferences: null,
     authPreferences: null,
   );

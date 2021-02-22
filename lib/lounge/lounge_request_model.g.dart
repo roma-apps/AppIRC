@@ -52,10 +52,10 @@ Map<String, dynamic> _$MoreLoungeJsonRequestToJson(
 MsgPreviewToggleLoungeJsonRequest _$MsgPreviewToggleLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return MsgPreviewToggleLoungeJsonRequest(
-    json['target'] as int,
-    json['msgId'] as int,
-    json['link'] as String,
-    json['shown'] as bool,
+    target: json['target'] as int,
+    msgId: json['msgId'] as int,
+    link: json['link'] as String,
+    shown: json['shown'] as bool,
   );
 }
 
@@ -99,8 +99,8 @@ Map<String, dynamic> _$RegistrationLoungeJsonRequestToJson(
 AuthLoginLoungeJsonRequestBody _$AuthLoginLoungeJsonRequestBodyFromJson(
     Map<String, dynamic> json) {
   return AuthLoginLoungeJsonRequestBody(
-    json['user'] as String,
-    json['password'] as String,
+    user: json['user'] as String,
+    password: json['password'] as String,
   );
 }
 
@@ -133,17 +133,17 @@ Map<String, dynamic> _$AuthReconnectLoungeJsonRequestBodyToJson(
 NetworkEditLoungeJsonRequest _$NetworkEditLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return NetworkEditLoungeJsonRequest(
-    json['uuid'] as String,
-    json['host'] as String,
-    json['name'] as String,
-    json['nick'] as String,
-    json['port'] as String,
-    json['realname'] as String,
-    json['password'] as String,
-    json['rejectUnauthorized'] as String,
-    json['tls'] as String,
-    json['username'] as String,
-    json['commands'] as String,
+    uuid: json['uuid'] as String,
+    host: json['host'] as String,
+    name: json['name'] as String,
+    nick: json['nick'] as String,
+    port: json['port'] as String,
+    realname: json['realname'] as String,
+    password: json['password'] as String,
+    rejectUnauthorized: json['rejectUnauthorized'] as String,
+    tls: json['tls'] as String,
+    username: json['username'] as String,
+    commands: json['commands'] as String,
   );
 }
 
@@ -166,17 +166,17 @@ Map<String, dynamic> _$NetworkEditLoungeJsonRequestToJson(
 NetworkNewLoungeJsonRequest _$NetworkNewLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return NetworkNewLoungeJsonRequest(
-    json['join'] as String,
-    json['host'] as String,
-    json['name'] as String,
-    json['nick'] as String,
-    json['port'] as String,
-    json['realname'] as String,
-    json['password'] as String,
-    json['rejectUnauthorized'] as String,
-    json['tls'] as String,
-    json['username'] as String,
-    json['commands'] as String,
+    join: json['join'] as String,
+    host: json['host'] as String,
+    name: json['name'] as String,
+    nick: json['nick'] as String,
+    port: json['port'] as String,
+    realname: json['realname'] as String,
+    password: json['password'] as String,
+    rejectUnauthorized: json['rejectUnauthorized'] as String,
+    tls: json['tls'] as String,
+    username: json['username'] as String,
+    commands: json['commands'] as String,
   );
 }
 

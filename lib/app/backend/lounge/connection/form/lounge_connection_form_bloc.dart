@@ -82,7 +82,7 @@ class LoungeConnectionFormBloc extends FormBloc {
   }
 
   LoungePreferences extractData() => LoungePreferences(
-        extractHostPreferences(),
+        hostPreferences: extractHostPreferences(),
         authPreferences: _extractCurrentAuthPreferences(),
       );
 

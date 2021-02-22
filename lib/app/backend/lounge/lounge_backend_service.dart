@@ -39,12 +39,18 @@ import 'package:rxdart/subjects.dart';
 
 var _logger = Logger("lounge_backend_service.dart");
 
-var _connectTimeout = Duration(seconds: 15);
-const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
-
-const _timeoutForRequestsWithResponse = Duration(seconds: 10);
-const _timeBetweenCheckResultForRequestsWithResponse =
-    Duration(milliseconds: 100);
+const _connectTimeout = Duration(
+  seconds: 15,
+);
+const _timeBetweenCheckingConnectionResponse = Duration(
+  milliseconds: 500,
+);
+const _timeoutForRequestsWithResponse = Duration(
+  seconds: 10,
+);
+const _timeBetweenCheckResultForRequestsWithResponse = Duration(
+  milliseconds: 100,
+);
 
 class LoungeBackendService extends DisposableOwner
     implements ChatBackendService {
@@ -315,7 +321,10 @@ class LoungeBackendService extends DisposableOwner
         networkPreferences.networkConnectionPreferences.serverPreferences;
 
     var request = toNetworkEditLoungeRequestBody(
-        network.remoteId, userPreferences, serverPreferences);
+      remoteId: network.remoteId,
+      userPreferences: userPreferences,
+      serverPreferences: serverPreferences,
+    );
 
     // important to put request before send it
     _editNetworkRequests.add(networkPreferences);
@@ -383,7 +392,12 @@ class LoungeBackendService extends DisposableOwner
       throw NotImplementedYetLoungeException();
     }
     _sendInputRequest(
-        network, channel, WhoIsIRCCommand.name(userNick: userNick).asRawString);
+      network,
+      channel,
+      WhoIsIRCCommand(
+        userNick: userNick,
+      ).asRawString,
+    );
     return RequestResult.notWaitForResponse();
   }
 
@@ -570,11 +584,14 @@ class LoungeBackendService extends DisposableOwner
           );
 
           if (channelWithState != null) {
-            listener(MessagesForChannel.name(
+            listener(
+              MessagesForChannel(
                 channel: channel,
                 messages: channelWithState.initMessages,
                 isNeedCheckAdditionalLoadMore: true,
-                isNeedCheckAlreadyExistInLocalStorage: true));
+                isNeedCheckAlreadyExistInLocalStorage: true,
+              ),
+            );
           }
         },
       ),
@@ -596,18 +613,28 @@ class LoungeBackendService extends DisposableOwner
                   // lounge send whois message as regular
                   // but actually lounge client display it as special
                   _toWhoIsSpecialMessage(data).then((message) {
-                    listener(MessagesForChannel.name(
+                    listener(
+                      MessagesForChannel(
                         isNeedCheckAlreadyExistInLocalStorage: true,
                         isNeedCheckAdditionalLoadMore: false,
                         channel: channel,
-                        messages: <ChatMessage>[message]));
+                        messages: <ChatMessage>[
+                          message,
+                        ],
+                      ),
+                    );
                   });
                 } else {
-                  listener(MessagesForChannel.name(
+                  listener(
+                    MessagesForChannel(
                       isNeedCheckAlreadyExistInLocalStorage: false,
                       isNeedCheckAdditionalLoadMore: false,
                       channel: channel,
-                      messages: <ChatMessage>[message]));
+                      messages: <ChatMessage>[
+                        message,
+                      ],
+                    ),
+                  );
                 }
               },
             );
@@ -620,24 +647,31 @@ class LoungeBackendService extends DisposableOwner
       createEventListenerDisposable(
         MsgSpecialLoungeResponseBody.eventName,
         (raw) {
-          MsgSpecialLoungeResponseBody data =
+          MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody =
               MsgSpecialLoungeResponseBody.fromJson(
                   _preProcessRawDataEncodeDecodeJson(raw));
 
-          if (channel.remoteId == data.chan) {
-            toSpecialMessages(channel, data).then(
+          if (channel.remoteId == messageSpecialLoungeResponseBody.chan) {
+            toSpecialMessages(
+                    channel: channel,
+                    messageSpecialLoungeResponseBody:
+                        messageSpecialLoungeResponseBody)
+                .then(
               (specialMessages) {
                 if (specialMessages.length == 1 &&
                     specialMessages.first.specialType ==
                         SpecialMessageType.text) {
                   return;
                 }
-                listener(MessagesForChannel.name(
+                listener(
+                  MessagesForChannel(
                     isNeedCheckAlreadyExistInLocalStorage: false,
                     isNeedCheckAdditionalLoadMore: false,
                     channel: channel,
                     messages: specialMessages,
-                    isContainsTextSpecialMessage: true));
+                    isContainsTextSpecialMessage: true,
+                  ),
+                );
               },
             );
           }
@@ -650,11 +684,14 @@ class LoungeBackendService extends DisposableOwner
         network,
         channel,
         (loadMoreResponse) {
-          listener(MessagesForChannel.name(
+          listener(
+            MessagesForChannel(
               isNeedCheckAlreadyExistInLocalStorage: false,
               isNeedCheckAdditionalLoadMore: true,
               channel: channel,
-              messages: loadMoreResponse.messages));
+              messages: loadMoreResponse.messages,
+            ),
+          );
         },
       ),
     );
@@ -675,6 +712,8 @@ class LoungeBackendService extends DisposableOwner
       specialType: SpecialMessageType.whoIs,
       date: DateTime.now(),
       linksInMessage: null,
+      messageLocalId: null,
+      channelLocalId: null,
     );
   }
 
@@ -911,7 +950,7 @@ class LoungeBackendService extends DisposableOwner
             connectionPreferences.userPreferences.nickname = nick;
 
             toNetworkWithState(loungeNetwork).then(
-              (networkWithState) {
+              (NetworkWithState networkWithState) {
                 networkWithState.network.localId =
                     request.networkPreferences.localId;
 
@@ -926,8 +965,11 @@ class LoungeBackendService extends DisposableOwner
                   }
                 });
 
-                networkWithState.network.connectionPreferences =
-                    connectionPreferences;
+                networkWithState = networkWithState.copyWith(
+                  network: networkWithState.network.copyWith(
+                    connectionPreferences: connectionPreferences,
+                  ),
+                );
 
                 listener(networkWithState);
               },
@@ -1023,8 +1065,10 @@ class LoungeBackendService extends DisposableOwner
             if (network.connectionPreferences.localId ==
                 networkPreferences.localId) {
               var currentState = currentStateExtractor();
-              currentState.name = networkPreferences
-                  .networkConnectionPreferences.serverPreferences.name;
+              currentState = currentState.copyWith(
+                name: networkPreferences
+                    .networkConnectionPreferences.serverPreferences.name,
+              );
               listener(currentState);
             }
           },
@@ -1036,12 +1080,14 @@ class LoungeBackendService extends DisposableOwner
       createEventListenerDisposable(
         (NickLoungeResponseBody.eventName),
         (raw) {
-          var parsed = NickLoungeResponseBody.fromJson(
+          var nickLoungeResponseBody = NickLoungeResponseBody.fromJson(
               _preProcessRawDataEncodeDecodeJson(raw));
 
-          if (parsed.network == network.remoteId) {
+          if (nickLoungeResponseBody.network == network.remoteId) {
             var currentState = currentStateExtractor();
-            currentState.nick = parsed.nick;
+            currentState = currentState.copyWith(
+              nick: nickLoungeResponseBody.nick,
+            );
             listener(currentState);
           }
         },
@@ -1053,7 +1099,10 @@ class LoungeBackendService extends DisposableOwner
         (NetworkOptionsLoungeResponseBody.eventName),
         (raw) {
           var parsed = NetworkOptionsLoungeResponseBody.fromJson(
-              _preProcessRawDataEncodeDecodeJson(raw));
+            _preProcessRawDataEncodeDecodeJson(
+              raw,
+            ),
+          );
 
           if (parsed.network == network.remoteId) {
             // nothing to change right now
@@ -1068,18 +1117,18 @@ class LoungeBackendService extends DisposableOwner
       createEventListenerDisposable(
         (NetworkStatusLoungeResponseBody.eventName),
         (raw) {
-          var parsed = NetworkStatusLoungeResponseBody.fromJson(
+          var loungeNetworkStatus = NetworkStatusLoungeResponseBody.fromJson(
             _preProcessRawDataEncodeDecodeJson(
               raw,
             ),
           );
 
-          if (parsed.network == network.remoteId) {
+          if (loungeNetworkStatus.network == network.remoteId) {
             var currentState = currentStateExtractor();
             var newState = toNetworkState(
-              parsed,
-              currentState.nick,
-              network.name,
+              loungeNetworkStatus: loungeNetworkStatus,
+              nick: currentState.nick,
+              name: network.name,
             );
             listener(newState);
           }
@@ -1332,13 +1381,17 @@ class LoungeBackendService extends DisposableOwner
       createEventListenerDisposable(
         (MoreLoungeResponseBody.eventName),
         (raw) {
-          var parsed = MoreLoungeResponseBody.fromJson(
+          var moreLoungeResponseBody = MoreLoungeResponseBody.fromJson(
               _preProcessRawDataEncodeDecodeJson(raw));
 
-          _logger.fine(() => "loadMoreHistory $parsed for $channel");
+          _logger.fine(
+              () => "loadMoreHistory $moreLoungeResponseBody for $channel");
 
-          if (parsed.chan == channel.remoteId) {
-            toChatLoadMore(channel, parsed).then((chatLoadMore) {
+          if (moreLoungeResponseBody.chan == channel.remoteId) {
+            toChatLoadMore(
+              channel: channel,
+              moreLoungeResponseBody: moreLoungeResponseBody,
+            ).then((chatLoadMore) {
               callback(chatLoadMore);
             });
           }
@@ -1510,7 +1563,7 @@ class LoungeBackendService extends DisposableOwner
     var shownInverted = !preview.shown;
     preview.shown = shownInverted;
     await _sendRequest(
-      MsgPreviewToggleLoungeJsonRequest.name(
+      MsgPreviewToggleLoungeJsonRequest(
         target: channel.remoteId,
         msgId: message.messageRemoteId,
         link: preview.link,
@@ -1534,7 +1587,10 @@ class LoungeBackendService extends DisposableOwner
   void signOut() {
     _signOutSubject.add(true);
 
-    _sendRequest(SignOutLoungeEmptyRequest(), isNeedAddRequestToPending: false);
+    _sendRequest(
+      SignOutLoungeEmptyRequest(),
+      isNeedAddRequestToPending: false,
+    );
   }
 }
 
@@ -2031,7 +2087,7 @@ Future<RequestResult<ChatLoginResult>> _connectAndLogin(
       if (isPrivateModeResponseReceived &&
           !isAuthRequestSent &&
           authPreferencesExist) {
-        var authRequest = AuthLoginLoungeJsonRequestBody.name(
+        var authRequest = AuthLoginLoungeJsonRequestBody(
           user: authPreferences.username,
           password: authPreferences.password,
         );
@@ -2087,8 +2143,8 @@ Future<RequestResult<ChatLoginResult>> _connectAndLogin(
 
   if (authorizedResponseReceived) {
     result.config = toChatConfig(
-      loungeConfig,
-      loungeCommands,
+      loungeConfig: loungeConfig,
+      commands: loungeCommands,
     );
     return RequestResult.withResponse(result);
   } else {
@@ -2096,12 +2152,15 @@ Future<RequestResult<ChatLoginResult>> _connectAndLogin(
         configReceived ||
         commandsReceived ||
         chatInitReceived) {
-      return RequestResult.error(InvalidResponseException(
+      return RequestResult.error(
+        InvalidResponseException(
           preferences,
           authorizedReceived,
           configReceived,
           commandsReceived,
-          chatInitReceived));
+          chatInitReceived,
+        ),
+      );
     } else {
       return RequestResult.withResponse(result);
     }

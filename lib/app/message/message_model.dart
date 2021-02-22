@@ -2,44 +2,72 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 
 abstract class ChatMessage {
-  int messageLocalId;
+  // todo:  should be final
+   int messageLocalId;
 
-  int channelLocalId;
+  final int channelLocalId;
 
   final ChatMessageType chatMessageType;
 
   final int channelRemoteId;
   final DateTime date;
-  List<String> linksInText;
+  final List<String> linksInMessage;
 
-  ChatMessage(
-    this.chatMessageType,
-    this.channelRemoteId,
-    this.date,
-    this.linksInText, {
-    this.messageLocalId,
+  ChatMessage({
+    @required this.channelLocalId,
+    @required this.chatMessageType,
+    @required this.channelRemoteId,
+    @required this.date,
+    @required this.linksInMessage,
+    @required this.messageLocalId,
   });
 
   bool get isSpecial => chatMessageType == ChatMessageType.special;
 
   bool get isRegular => chatMessageType == ChatMessageType.regular;
 
+  ChatMessage copyWith({
+    int messageLocalId,
+    int channelLocalId,
+    int channelRemoteId,
+    DateTime date,
+    List<String> linksInMessage,
+  });
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ChatMessage &&
           runtimeType == other.runtimeType &&
-          messageLocalId == other.messageLocalId;
+          messageLocalId == other.messageLocalId &&
+          channelLocalId == other.channelLocalId &&
+          chatMessageType == other.chatMessageType &&
+          channelRemoteId == other.channelRemoteId &&
+          date == other.date &&
+          linksInMessage == other.linksInMessage;
 
   @override
-  int get hashCode => messageLocalId.hashCode;
+  int get hashCode =>
+      messageLocalId.hashCode ^
+      channelLocalId.hashCode ^
+      chatMessageType.hashCode ^
+      channelRemoteId.hashCode ^
+      date.hashCode ^
+      linksInMessage.hashCode;
 
-  bool isContainsText(String searchTerm, {@required bool ignoreCase});
+  bool isContainsText(
+    String searchTerm, {
+    @required bool ignoreCase,
+  });
 
   Future<List<String>> extractLinks();
 }
 
-bool isContainsSearchTerm(String text, String searchTerm, {bool ignoreCase}) {
+bool isContainsSearchTerm(
+  String text,
+  String searchTerm, {
+  @required bool ignoreCase,
+}) {
   if (text == null) {
     return false;
   }
@@ -54,12 +82,12 @@ enum ChatMessageType { special, regular }
 
 class MessagesForChannel {
   final Channel channel;
-  List<ChatMessage> messages;
+  final List<ChatMessage> messages;
   final bool isNeedCheckAdditionalLoadMore;
   final bool isNeedCheckAlreadyExistInLocalStorage;
   final bool isContainsTextSpecialMessage;
 
-  MessagesForChannel.name({
+  MessagesForChannel({
     @required this.channel,
     @required this.messages,
     @required this.isNeedCheckAlreadyExistInLocalStorage,
@@ -69,10 +97,11 @@ class MessagesForChannel {
 
   @override
   String toString() {
-    return 'MessagesForChannel{channel: $channel,'
-        ' messages: $messages, '
-        ' isNeedCheckAlreadyExistInLocalStorage: $isNeedCheckAlreadyExistInLocalStorage, '
-        ' isNeedCheckAdditionalLoadMore: $isNeedCheckAdditionalLoadMore, '
+    return 'MessagesForChannel{'
+        'channel: $channel, '
+        'messages: $messages, '
+        'isNeedCheckAlreadyExistInLocalStorage: $isNeedCheckAlreadyExistInLocalStorage, '
+        'isNeedCheckAdditionalLoadMore: $isNeedCheckAdditionalLoadMore, '
         'isContainsTextSpecialMessage: $isContainsTextSpecialMessage'
         '}';
   }
@@ -123,7 +152,7 @@ class MessageInListState {
   final bool inSearchResult;
   final String searchTerm;
 
-  MessageInListState.name({
+  MessageInListState({
     @required this.inSearchResult,
     @required this.searchTerm,
   });
@@ -141,6 +170,6 @@ class MessageInListState {
 
   @override
   String toString() => 'MessageInListState{'
-        'inSearchResult: $inSearchResult, '
-        'searchTerm: $searchTerm}';
+      'inSearchResult: $inSearchResult, '
+      'searchTerm: $searchTerm}';
 }

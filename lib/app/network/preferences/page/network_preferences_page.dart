@@ -20,7 +20,7 @@ abstract class NetworkPreferencesPage extends StatefulWidget {
   final String buttonText;
   final String titleText;
 
-  NetworkPreferencesPage.name({
+  NetworkPreferencesPage({
     @required this.titleText,
     @required this.startValues,
     @required this.isNeedShowChannels,

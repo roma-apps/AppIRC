@@ -73,7 +73,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     _logger.fine(() => "onChannelJoined _onNewMessages "
         "${channelWithState.initMessages.length}");
     _onNewMessages(
-      MessagesForChannel.name(
+      MessagesForChannel(
         isNeedCheckAdditionalLoadMore: true,
         channel: channel,
         messages: channelWithState.initMessages,
@@ -263,23 +263,34 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   }
 
   Future _extractLinks(MessagesForChannel messagesForChannel) async {
-    var messages = messagesForChannel.messages;
+    List<ChatMessage> messages = messagesForChannel.messages;
     var linksList = await compute(extractLinks, messages);
 
     var regularMessagesToUpdate = <RegularMessageDB>[];
     var specialMessagesToUpdate = <SpecialMessageDB>[];
     for (int i = 0; i < messages.length; i++) {
       var message = messages[i];
-      message.linksInText = linksList[i];
 
-      if (message.linksInText.isNotEmpty) {
+      message = message.copyWith(
+        linksInMessage: linksList[i],
+      );
+
+      if (message.linksInMessage.isNotEmpty) {
         switch (message.chatMessageType) {
           case ChatMessageType.regular:
-            regularMessagesToUpdate.add(toRegularMessageDB(message));
+            regularMessagesToUpdate.add(
+              toRegularMessageDB(
+                message,
+              ),
+            );
             break;
 
           case ChatMessageType.special:
-            specialMessagesToUpdate.add(toSpecialMessageDB(message));
+            specialMessagesToUpdate.add(
+              toSpecialMessageDB(
+                message,
+              ),
+            );
             break;
         }
 
@@ -311,8 +322,10 @@ Future<List<List<String>>> extractLinks(List<ChatMessage> messages) async {
   return result;
 }
 
-void updatePreview(RegularMessage oldMessage,
-    MessagePreviewForRemoteMessageId previewForMessage) {
+void updatePreview(
+  RegularMessage oldMessage,
+  MessagePreviewForRemoteMessageId previewForMessage,
+) {
   oldMessage.previews ??= [];
 
   oldMessage.previews.clear();

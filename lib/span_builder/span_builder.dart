@@ -13,26 +13,30 @@ class SpanBuilder {
   final TextStyle highlightTextStyle;
   final SpanTapCallback tapCallback;
 
-  RegExp regExp;
+  final RegExp regExp;
 
-  SpanBuilder.name({
+  SpanBuilder({
     @required this.highlightString,
     @required this.highlightTextStyle,
     @required this.tapCallback,
-  }) {
-    regExp = RegExp("$highlightString", caseSensitive: false);
-  }
+  }) : regExp = RegExp("$highlightString", caseSensitive: false);
 
   TextSpan createTextSpan(String word) {
     TapGestureRecognizer gestureRecognizer;
     if (tapCallback != null) {
       gestureRecognizer = TapGestureRecognizer()
         ..onTap = () {
-          tapCallback(word, gestureRecognizer.initialPosition);
+          tapCallback(
+            word,
+            gestureRecognizer.initialPosition,
+          );
         };
     }
     var textSpan = TextSpan(
-        text: word, style: highlightTextStyle, recognizer: gestureRecognizer);
+      text: word,
+      style: highlightTextStyle,
+      recognizer: gestureRecognizer,
+    );
 
     return textSpan;
   }

@@ -93,13 +93,13 @@ class MessageListState {
   final List<ChatMessage> newItems;
   final MessageListUpdateType updateType;
 
-  MessageListState.name({
+  MessageListState({
     @required this.items,
     @required this.newItems,
     @required this.updateType,
   });
 
-  static MessageListState get empty => MessageListState.name(
+  static MessageListState get empty => MessageListState(
         items: [],
         newItems: [],
         updateType: MessageListUpdateType.notUpdated,

@@ -22,8 +22,8 @@ Map<String, dynamic> _$LoungeHostPreferencesToJson(
 LoungeAuthPreferences _$LoungeAuthPreferencesFromJson(
     Map<String, dynamic> json) {
   return LoungeAuthPreferences(
-    json['username'] as String,
-    json['password'] as String,
+    username: json['username'] as String,
+    password: json['password'] as String,
   );
 }
 
@@ -36,7 +36,7 @@ Map<String, dynamic> _$LoungeAuthPreferencesToJson(
 
 LoungePreferences _$LoungePreferencesFromJson(Map<String, dynamic> json) {
   return LoungePreferences(
-    json['hostPreferences'] == null
+    hostPreferences: json['hostPreferences'] == null
         ? null
         : LoungeHostPreferences.fromJson(
             json['hostPreferences'] as Map<String, dynamic>),

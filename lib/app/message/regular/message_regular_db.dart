@@ -207,49 +207,28 @@ class RegularMessageDB implements ChatMessageDB {
   final String newNick;
   final int messageRemoteId;
 
-  RegularMessageDB(
-      this.localId,
-      this.channelLocalId,
-      this.chatMessageTypeId,
-      this.channelRemoteId,
-      this.command,
-      this.hostMask,
-      this.text,
-      this.paramsJsonEncoded,
-      this.nicknamesJsonEncoded,
-      this.regularMessageTypeId,
-      this.self,
-      this.highlight,
-      this.previewsJsonEncoded,
-      this.linksJsonEncoded,
-      this.dateMicrosecondsSinceEpoch,
-      this.fromRemoteId,
-      this.fromNick,
-      this.fromMode,
-      this.newNick,
-      this.messageRemoteId);
-
-  RegularMessageDB.name(
-      {this.localId,
-      this.channelLocalId,
-      this.messageRemoteId,
-      this.chatMessageTypeId = chatMessageTypeRegularId,
-      @required this.channelRemoteId,
-      this.command,
-      this.hostMask,
-      this.text,
-      this.paramsJsonEncoded,
-      this.regularMessageTypeId,
-      this.self,
-      this.highlight,
-      this.previewsJsonEncoded,
-      this.linksJsonEncoded,
-      this.dateMicrosecondsSinceEpoch,
-      this.fromRemoteId,
-      this.fromNick,
-      this.fromMode,
-      this.newNick,
-      this.nicknamesJsonEncoded});
+  RegularMessageDB({
+    @required this.localId,
+    @required this.channelLocalId,
+    @required this.messageRemoteId,
+    this.chatMessageTypeId = chatMessageTypeRegularId,
+    @required this.channelRemoteId,
+    @required this.command,
+    @required this.hostMask,
+    @required this.text,
+    @required this.paramsJsonEncoded,
+    @required this.regularMessageTypeId,
+    @required this.self,
+    @required this.highlight,
+    @required this.previewsJsonEncoded,
+    @required this.linksJsonEncoded,
+    @required this.dateMicrosecondsSinceEpoch,
+    @required this.fromRemoteId,
+    @required this.fromNick,
+    @required this.fromMode,
+    @required this.newNick,
+    @required this.nicknamesJsonEncoded,
+  });
 
   @override
   String toString() {
@@ -426,43 +405,46 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
 }
 
 RegularMessageDB toRegularMessageDB(RegularMessage regularMessage) =>
-    RegularMessageDB.name(
-        messageRemoteId: regularMessage.messageRemoteId,
-        command: regularMessage.command,
-        hostMask: regularMessage.hostMask,
-        text: regularMessage.text,
-        regularMessageTypeId:
-            regularMessageTypeTypeToId(regularMessage.regularMessageType),
-        self: regularMessage.self != null
-            ? regularMessage.self
-                ? 1
-                : 0
-            : null,
-        highlight: regularMessage.highlight != null
-            ? regularMessage.highlight
-                ? 1
-                : 0
-            : null,
-        paramsJsonEncoded: json.encode(regularMessage.params),
-        nicknamesJsonEncoded: json.encode(regularMessage.nicknames),
-        previewsJsonEncoded: regularMessage.previews != null
-            ? json.encode(regularMessage.previews
-                .map((preview) => preview.toJson())
-                .toList())
-            : null,
-        linksJsonEncoded: regularMessage.linksInText != null
-            ? json.encode(regularMessage.linksInText)
-            : null,
-        dateMicrosecondsSinceEpoch: regularMessage.date.microsecondsSinceEpoch,
-        fromNick: regularMessage.fromNick,
-        fromRemoteId: regularMessage.fromRemoteId,
-        fromMode: regularMessage.fromMode,
-        newNick: regularMessage.newNick,
-        channelRemoteId: regularMessage.channelRemoteId);
+    RegularMessageDB(
+      messageRemoteId: regularMessage.messageRemoteId,
+      command: regularMessage.command,
+      hostMask: regularMessage.hostMask,
+      text: regularMessage.text,
+      regularMessageTypeId:
+          regularMessageTypeTypeToId(regularMessage.regularMessageType),
+      self: regularMessage.self != null
+          ? regularMessage.self
+              ? 1
+              : 0
+          : null,
+      highlight: regularMessage.highlight != null
+          ? regularMessage.highlight
+              ? 1
+              : 0
+          : null,
+      paramsJsonEncoded: json.encode(regularMessage.params),
+      nicknamesJsonEncoded: json.encode(regularMessage.nicknames),
+      previewsJsonEncoded: regularMessage.previews != null
+          ? json.encode(regularMessage.previews
+              .map((preview) => preview.toJson())
+              .toList())
+          : null,
+      linksJsonEncoded: regularMessage.linksInMessage != null
+          ? json.encode(regularMessage.linksInMessage)
+          : null,
+      dateMicrosecondsSinceEpoch: regularMessage.date.microsecondsSinceEpoch,
+      fromNick: regularMessage.fromNick,
+      fromRemoteId: regularMessage.fromRemoteId,
+      fromMode: regularMessage.fromMode,
+      newNick: regularMessage.newNick,
+      channelRemoteId: regularMessage.channelRemoteId,
+      localId: null,
+      channelLocalId: null,
+    );
 
 RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
-    RegularMessage.name(
-      messageDB.channelRemoteId,
+    RegularMessage(
+      channelRemoteId: messageDB.channelRemoteId,
       messageLocalId: messageDB.localId,
       messageRemoteId: messageDB.messageRemoteId,
       command: messageDB.command,
@@ -486,10 +468,11 @@ RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
       previews: messageDB.previewsJsonEncoded != null
           ? _convertPreviews(messageDB)
           : null,
-      linksInText:
+      linksInMessage:
           messageDB.linksJsonEncoded != null ? convertLinks(messageDB) : null,
       date: DateTime.fromMicrosecondsSinceEpoch(
-          messageDB.dateMicrosecondsSinceEpoch),
+        messageDB.dateMicrosecondsSinceEpoch,
+      ),
       fromRemoteId: messageDB.fromRemoteId,
       fromNick: messageDB.fromNick,
       fromMode: messageDB.fromMode,
@@ -497,6 +480,7 @@ RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
       nicknames: messageDB.nicknamesJsonEncoded != null
           ? _convertNicknames(messageDB)
           : null,
+      channelLocalId: null,
     );
 
 List<String> _convertNicknames(RegularMessageDB messageDB) {

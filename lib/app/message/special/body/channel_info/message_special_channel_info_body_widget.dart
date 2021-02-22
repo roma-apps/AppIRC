@@ -51,7 +51,7 @@ class ChannelInfoSpecialMessageBodyWidget
           _buildChannelInfoTopic(
             context: context,
             topic: body.topic,
-            linksInText: message.linksInText ?? [],
+            linksInText: message.linksInMessage ?? [],
           ),
         ],
       ),

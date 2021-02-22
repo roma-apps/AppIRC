@@ -151,6 +151,9 @@ PlatformAwarePopupMenuAction _buildEditAction(
     text: S.of(context).chat_network_action_edit,
     iconData: Icons.edit,
     actionCallback: (action) {
+      var titleText = S.of(context).irc_connection_edit_title;
+      var buttonText = S.of(context).irc_connection_edit_action_save;
+
       Navigator.push(
         context,
         platformPageRoute(
@@ -158,11 +161,12 @@ PlatformAwarePopupMenuAction _buildEditAction(
           builder: (_) => Provider<NetworkBloc>.value(
             value: networkBloc,
             child: EditNetworkPreferencesPage(
-              context: context,
               startValues: NetworkPreferences(
                 networkBloc.network.connectionPreferences,
                 [],
               ),
+              titleText: titleText,
+              buttonText: buttonText,
               serverPreferencesEnabled: !backendService.chatConfig.lockNetwork,
               serverPreferencesVisible:
                   backendService.chatConfig.displayNetwork,

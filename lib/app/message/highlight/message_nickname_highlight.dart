@@ -11,7 +11,7 @@ SpanBuilder buildNicknameSpanHighlighter({
   @required String nickname,
 }) {
   var nickNamesBloc = Provider.of<ColoredNicknamesBloc>(context);
-  return SpanBuilder.name(
+  return SpanBuilder(
     highlightString: nickname,
     highlightTextStyle: IAppIrcUiTextTheme.of(context).mediumDarkGrey.copyWith(
           color: nickNamesBloc.getColorForNick(

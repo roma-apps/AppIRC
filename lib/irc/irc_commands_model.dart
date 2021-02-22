@@ -48,7 +48,7 @@ class TopicIRCCommand extends IRCCommand {
 class WhoIsIRCCommand extends IRCCommand {
   final String userNick;
 
-  WhoIsIRCCommand.name({
+  WhoIsIRCCommand({
     @required this.userNick,
   });
 

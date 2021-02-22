@@ -10,19 +10,42 @@ class SpecialMessage extends ChatMessage {
   final SpecialMessageType specialType;
 
   SpecialMessage({
+    @required int channelLocalId,
     @required int channelRemoteId,
     @required this.data,
     @required this.specialType,
-    int messageLocalId,
+    @required int messageLocalId,
     @required DateTime date,
     @required List<String> linksInMessage,
   }) : super(
-          ChatMessageType.special,
-          channelRemoteId,
-          date,
-          linksInMessage,
+          channelLocalId: channelLocalId,
+          channelRemoteId: channelRemoteId,
+          chatMessageType: ChatMessageType.special,
+          date: date,
+          linksInMessage: linksInMessage,
           messageLocalId: messageLocalId,
         );
+
+  @override
+  SpecialMessage copyWith({
+    int messageLocalId,
+    int channelLocalId,
+    int channelRemoteId,
+    DateTime date,
+    List<String> linksInMessage,
+    SpecialMessageBody data,
+    SpecialMessageType specialType,
+  }) {
+    return SpecialMessage(
+      messageLocalId: messageLocalId ?? this.messageLocalId,
+      channelLocalId: channelLocalId ?? this.channelLocalId,
+      channelRemoteId: channelRemoteId ?? this.channelRemoteId,
+      date: date ?? this.date,
+      linksInMessage: linksInMessage ?? this.linksInMessage,
+      data: data ?? this.data,
+      specialType: specialType ?? this.specialType,
+    );
+  }
 
   @override
   Future<List<String>> extractLinks() => data.extractLinks();

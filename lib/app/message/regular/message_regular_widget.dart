@@ -132,7 +132,7 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
       var spanBuilders = <SpanBuilder>[];
 
       spanBuilders.addAll(
-        message.linksInText?.map(
+        message.linksInMessage?.map(
               (link) => buildLinkHighlighter(
                 context: context,
                 link: link,

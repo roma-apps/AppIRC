@@ -50,7 +50,7 @@ Widget buildMessageWidget({
   return child;
 }
 
-final MessageInListState notInSearchState = MessageInListState.name(
+final MessageInListState notInSearchState = MessageInListState(
   inSearchResult: false,
   searchTerm: null,
 );

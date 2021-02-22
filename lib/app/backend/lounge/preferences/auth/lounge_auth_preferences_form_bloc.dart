@@ -31,7 +31,7 @@ class LoungeAuthPreferencesFormBloc extends FormBloc {
         passwordFieldBloc,
       ];
 
-  LoungeAuthPreferences extractData() => LoungeAuthPreferences.name(
+  LoungeAuthPreferences extractData() => LoungeAuthPreferences(
         username: usernameFieldBloc.value,
         password: passwordFieldBloc.value,
       );

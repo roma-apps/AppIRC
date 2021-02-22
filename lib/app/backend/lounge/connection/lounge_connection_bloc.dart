@@ -13,8 +13,10 @@ var _logger = Logger("lounge_connection_form_bloc.dart");
 class LoungeConnectionBloc extends DisposableOwner {
   final SocketIOService socketIOService;
 
-  LoungePreferences get preferences => LoungePreferences.name(
-      hostPreferences: hostPreferences, authPreferences: authPreferences);
+  LoungePreferences get preferences => LoungePreferences(
+        hostPreferences: hostPreferences,
+        authPreferences: authPreferences,
+      );
 
   LoungeHostPreferences hostPreferences;
   LoungeAuthPreferences authPreferences;

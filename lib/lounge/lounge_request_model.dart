@@ -178,10 +178,7 @@ class MsgPreviewToggleLoungeJsonRequest extends LoungeJsonRequest {
   final String link;
   final bool shown;
 
-  MsgPreviewToggleLoungeJsonRequest(
-      this.target, this.msgId, this.link, this.shown);
-
-  MsgPreviewToggleLoungeJsonRequest.name({
+  MsgPreviewToggleLoungeJsonRequest({
     @required this.target,
     @required this.msgId,
     @required this.link,
@@ -291,12 +288,7 @@ class AuthLoginLoungeJsonRequestBody extends LoungeJsonRequest {
     return 'AuthLoungeJsonRequestBody{user: $user, password: $password}';
   }
 
-  AuthLoginLoungeJsonRequestBody(
-    this.user,
-    this.password,
-  );
-
-  AuthLoginLoungeJsonRequestBody.name({
+  AuthLoginLoungeJsonRequestBody({
     @required this.user,
     @required this.password,
   });
@@ -343,7 +335,7 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.networkEdit;
 
-  NetworkEditLoungeJsonRequest.name({
+  NetworkEditLoungeJsonRequest({
     @required this.uuid,
     @required String host,
     @required String name,
@@ -355,7 +347,7 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
     @required String tls,
     @required String username,
     @required String commands,
-  }) : super.name(
+  }) : super(
           host: host,
           name: name,
           nick: nick,
@@ -366,31 +358,6 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
           tls: tls,
           username: username,
           commands: commands,
-        );
-
-  NetworkEditLoungeJsonRequest(
-      this.uuid,
-      String host,
-      String name,
-      String nick,
-      String port,
-      String realname,
-      String password,
-      String rejectUnauthorized,
-      String tls,
-      String username,
-      String commands)
-      : super(
-          host,
-          name,
-          nick,
-          port,
-          realname,
-          password,
-          rejectUnauthorized,
-          tls,
-          username,
-          commands,
         );
 
   @override
@@ -407,19 +374,19 @@ class NetworkNewLoungeJsonRequest extends NetworkLoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.networkNew;
 
-  NetworkNewLoungeJsonRequest.name(
-      {@required this.join,
-      @required String host,
-      @required String name,
-      @required String nick,
-      @required String port,
-      @required String realname,
-      @required String password,
-      @required String rejectUnauthorized,
-      @required String tls,
-      @required String username,
-      @required String commands})
-      : super.name(
+  NetworkNewLoungeJsonRequest({
+    @required this.join,
+    @required String host,
+    @required String name,
+    @required String nick,
+    @required String port,
+    @required String realname,
+    @required String password,
+    @required String rejectUnauthorized,
+    @required String tls,
+    @required String username,
+    @required String commands,
+  }) : super(
           host: host,
           name: name,
           nick: nick,
@@ -430,31 +397,6 @@ class NetworkNewLoungeJsonRequest extends NetworkLoungeJsonRequest {
           tls: tls,
           username: username,
           commands: commands,
-        );
-
-  NetworkNewLoungeJsonRequest(
-    this.join,
-    String host,
-    String name,
-    String nick,
-    String port,
-    String realname,
-    String password,
-    String rejectUnauthorized,
-    String tls,
-    String username,
-    String commands,
-  ) : super(
-          host,
-          name,
-          nick,
-          port,
-          realname,
-          password,
-          rejectUnauthorized,
-          tls,
-          username,
-          commands,
         );
 
   @override
@@ -482,20 +424,7 @@ abstract class NetworkLoungeJsonRequest extends LoungeJsonRequest {
 
   String get uri => "$host:$port";
 
-  NetworkLoungeJsonRequest(
-    this.host,
-    this.name,
-    this.nick,
-    this.port,
-    this.realname,
-    this.password,
-    this.rejectUnauthorized,
-    this.tls,
-    this.username,
-    this.commands,
-  );
-
-  NetworkLoungeJsonRequest.name({
+  NetworkLoungeJsonRequest({
     @required this.host,
     @required this.commands,
     @required this.name,

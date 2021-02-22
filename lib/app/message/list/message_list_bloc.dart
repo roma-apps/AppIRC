@@ -92,10 +92,11 @@ class MessageListBloc extends DisposableOwner {
     var messages = messagesList.allMessages;
     var messageListItems = _convertMessagesToMessageListItems(messages);
 
-    MessageListState initListState = MessageListState.name(
-        items: messageListItems,
-        newItems: messages,
-        updateType: MessageListUpdateType.loadedFromLocalDatabase);
+    MessageListState initListState = MessageListState(
+      items: messageListItems,
+      newItems: messages,
+      updateType: MessageListUpdateType.loadedFromLocalDatabase,
+    );
     _logger.fine(() => "init messages $initListState");
 
     _listStateSubject = BehaviorSubject.seeded(initListState);
@@ -147,7 +148,7 @@ class MessageListBloc extends DisposableOwner {
       );
     }
 
-    var messageListState = MessageListState.name(
+    var messageListState = MessageListState(
       items: messageListItems,
       newItems: newMessages,
       updateType: updateType,
