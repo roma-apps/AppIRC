@@ -3,13 +3,12 @@ import 'dart:async';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "lounge_connection_form_bloc.dart", enabled: true);
+var _logger = Logger("lounge_connection_form_bloc.dart");
 
 class LoungeConnectionBloc extends DisposableOwner {
   final SocketIOService socketIOService;
@@ -78,8 +77,9 @@ class LoungeConnectionBloc extends DisposableOwner {
 
   void onHostPreferencesChanged(LoungeHostPreferences hostPreferences) {
     var isNewValue = hostPreferences.host != this.hostPreferences.host;
-    _logger.d(() => "onHostPreferencesChanged isNewValue $isNewValue"
-        " hostPreferences $hostPreferences");
+    _logger.fine(() => "onHostPreferencesChanged \n"
+        "isNewValue $isNewValue\n"
+        "hostPreferences $hostPreferences\n");
     if (!isNewValue) {
       return;
     }
@@ -91,7 +91,7 @@ class LoungeConnectionBloc extends DisposableOwner {
 
   void onHostConnectionResult(LoungeHostPreferences hostPreferences,
       LoungeHostInformation hostInformation) {
-    _logger.d(() => "onHostConnectionResult "
+    _logger.fine(() => "onHostConnectionResult "
         "hostInformation $hostInformation");
     if (hostInformation == null) {
       return;

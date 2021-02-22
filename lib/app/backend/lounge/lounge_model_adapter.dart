@@ -17,12 +17,13 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_model
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
+import 'package:logging/logging.dart';
 
-var _logger = MyLogger(logTag: "lounge_model_adapter.dart", enabled: true);
+var _logger = Logger("lounge_model_adapter.dart");
 
 Future<ChatInitInformation> toChatInitInformation(
     InitLoungeResponseBody parsed) async {
@@ -202,7 +203,7 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
     );
   }
 
-  _logger.d(() => "toChannelsListSpecialMessages ${specialMessages.length}");
+  _logger.fine(() => "toChannelsListSpecialMessages ${specialMessages.length}");
 
   return specialMessages;
 }
@@ -238,8 +239,12 @@ SpecialMessageType detectSpecialMessageType(data) {
     TextSpecialMessageLoungeResponseBodyPart textMessage;
     try {
       textMessage = TextSpecialMessageLoungeResponseBodyPart.fromJson(map);
-    } on Exception catch (e) {
-      _logger.e(() => "error during detecting text special message $e");
+    } on Exception catch (error, stackTrace) {
+      _logger.shout(
+        () => "error during detecting text special message",
+        error,
+        stackTrace,
+      );
     }
 
     if (textMessage != null && textMessage.text != null) {
@@ -256,8 +261,12 @@ SpecialMessageType detectSpecialMessageType(data) {
       try {
         channelListItem =
             ChannelListItemSpecialMessageLoungeResponseBodyPart.fromJson(first);
-      } on Exception catch (e) {
-        _logger.e(() => "error during detecting text special message $e");
+      } on Exception catch (error, stackTrace) {
+        _logger.shout(
+          () => "error during detecting text special message",
+          error,
+          stackTrace,
+        );
       }
 
       if (channelListItem != null && channelListItem.channel != null) {

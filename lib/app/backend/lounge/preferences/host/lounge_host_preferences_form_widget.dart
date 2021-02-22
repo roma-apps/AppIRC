@@ -5,11 +5,11 @@ import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_p
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/lounge/lounge_model.dart';
 
-MyLogger _logger = MyLogger(
-    logTag: "lounge_connection_preferences_form_widget.dart", enabled: true);
+import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:logging/logging.dart';
+
+var _logger = Logger("lounge_connection_preferences_form_widget.dart");
 
 class LoungeHostPreferencesFormWidget extends StatefulWidget {
   final LoungeHostPreferencesFormBloc _hostPreferencesFormBloc;
@@ -55,7 +55,7 @@ class LoungeHostPreferencesFormWidgetState
   Widget build(BuildContext context) {
     var hostFormBloc = widget._hostPreferencesFormBloc;
 
-    _logger.d(() => "build");
+    _logger.fine(() => "build");
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[

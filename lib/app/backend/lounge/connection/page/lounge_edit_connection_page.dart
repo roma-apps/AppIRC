@@ -3,13 +3,12 @@ import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_connect
 import 'package:flutter_appirc/app/instance/current/current_auth_instance_bloc.dart';
 import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "lounge_edit_connection_page.dart", enabled: true);
+var _logger = Logger("lounge_edit_connection_page.dart");
 
 class EditLoungeConnectionPage extends LoungeConnectionPage {
   EditLoungeConnectionPage() : super();
@@ -17,7 +16,7 @@ class EditLoungeConnectionPage extends LoungeConnectionPage {
   @override
   void onSuccessTestConnectionWithGivenPreferences(
       BuildContext context, LoungePreferences preferences) async {
-    _logger.d(() => "build");
+    _logger.fine(() => "build");
     await showPlatformDialog(
       androidBarrierDismissible: true,
       context: context,

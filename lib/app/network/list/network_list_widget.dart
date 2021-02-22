@@ -105,16 +105,26 @@ class NetworkListWidget extends StatelessWidget {
       bool isChannelActive, bool expanded) {
     var channel = network.lobbyChannel;
     var channelItemRow = _buildChannelItemWidget(
-        context, network, channel, expanded, isChannelActive);
+      context,
+      network,
+      channel,
+      expanded,
+      isChannelActive,
+    );
 
     if (expanded == true) {
       return Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            channelItemRow,
-            ChannelListWidget(network, onActionCallback, true)
-          ]);
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          channelItemRow,
+          ChannelListWidget(
+            network,
+            onActionCallback,
+            true,
+          )
+        ],
+      );
     } else {
       return channelItemRow;
     }
@@ -127,7 +137,7 @@ class NetworkListWidget extends StatelessWidget {
     var networkBloc = NetworkBlocsBloc.of(context).getNetworkBloc(network);
 
     if (networkBloc == null) {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
 
     var channelBloc = ChannelBlocsBloc.of(context).getChannelBloc(channel);
@@ -147,7 +157,7 @@ class NetworkListWidget extends StatelessWidget {
             context: context,
             networkBloc: networkBloc,
             iconColor: isChannelActive
-                ? IAppIrcUiColorTheme.of(context).primary
+                ? IAppIrcUiColorTheme.of(context).lightGrey
                 : IAppIrcUiColorTheme.of(context).darkGrey,
           )
         ],
@@ -156,7 +166,7 @@ class NetworkListWidget extends StatelessWidget {
     var rowContainer = Container(
       decoration: BoxDecoration(
         color: isChannelActive
-            ? IAppIrcUiColorTheme.of(context).primary
+            ? IAppIrcUiColorTheme.of(context).lightGrey
             : IAppIrcUiColorTheme.of(context).darkGrey,
       ),
       child: row,

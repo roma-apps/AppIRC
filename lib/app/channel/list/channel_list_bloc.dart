@@ -95,9 +95,11 @@ class ChannelListBloc extends DisposableOwner {
 
   IDisposable listenForChannelJoin(ChannelListener listener) {
     _joinListeners.add(listener);
-    return CustomDisposable(() {
-      _joinListeners.remove(listener);
-    });
+    return CustomDisposable(
+      () {
+        _joinListeners.remove(listener);
+      },
+    );
   }
 
   IDisposable listenForChannelLeave(Channel channel, VoidCallback listener) {
@@ -105,8 +107,10 @@ class ChannelListBloc extends DisposableOwner {
       _leaveListeners[channel] = [];
     }
     _leaveListeners[channel].add(listener);
-    return CustomDisposable(() {
-      _leaveListeners[channel].remove(listener);
-    });
+    return CustomDisposable(
+      () {
+        _leaveListeners[channel].remove(listener);
+      },
+    );
   }
 }

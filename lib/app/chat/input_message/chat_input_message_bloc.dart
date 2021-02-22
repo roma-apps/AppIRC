@@ -7,9 +7,10 @@ import 'package:flutter_appirc/app/chat/input_message/autocomplete/chat_input_me
 import 'package:flutter_appirc/app/chat/input_message/autocomplete/chat_input_message_names_autocomplete.dart';
 import 'package:flutter_appirc/autocomplete/autocomplete.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 
-var _logger = MyLogger(logTag: "chat_input_message_bloc.dart", enabled: true);
+import 'package:logging/logging.dart';
+
+var _logger = Logger("chat_input_message_bloc.dart");
 
 class ChatInputMessageBloc extends DisposableOwner {
   final ChatConfig chatConfig;
@@ -49,7 +50,7 @@ class ChatInputMessageBloc extends DisposableOwner {
       }
     }
 
-    _logger.d(() => "Suggestions for $pattern is $suggestions");
+    _logger.fine(() => "Suggestions for $pattern is $suggestions");
     return suggestions;
   }
 
@@ -69,9 +70,10 @@ class ChatInputMessageBloc extends DisposableOwner {
     messageController.selection =
         TextSelection.fromPosition(TextPosition(offset: newMessage.length));
 
-    _logger.d(() =>
+    _logger.fine(() =>
     "after onAutoCompleteSelected $currentMessage "
-        "replaceText = $replaceText newMessage = $newMessage");
+        "replaceText = $replaceText "
+        "newMessage = $newMessage");
   }
 
   void appendText(String remoteURL) {

@@ -7,7 +7,7 @@ import 'package:flutter_appirc/error/error_data_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:logging/logging.dart';
 
-Logger _logger = Logger("async_dialog.dart");
+var _logger = Logger("async_dialog.dart");
 
 typedef ErrorData ErrorDataBuilder(
   BuildContext context,

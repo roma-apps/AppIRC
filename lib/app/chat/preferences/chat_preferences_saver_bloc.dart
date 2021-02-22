@@ -10,10 +10,11 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/app/network/state/network_states_bloc.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 
 var _logger =
-    MyLogger(logTag: "chat_preferences_saver_bloc.dart", enabled: true);
+    Logger("chat_preferences_saver_bloc.dart");
 
 class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
@@ -76,7 +77,7 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
   @override
   void onChannelJoined(
       Network network, ChannelWithState channelWithState) {
-    _logger.d(() => "onChannelJoined $channelWithState");
+    _logger.fine(() => "onChannelJoined $channelWithState");
 
     var channel = channelWithState.channel;
     var networkPreference = findPreferencesForNetwork(network);
@@ -98,10 +99,10 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
 
   void _onPreferencesChanged() {
     var isInitFinished = initBloc.isInitFinished;
-    _logger.d(() => "onPreferencesChanged isInitFinished $isInitFinished");
+    _logger.fine(() => "onPreferencesChanged isInitFinished $isInitFinished");
 
     if (isInitFinished) {
-      _logger.d(() => "save new chat preferences $_currentPreferences");
+      _logger.fine(() => "save new chat preferences $_currentPreferences");
       chatPreferencesBloc.setValue(_currentPreferences);
     }
   }

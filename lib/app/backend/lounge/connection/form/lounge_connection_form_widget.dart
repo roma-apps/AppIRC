@@ -13,14 +13,14 @@ import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_p
 import 'package:flutter_appirc/dialog/async/async_dialog.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "lounge_connection_form_widget.dart", enabled: true);
+var _logger = Logger("lounge_connection_form_widget.dart");
 
 typedef LoungePreferencesActionCallback = Function(
     BuildContext context, LoungePreferences preferences);
@@ -30,7 +30,7 @@ class LoungeConnectionFormWidget extends StatefulWidget {
   final LoungePreferencesActionCallback callback;
 
   LoungeConnectionFormWidget(this.startPreferences, this.callback) {
-    _logger.d(() => "LoungeConnectionFormWidget constructor");
+    _logger.fine(() => "LoungeConnectionFormWidget constructor");
   }
 
   @override
@@ -47,7 +47,7 @@ class LoungeConnectionFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    _logger.d(() => "build");
+    _logger.fine(() => "build");
 
     return Padding(
       padding: const EdgeInsets.all(8.0),

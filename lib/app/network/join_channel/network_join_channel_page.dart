@@ -7,12 +7,13 @@ import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-var _logger = MyLogger(logTag: "network_join_channel_page.dart", enabled: true);
+var _logger = Logger("network_join_channel_page.dart");
 
 class NetworkJoinChannelPage extends StatefulWidget {
   final Network network;
@@ -85,10 +86,10 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
           var chatChannelPreferences = ChannelPreferences.name(
               name: channelJoinFormBloc.extractChannel(),
               password: channelJoinFormBloc.extractPassword());
-          _logger.d(() => "startJoinChannel $chatChannelPreferences");
+          _logger.fine(() => "startJoinChannel $chatChannelPreferences");
           var joinResult = await networkBloc.joinChannel(chatChannelPreferences,
               waitForResult: true);
-          _logger.d(() => "startJoinChannel result $joinResult");
+          _logger.fine(() => "startJoinChannel result $joinResult");
         },
         cancelable: true);
 

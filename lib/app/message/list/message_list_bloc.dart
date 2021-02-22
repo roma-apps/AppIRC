@@ -12,10 +12,11 @@ import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-var _logger = MyLogger(logTag: "message_list_bloc.dart", enabled: true);
+var _logger = Logger("message_list_bloc.dart");
 
 class MessageListBloc extends DisposableOwner {
   final ChannelBloc channelBloc;
@@ -86,14 +87,14 @@ class MessageListBloc extends DisposableOwner {
         items: messageListItems,
         newItems: messages,
         updateType: MessageListUpdateType.loadedFromLocalDatabase);
-    _logger.d(() => "init messages $initListState");
+    _logger.fine(() => "init messages $initListState");
 
     _listStateSubject = BehaviorSubject.seeded(initListState);
   }
 
   void _onMessagesChanged(List<ChatMessage> newMessages,
       List<ChatMessage> lastAddedMessages, MessageListUpdateType updateType) {
-    _logger.d(() => "newMessages = ${newMessages.length} ");
+    _logger.fine(() => "newMessages = ${newMessages.length} ");
 
     var messageListItems = _convertMessagesToMessageListItems(newMessages);
 
@@ -123,7 +124,7 @@ class MessageListBloc extends DisposableOwner {
 
     var messageListState = MessageListState.name(
         items: messageListItems, newItems: newMessages, updateType: updateType);
-    _logger.d(() => "_updateMessageListItems $messageListState");
+    _logger.fine(() => "_updateMessageListItems $messageListState");
     _listStateSubject.add(messageListState);
   }
 
@@ -206,12 +207,12 @@ class MessageListBloc extends DisposableOwner {
         }, orElse: () => null);
       }
       if (initScrollPositionItem == null) {
-        _logger.w(() => "use latest message for init scroll");
+        _logger.warning(() => "use latest message for init scroll");
         if (items?.isNotEmpty == true) {
           initScrollPositionItem = items.last;
         }
       }
-      _logger.d(() => "_buildMessagesList "
+      _logger.fine(() => "_buildMessagesList "
           "visibleMessagesBounds $visibleMessagesBounds "
           "initScrollPositionItem $initScrollPositionItem ");
     }

@@ -13,11 +13,14 @@ StreamBuilder<bool> buildConnectionIcon(
     builder: (context, snapshot) {
       var chatConnected = snapshot.data;
       if (connected && chatConnected) {
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       } else {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Icon(Icons.cloud_off, color: foregroundColor),
+          child: Icon(
+            Icons.cloud_off,
+            color: foregroundColor,
+          ),
         );
       }
     },

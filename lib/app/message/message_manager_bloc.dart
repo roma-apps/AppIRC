@@ -15,10 +15,11 @@ import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-var _logger = MyLogger(logTag: "message_saver_bloc.dart", enabled: true);
+var _logger = Logger("message_saver_bloc.dart");
 
 class MessageManagerBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
@@ -35,7 +36,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   MessageManagerBloc(
       this._backendService, NetworkListBloc networksListBloc, this._db)
       : super(networksListBloc) {
-    _logger.d(() => "Create ChannelMessagesSaverBloc");
+    _logger.fine(() => "Create ChannelMessagesSaverBloc");
 
     addDisposable(subject: _messageUpdateSubject);
   }
@@ -60,9 +61,9 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   void onChannelJoined(Network network, ChannelWithState channelWithState) {
     Channel channel = channelWithState.channel;
 
-    _logger.d(() => "listen for mesasges from channel $channel");
+    _logger.fine(() => "listen for messages from channel $channel");
 
-    _logger.d(() => "onChannelJoined _onNewMessages "
+    _logger.fine(() => "onChannelJoined _onNewMessages "
         "${channelWithState.initMessages.length}");
     _onNewMessages(MessagesForChannel.name(
         isNeedCheckAdditionalLoadMore: true,
@@ -72,26 +73,41 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     var channelDisposable = CompositeDisposable([]);
 
-    channelDisposable.add(_backendService.listenForMessages(network, channel,
+    channelDisposable.add(
+      _backendService.listenForMessages(
+        network,
+        channel,
         (messagesForChannel) {
-      _logger.d(() => "listenForMessages "
-          "${messagesForChannel.messages.length}");
-      _onNewMessages(messagesForChannel);
-    }));
+          _logger.fine(() => "listenForMessages "
+              "${messagesForChannel.messages.length}");
+          _onNewMessages(messagesForChannel);
+        },
+      ),
+    );
 
-    channelDisposable.add(_backendService
-        .listenForMessagePreviews(network, channel, (previewForMessage) async {
-      var newMessage = await _updatePreview(channel, previewForMessage);
+    channelDisposable.add(
+      _backendService.listenForMessagePreviews(
+        network,
+        channel,
+        (previewForMessage) async {
+          var newMessage = await _updatePreview(channel, previewForMessage);
 
-      _messageUpdateSubject.add(newMessage);
-    }));
+          _messageUpdateSubject.add(newMessage);
+        },
+      ),
+    );
 
-    channelDisposable.add(_backendService.listenForMessagePreviewToggle(
-        network, channel, (ToggleMessagePreviewData togglePreview) async {
-      var newMessage = await _togglePreview(channel, togglePreview);
+    channelDisposable.add(
+      _backendService.listenForMessagePreviewToggle(
+        network,
+        channel,
+        (ToggleMessagePreviewData togglePreview) async {
+          var newMessage = await _togglePreview(channel, togglePreview);
 
-      _messageUpdateSubject.add(newMessage);
-    }));
+          _messageUpdateSubject.add(newMessage);
+        },
+      ),
+    );
 
     _channelsListeners[channel.remoteId] = channelDisposable;
 
@@ -139,7 +155,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   }
 
   void _onNewMessages(MessagesForChannel messagesForChannel) async {
-    _logger.d(() => "_onNewMessages $messagesForChannel");
+    _logger.fine(() => "_onNewMessages $messagesForChannel");
 
     List<ChatMessage> newMessages = messagesForChannel.messages;
 

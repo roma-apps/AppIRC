@@ -4,10 +4,11 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/form/form_value_field_bloc.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-var _logger = MyLogger(logTag: "user_list_bloc.dart", enabled: true);
+var _logger = Logger("user_list_bloc.dart");
 
 class ChannelUsersListBloc extends DisposableOwner {
   final ChannelBloc _channelBloc;
@@ -49,7 +50,7 @@ class ChannelUsersListBloc extends DisposableOwner {
       return user.nick.contains(RegExp(filter, caseSensitive: false));
     }).toList();
 
-    _logger.d(() => "filteredUsers for $filter: $filteredUsers ");
+    _logger.fine(() => "filteredUsers for $filter: $filteredUsers ");
     _usersSubject.add(filteredUsers);
   }
 }

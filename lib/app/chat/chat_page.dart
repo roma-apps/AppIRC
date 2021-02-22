@@ -32,12 +32,13 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_form_
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/disposable_provider.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-var _logger = MyLogger(logTag: "chat_page.dart", enabled: true);
+var _logger = Logger("chat_page.dart");
 
 class ChatPage extends StatefulWidget {
   @override
@@ -303,14 +304,14 @@ class _ChatPageState extends State<ChatPage> {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var networkListBloc = Provider.of<NetworkListBloc>(context);
 
-    _logger.d(() => "_buildBody");
+    _logger.fine(() => "_buildBody");
     return SafeArea(
       child: StreamBuilder<Channel>(
         stream: activeChannelBloc.activeChannelStream,
         builder: (BuildContext context, AsyncSnapshot<Channel> snapshot) {
           var activeChannel = snapshot.data;
 
-          _logger.d(() => "activeChannel stream");
+          _logger.fine(() => "activeChannel stream");
           if (activeChannel == null) {
             return StreamBuilder<bool>(
               stream: networkListBloc.isNetworksEmptyStream,
@@ -336,7 +337,7 @@ class _ChatPageState extends State<ChatPage> {
               ChatBackendService backendService = Provider.of(context);
               ChatDatabaseService chatDatabaseService = Provider.of(context);
 
-              _logger.d(() => "before stream");
+              _logger.fine(() => "before stream");
               return DisposableProvider<MessageLoaderBloc>(
                 create: (context) => MessageLoaderBloc(
                   backendService,
@@ -356,10 +357,10 @@ class _ChatPageState extends State<ChatPage> {
                         var initFinished = snapshot.data;
                         var length = messagesLoaderBloc
                             .messagesList?.allMessages?.length;
-                        _logger.d(() => "initFinished $initFinished "
+                        _logger.fine(() => "initFinished $initFinished "
                             "messages $length");
                         if (initFinished && length != null) {
-                          _logger.d(() =>
+                          _logger.fine(() =>
                               "build for activeChannel ${channelBloc.channel.name}");
 
                           return Provider<ChannelBloc>.value(
@@ -477,14 +478,14 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildConnectedWidget(BuildContext context) {
     var initBloc = Provider.of<ChatInitBloc>(context);
 
-    _logger.d(() => "_buildConnectedWidget");
+    _logger.fine(() => "_buildConnectedWidget");
 
     return StreamBuilder<ChatInitState>(
       stream: initBloc.stateStream,
       initialData: initBloc.state,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         var currentInitState = snapshot.data;
-        _logger.d(() => "currentInitState $currentInitState");
+        _logger.fine(() => "currentInitState $currentInitState");
         if (currentInitState == ChatInitState.finished) {
           return _buildConnectedInitFinishedWidget(context);
         } else {

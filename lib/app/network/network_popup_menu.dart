@@ -6,12 +6,13 @@ import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_edit_preferences_page.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-MyLogger _logger = MyLogger(logTag: "network_popup_menu.dart", enabled: true);
+var _logger = Logger("network_popup_menu.dart");
 
 Widget buildNetworkPopupMenuButton({
   @required BuildContext context,
@@ -39,7 +40,7 @@ List<PlatformAwarePopupMenuAction> _buildDropdownItems(
     {@required BuildContext context,
     @required bool connected,
     @required NetworkBloc networkBloc}) {
-  _logger.d(() => "_buildDropdownItems $connected");
+  _logger.fine(() => "_buildDropdownItems $connected");
 
   ChatBackendService backendService = Provider.of(context);
 

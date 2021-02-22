@@ -30,7 +30,7 @@ class ChatConnectionBloc extends DisposableOwner {
   Future reconnect() => _reconnectIfNeeded();
 
   Future _reconnectIfNeeded() async {
-//    _logger.d(() => "_reconnectIfNeeded = $connectionState "
+//    _logger.fine(() => "_reconnectIfNeeded = $connectionState "
 //        "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
     if (connectionState == ChatConnectionState.disconnected) {
       var connectivityResult = await (Connectivity().checkConnectivity());

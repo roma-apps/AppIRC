@@ -11,57 +11,65 @@ import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-MyLogger _logger = MyLogger(logTag: "channel_list_widget.dart", enabled: true);
+var _logger = Logger("channel_list_widget.dart");
 
 class ChannelListWidget extends StatelessWidget {
-  final Network _network;
+  final Network network;
 
   final VoidCallback _onActionCallback;
 
   final bool _isChildInListView;
 
   ChannelListWidget(
-      this._network, this._onActionCallback, this._isChildInListView);
+    this.network,
+    this._onActionCallback,
+    this._isChildInListView,
+  );
 
   @override
   Widget build(BuildContext context) {
     var networksListBloc = Provider.of<NetworkListBloc>(context);
-    var channelsListBloc = networksListBloc.getChannelListBloc(_network);
+    var channelsListBloc = networksListBloc.getChannelListBloc(network);
 
     if (channelsListBloc == null) {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
 
     return StreamBuilder<List<Channel>>(
-        stream: channelsListBloc.channelsStream,
-        initialData: channelsListBloc.channels,
-        builder: (context, snapshot) {
-          var channels = snapshot.data;
+      stream: channelsListBloc.channelsStream,
+      initialData: channelsListBloc.channels,
+      builder: (context, snapshot) {
+        var channels = snapshot.data;
 
-          _logger.d(() => "channels $channels");
-          var filteredChannels =
-              channels.where((channel) => !channel.isLobby).toList();
-          _logger.d(() => "filteredChannels $filteredChannels");
+        _logger.fine(() => "channels $channels");
+        var filteredChannels =
+            channels.where((channel) => !channel.isLobby).toList();
+        _logger.fine(() => "filteredChannels $filteredChannels");
 
-          bool shrinkWrap;
-          ClampingScrollPhysics scrollPhysics;
-          if (_isChildInListView) {
-            shrinkWrap = true;
-            scrollPhysics = ClampingScrollPhysics();
-          } else {
-            shrinkWrap = false;
-          }
-          return ListView.builder(
-              shrinkWrap: shrinkWrap,
-              physics: scrollPhysics,
-              itemCount: filteredChannels.length,
-              itemBuilder: (BuildContext context, int index) {
-                return _channelItem(context, _network, filteredChannels[index]);
-              });
-        });
+        bool shrinkWrap;
+        ClampingScrollPhysics scrollPhysics;
+        if (_isChildInListView) {
+          shrinkWrap = true;
+          scrollPhysics = ClampingScrollPhysics();
+        } else {
+          shrinkWrap = false;
+        }
+        return ListView.builder(
+          shrinkWrap: shrinkWrap,
+          physics: scrollPhysics,
+          itemCount: filteredChannels.length,
+          itemBuilder: (BuildContext context, int index) => _channelItem(
+            context,
+            network,
+            filteredChannels[index],
+          ),
+        );
+      },
+    );
   }
 
   Widget _channelItem(BuildContext context, Network network, Channel channel) {
@@ -77,7 +85,7 @@ class ChannelListWidget extends StatelessWidget {
           return Container(
             decoration: BoxDecoration(
               color: isChannelActive
-                  ? IAppIrcUiColorTheme.of(context).primary
+                  ? IAppIrcUiColorTheme.of(context).lightGrey
                   : IAppIrcUiColorTheme.of(context).darkGrey,
             ),
             child: _buildChannelRow(

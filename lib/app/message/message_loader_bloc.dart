@@ -12,10 +12,11 @@ import 'package:flutter_appirc/app/message/special/message_special_db.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-var _logger = MyLogger(logTag: "message_loader_bloc.dart", enabled: true);
+var _logger = Logger("message_loader_bloc.dart");
 
 class MessageLoaderBloc extends DisposableOwner {
   final ChatBackendService _backendService;
@@ -117,7 +118,7 @@ class MessageLoaderBloc extends DisposableOwner {
   }
 
   Future _loadStartMessagesFromDatabaseAndSubscribe() async {
-    _logger.d(() => "init start isDisposed $isDisposed");
+    _logger.fine(() => "init start isDisposed $isDisposed");
 
     var receivedMessages = <List<ChatMessage>>[];
     // socket listener
@@ -149,7 +150,7 @@ class MessageLoaderBloc extends DisposableOwner {
         messageListUpdateType: MessageListUpdateType.loadedFromLocalDatabase,
       ),
     );
-    _logger.d(() => "init finish");
+    _logger.fine(() => "init finish");
     _isInitFinishedSubject.add(true);
 
     addDisposable(
@@ -267,7 +268,7 @@ class MessageLoaderBloc extends DisposableOwner {
 
       messages.addAll(newMessages);
     }
-    _logger.d(() => "_addNewMessages $newMessages");
+    _logger.fine(() => "_addNewMessages $newMessages");
 
     if (messagesForChannel.isContainsTextSpecialMessage) {
       _removeUnnecessarySpecialLoadingMessages(messages);
@@ -319,7 +320,7 @@ class MessageLoaderBloc extends DisposableOwner {
           // remote message is newer than local
           // we should try load more from remote
 
-          _logger.d(() => "_checkAdditionalLoadMore loadMore "
+          _logger.fine(() => "_checkAdditionalLoadMore loadMore "
               "newestLocalMessage $newestLocalMessage"
               "oldestRemoteMessage $oldestRemoteMessage");
 
@@ -331,7 +332,7 @@ class MessageLoaderBloc extends DisposableOwner {
         }
         return;
       } else {
-        _logger.e(() => "_checkAdditionalLoadMore: Invalid case");
+        _logger.shout(() => "_checkAdditionalLoadMore: Invalid case");
       }
     }
   }

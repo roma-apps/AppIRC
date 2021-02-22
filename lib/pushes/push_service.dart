@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-var _logger = MyLogger(logTag: "push_service.dart", enabled: true);
+var _logger = Logger("push_service.dart");
 
 class PushesService extends DisposableOwner {
   FirebaseMessaging _fcm;
@@ -30,11 +30,11 @@ class PushesService extends DisposableOwner {
 
   void init() async {
     _fcm = FirebaseMessaging();
-    _logger.d(() => "init");
+    _logger.fine(() => "init");
   }
 
   Future configure() async {
-    _logger.d(() => "configure");
+    _logger.fine(() => "configure");
     addDisposable(
       streamSubscription: _fcm.onTokenRefresh.listen(
         (newToken) {
@@ -57,12 +57,12 @@ class PushesService extends DisposableOwner {
   }
 
   void _onNewToken(String newToken) {
-    _logger.d(() => "newToken $newToken");
+    _logger.fine(() => "newToken $newToken");
     _tokenSubject.add(newToken);
   }
 
   void _onNewMessage(PushMessage pushMessage) {
-    _logger.d(() => "pushMessage $pushMessage");
+    _logger.fine(() => "pushMessage $pushMessage");
     _messageSubject.add(pushMessage);
   }
 

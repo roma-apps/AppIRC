@@ -7,10 +7,11 @@ import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_widget.dart';
 import 'package:flutter_appirc/disposable/disposable_provider.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-MyLogger _logger = MyLogger(logTag: "chat_channel_widget.dart", enabled: true);
+var _logger = Logger("chat_channel_widget.dart");
 
 class ChannelWidget extends StatefulWidget {
   ChannelWidget();
@@ -22,7 +23,7 @@ class ChannelWidget extends StatefulWidget {
 class _ChannelWidgetState extends State<ChannelWidget> {
   @override
   Widget build(BuildContext context) {
-    _logger.d(() => "build");
+    _logger.fine(() => "build");
 
     var channelBloc = ChannelBloc.of(context);
     // whe listen false here?

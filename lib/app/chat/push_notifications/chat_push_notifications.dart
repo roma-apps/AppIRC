@@ -6,11 +6,12 @@ import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:flutter_appirc/pushes/push_service.dart';
+import 'package:logging/logging.dart';
 
-var _logger = MyLogger(logTag: "chat_push_notifications.dart", enabled: true);
+var _logger = Logger("chat_push_notifications.dart");
 
 final String _iosPushMessageNotificationKey = "notification";
 final String _iosPushMessageDataKey = "data";
@@ -109,7 +110,7 @@ class ChatPushesService extends DisposableOwner {
 
     addDisposable(
         streamSubscription: _pushesService.messageStream.listen((pushMessage) {
-      _logger.d(() => "newPushMessage $pushMessage");
+      _logger.fine(() => "newPushMessage $pushMessage");
     }));
   }
 }

@@ -12,18 +12,18 @@ import 'package:flutter_appirc/app/message/preview/message_video_preview_widget.
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "message_preview_model.dart", enabled: true);
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:logging/logging.dart';
+
+var _logger = Logger("message_preview_model.dart");
 
 Widget buildPreview(
   BuildContext context,
   RegularMessage message,
   MessagePreview preview,
 ) {
-  _logger.d((() => " build preview for $preview"));
+  _logger.fine((() => " build preview for $preview"));
 
   return Padding(
     padding: const EdgeInsets.all(4.0),

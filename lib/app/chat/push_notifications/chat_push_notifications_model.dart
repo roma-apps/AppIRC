@@ -1,11 +1,11 @@
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:logging/logging.dart';
 
 part 'chat_push_notifications_model.g.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "chat_push_notifications_model.dart", enabled: true);
+var _logger = Logger("chat_push_notifications_model.dart");
 
 @JsonSerializable()
 class ChatPushMessageNotification {
@@ -72,8 +72,12 @@ int _parseJsonInt(String value) {
   } else {
     try {
       return int.parse(value);
-    } catch (e) {
-      _logger.e(() => "Error during parsing int from $value");
+    } catch (error, stackTrace) {
+      _logger.shout(
+        () => "Error during parsing int from $value",
+        error,
+        stackTrace,
+      );
       return null;
     }
   }

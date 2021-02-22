@@ -12,13 +12,14 @@ import 'package:flutter_appirc/app/message/special/message_special_widget.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-MyLogger _logger = MyLogger(logTag: "message_widget.dart", enabled: true);
+var _logger = Logger("message_widget.dart");
 
 enum MessageWidgetType { formatted, raw }
 
@@ -127,7 +128,7 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
       builder: (context, snapshot) {
         ChatMessage message = snapshot.data;
 
-        _logger.d(() => "StreamBuilder messageState =$message");
+        _logger.fine(() => "StreamBuilder messageState =$message");
         return Container(
             decoration: _createMessageDecoration(context: context),
             child: buildMessageBody(context, message));

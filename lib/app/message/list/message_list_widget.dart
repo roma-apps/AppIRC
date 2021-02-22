@@ -18,11 +18,12 @@ import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-var _logger = MyLogger(logTag: "message_list_widget.dart", enabled: true);
+var _logger = Logger("message_list_widget.dart");
 
 class MessageListWidget extends StatefulWidget {
   MessageListWidget();
@@ -96,7 +97,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     );
     if (_lastBuildItems != null) {
       var visiblePositions = _positionsListener.itemPositions.value;
-      _logger.d(() => "visiblePositions $visiblePositions"
+      _logger.fine(() => "visiblePositions $visiblePositions"
           "_lastBuildMessagesStartIndex $_lastBuildMessagesStartIndex");
 
       if (visiblePositions.isNotEmpty) {
@@ -133,7 +134,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           messagesListJumpToNewestBloc.onVisibleAreaChanged(false);
         }
 
-        _logger.d(() => "minIndex $minIndex "
+        _logger.fine(() => "minIndex $minIndex "
             "maxIndex $maxIndex "
             "_lastBuildItems.length ${_lastBuildItems.length}");
 
@@ -157,7 +158,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   Widget build(BuildContext context) {
     var chatListMessagesBloc = Provider.of<MessageListBloc>(context);
 
-    _logger.d(() => "build for ${chatListMessagesBloc.listState}");
+    _logger.fine(() => "build for ${chatListMessagesBloc.listState}");
 
     return StreamBuilder<MessageListState>(
       stream: chatListMessagesBloc.listStateStream,
@@ -174,7 +175,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       BuildContext context, MessageListState chatMessageListState) {
     var items = chatMessageListState.items;
 
-    _logger.d(() => "_buildMessagesList "
+    _logger.fine(() => "_buildMessagesList "
         "items ${items.length} ");
 
     if (items == null || items.isEmpty) {
@@ -204,14 +205,14 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     if (nextJumpDestination != null && _scrollController != null) {
       var indexToJump = nextJumpDestination.items?.indexWhere(
           (listItem) => listItem == nextJumpDestination.selectedFoundItem);
-      _logger.d(() => "_jumpToMessage ${nextJumpDestination.selectedFoundItem}"
+      _logger.fine(() => "_jumpToMessage ${nextJumpDestination.selectedFoundItem}"
           "indexToJump $indexToJump");
       try {
         _scrollController?.jumpTo(
             index: indexToJump + _lastBuildMessagesStartIndex,
             alignment: nextJumpDestination.alignment);
-      } catch (e) {
-        _logger.e(() => "error during _jumpToMessage $e");
+      } catch (error, stackTrace) {
+        _logger.shout(() => "error during _jumpToMessage", error, stackTrace);
       }
       nextJumpDestination = null;
     }
@@ -239,7 +240,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       initialScrollIndex = 0;
     }
 
-    _logger.d(() => "_buildListWidget "
+    _logger.fine(() => "_buildListWidget "
         "itemCount $itemCount "
         "items ${items?.length}"
         "initialScrollIndex = $initialScrollIndex ");
@@ -265,7 +266,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
               itemCount: itemCount,
               initialAlignment: initialAlignment,
               itemBuilder: (BuildContext context, int index) {
-                _logger.d(() => "itemBuilder $index items "
+                _logger.fine(() => "itemBuilder $index items "
                     "${items.length}");
 
                 if (index == 0) {

@@ -10,10 +10,11 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:uni_links/uni_links.dart';
 
-var _logger = MyLogger(logTag: "chat_deep_link_bloc.dart", enabled: true);
+var _logger = Logger("chat_deep_link_bloc.dart");
 
 class ChatDeepLinkBloc extends DisposableOwner {
   final ChatBackendService _backendService;
@@ -35,16 +36,16 @@ class ChatDeepLinkBloc extends DisposableOwner {
     });
 
     var linksStream = getLinksStream();
-    _logger.d(() => "ChatDeepLinkBloc linksStream $linksStream");
+    _logger.fine(() => "ChatDeepLinkBloc linksStream $linksStream");
     addDisposable(
       streamSubscription: linksStream.listen(
         (String link) {
           // Parse the link and warn the user, if it is not correct
-          _logger.d(() => "linksStream link $link");
+          _logger.fine(() => "linksStream link $link");
           _onNewDeepLink(link);
         },
         onError: (err) {
-          _logger.d(() => "linksStream err $err");
+          _logger.fine(() => "linksStream err $err");
           // Handle exception by warning the user their action did not succeed
         },
       ),
@@ -52,17 +53,17 @@ class ChatDeepLinkBloc extends DisposableOwner {
   }
 
   Future _initUniLinks() async {
-    _logger.d(() => "initUniLinks()");
+    _logger.fine(() => "initUniLinks()");
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       String initialLink = await getInitialLink();
       // Parse the link and warn the user, if it is not correct,
       // but keep in mind it could be `null`.
-      _logger.d(() => "initialLink $initialLink");
+      _logger.fine(() => "initialLink $initialLink");
 
       _onNewDeepLink(initialLink);
     } on Exception catch (e) {
-      _logger.d(() => "initialLink exception $e");
+      _logger.fine(() => "initialLink exception $e");
       // Handle exception by warning the user their action did not succeed
       // return?
     }
@@ -73,8 +74,8 @@ class ChatDeepLinkBloc extends DisposableOwner {
       var chatDeepLink = _parseLink(initialLink);
 
       var networks = _networksListBloc.networks;
-      _logger.d(() => "onNewDeepLink chatDeepLink $chatDeepLink");
-      _logger.d(() => "onNewDeepLink networks $networks");
+      _logger.fine(() => "onNewDeepLink chatDeepLink $chatDeepLink");
+      _logger.fine(() => "onNewDeepLink networks $networks");
 
       var networkForDeepLink = networks.firstWhere((network) {
         var serverPreferences = network.connectionPreferences.serverPreferences;
@@ -87,7 +88,7 @@ class ChatDeepLinkBloc extends DisposableOwner {
         networkForDeepLink = networks.first;
       }
 
-      _logger.d(() => "onNewDeepLink networkForDeepLink $networkForDeepLink");
+      _logger.fine(() => "onNewDeepLink networkForDeepLink $networkForDeepLink");
 
       var channelPreferences =
           ChannelPreferences.name(name: chatDeepLink.channel, password: null);
@@ -144,7 +145,7 @@ class ChatDeepLinkBloc extends DisposableOwner {
       }
       deepLink = ChatDeepLink(uri.host, uri.port, fragment);
     } catch (e, stackTrace) {
-      _logger.w(() => "_parseLink", e, stackTrace);
+      _logger.warning(() => "_parseLink", e, stackTrace);
     }
     return deepLink;
   }

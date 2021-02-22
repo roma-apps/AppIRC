@@ -1,11 +1,9 @@
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
-
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "channel_list_unread_count_bloc.dart", enabled: true);
+var _logger = Logger("channel_list_unread_count_bloc.dart");
 
 class ChannelListUnreadCountBloc extends DisposableOwner {
   // ignore: close_sinks
@@ -24,9 +22,12 @@ class ChannelListUnreadCountBloc extends DisposableOwner {
     addDisposable(subject: _channelsWithUnreadMessagesCountController);
 
     addDisposable(
-        streamSubscription: channelsStateBloc.anyStateChangedStream.listen((_) {
-      _update();
-    }));
+      streamSubscription: channelsStateBloc.anyStateChangedStream.listen(
+        (_) {
+          _update();
+        },
+      ),
+    );
     _update();
   }
 
@@ -38,7 +39,7 @@ class ChannelListUnreadCountBloc extends DisposableOwner {
         unreadCount++;
       }
     }
-    _logger.d(() => "_update $unreadCount");
+    _logger.fine(() => "_update $unreadCount");
     _channelsWithUnreadMessagesCountController.add(unreadCount);
   }
 }

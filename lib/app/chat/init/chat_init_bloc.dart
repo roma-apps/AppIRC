@@ -6,10 +6,11 @@ import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-var _logger = MyLogger(logTag: "chat_init_bloc.dart", enabled: true);
+var _logger = Logger("chat_init_bloc.dart");
 
 class ChatInitBloc extends DisposableOwner {
   final ChatBackendService _backendService;
@@ -36,7 +37,7 @@ class ChatInitBloc extends DisposableOwner {
     addDisposable(subject: _stateSubject);
 
     var isConnected = _connectionBloc.isConnected;
-    _logger.d(() => "init $_startPreferences"
+    _logger.fine(() => "init $_startPreferences"
         "isConnected $isConnected");
     if (isConnected) {
       _sendStartRequests();
@@ -47,12 +48,12 @@ class ChatInitBloc extends DisposableOwner {
   }
 
   void _subscribeForConnectEvent() {
-    _logger.d(() => "_subscribeForConnectEvent");
+    _logger.fine(() => "_subscribeForConnectEvent");
     // ignore: cancel_subscriptions
     StreamSubscription<bool> subscription;
     subscription =
         _backendService.isChatConfigExistStream.listen((configExist) {
-      _logger.d(() => "_subscribeForConnectEvent configExist $configExist");
+      _logger.fine(() => "_subscribeForConnectEvent configExist $configExist");
       if (configExist) {
         _sendStartRequests();
         subscription.cancel();
@@ -63,9 +64,9 @@ class ChatInitBloc extends DisposableOwner {
   }
 
   void _sendStartRequests() async {
-    _logger.d(() => "_sendStartRequests $state");
+    _logger.fine(() => "_sendStartRequests $state");
     if (isInitNotStarted) {
-      _logger.d(() => "_sendStartRequests $state");
+      _logger.fine(() => "_sendStartRequests $state");
       _stateSubject.add(ChatInitState.inProgress);
 
       // server restores state automatically in private mode

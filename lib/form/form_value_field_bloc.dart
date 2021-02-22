@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "form_value_field_bloc.dart", enabled: true);
+var _logger = Logger("form_value_field_bloc.dart");
 
 class FormValueFieldBloc<T> extends FormFieldBloc<T> {
   final bool enabled;
@@ -48,7 +48,7 @@ class FormValueFieldBloc<T> extends FormFieldBloc<T> {
   void onNewValue(T newValue) {
     var isNew = value != newValue;
 
-    _logger.d(() => "onNewValue = $isNew.");
+    _logger.fine(() => "onNewValue = $isNew.");
     if (isNew) {
       _valueController.add(newValue);
     }

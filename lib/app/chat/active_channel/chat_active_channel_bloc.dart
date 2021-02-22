@@ -12,12 +12,12 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/local_preferences/local_preference_bloc_impl.dart';
 import 'package:flutter_appirc/local_preferences/local_preferences_service.dart';
-import 'package:flutter_appirc/logger/logger.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
 var _preferenceKey = "chat.activeChannel";
-var _logger = MyLogger(logTag: "chat_active_channel_bloc.dart", enabled: true);
+var _logger = Logger("chat_active_channel_bloc.dart");
 
 class ChatActiveChannelBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
@@ -47,7 +47,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     addDisposable(
       streamSubscription: pushesService.chatPushMessageStream.listen(
         (chatPushMessage) async {
-          _logger.d(() => "chatPushMessageStream $chatPushMessage");
+          _logger.fine(() => "chatPushMessageStream $chatPushMessage");
 
           var channelRemoteId = chatPushMessage.data?.chanId;
           if (channelRemoteId != null) {
@@ -59,13 +59,13 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
               _channelRemoteIdFromLaunchPushMessage = channelRemoteId;
             }
           } else {
-            _logger.e(() => "Error during handling $chatPushMessage");
+            _logger.shout(() => "Error during handling $chatPushMessage");
           }
         },
       ),
     );
 
-    _logger.i(() => "start creating");
+    _logger.finest(() => "start creating");
 
     addDisposable(
       streamSubscription: _chatInitBloc.stateStream.listen(
@@ -82,7 +82,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
 
     addDisposable(subject: _activeChannelSubject);
 
-    _logger.i(() => "stop creating");
+    _logger.finest(() => "stop creating");
   }
 
   void tryRestoreActiveChannel() async {
@@ -116,7 +116,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
         await findChannelWithRemoteID(chatInitActiveChannelRemoteID);
 
     if (newActiveChannel == null) {
-      _logger.w(() => "fail to _restoreByRemoteID "
+      _logger.warning(() => "fail to _restoreByRemoteID "
           "$chatInitActiveChannelRemoteID");
       // sometimes required channel already leaved
       // usually when we try to restore active channel by remote config
@@ -172,7 +172,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
       return;
     }
 
-    _logger.i(() => "changeActiveChanel $newActiveChannel");
+    _logger.finest(() => "changeActiveChanel $newActiveChannel");
     await _preferenceBloc.setValue(newActiveChannel.localId);
     _activeChannelSubject.sink.add(newActiveChannel);
 

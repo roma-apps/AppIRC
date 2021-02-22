@@ -3,10 +3,11 @@ import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/logger/logger.dart';
-import 'package:flutter_appirc/span_builder/span_builder_model.dart';
 
-MyLogger _logger = MyLogger(logTag: "span_builder.dart", enabled: true);
+import 'package:flutter_appirc/span_builder/span_builder_model.dart';
+import 'package:logging/logging.dart';
+
+var _logger = Logger("span_builder.dart");
 
 class SpanBuilder {
   final String highlightString;
@@ -86,7 +87,7 @@ List<TextSpan> createSpans(
       // find biggest span for current start index
       var maxLengthMatch = matchList.first;
 
-      _logger.d(() => "startIndex $startIndex "
+      _logger.fine(() => "startIndex $startIndex "
           " matchList : ${matchList.length} "
           "maxLengthMatch $maxLengthMatch");
       if (lastSpanIndex != startIndex) {

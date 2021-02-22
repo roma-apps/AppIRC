@@ -4,11 +4,11 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-MyLogger _logger =
-    MyLogger(logTag: "message_list_load_more_bloc.dart", enabled: true);
+var _logger = Logger("message_list_load_more_bloc.dart");
 
 class MessageListLoadMoreBloc extends DisposableOwner {
   // ignore: close_sinks
@@ -52,7 +52,7 @@ class MessageListLoadMoreBloc extends DisposableOwner {
 
       await channelBloc.loadMoreHistory(oldestRegularMessage);
     } else {
-      _logger.w(() => "can't loadMore() because state = $state");
+      _logger.warning(() => "can't loadMore() because state = $state");
     }
   }
 

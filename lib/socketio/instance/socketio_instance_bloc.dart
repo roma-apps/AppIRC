@@ -1,15 +1,17 @@
 import 'dart:async';
 
 import 'package:adhara_socket_io/adhara_socket_io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
-var _logger = MyLogger(logTag: "socketio_service.dart", enabled: true);
+var _logger = Logger("socketio_service.dart");
 
 var _connectTimeout = Duration(seconds: 5);
 const _timeBetweenCheckingConnectionResponse = Duration(milliseconds: 500);
@@ -114,13 +116,13 @@ class SocketIOInstanceBloc extends DisposableOwner {
 
   Future init() async {
     var socketOptions = _createSocketOptions(uri);
-    _logger.d(() => "init socketOptions = $socketOptions");
+    _logger.fine(() => "init socketOptions = $socketOptions");
     _socketIO = await socketIoService.createInstance(socketOptions);
 
-    _logger.d(() => "init _socketIO = $_socketIO");
+    _logger.fine(() => "init _socketIO = $_socketIO");
 
     addDisposable(disposable: _listenConnectionState((socketState, eventName) {
-      _logger.d(() => "onNewState => $socketState eventName = $eventName");
+      _logger.fine(() => "onNewState => $socketState eventName = $eventName");
       _connectionStateController.add(socketState);
     }));
   }
@@ -188,7 +190,7 @@ class SocketIOInstanceBloc extends DisposableOwner {
       try {
         await socketIoService.clearInstance(_socketIO);
       } catch (e, stackTrace) {
-        _logger.w(
+        _logger.warning(
           () => "error during disposing",
           e,
           stackTrace,
@@ -197,17 +199,15 @@ class SocketIOInstanceBloc extends DisposableOwner {
     }
   }
 
-  SocketOptions _createSocketOptions(String host) {
-    return SocketOptions(
-        //Socket IO server URI
-        host, //Enable or disable platform channel logging
-        enableLogging: _logger.globalAndLoggerEnabled,
-        transports: [
-          Transports.WEB_SOCKET,
-          Transports.POLLING
-        ] //Enable required transport
-        );
-  }
+  SocketOptions _createSocketOptions(String host) => SocketOptions(
+      //Socket IO server URI
+      host, //Enable or disable platform channel logging
+      enableLogging: !kReleaseMode && !kProfileMode,
+      transports: [
+        Transports.WEB_SOCKET,
+        Transports.POLLING
+      ], //Enable required transport
+    );
 
   Future _connect(SocketIO socketIO) async {
     var connected;

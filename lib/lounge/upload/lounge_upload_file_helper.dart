@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_appirc/logger/logger.dart';
+
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_model.dart';
 import 'package:http/http.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 
 final String _loungeInstanceUploadRelativePath = "/uploads/new/";
@@ -14,8 +15,7 @@ final int _successResponseCode = 200;
 var _durationToCheckResponseDecode = Duration(milliseconds: 100);
 var _durationToTimeoutResponseDecode = Duration(seconds: 5);
 
-MyLogger _logger =
-    MyLogger(logTag: "lounge_upload_file_helper.dart", enabled: true);
+var _logger = Logger("lounge_upload_file_helper.dart");
 
 Future<String> uploadFileToLounge(String loungeURL, File file,
     String uploadAuthToken, int maximumPossibleUploadFileSizeInBytes) async {
@@ -37,31 +37,35 @@ Future<String> uploadFileToLounge(String loungeURL, File file,
   loungeURL = _removeTrailingSlashIfExist(loungeURL);
 
   var postUri = _calculatePostURI(loungeURL, uploadAuthToken);
-  _logger.d(() => "uploadFileToLounge $postUri");
+  _logger.fine(() => "uploadFileToLounge $postUri");
   var request = MultipartRequest(_uploadMultipartRequestMethod, postUri);
   request.files.add(await _createPostMultipartFile(file));
 
   var response = await request.send();
 
-  _logger.d(() => "uploadFileToLounge"
-      " response.statusCode ${response.statusCode}");
-  _logger.d(() => "uploadFileToLounge"
-      " response.contentLength ${response.contentLength}");
+  _logger.fine(() => "uploadFileToLounge "
+      "response.statusCode ${response.statusCode}");
+  _logger.fine(() => "uploadFileToLounge "
+      "response.contentLength ${response.contentLength}");
 
   var responseCode = response.statusCode;
   if (responseCode == _successResponseCode) {
     String decodedResponseBody;
     bool timeout = false;
-    var listener =
-        response.stream.transform(utf8.decoder).listen((responseBody) {
-      decodedResponseBody = responseBody;
-    });
+    var listener = response.stream.transform(utf8.decoder).listen(
+      (responseBody) {
+        decodedResponseBody = responseBody;
+      },
+    );
 
-    Future.delayed(_durationToTimeoutResponseDecode, () {
-      if (decodedResponseBody == null) {
-        timeout = true;
-      }
-    });
+    Future.delayed(
+      _durationToTimeoutResponseDecode,
+      () {
+        if (decodedResponseBody == null) {
+          timeout = true;
+        }
+      },
+    );
 
     while (decodedResponseBody == null && !timeout) {
       await Future.delayed(_durationToCheckResponseDecode);
@@ -70,10 +74,11 @@ Future<String> uploadFileToLounge(String loungeURL, File file,
     await listener.cancel();
 
     if (timeout) {
-      throw TimeoutHttpLoungeUploadException(file, loungeURL,
-          uploadAuthToken, maximumPossibleUploadFileSizeInBytes);
+      throw TimeoutHttpLoungeUploadException(file, loungeURL, uploadAuthToken,
+          maximumPossibleUploadFileSizeInBytes);
     } else {
-      _logger.d(() => "uploadFileToLounge response body $decodedResponseBody");
+      _logger
+          .fine(() => "uploadFileToLounge response body $decodedResponseBody");
 
       var responseBody = LoungeResponseUploadResponseBody.fromJson(
           json.decode(decodedResponseBody));
@@ -97,7 +102,6 @@ Future<String> uploadFileToLounge(String loungeURL, File file,
 
 String _calculateUploadedFileURL(String loungeURL, String relativePath) =>
     loungeURL + "/" + relativePath;
-
 
 Future<MultipartFile> _createPostMultipartFile(File file) async {
   return MultipartFile.fromBytes(

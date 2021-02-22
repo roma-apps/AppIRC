@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/message/list/jump_to_newest/message_list_jump_to_newest_bloc.dart';
 import 'package:flutter_appirc/app/message/list/jump_to_newest/message_list_jump_to_newest_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/logger/logger.dart';
+
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-MyLogger _logger = MyLogger(
-    logTag: "message_list_jump_to_newest_widget"
-        ".dart",
-    enabled: true);
+var _logger = Logger("message_list_jump_to_newest_widget.dart");
 
 class MessageListJumpToNewestWidget extends StatelessWidget {
   @override
@@ -23,7 +21,7 @@ class MessageListJumpToNewestWidget extends StatelessWidget {
         builder: (context, snapshot) {
           MessagesListJumpToNewestState state = snapshot.data;
 
-          _logger.d(() => "MessagesListJumpToNewestState $state");
+          _logger.fine(() => "MessagesListJumpToNewestState $state");
 
           if (state.isLastMessageShown) {
             return const SizedBox.shrink();
