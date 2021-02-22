@@ -5,15 +5,16 @@ import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connect
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/login/lounge_login_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/registration/lounge_registration_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/registration/lounge_registration_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_dialog_widgets.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_preferences_form_widget.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -25,25 +26,14 @@ var _logger = Logger("lounge_connection_form_widget.dart");
 typedef LoungePreferencesActionCallback = Function(
     BuildContext context, LoungePreferences preferences);
 
-class LoungeConnectionFormWidget extends StatefulWidget {
-  final LoungePreferences startPreferences;
-  final LoungePreferencesActionCallback callback;
-
-  LoungeConnectionFormWidget(this.startPreferences, this.callback) {
-    _logger.fine(() => "LoungeConnectionFormWidget constructor");
-  }
-
-  @override
-  State<StatefulWidget> createState() =>
-      LoungeConnectionFormWidgetState(startPreferences, callback);
-}
-
-class LoungeConnectionFormWidgetState
-    extends State<LoungeConnectionFormWidget> {
+class LoungeConnectionFormWidget extends StatelessWidget {
   final LoungePreferences startPreferences;
   final LoungePreferencesActionCallback successCallback;
 
-  LoungeConnectionFormWidgetState(this.startPreferences, this.successCallback);
+  LoungeConnectionFormWidget({
+    @required this.startPreferences,
+    @required this.successCallback,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -114,14 +104,14 @@ class LoungeConnectionFormWidgetState
         } else {
           return PlatformButton(
             onPressed: () async {
-              var extractData = formBloc.extractData();
+              var loungePreferences = formBloc.extractData();
               AsyncDialogResult<RequestResult<LoungeHostInformation>>
                   asyncResult = await doAsyncOperationWithDialog(
                 context: context,
                 asyncCode: () {
                   return retrieveLoungeHostInformation(
-                    SocketIOService.of(context, listen: false),
-                    extractData.hostPreferences,
+                    socketIoService:SocketIOService.of(context, listen: false),
+                    hostPreferences:loungePreferences.hostPreferences,
                   );
                 },
                 cancelable: true,
@@ -138,10 +128,10 @@ class LoungeConnectionFormWidgetState
 
                     if (hostInformation.connected &&
                         !hostInformation.authRequired) {
-                      successCallback(context, extractData);
+                      successCallback(context, loungePreferences);
                     } else {
                       connectionBloc.onHostConnectionResult(
-                          extractData.hostPreferences, hostInformation);
+                          loungePreferences.hostPreferences, hostInformation);
 
                       if (!hostInformation.connected) {
                         await showLoungeConnectionErrorAlertDialog(
@@ -165,14 +155,15 @@ class LoungeConnectionFormWidgetState
   }
 
   Widget _buildLoginForm(BuildContext context) {
-    LoungeConnectionFormBloc formBloc = Provider.of(context);
-
-    var loginFormBloc = formBloc.loginFormBloc;
     return Column(
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: LoungeLoginFormWidget(loginFormBloc),
+          child: ProxyProvider<LoungeConnectionFormBloc,
+              LoungeAuthPreferencesFormBloc>(
+            update: (context, value, _) => value.loginFormBloc,
+            child: LoungeLoginFormWidget(),
+          ),
         ),
         _buildLoginButton(context),
         _buildSwitchToRegistrationButton(context),
@@ -215,13 +206,13 @@ class LoungeConnectionFormWidgetState
               ? () async {
                   var connectionFormBloc =
                       Provider.of<LoungeConnectionFormBloc>(context);
-                  var extractData = connectionFormBloc.extractData();
+                  var loungePreferences = connectionFormBloc.extractData();
                   var asyncResult = await doAsyncOperationWithDialog(
                     context: context,
                     asyncCode: () async {
                       return await tryLoginToLounge(
-                        Provider.of<SocketIOService>(context),
-                        extractData,
+                        socketIoService: Provider.of<SocketIOService>(context),
+                        loungePreferences: loungePreferences,
                       );
                     },
                     cancelable: true,
@@ -237,7 +228,10 @@ class LoungeConnectionFormWidgetState
                         ChatLoginResult loginResult = requestResult.result;
 
                         if (loginResult.success) {
-                          successCallback(context, extractData);
+                          successCallback(
+                            context,
+                            loungePreferences,
+                          );
                         } else {
                           await showLoungeLoginFailAlertDialog(context);
                         }
@@ -260,14 +254,15 @@ class LoungeConnectionFormWidgetState
   }
 
   Widget _buildRegistrationForm(BuildContext context) {
-    LoungeConnectionFormBloc formBloc = Provider.of(context);
-    var registrationFormBloc = formBloc.registrationFormBloc;
-
     return Column(
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: LoungeRegistrationFormWidget(registrationFormBloc),
+          child: ProxyProvider<LoungeConnectionFormBloc,
+              LoungeRegistrationFormBloc>(
+            update: (context, value, _) => value.registrationFormBloc,
+            child: LoungeRegistrationFormWidget(),
+          ),
         ),
         _buildRegisterButton(context),
         _buildSwitchToRegisterButton(context),
@@ -289,13 +284,13 @@ class LoungeConnectionFormWidgetState
               ? () async {
                   var connectionFormBloc =
                       Provider.of<LoungeConnectionFormBloc>(context);
-                  var extractData = connectionFormBloc.extractData();
+                  var loungePreferences = connectionFormBloc.extractData();
                   var asyncResult = await doAsyncOperationWithDialog(
                     context: context,
                     asyncCode: () async {
                       return await registerOnLounge(
-                        Provider.of<SocketIOService>(context),
-                        extractData,
+                        socketIoService:Provider.of<SocketIOService>(context),
+                        loungePreferences:loungePreferences,
                       );
                     },
                     cancelable: true,
@@ -312,7 +307,7 @@ class LoungeConnectionFormWidgetState
                             requestResult.result;
 
                         if (registrationResult.success) {
-                          successCallback(context, extractData);
+                          successCallback(context, loungePreferences);
                         } else {
                           switch (registrationResult.errorType) {
                             case RegistrationErrorType.alreadyExist:

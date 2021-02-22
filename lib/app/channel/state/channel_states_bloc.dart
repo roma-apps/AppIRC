@@ -130,12 +130,21 @@ class ChannelStatesBloc extends ChannelListListenerBloc {
     _updateState(network, channel, state);
     addDisposable(
       disposable: _backendService.listenForChannelState(
-        network,
-        channel,
-        () => _getStateSubjectForChannel(network, channel).value,
-        () => calculateChannelMessagesCount(channel),
-        (state) {
-          _updateState(network, channel, state);
+        network: network,
+        channel: channel,
+        currentStateExtractor: () => _getStateSubjectForChannel(
+          network,
+          channel,
+        ).value,
+        currentMessageCountExtractor: () => calculateChannelMessagesCount(
+          channel,
+        ),
+        listener: (state) {
+          _updateState(
+            network,
+            channel,
+            state,
+          );
         },
       ),
     );

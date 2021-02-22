@@ -164,9 +164,9 @@ class MessageLoaderBloc extends DisposableOwner {
 
     addDisposable(
       disposable: _backendService.listenForMessagePreviews(
-        _network,
-        _channel,
-        (previewForMessage) {
+        network: _network,
+        channel: _channel,
+        listener: (previewForMessage) {
           _updatePreview(previewForMessage);
         },
       ),
@@ -174,9 +174,9 @@ class MessageLoaderBloc extends DisposableOwner {
 
     addDisposable(
       disposable: _backendService.listenForMessagePreviewToggle(
-        _network,
-        _channel,
-        (ToggleMessagePreviewData togglePreview) async {
+        network: _network,
+        channel: _channel,
+        listener: (ToggleMessagePreviewData togglePreview) async {
           _onMessagesChanged(
               messagesList.allMessages, [], MessageListUpdateType.notUpdated);
         },
@@ -185,9 +185,9 @@ class MessageLoaderBloc extends DisposableOwner {
 
     addDisposable(
       disposable: _backendService.listenForChannelPreviewToggle(
-        _network,
-        _channel,
-        (channelToggle) async {
+        network: _network,
+        channel: _channel,
+        listener: (channelToggle) async {
           _toggleMessages(channelToggle);
         },
       ),
@@ -203,7 +203,11 @@ class MessageLoaderBloc extends DisposableOwner {
               (preview) {
                 if (preview.shown != channelToggle.allPreviewsShown) {
                   _backendService.togglePreview(
-                      _network, _channel, message, preview);
+                    network: _network,
+                    channel: _channel,
+                    message: message,
+                    preview: preview,
+                  );
                 }
               },
             );
@@ -343,9 +347,9 @@ class MessageLoaderBloc extends DisposableOwner {
               "oldestRemoteMessage $oldestRemoteMessage");
 
           await _backendService.loadMoreHistory(
-            network,
-            channel,
-            oldestRemoteMessage.messageRemoteId,
+            network: network,
+            channel: channel,
+            lastMessageId: oldestRemoteMessage.messageRemoteId,
           );
         }
         return;

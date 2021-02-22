@@ -66,7 +66,7 @@ class NetworkBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.printNetworkAvailableChannels(
-        network,
+        network: network,
         waitForResult: waitForResult,
       );
 
@@ -74,7 +74,7 @@ class NetworkBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.printNetworkIgnoredUsers(
-        network,
+        network: network,
         waitForResult: waitForResult,
       );
 
@@ -82,7 +82,7 @@ class NetworkBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.enableNetwork(
-        network,
+        network: network,
         waitForResult: waitForResult,
       );
 
@@ -90,26 +90,26 @@ class NetworkBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.disableNetwork(
-        network,
+        network: network,
         waitForResult: waitForResult,
       );
 
   Future<RequestResult<Network>> editNetworkSettings(
-    NetworkPreferences preferences, {
+    NetworkPreferences networkPreferences, {
     bool waitForResult = false,
   }) async =>
       await _backendService.editNetworkSettings(
-        network,
-        preferences,
+        network:  network,
+        networkPreferences: networkPreferences,
         waitForResult: waitForResult,
       );
 
   Future<RequestResult<ChannelWithState>> joinChannel(
-    ChannelPreferences preferences, {
+    ChannelPreferences channelPreferences, {
     bool waitForResult = false,
   }) async {
     var alreadyJoinedChannel = network.channels.firstWhere(
-      (channel) => channel.name == preferences.name,
+      (channel) => channel.name == channelPreferences.name,
       orElse: () => null,
     );
 
@@ -132,8 +132,8 @@ class NetworkBloc extends DisposableOwner {
       );
     } else {
       return await _backendService.joinChannel(
-        network,
-        preferences,
+        network: network,
+        channelPreferences: channelPreferences,
         waitForResult: waitForResult,
       );
     }
@@ -143,7 +143,7 @@ class NetworkBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.leaveNetwork(
-        network,
+        network: network,
         waitForResult: waitForResult,
       );
 

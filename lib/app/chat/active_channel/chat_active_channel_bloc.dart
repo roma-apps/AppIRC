@@ -178,8 +178,13 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     Network network =
         _networksListBloc.findNetworkWithChannel(newActiveChannel);
     await _backendService.sendChannelOpenedEventToServer(
-        network, newActiveChannel);
-    await _backendService.requestChannelUsers(network, newActiveChannel);
+      network: network,
+      channel: newActiveChannel,
+    );
+    await _backendService.requestChannelUsers(
+      network: network,
+      channel: newActiveChannel,
+    );
   }
 
   Future _onActiveChannelLeaved() async {

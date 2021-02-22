@@ -60,193 +60,193 @@ abstract class ChatBackendService implements IDisposable {
     bool waitForResult = false,
   });
 
-  Future<RequestResult<NetworkWithState>> joinNetwork(
-    NetworkPreferences preferences, {
+  Future<RequestResult<NetworkWithState>> joinNetwork({
+    @required NetworkPreferences networkPreferences,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<bool>> leaveNetwork(
-    Network network, {
+  Future<RequestResult<bool>> leaveNetwork({
+    @required Network network,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
-    Network network, {
+  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels({
+    @required Network network,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
-    Network network, {
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers({
+    @required Network network,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<bool>> enableNetwork(
-    Network network, {
+  Future<RequestResult<bool>> enableNetwork({
+    @required Network network,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<bool>> disableNetwork(
-    Network network, {
+  Future<RequestResult<bool>> disableNetwork({
+    @required Network network,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<Network>> editNetworkSettings(
-    Network network,
-    NetworkPreferences preferences, {
+  Future<RequestResult<Network>> editNetworkSettings({
+    @required Network network,
+    @required NetworkPreferences networkPreferences,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<ChannelWithState>> joinChannel(
-    Network network,
-    ChannelPreferences preferences, {
+  Future<RequestResult<ChannelWithState>> joinChannel({
+    @required Network network,
+    @required ChannelPreferences channelPreferences,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<ChannelWithState>> openDirectMessagesChannel(
-    Network network,
-    Channel channel,
-    String nick, {
+  Future<RequestResult<ChannelWithState>> openDirectMessagesChannel({
+    @required Network network,
+    @required Channel channel,
+    @required String nick,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<bool>> leaveChannel(
-    Network network,
-    Channel channel, {
+  Future<RequestResult<bool>> leaveChannel({
+    @required Network network,
+    @required Channel channel,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<ChannelUser>> requestUserInfo(
-    Network network,
-    Channel channel,
-    String userNick, {
+  Future<RequestResult<ChannelUser>> requestUserInfo({
+    @required Network network,
+    @required Channel channel,
+    @required String userNick,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<RegularMessage>> printChannelBannedUsers(
-    Network network,
-    Channel channel, {
+  Future<RequestResult<RegularMessage>> printChannelBannedUsers({
+    @required Network network,
+    @required Channel channel,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<List<ChannelUser>>> requestChannelUsers(
-    Network network,
-    Channel channel, {
+  Future<RequestResult<List<ChannelUser>>> requestChannelUsers({
+    @required Network network,
+    @required Channel channel,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<bool>> editChannelTopic(
-    Network network,
-    Channel channel,
-    String newTopic, {
+  Future<RequestResult<bool>> editChannelTopic({
+    @required Network network,
+    @required Channel channel,
+    @required String newTopic,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<bool>> sendChannelOpenedEventToServer(
-    Network network,
-    Channel channel,
-  );
+  Future<RequestResult<bool>> sendChannelOpenedEventToServer({
+    @required Network network,
+    @required Channel channel,
+  });
 
-  Future<RequestResult<bool>> sendDevicePushFCMTokenToServer(
-    String newToken, {
+  Future<RequestResult<bool>> sendDevicePushFCMTokenToServer({
+    @required String newToken,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<RegularMessage>> sendChannelRawMessage(
-    Network network,
-    Channel channel,
-    String rawMessage, {
+  Future<RequestResult<RegularMessage>> sendChannelRawMessage({
+    @required Network network,
+    @required Channel channel,
+    @required String rawMessage,
     bool waitForResult = false,
   });
 
-  Future<RequestResult<ToggleMessagePreviewData>> togglePreview(
-    Network network,
-    Channel channel,
-    RegularMessage message,
-    MessagePreview preview,
-  );
+  Future<RequestResult<ToggleMessagePreviewData>> togglePreview({
+    @required Network network,
+    @required Channel channel,
+    @required RegularMessage message,
+    @required MessagePreview preview,
+  });
 
-  Future<RequestResult<MessageListLoadMore>> loadMoreHistory(
-    Network network,
-    Channel channel,
-    int lastMessageId,
-  );
+  Future<RequestResult<MessageListLoadMore>> loadMoreHistory({
+    @required Network network,
+    @required Channel channel,
+    @required int lastMessageId,
+  });
 
-  Future<RequestResult<String>> uploadFile(
-    File file,
-  );
+  Future<RequestResult<String>> uploadFile({
+    @required File file,
+  });
 
-  IDisposable listenForNetworkState(
-    Network network,
-    NetworkState Function() currentStateExtractor,
-    NetworkStateListener listener,
-  );
+  IDisposable listenForNetworkState({
+    @required Network network,
+    @required NetworkState Function() currentStateExtractor,
+    @required NetworkStateListener listener,
+  });
 
-  IDisposable listenForNetworkJoin(
-    NetworkListener listener,
-  );
+  IDisposable listenForNetworkJoin({
+    @required NetworkListener listener,
+  });
 
-  IDisposable listenForNetworkLeave(
-    Network network,
-    VoidCallback listener,
-  );
+  IDisposable listenForNetworkLeave({
+    @required Network network,
+    @required VoidCallback listener,
+  });
 
-  IDisposable listenForNetworkEdit(
-    Network network,
-    NetworkConnectionListener listener,
-  );
+  IDisposable listenForNetworkEdit({
+    @required Network network,
+    @required NetworkConnectionListener listener,
+  });
 
-  IDisposable listenForChannelJoin(
-    Network network,
-    ChannelListener listener,
-  );
+  IDisposable listenForChannelJoin({
+    @required Network network,
+    @required ChannelListener listener,
+  });
 
-  IDisposable listenForChannelLeave(
-    Network network,
-    Channel channel,
-    VoidCallback listener,
-  );
+  IDisposable listenForChannelLeave({
+    @required Network network,
+    @required Channel channel,
+    @required VoidCallback listener,
+  });
 
-  IDisposable listenForChannelState(
-    Network network,
-    Channel channel,
-    ChannelState Function() currentStateExtractor,
-    Future<int> Function() currentMessageCountExtractor,
-    ChannelStateListener listener,
-  );
+  IDisposable listenForChannelState({
+    @required Network network,
+    @required Channel channel,
+    @required ChannelState Function() currentStateExtractor,
+    @required Future<int> Function() currentMessageCountExtractor,
+    @required ChannelStateListener listener,
+  });
 
-  IDisposable listenForChannelNames(
-    Network network,
-    Channel channel,
-    Function(List<ChannelUser>) listener,
-  );
+  IDisposable listenForChannelNames({
+    @required Network network,
+    @required Channel channel,
+    @required Function(List<ChannelUser>) listener,
+  });
 
-  IDisposable listenForChannelUsers(
-    Network network,
-    Channel channel,
-    VoidCallback listener,
-  );
+  IDisposable listenForChannelUsers({
+    @required Network network,
+    @required Channel channel,
+    @required VoidCallback listener,
+  });
 
-  IDisposable listenForMessages(
-    Network network,
-    Channel channel,
-    ChannelMessageListener listener,
-  );
+  IDisposable listenForMessages({
+    @required Network network,
+    @required Channel channel,
+    @required ChannelMessageListener listener,
+  });
 
-  IDisposable listenForMessagePreviews(
-    Network network,
-    Channel channel,
-    ChannelMessagePreviewListener listener,
-  );
+  IDisposable listenForMessagePreviews({
+    @required Network network,
+    @required Channel channel,
+    @required ChannelMessagePreviewListener listener,
+  });
 
-  IDisposable listenForMessagePreviewToggle(
-    Network network,
-    Channel channel,
-    Function(ToggleMessagePreviewData) callback,
-  );
+  IDisposable listenForMessagePreviewToggle({
+    @required Network network,
+    @required Channel channel,
+    @required Function(ToggleMessagePreviewData) listener,
+  });
 
-  IDisposable listenForChannelPreviewToggle(
-    Network network,
-    Channel channel,
-    Function(ToggleChannelPreviewData) callback,
-  );
+  IDisposable listenForChannelPreviewToggle({
+    @required Network network,
+    @required Channel channel,
+    @required Function(ToggleChannelPreviewData) listener,
+  });
 }

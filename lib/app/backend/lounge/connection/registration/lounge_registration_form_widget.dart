@@ -1,21 +1,17 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/lounge/connection/registration/lounge_registration_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_widget.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';
 
 class LoungeRegistrationFormWidget extends StatelessWidget {
-  final LoungeRegistrationFormBloc registrationFormBloc;
-
-  LoungeRegistrationFormWidget(this.registrationFormBloc);
+  LoungeRegistrationFormWidget();
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
         LoungeAuthPreferencesFormWidget(
-          S.of(context).lounge_preferences_registration_title,
-          registrationFormBloc,
+          titleText:S.of(context).lounge_preferences_registration_title,
         ),
       ],
     );

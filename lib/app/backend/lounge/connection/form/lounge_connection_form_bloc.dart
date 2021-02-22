@@ -21,10 +21,15 @@ class LoungeConnectionFormBloc extends FormBloc {
     var startPreferences = loungeConnectionBloc.preferences;
 
     hostFormBloc = LoungeHostPreferencesFormBloc(
-        startPreferences.hostPreferences, loungeConnectionBloc.hostInformation);
-    loginFormBloc = LoungeLoginFormBloc(startPreferences.authPreferences);
-    registrationFormBloc =
-        LoungeRegistrationFormBloc(startPreferences.authPreferences);
+      startPreferences.hostPreferences,
+      loungeConnectionBloc.hostInformation,
+    );
+    loginFormBloc = LoungeLoginFormBloc(
+      startPreferences.authPreferences,
+    );
+    registrationFormBloc = LoungeRegistrationFormBloc(
+      startPreferences.authPreferences,
+    );
 
     addDisposable(
       streamSubscription: loginFormBloc.usernameFieldBloc.valueStream.listen(
@@ -32,8 +37,10 @@ class LoungeConnectionFormBloc extends FormBloc {
       ),
     );
     addDisposable(
-        streamSubscription:
-            loginFormBloc.passwordFieldBloc.valueStream.listen(_onAuthChanged));
+      streamSubscription: loginFormBloc.passwordFieldBloc.valueStream.listen(
+        _onAuthChanged,
+      ),
+    );
 
     addDisposable(
       streamSubscription:
@@ -67,7 +74,9 @@ class LoungeConnectionFormBloc extends FormBloc {
 
   @override
   List<FormFieldBloc> get children {
-    var children = <FormFieldBloc>[hostFormBloc];
+    var children = <FormFieldBloc>[
+      hostFormBloc,
+    ];
 
     switch (loungeConnectionBloc.state) {
       case LoungeAuthState.login:

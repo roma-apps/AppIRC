@@ -42,8 +42,8 @@ class ChannelListBloc extends DisposableOwner {
     }
 
     var listenForChannelJoin = _backendService.listenForChannelJoin(
-      network,
-      (channelWithState) async {
+      network: network,
+      listener:(channelWithState) async {
         var channel = channelWithState.channel;
 
         network.channels.add(channel);
@@ -67,9 +67,9 @@ class ChannelListBloc extends DisposableOwner {
     IDisposable listenForChannelLeave;
 
     listenForChannelLeave = _backendService.listenForChannelLeave(
-      network,
-      channel,
-      () async {
+      network:network,
+      channel:channel,
+      listener:() async {
         var tempListeners = <VoidCallback>[];
         // additional list required
         // because we want modify original list during iteration

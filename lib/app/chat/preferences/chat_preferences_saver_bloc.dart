@@ -38,8 +38,8 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
 
     addDisposable(
       disposable: _backendService.listenForNetworkEdit(
-        network,
-        (NetworkPreferences networkPreferences) {
+        network: network,
+        listener:(NetworkPreferences networkPreferences) {
           findPreferencesForNetwork(network).networkConnectionPreferences =
               networkPreferences.networkConnectionPreferences;
           _onPreferencesChanged();

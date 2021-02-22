@@ -5,25 +5,24 @@ import 'package:flutter_appirc/form/form_value_field_bloc.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 
 class LoungeAuthPreferencesFormBloc extends FormBloc {
-  FormValueFieldBloc<String> usernameFieldBloc;
-  FormValueFieldBloc<String> passwordFieldBloc;
+  final FormValueFieldBloc<String> usernameFieldBloc;
+  final FormValueFieldBloc<String> passwordFieldBloc;
 
-  LoungeAuthPreferencesFormBloc(LoungeAuthPreferences startPreferences) {
-    usernameFieldBloc = FormValueFieldBloc<String>(
-      startPreferences?.username,
-      validators: [
-        NotEmptyTextValidator.instance,
-        NoWhitespaceTextValidator.instance,
-      ],
-    );
-    passwordFieldBloc = FormValueFieldBloc<String>(
-      startPreferences?.password,
-      validators: [
-        NotEmptyTextValidator.instance,
-        NoWhitespaceTextValidator.instance
-      ],
-    );
-  }
+  LoungeAuthPreferencesFormBloc(LoungeAuthPreferences startPreferences)
+      : usernameFieldBloc = FormValueFieldBloc<String>(
+          startPreferences?.username,
+          validators: [
+            NotEmptyTextValidator.instance,
+            NoWhitespaceTextValidator.instance,
+          ],
+        ),
+        passwordFieldBloc = FormValueFieldBloc<String>(
+          startPreferences?.password,
+          validators: [
+            NotEmptyTextValidator.instance,
+            NoWhitespaceTextValidator.instance
+          ],
+        );
 
   @override
   List<FormFieldBloc> get children => [

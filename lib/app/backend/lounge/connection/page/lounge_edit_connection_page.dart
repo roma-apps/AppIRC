@@ -59,7 +59,9 @@ class EditLoungeConnectionPage extends LoungeConnectionPage {
   }
 
   void _saveNewPreferenceValue(
-      BuildContext context, LoungePreferences preferences) {
+    BuildContext context,
+    LoungePreferences preferences,
+  ) {
     var currentAuthInstanceBloc = ICurrentAuthInstanceBloc.of(context);
 
     currentAuthInstanceBloc.changeCurrentInstance(preferences);

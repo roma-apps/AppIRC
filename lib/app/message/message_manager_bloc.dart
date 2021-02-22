@@ -85,8 +85,9 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     channelDisposable.add(
       _backendService.listenForMessages(
-        network,
-        channel,
+        network:network,
+        channel:channel,
+        listener:
         (messagesForChannel) {
           _logger.fine(() => "listenForMessages "
               "${messagesForChannel.messages.length}");
@@ -97,8 +98,9 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     channelDisposable.add(
       _backendService.listenForMessagePreviews(
-        network,
-        channel,
+        network:network,
+        channel:channel,
+        listener:
         (previewForMessage) async {
           var newMessage = await _updatePreview(channel, previewForMessage);
 
@@ -109,8 +111,9 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     channelDisposable.add(
       _backendService.listenForMessagePreviewToggle(
-        network,
-        channel,
+        network:network,
+        channel:channel,
+        listener:
         (ToggleMessagePreviewData togglePreview) async {
           var newMessage = await _togglePreview(
             channel,

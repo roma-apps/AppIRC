@@ -30,16 +30,20 @@ class NetworkStatesBloc extends NetworkListListenerBloc {
     var network = networkWithState.network;
 
     _states[_calculateNetworkKey(network)] =
-        BehaviorSubject<NetworkState>.seeded( networkWithState.state);
+        BehaviorSubject<NetworkState>.seeded(networkWithState.state);
 
     addDisposable(
-        disposable: _backendService.listenForNetworkState(
-            network, () => _states[_calculateNetworkKey(network)].value,
-            (state) {
-      _logger.fine(() => "onNewNetworkState $state");
+      disposable: _backendService.listenForNetworkState(
+        network: network,
+        currentStateExtractor: () =>
+            _states[_calculateNetworkKey(network)].value,
+        listener: (state) {
+          _logger.fine(() => "onNewNetworkState $state");
 
-      _states[_calculateNetworkKey(network)].add(state);
-    }));
+          _states[_calculateNetworkKey(network)].add(state);
+        },
+      ),
+    );
   }
 
   @override

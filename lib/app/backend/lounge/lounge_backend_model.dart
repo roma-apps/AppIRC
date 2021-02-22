@@ -125,28 +125,28 @@ class ChatNetworkNewLoungeJsonRequest extends NetworkNewLoungeJsonRequest {
 }
 
 class LoungeHostInformation {
-  bool connected;
+  final bool connected;
 
-  bool authRequired;
-  bool authResponse;
+  final bool authRequired;
+  final bool authResponse;
 
   // TODO: remove todo when will be in master branch
   // only available in custom the lounge version
   // https://github.com/xal/thelounge/tree/xal/sign_up
-  bool registrationSupported;
+  final bool registrationSupported;
 
   bool get isPublicMode => connected && !authRequired;
 
   bool get isPrivateMode => connected && authRequired;
 
-  LoungeHostInformation._name(
+  LoungeHostInformation._private(
       {@required this.connected,
       @required this.authRequired,
       @required this.registrationSupported,
       @required this.authResponse});
 
   LoungeHostInformation.notConnected()
-      : this._name(
+      : this._private(
           connected: false,
           authRequired: null,
           registrationSupported: null,
@@ -154,16 +154,17 @@ class LoungeHostInformation {
         );
 
   LoungeHostInformation.connectedToPublic()
-      : this._name(
+      : this._private(
           connected: true,
           authRequired: false,
           registrationSupported: false,
           authResponse: true,
         );
 
-  LoungeHostInformation.connectedToPrivate(
-      {@required bool authResponse, @required bool registrationSupported})
-      : this._name(
+  LoungeHostInformation.connectedToPrivate({
+    @required bool authResponse,
+    @required bool registrationSupported,
+  }) : this._private(
             connected: true,
             authRequired: true,
             registrationSupported: registrationSupported,

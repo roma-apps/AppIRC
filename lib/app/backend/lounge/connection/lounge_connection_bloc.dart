@@ -18,7 +18,9 @@ class LoungeConnectionBloc extends DisposableOwner {
         authPreferences: authPreferences,
       );
 
+  // todo: should be final or subject
   LoungeHostPreferences hostPreferences;
+  // todo: should be final or subject
   LoungeAuthPreferences authPreferences;
 
   // ignore: close_sinks
@@ -55,8 +57,9 @@ class LoungeConnectionBloc extends DisposableOwner {
       _stateSubject = BehaviorSubject();
     }
 
-    _hostInformationSubject =
-        BehaviorSubject.seeded(LoungeHostInformation.notConnected());
+    _hostInformationSubject = BehaviorSubject.seeded(
+      LoungeHostInformation.notConnected(),
+    );
 
     addDisposable(subject: _stateSubject);
     addDisposable(subject: _hostInformationSubject);
@@ -66,7 +69,10 @@ class LoungeConnectionBloc extends DisposableOwner {
       _extractIsRegistrationSupported(hostInformation);
 
   Stream<bool> get isRegistrationSupportedStream => hostInformationStream.map(
-      (hostInformation) => _extractIsRegistrationSupported(hostInformation));
+        (hostInformation) => _extractIsRegistrationSupported(
+          hostInformation,
+        ),
+      );
 
   bool _extractIsRegistrationSupported(LoungeHostInformation hostInformation) {
     return hostInformation?.connected == true ??
@@ -87,7 +93,9 @@ class LoungeConnectionBloc extends DisposableOwner {
     }
     this.hostPreferences = hostPreferences;
 
-    _hostInformationSubject.add(LoungeHostInformation.notConnected());
+    _hostInformationSubject.add(
+      LoungeHostInformation.notConnected(),
+    );
     _stateSubject.add(null);
   }
 

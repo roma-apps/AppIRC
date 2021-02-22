@@ -9,19 +9,18 @@ import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:rxdart/subjects.dart';
 
 class LoungeHostPreferencesFormBloc extends FormBloc {
-  FormValueFieldBloc<String> hostFieldBloc;
+  final FormValueFieldBloc<String> hostFieldBloc;
 
   // ignore: close_sinks
-  BehaviorSubject<LoungeHostInformation> _hostInformationSubject =
-      BehaviorSubject.seeded(null);
+  final BehaviorSubject<LoungeHostInformation> hostInformationSubject;
 
   Stream<LoungeHostInformation> get hostInformationStream =>
-      _hostInformationSubject.stream;
+      hostInformationSubject.stream;
 
-  LoungeHostInformation get hostInformation => _hostInformationSubject.value;
+  LoungeHostInformation get hostInformation => hostInformationSubject.value;
 
   set hostInformation(LoungeHostInformation newHostInformation) {
-    _hostInformationSubject.add(newHostInformation);
+    hostInformationSubject.add(newHostInformation);
   }
 
   Stream<bool> get connectedStream => hostInformationStream
@@ -30,18 +29,17 @@ class LoungeHostPreferencesFormBloc extends FormBloc {
   bool get connected => hostInformation?.connected;
 
   LoungeHostPreferencesFormBloc(LoungeHostPreferences startPreferences,
-      LoungeHostInformation startHostInformation) {
-    hostFieldBloc = FormValueFieldBloc<String>(
-      startPreferences.host,
-      validators: [
-        NotEmptyTextValidator.instance,
-        NoWhitespaceTextValidator.instance
-      ],
-    );
-
-    _hostInformationSubject = BehaviorSubject.seeded(startHostInformation);
-
-    addDisposable(subject: _hostInformationSubject);
+      LoungeHostInformation startHostInformation)
+      : hostFieldBloc = FormValueFieldBloc<String>(
+          startPreferences.host,
+          validators: [
+            NotEmptyTextValidator.instance,
+            NoWhitespaceTextValidator.instance
+          ],
+        ),
+        hostInformationSubject = BehaviorSubject.seeded(startHostInformation) {
+    addDisposable(disposable: hostFieldBloc);
+    addDisposable(subject: hostInformationSubject);
   }
 
   @override

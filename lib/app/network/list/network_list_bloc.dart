@@ -33,7 +33,7 @@ class NetworkListBloc extends DisposableOwner {
 
     addDisposable(
       disposable: backendService.listenForNetworkJoin(
-        (networkWithState) {
+        listener:(networkWithState) {
           onNetworkJoined(networkWithState);
         },
       ),
@@ -57,8 +57,8 @@ class NetworkListBloc extends DisposableOwner {
 
     IDisposable listenForNetworkExit;
     listenForNetworkExit = backendService.listenForNetworkLeave(
-      network,
-      () {
+      network:network,
+      listener:() {
         _networksChannelListBlocs.remove(network).dispose();
 
         _networks.remove(network);
@@ -177,11 +177,11 @@ class NetworkListBloc extends DisposableOwner {
   }
 
   Future<RequestResult<NetworkWithState>> joinNetwork(
-    NetworkPreferences preferences, {
+    NetworkPreferences networkPreferences, {
     bool waitForResult = false,
   }) async =>
       await backendService.joinNetwork(
-        preferences,
+        networkPreferences: networkPreferences,
         waitForResult: waitForResult,
       );
 
@@ -190,7 +190,7 @@ class NetworkListBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await backendService.leaveNetwork(
-        network,
+        network: network,
         waitForResult: waitForResult,
       );
 

@@ -15,5 +15,7 @@ class ChatUploadBloc extends DisposableOwner {
   ChatUploadBloc(this._backendService);
 
   Future<RequestResult<String>> uploadFile(File file) =>
-      _backendService.uploadFile(file);
+      _backendService.uploadFile(
+        file: file,
+      );
 }

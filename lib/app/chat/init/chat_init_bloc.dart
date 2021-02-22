@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -71,8 +70,11 @@ class ChatInitBloc extends DisposableOwner {
 
       // server restores state automatically in private mode
       if (_backendService.chatConfig.public) {
-        for (var network in _startPreferences.networks) {
-          await _backendService.joinNetwork(network, waitForResult: true);
+        for (var networkPreferences in _startPreferences.networks) {
+          await _backendService.joinNetwork(
+            networkPreferences: networkPreferences,
+            waitForResult: true,
+          );
         }
       } else {
         for (var network

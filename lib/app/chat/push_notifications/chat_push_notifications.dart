@@ -89,7 +89,7 @@ class ChatPushesService extends DisposableOwner {
           if (newState == ChatInitState.finished) {
             var token = _pushesService.token;
             if (token != null) {
-              _backendService.sendDevicePushFCMTokenToServer(token);
+              _backendService.sendDevicePushFCMTokenToServer(newToken: token);
             }
           }
         },
@@ -103,7 +103,7 @@ class ChatPushesService extends DisposableOwner {
 
           if (token != null &&
               connectionState == ChatConnectionState.connected) {
-            _backendService.sendDevicePushFCMTokenToServer(token);
+            _backendService.sendDevicePushFCMTokenToServer(newToken: token);
           }
         },
       ),
@@ -114,7 +114,7 @@ class ChatPushesService extends DisposableOwner {
           if (token != null &&
               _backendService.connectionState ==
                   ChatConnectionState.connected) {
-            _backendService.sendDevicePushFCMTokenToServer(token);
+            _backendService.sendDevicePushFCMTokenToServer(newToken: token);
           }
         },
       ),

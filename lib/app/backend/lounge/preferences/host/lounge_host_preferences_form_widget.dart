@@ -23,6 +23,7 @@ class LoungeHostPreferencesFormWidget extends StatefulWidget {
 
 class LoungeHostPreferencesFormWidgetState
     extends State<LoungeHostPreferencesFormWidget> {
+  // todo: rework with bloc
   TextEditingController _hostController;
 
   LoungeHostPreferencesFormWidgetState(

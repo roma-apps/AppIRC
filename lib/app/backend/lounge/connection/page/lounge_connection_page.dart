@@ -8,12 +8,16 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 typedef LoungePreferencesActionCallback = void Function(
-    BuildContext context, LoungePreferences preferences);
+  BuildContext context,
+  LoungePreferences preferences,
+);
 
 abstract class LoungeConnectionPage extends StatefulWidget {
   @protected
   void onSuccessTestConnectionWithGivenPreferences(
-      BuildContext context, LoungePreferences preferences);
+    BuildContext context,
+    LoungePreferences preferences,
+  );
 
   @override
   State<StatefulWidget> createState() {
@@ -47,8 +51,9 @@ class LoungeConnectionPageState extends State<LoungeConnectionPage> {
             children: <Widget>[
               Expanded(
                 child: LoungeConnectionFormWidget(
-                  loungePreferences,
-                  widget.onSuccessTestConnectionWithGivenPreferences,
+                  startPreferences: loungePreferences,
+                  successCallback:
+                      widget.onSuccessTestConnectionWithGivenPreferences,
                 ),
               )
             ],

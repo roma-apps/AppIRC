@@ -52,19 +52,22 @@ class ChannelBloc extends DisposableOwner {
     addDisposable(subject: _usersSubject);
     addDisposable(
       disposable: _backendService.listenForChannelNames(
-        network,
-        channel,
-        (newUsers) {
+        network: network,
+        channel: channel,
+        listener: (newUsers) {
           _usersSubject.add(newUsers);
         },
       ),
     );
     addDisposable(
       disposable: _backendService.listenForChannelUsers(
-        network,
-        channel,
-        () {
-          _backendService.requestChannelUsers(network, channel);
+        network: network,
+        channel: channel,
+        listener: () {
+          _backendService.requestChannelUsers(
+            network: network,
+            channel: channel,
+          );
         },
       ),
     );
@@ -103,8 +106,8 @@ class ChannelBloc extends DisposableOwner {
   Future requestUsersListUpdate() async {
     _lastUsersRefreshDate = DateTime.now();
     await _backendService.requestChannelUsers(
-      network,
-      channel,
+      network:network,
+      channel:channel,
       waitForResult: false,
     );
   }
@@ -148,8 +151,8 @@ class ChannelBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.leaveChannel(
-        network,
-        channel,
+        network: network,
+        channel: channel,
         waitForResult: waitForResult,
       );
 
@@ -158,9 +161,9 @@ class ChannelBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.requestUserInfo(
-        network,
-        channel,
-        userNick,
+        network: network,
+        channel: channel,
+        userNick: userNick,
         waitForResult: waitForResult,
       );
 
@@ -168,8 +171,8 @@ class ChannelBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.printChannelBannedUsers(
-        network,
-        channel,
+        network: network,
+        channel: channel,
         waitForResult: waitForResult,
       );
 
@@ -178,16 +181,16 @@ class ChannelBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.editChannelTopic(
-        network,
-        channel,
-        newTopic,
+        network: network,
+        channel: channel,
+        newTopic: newTopic,
         waitForResult: waitForResult,
       );
 
   Future<RequestResult<bool>> onOpenChannel() async =>
       await _backendService.sendChannelOpenedEventToServer(
-        network,
-        channel,
+        network: network,
+        channel: channel,
       );
 
   Future<RequestResult<ChatMessage>> sendChannelRawMessage(
@@ -195,18 +198,18 @@ class ChannelBloc extends DisposableOwner {
     bool waitForResult = false,
   }) async =>
       await _backendService.sendChannelRawMessage(
-        network,
-        channel,
-        rawMessage,
+        network: network,
+        channel: channel,
+        rawMessage: rawMessage,
         waitForResult: waitForResult,
       );
 
   Future<RequestResult<ChannelWithState>> openDirectMessagesChannel(
           String nick) async =>
       await _backendService.openDirectMessagesChannel(
-        network,
-        channel,
-        nick,
+        network: network,
+        channel: channel,
+        nick: nick,
       );
 
   static ChannelBloc of(
@@ -219,19 +222,22 @@ class ChannelBloc extends DisposableOwner {
       );
 
   Future<RequestResult<MessageListLoadMore>> loadMoreHistory(
-          RegularMessage oldestMessage) async =>
+    RegularMessage oldestMessage,
+  ) async =>
       await _backendService.loadMoreHistory(
-        network,
-        channel,
-        oldestMessage?.messageRemoteId,
+        network: network,
+        channel: channel,
+        lastMessageId: oldestMessage?.messageRemoteId,
       );
 
   Future<RequestResult<ToggleMessagePreviewData>> togglePreview(
-          RegularMessage message, MessagePreview preview) =>
+    RegularMessage message,
+    MessagePreview preview,
+  ) =>
       _backendService.togglePreview(
-        network,
-        channel,
-        message,
-        preview,
+        network: network,
+        channel: channel,
+        message: message,
+        preview: preview,
       );
 }
