@@ -95,7 +95,8 @@ class ChatDrawerWidget extends StatelessWidget {
 
   Widget _buildLoungeSettingsButton(BuildContext context) => PlatformIconButton(
         onPressed: () async {
-          var currentAuthInstanceBloc = ICurrentAuthInstanceBloc.of(context);
+          var currentAuthInstanceBloc =
+              ICurrentAuthInstanceBloc.of(context, listen: false);
 
           var settings = currentAuthInstanceBloc.currentInstance ??
               createDefaultLoungePreferences();

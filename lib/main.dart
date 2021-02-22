@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -42,9 +44,21 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 CurrentAuthInstanceContextBloc currentInstanceContextBloc;
 
+TargetPlatform initialPlatform;
+
 void main() async {
   // debugRepaintRainbowEnabled = true;
   WidgetsFlutterBinding.ensureInitialized();
+
+  // we need specify initialPlatform to detect
+  // current platform selection inside widgets
+  if(Platform.isAndroid) {
+    initialPlatform = TargetPlatform.android;
+  } else if(Platform.isIOS) {
+    initialPlatform = TargetPlatform.iOS;
+  } else {
+    throw "unsupported platform";
+  }
 
   // Set `enableInDevMode` to true to see reports while in debug mode
   // This is only to be used for confirming that reports are being
@@ -159,6 +173,7 @@ Future runInitializedCurrentInstanceApp({
 void runNotInitializedSplashApp() {
   runApp(
     PlatformProvider(
+      initialPlatform: initialPlatform,
       builder: (context) => PlatformApp(
         debugShowCheckedModeBanner: false,
         home: const SplashPage(),
@@ -170,6 +185,7 @@ void runNotInitializedSplashApp() {
 void runInitFailedApp() {
   runApp(
     PlatformProvider(
+      initialPlatform: initialPlatform,
       builder: (context) => PlatformApp(
         localizationsDelegates: [
           S.delegate,
@@ -246,6 +262,7 @@ class AppIrcApp extends StatelessWidget {
                 }
                 _logger.finest(() => "locale $locale");
                 return PlatformProvider(
+                  initialPlatform: initialPlatform,
                   builder: (context) => PlatformApp(
                     // checkerboardRasterCacheImages: true,
                     // checkerboardOffscreenLayers: true,
