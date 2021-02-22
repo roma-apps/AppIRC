@@ -12,12 +12,13 @@ class NetworkUserPreferences extends IJsonObject {
   String realName;
   String commands;
 
-  NetworkUserPreferences(
-      {@required this.nickname,
-      @required this.password,
-      @required this.commands,
-      @required this.realName,
-      @required this.username});
+  NetworkUserPreferences({
+    @required this.nickname,
+    @required this.password,
+    @required this.commands,
+    @required this.realName,
+    @required this.username,
+  });
 
   @override
   String toString() {
@@ -32,4 +33,23 @@ class NetworkUserPreferences extends IJsonObject {
 
   @override
   Map<String, dynamic> toJson() => _$NetworkUserPreferencesToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkUserPreferences &&
+          runtimeType == other.runtimeType &&
+          nickname == other.nickname &&
+          username == other.username &&
+          password == other.password &&
+          realName == other.realName &&
+          commands == other.commands;
+
+  @override
+  int get hashCode =>
+      nickname.hashCode ^
+      username.hashCode ^
+      password.hashCode ^
+      realName.hashCode ^
+      commands.hashCode;
 }

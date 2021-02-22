@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/form_validation.dart';
-
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -39,9 +38,13 @@ class FormValueFieldBloc<T> extends FormFieldBloc<T> {
       },
     );
 
-    addDisposable(streamSubscription: valueStream.listen((newValue) async {
-      onNewError(await validate(newValue));
-    }));
+    addDisposable(
+      streamSubscription: valueStream.listen(
+        (newValue) async {
+          onNewError(await validate(newValue));
+        },
+      ),
+    );
     addDisposable(subject: _valueController);
   }
 

@@ -7,7 +7,10 @@ import 'package:flutter_appirc/form/form_validation.dart';
 abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
   var listeners = <StreamSubscription>[];
 
-  FormBloc() : super(<Validator<List<FormFieldBloc>>>[FormFieldsValidator()]) {
+  FormBloc()
+      : super(<Validator<List<FormFieldBloc>>>[
+          FormFieldsValidator(),
+        ]) {
     Timer.run(() {
       resubscribeInternalFormsErrors();
     });
@@ -33,10 +36,10 @@ abstract class FormBloc extends FormFieldBloc<List<FormFieldBloc>> {
   @override
   Future dispose() async {
     await super.dispose();
-    for(var bloc in children) {
+    for (var bloc in children) {
       await bloc.dispose();
     }
-    for(var listener in listeners) {
+    for (var listener in listeners) {
       await listener.cancel();
     }
   }

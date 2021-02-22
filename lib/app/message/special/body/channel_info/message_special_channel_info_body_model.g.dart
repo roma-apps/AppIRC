@@ -9,9 +9,9 @@ part of 'message_special_channel_info_body_model.dart';
 ChannelInfoSpecialMessageBody _$ChannelInfoSpecialMessageBodyFromJson(
     Map<String, dynamic> json) {
   return ChannelInfoSpecialMessageBody(
-    json['name'] as String,
-    json['topic'] as String,
-    json['usersCount'] as int,
+    name: json['name'] as String,
+    topic: json['topic'] as String,
+    usersCount: json['usersCount'] as int,
   );
 }
 

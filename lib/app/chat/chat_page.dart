@@ -32,7 +32,6 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_form_
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/disposable_provider.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:logging/logging.dart';
@@ -112,69 +111,76 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Widget buildLeading(BuildContext context, Function() onPressed) {
+  Widget buildLeading(
+    BuildContext context,
+    Function() onPressed,
+  ) {
     return _buildMenuIcon(context, onPressed);
   }
 
-  Widget _buildMenuIcon(BuildContext context, Function() onPressed) {
+  Widget _buildMenuIcon(
+    BuildContext context,
+    Function() onPressed,
+  ) {
     ChannelListUnreadCountBloc chatUnreadBloc =
         Provider.of<ChannelListUnreadCountBloc>(context);
 
     return StreamBuilder<int>(
-        stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
-        initialData: chatUnreadBloc.channelsWithUnreadMessagesCount,
-        builder: (context, snapshot) {
-          var unreadCount = snapshot.data;
+      stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
+      initialData: chatUnreadBloc.channelsWithUnreadMessagesCount,
+      builder: (context, snapshot) {
+        var unreadCount = snapshot.data;
 
-          var platformIconButton = PlatformIconButton(
-            icon: Icon(
-              Icons.menu,
-              color: IAppIrcUiColorTheme.of(context).white,
-            ),
-            onPressed: onPressed,
-          );
-          if (unreadCount > 0) {
-            // badge hide part of button clickable area
-            double rightMargin = 15.0;
+        var platformIconButton = PlatformIconButton(
+          icon: Icon(
+            Icons.menu,
+            color: IAppIrcUiColorTheme.of(context).white,
+          ),
+          onPressed: onPressed,
+        );
+        if (unreadCount > 0) {
+          // badge hide part of button clickable area
+          double rightMargin = 15.0;
 
-            if (isMaterial(context)) {
-              rightMargin = 15;
-            } else if (isCupertino(context)) {
-              rightMargin = 5;
-            }
-            return GestureDetector(
-              onTap: onPressed,
-              child: Stack(children: <Widget>[
-                platformIconButton,
-                Positioned(
-                  right: rightMargin,
-                  top: 10,
-                  child: Container(
-                    padding: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      "$unreadCount",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-              ]),
-            );
-          } else {
-            return platformIconButton;
+          if (isMaterial(context)) {
+            rightMargin = 15;
+          } else if (isCupertino(context)) {
+            rightMargin = 5;
           }
-        });
+          return GestureDetector(
+            onTap: onPressed,
+            child: Stack(children: <Widget>[
+              platformIconButton,
+              Positioned(
+                right: rightMargin,
+                top: 10,
+                child: Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    "$unreadCount",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            ]),
+          );
+        } else {
+          return platformIconButton;
+        }
+      },
+    );
   }
 
   Widget _buildTrailing(BuildContext context) {
@@ -227,7 +233,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _goToSearchPage(
-      BuildContext context, Channel channel, ChannelBloc channelBloc) {
+    BuildContext context,
+    Channel channel,
+    ChannelBloc channelBloc,
+  ) {
     ChatDatabaseService databaseProvider = Provider.of(context);
 
     Navigator.push(
@@ -261,33 +270,34 @@ class _ChatPageState extends State<ChatPage> {
         var channel = activeChannelSnapshot.data;
         if (channel == null) {
           return StreamBuilder<ChatConnectionState>(
-              stream: connectionBloc.connectionStateStream,
-              initialData: connectionBloc.connectionState,
-              builder: (BuildContext context,
-                  AsyncSnapshot<ChatConnectionState> snapshot) {
-                var connectionState = snapshot.data;
+            stream: connectionBloc.connectionStateStream,
+            initialData: connectionBloc.connectionState,
+            builder: (BuildContext context,
+                AsyncSnapshot<ChatConnectionState> snapshot) {
+              var connectionState = snapshot.data;
 
-                var title = S.of(context).chat_title;
+              var title = S.of(context).chat_title;
 
-                String content;
+              String content;
 
-                switch (connectionState) {
-                  case ChatConnectionState.connected:
-                    content =
-                        S.of(context).chat_state_connection_status_connected;
-                    break;
-                  case ChatConnectionState.connecting:
-                    content =
-                        S.of(context).chat_state_connection_status_connecting;
-                    break;
-                  case ChatConnectionState.disconnected:
-                    content =
-                        S.of(context).chat_state_connection_status_disconnected;
-                    break;
-                }
+              switch (connectionState) {
+                case ChatConnectionState.connected:
+                  content =
+                      S.of(context).chat_state_connection_status_connected;
+                  break;
+                case ChatConnectionState.connecting:
+                  content =
+                      S.of(context).chat_state_connection_status_connecting;
+                  break;
+                case ChatConnectionState.disconnected:
+                  content =
+                      S.of(context).chat_state_connection_status_disconnected;
+                  break;
+              }
 
-                return ChatAppBarWidget(title, content);
-              });
+              return ChatAppBarWidget(title, content);
+            },
+          );
         } else {
           var channelBloc =
               ChannelBlocsBloc.of(context).getChannelBloc(channel);
@@ -432,25 +442,26 @@ class _ChatPageState extends State<ChatPage> {
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
 
     return StreamBuilder<ChatConnectionState>(
-        stream: connectionBloc.connectionStateStream,
-        initialData: connectionBloc.connectionState,
-        builder: (BuildContext context,
-            AsyncSnapshot<ChatConnectionState> snapshot) {
-          var connectionState = snapshot.data;
-          switch (connectionState) {
-            case ChatConnectionState.connected:
-              return _buildConnectedWidget(context);
+      stream: connectionBloc.connectionStateStream,
+      initialData: connectionBloc.connectionState,
+      builder:
+          (BuildContext context, AsyncSnapshot<ChatConnectionState> snapshot) {
+        var connectionState = snapshot.data;
+        switch (connectionState) {
+          case ChatConnectionState.connected:
+            return _buildConnectedWidget(context);
 
-              break;
-            case ChatConnectionState.connecting:
-              return _buildConnectingWidget(context);
-              break;
-            case ChatConnectionState.disconnected:
-              return _buildDisconnectedWidget(context);
-              break;
-          }
-          throw Exception("Invalid Chat connection state $connectionState");
-        });
+            break;
+          case ChatConnectionState.connecting:
+            return _buildConnectingWidget(context);
+            break;
+          case ChatConnectionState.disconnected:
+            return _buildDisconnectedWidget(context);
+            break;
+        }
+        throw Exception("Invalid Chat connection state $connectionState");
+      },
+    );
   }
 
   Widget _buildDisconnectedWidget(BuildContext context) {

@@ -12,7 +12,6 @@ import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -54,26 +53,36 @@ class MessageListBloc extends DisposableOwner {
 
     addDisposable(subject: _listJumpDestinationSubject);
 
-    addDisposable(streamSubscription:
-        _messageLoaderBloc.messagesListStream.listen((messageList) {
-      _onMessagesChanged(messageList.allMessages, messageList.lastAddedMessages,
-          messageList.messageListUpdateType);
-    }));
+    addDisposable(
+      streamSubscription: _messageLoaderBloc.messagesListStream.listen(
+        (messageList) {
+          _onMessagesChanged(messageList.allMessages,
+              messageList.lastAddedMessages, messageList.messageListUpdateType);
+        },
+      ),
+    );
 
-    addDisposable(streamSubscription: _channelMessagesListBloc
-        .visibleMessagesBoundsStream
-        .listen((visibleMessageBounds) {
-      if (visibleMessageBounds?.updateType ==
-          MessageListVisibleBoundsUpdateType.push) {
-        _listJumpDestinationSubject.add(MessageListJumpDestination(
-            items: listState.items,
-            selectedFoundItem: listState.items.firstWhere(
-                (item) => item.isContainsMessageWithRemoteId(
-                    visibleMessageBounds.minRegularMessageRemoteId),
-                orElse: () => null),
-            alignment: 0.5));
-      }
-    }));
+    addDisposable(
+      streamSubscription:
+          _channelMessagesListBloc.visibleMessagesBoundsStream.listen(
+        (visibleMessageBounds) {
+          if (visibleMessageBounds?.updateType ==
+              MessageListVisibleBoundsUpdateType.push) {
+            _listJumpDestinationSubject.add(
+              MessageListJumpDestination(
+                items: listState.items,
+                selectedFoundItem: listState.items.firstWhere(
+                    (item) => item.isContainsMessageWithRemoteId(
+                          visibleMessageBounds.minRegularMessageRemoteId,
+                        ),
+                    orElse: () => null),
+                alignment: 0.5,
+              ),
+            );
+          }
+        },
+      ),
+    );
 
     addDisposable(subject: _listStateSubject);
   }
@@ -92,38 +101,57 @@ class MessageListBloc extends DisposableOwner {
     _listStateSubject = BehaviorSubject.seeded(initListState);
   }
 
-  void _onMessagesChanged(List<ChatMessage> newMessages,
-      List<ChatMessage> lastAddedMessages, MessageListUpdateType updateType) {
+  void _onMessagesChanged(
+    List<ChatMessage> newMessages,
+    List<ChatMessage> lastAddedMessages,
+    MessageListUpdateType updateType,
+  ) {
     _logger.fine(() => "newMessages = ${newMessages.length} ");
 
     var messageListItems = _convertMessagesToMessageListItems(newMessages);
 
-    _updateMessageListItems(messageListItems, lastAddedMessages, updateType);
+    _updateMessageListItems(
+      messageListItems,
+      lastAddedMessages,
+      updateType,
+    );
   }
 
-  void _updateMessageListItems(List<MessageListItem> messageListItems,
-      List<ChatMessage> newMessages, MessageListUpdateType updateType) {
+  void _updateMessageListItems(
+    List<MessageListItem> messageListItems,
+    List<ChatMessage> newMessages,
+    MessageListUpdateType updateType,
+  ) {
     var visibleMessagesBounds = channelMessagesListBloc.visibleMessagesBounds;
 
     MessageListItem initScrollPositionItem = calculateInitScrollPositionMessage(
         visibleMessagesBounds, listState.items);
 
     if (updateType == MessageListUpdateType.historyFromBackend) {
-      _listJumpDestinationSubject.add(MessageListJumpDestination(
+      _listJumpDestinationSubject.add(
+        MessageListJumpDestination(
           items: listState.items,
           selectedFoundItem: initScrollPositionItem,
-          alignment: 0.0));
+          alignment: 0.0,
+        ),
+      );
     }
 
     if (updateType == MessageListUpdateType.loadedFromLocalDatabase) {
-      _listJumpDestinationSubject.add(MessageListJumpDestination(
+      _listJumpDestinationSubject.add(
+        MessageListJumpDestination(
           items: listState.items,
           selectedFoundItem: initScrollPositionItem,
-          alignment: 0));
+          alignment: 0,
+        ),
+      );
     }
 
     var messageListState = MessageListState.name(
-        items: messageListItems, newItems: newMessages, updateType: updateType);
+      items: messageListItems,
+      newItems: newMessages,
+      updateType: updateType,
+    );
     _logger.fine(() => "_updateMessageListItems $messageListState");
     _listStateSubject.add(messageListState);
   }
@@ -135,50 +163,71 @@ class MessageListBloc extends DisposableOwner {
           CondensedMessageListItem(readyToCondenseMessages);
 
       _messageCondensedBloc.restoreCondensedState(
-          channelMessagesListBloc.channel, condensedMessageListItem);
+        channelMessagesListBloc.channel,
+        condensedMessageListItem,
+      );
 
       items.add(condensedMessageListItem);
     } else {
-      items.add(SimpleMessageListItem(readyToCondenseMessages.first));
+      items.add(
+        SimpleMessageListItem(
+          readyToCondenseMessages.first,
+        ),
+      );
     }
   }
 
   List<MessageListItem> _convertMessagesToMessageListItems(
-      List<ChatMessage> messages) {
+    List<ChatMessage> messages,
+  ) {
     var items = <MessageListItem>[];
 
     DateTime lastMessageDate;
     List<ChatMessage> readyToCondenseMessages = [];
-    messages.forEach((message) {
-      var currentMessageDate = message.date;
+    messages.forEach(
+      (message) {
+        var currentMessageDate = message.date;
 
-      if (lastMessageDate?.day != currentMessageDate.day) {
-        if (readyToCondenseMessages.isNotEmpty) {
-          _addCondensedItem(items, readyToCondenseMessages);
-          readyToCondenseMessages = [];
-        }
-        items
-            .add(DaysDateSeparatorMessageListItem(message, currentMessageDate));
-      }
-      lastMessageDate = currentMessageDate;
-      if (message is RegularMessage) {
-        var isPossibleToCondense = isPossibleToCondenseMessage(message);
-
-        if (isPossibleToCondense) {
-          readyToCondenseMessages.add(message);
-        } else {
+        if (lastMessageDate?.day != currentMessageDate.day) {
           if (readyToCondenseMessages.isNotEmpty) {
             _addCondensedItem(items, readyToCondenseMessages);
             readyToCondenseMessages = [];
           }
-          items.add(SimpleMessageListItem(message));
+          items.add(
+            DaysDateSeparatorMessageListItem(
+              message,
+              currentMessageDate,
+            ),
+          );
         }
-      } else if (message is SpecialMessage) {
-        items.add(SimpleMessageListItem(message));
-      } else {
-        throw "Invalid message type";
-      }
-    });
+        lastMessageDate = currentMessageDate;
+        if (message is RegularMessage) {
+          var isPossibleToCondense = isPossibleToCondenseMessage(message);
+
+          if (isPossibleToCondense) {
+            readyToCondenseMessages.add(message);
+          } else {
+            if (readyToCondenseMessages.isNotEmpty) {
+              _addCondensedItem(items, readyToCondenseMessages);
+              readyToCondenseMessages = [];
+            }
+            items.add(
+              SimpleMessageListItem(
+                message,
+              ),
+            );
+          }
+        } else if (message is SpecialMessage) {
+          items.add(
+            SimpleMessageListItem(
+              message,
+            ),
+          );
+        } else {
+          throw "Invalid message type";
+        }
+      },
+    );
 
     if (readyToCondenseMessages.isNotEmpty) {
       _addCondensedItem(items, readyToCondenseMessages);
@@ -188,8 +237,9 @@ class MessageListBloc extends DisposableOwner {
   }
 
   MessageListItem calculateInitScrollPositionMessage(
-      MessageListVisibleBounds visibleMessagesBounds,
-      List<MessageListItem> items) {
+    MessageListVisibleBounds visibleMessagesBounds,
+    List<MessageListItem> items,
+  ) {
     MessageListItem initScrollPositionItem;
 
     if (visibleMessagesBounds != null) {

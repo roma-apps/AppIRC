@@ -141,8 +141,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     var allChannels = await _networksListBloc.allNetworksChannels;
 
     if (allChannels != null && allChannels.isNotEmpty) {
-      var savedLocalId =
-          _preferenceBloc.value ?? allChannels.first.localId;
+      var savedLocalId = _preferenceBloc.value ?? allChannels.first.localId;
       if (savedLocalId != null) {
         var filtered =
             allChannels.where((channel) => channel.localId == savedLocalId);
@@ -192,7 +191,8 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   }
 
   IntPreferenceBloc createActiveChannelPreferenceBloc(
-          ILocalPreferencesService preferencesService) =>
+    ILocalPreferencesService preferencesService,
+  ) =>
       IntPreferenceBloc(preferencesService, _preferenceKey);
 
   @override

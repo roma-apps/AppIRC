@@ -26,25 +26,43 @@ class LoungeConnectionFormBloc extends FormBloc {
     registrationFormBloc =
         LoungeRegistrationFormBloc(startPreferences.authPreferences);
 
-    addDisposable(streamSubscription: loginFormBloc.usernameFieldBloc
-        .valueStream.listen(_onAuthChanged));
-    addDisposable(streamSubscription: loginFormBloc.passwordFieldBloc
-        .valueStream.listen(_onAuthChanged));
-
-    addDisposable(streamSubscription: registrationFormBloc.usernameFieldBloc
-        .valueStream.listen(_onAuthChanged));
-    addDisposable(streamSubscription: registrationFormBloc.passwordFieldBloc
-        .valueStream.listen(_onAuthChanged));
+    addDisposable(
+      streamSubscription: loginFormBloc.usernameFieldBloc.valueStream.listen(
+        _onAuthChanged,
+      ),
+    );
+    addDisposable(
+        streamSubscription:
+            loginFormBloc.passwordFieldBloc.valueStream.listen(_onAuthChanged));
 
     addDisposable(
-        streamSubscription: hostFormBloc.hostFieldBloc.valueStream.listen((_) {
-      loungeConnectionBloc.onHostPreferencesChanged(extractHostPreferences());
-    }));
+      streamSubscription:
+          registrationFormBloc.usernameFieldBloc.valueStream.listen(
+        _onAuthChanged,
+      ),
+    );
+    addDisposable(
+      streamSubscription:
+          registrationFormBloc.passwordFieldBloc.valueStream.listen(
+        _onAuthChanged,
+      ),
+    );
 
+    addDisposable(
+      streamSubscription: hostFormBloc.hostFieldBloc.valueStream.listen(
+        (_) {
+          loungeConnectionBloc.onHostPreferencesChanged(
+            extractHostPreferences(),
+          );
+        },
+      ),
+    );
   }
 
   void _onAuthChanged(_) {
-    loungeConnectionBloc.onAuthPreferencesChanged(_extractCurrentAuthPreferences());
+    loungeConnectionBloc.onAuthPreferencesChanged(
+      _extractCurrentAuthPreferences(),
+    );
   }
 
   @override
@@ -63,8 +81,10 @@ class LoungeConnectionFormBloc extends FormBloc {
     return children;
   }
 
-  LoungePreferences extractData() => LoungePreferences(extractHostPreferences(),
-      authPreferences: _extractCurrentAuthPreferences());
+  LoungePreferences extractData() => LoungePreferences(
+        extractHostPreferences(),
+        authPreferences: _extractCurrentAuthPreferences(),
+      );
 
   LoungeAuthPreferences _extractCurrentAuthPreferences() {
     switch (loungeConnectionBloc.state) {
@@ -80,6 +100,4 @@ class LoungeConnectionFormBloc extends FormBloc {
   }
 
   LoungeHostPreferences extractHostPreferences() => hostFormBloc.extractData();
-
-
 }

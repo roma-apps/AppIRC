@@ -45,19 +45,33 @@ class ChannelBloc extends DisposableOwner {
     _usersSubject = BehaviorSubject.seeded(channelWithState.initUsers ?? []);
 
     _messagesBloc = ChannelMessageListBloc(chatPushesService, channel);
-    addDisposable(disposable: _messagesBloc);
+    addDisposable(
+      disposable: _messagesBloc,
+    );
 
     addDisposable(subject: _usersSubject);
     addDisposable(
-        disposable:
-            _backendService.listenForChannelNames(network, channel, (newUsers) {
-      _usersSubject.add(newUsers);
-    }));
+      disposable: _backendService.listenForChannelNames(
+        network,
+        channel,
+        (newUsers) {
+          _usersSubject.add(newUsers);
+        },
+      ),
+    );
     addDisposable(
-        disposable: _backendService.listenForChannelUsers(network, channel, () {
-      _backendService.requestChannelUsers(network, channel);
-    }));
-    _inputMessageBloc = ChatInputMessageBloc(_backendService.chatConfig, this);
+      disposable: _backendService.listenForChannelUsers(
+        network,
+        channel,
+        () {
+          _backendService.requestChannelUsers(network, channel);
+        },
+      ),
+    );
+    _inputMessageBloc = ChatInputMessageBloc(
+      _backendService.chatConfig,
+      this,
+    );
     addDisposable(disposable: _inputMessageBloc);
   }
 
@@ -95,11 +109,16 @@ class ChannelBloc extends DisposableOwner {
     );
   }
 
-  ChannelState get channelState =>
-      _channelsStatesBloc.getChannelState(network, channel);
+  ChannelState get channelState => _channelsStatesBloc.getChannelState(
+        network,
+        channel,
+      );
 
   Stream<ChannelState> get _channelStateStream =>
-      _channelsStatesBloc.getChannelStateStream(network, channel);
+      _channelsStatesBloc.getChannelStateStream(
+        network,
+        channel,
+      );
 
   bool get channelConnected => channelState.connected;
 
@@ -128,42 +147,67 @@ class ChannelBloc extends DisposableOwner {
   Future<RequestResult<bool>> leaveChannel({
     bool waitForResult = false,
   }) async =>
-      await _backendService.leaveChannel(network, channel,
-          waitForResult: waitForResult);
+      await _backendService.leaveChannel(
+        network,
+        channel,
+        waitForResult: waitForResult,
+      );
 
   Future<RequestResult<ChannelUser>> printUserInfo(
     String userNick, {
     bool waitForResult = false,
   }) async =>
-      await _backendService.requestUserInfo(network, channel, userNick,
-          waitForResult: waitForResult);
+      await _backendService.requestUserInfo(
+        network,
+        channel,
+        userNick,
+        waitForResult: waitForResult,
+      );
 
   Future<RequestResult<ChatMessage>> printChannelBannedUsers({
     bool waitForResult = false,
   }) async =>
-      await _backendService.printChannelBannedUsers(network, channel,
-          waitForResult: waitForResult);
+      await _backendService.printChannelBannedUsers(
+        network,
+        channel,
+        waitForResult: waitForResult,
+      );
 
   Future<RequestResult<bool>> editChannelTopic(
     String newTopic, {
     bool waitForResult = false,
   }) async =>
-      await _backendService.editChannelTopic(network, channel, newTopic,
-          waitForResult: waitForResult);
+      await _backendService.editChannelTopic(
+        network,
+        channel,
+        newTopic,
+        waitForResult: waitForResult,
+      );
 
   Future<RequestResult<bool>> onOpenChannel() async =>
-      await _backendService.sendChannelOpenedEventToServer(network, channel);
+      await _backendService.sendChannelOpenedEventToServer(
+        network,
+        channel,
+      );
 
   Future<RequestResult<ChatMessage>> sendChannelRawMessage(
     String rawMessage, {
     bool waitForResult = false,
   }) async =>
-      await _backendService.sendChannelRawMessage(network, channel, rawMessage,
-          waitForResult: waitForResult);
+      await _backendService.sendChannelRawMessage(
+        network,
+        channel,
+        rawMessage,
+        waitForResult: waitForResult,
+      );
 
   Future<RequestResult<ChannelWithState>> openDirectMessagesChannel(
           String nick) async =>
-      await _backendService.openDirectMessagesChannel(network, channel, nick);
+      await _backendService.openDirectMessagesChannel(
+        network,
+        channel,
+        nick,
+      );
 
   static ChannelBloc of(
     BuildContext context, {

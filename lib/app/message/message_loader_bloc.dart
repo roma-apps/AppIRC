@@ -12,7 +12,6 @@ import 'package:flutter_appirc/app/message/special/message_special_db.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -39,8 +38,13 @@ class MessageLoaderBloc extends DisposableOwner {
 
   MessagesList get messagesList => _messagesListSubject?.value;
 
-  MessageLoaderBloc(this._backendService, this._db, this._messagesSaverBloc,
-      this._network, this._channel) {
+  MessageLoaderBloc(
+    this._backendService,
+    this._db,
+    this._messagesSaverBloc,
+    this._network,
+    this._channel,
+  ) {
     addDisposable(subject: _messagesListSubject);
     addDisposable(subject: _isInitFinishedSubject);
 
@@ -53,13 +57,16 @@ class MessageLoaderBloc extends DisposableOwner {
     List<ChatMessage> messages = <ChatMessage>[];
 
     // history
-    var regularMessages = (await _db.regularMessagesDao
-            .getChannelMessagesOrderByDate(_channel.remoteId))
-        .map(regularMessageDBToChatMessage);
-    var specialMessages =
-        (await _db.specialMessagesDao.getChannelMessages(_channel.remoteId))
-            .map(specialMessageDBToChatMessage)
-            .toList();
+    var regularMessages =
+        (await _db.regularMessagesDao.getChannelMessagesOrderByDate(
+      _channel.remoteId,
+    ))
+            .map(regularMessageDBToChatMessage);
+    var specialMessages = (await _db.specialMessagesDao.getChannelMessages(
+      _channel.remoteId,
+    ))
+        .map(specialMessageDBToChatMessage)
+        .toList();
 
     _removeUnnecessarySpecialLoadingMessages(specialMessages);
 
@@ -93,8 +100,10 @@ class MessageLoaderBloc extends DisposableOwner {
     var lastTextSpecialMessage = findLatestTextSpecialMessage(messages);
 
     if (lastTextSpecialMessage != null) {
-      messages.removeWhere((message) =>
-          _isTextSpecialMessage(message) && message != lastTextSpecialMessage);
+      messages.removeWhere(
+        (message) =>
+            _isTextSpecialMessage(message) && message != lastTextSpecialMessage,
+      );
     }
   }
 
@@ -186,40 +195,49 @@ class MessageLoaderBloc extends DisposableOwner {
   }
 
   void _toggleMessages(ToggleChannelPreviewData channelToggle) {
-    messagesList.allMessages.forEach((message) {
-      if (message is RegularMessage) {
-        if (message.previews != null) {
-          message.previews.forEach((preview) {
-            if (preview.shown != channelToggle.allPreviewsShown) {
-              _backendService.togglePreview(
-                  _network, _channel, message, preview);
-            }
-          });
+    messagesList.allMessages.forEach(
+      (message) {
+        if (message is RegularMessage) {
+          if (message.previews != null) {
+            message.previews.forEach(
+              (preview) {
+                if (preview.shown != channelToggle.allPreviewsShown) {
+                  _backendService.togglePreview(
+                      _network, _channel, message, preview);
+                }
+              },
+            );
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   void _updatePreview(MessagePreviewForRemoteMessageId previewForMessage) {
-    var oldMessage = messagesList.allMessages.firstWhere((message) {
-      if (message is RegularMessage) {
-        var regularMessage = message;
+    var oldMessage = messagesList.allMessages.firstWhere(
+      (message) {
+        if (message is RegularMessage) {
+          var regularMessage = message;
 
-        if (regularMessage.messageRemoteId ==
-            previewForMessage.remoteMessageId) {
-          return true;
+          if (regularMessage.messageRemoteId ==
+              previewForMessage.remoteMessageId) {
+            return true;
+          } else {
+            return false;
+          }
         } else {
           return false;
         }
-      } else {
-        return false;
-      }
-    });
+      },
+    );
 
     updatePreview(oldMessage, previewForMessage);
 
     _onMessagesChanged(
-        messagesList.allMessages, [], MessageListUpdateType.notUpdated);
+      messagesList.allMessages,
+      [],
+      MessageListUpdateType.notUpdated,
+    );
   }
 
   void _addNewMessages(

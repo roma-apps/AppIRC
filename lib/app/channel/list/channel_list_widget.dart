@@ -11,7 +11,6 @@ import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
-
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -72,7 +71,11 @@ class ChannelListWidget extends StatelessWidget {
     );
   }
 
-  Widget _channelItem(BuildContext context, Network network, Channel channel) {
+  Widget _channelItem(
+    BuildContext context,
+    Network network,
+    Channel channel,
+  ) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
 
     return StreamBuilder<Channel>(
@@ -135,12 +138,27 @@ class ChannelListWidget extends StatelessWidget {
 
                 return Row(
                   children: <Widget>[
-                    _buildChannelIconWidget(context, iconData, isChannelActive),
-                    _buildChannelNameWidget(context, channel, isChannelActive),
-                    _buildConnectionStateWidget(context, networkBloc,
-                        isChannelActive, channelConnected),
+                    _buildChannelIconWidget(
+                      context,
+                      iconData,
+                      isChannelActive,
+                    ),
+                    _buildChannelNameWidget(
+                      context,
+                      channel,
+                      isChannelActive,
+                    ),
+                    _buildConnectionStateWidget(
+                      context,
+                      networkBloc,
+                      isChannelActive,
+                      channelConnected,
+                    ),
                     buildChannelUnreadCountBadge(
-                        context, channelBloc, isChannelActive),
+                      context,
+                      channelBloc,
+                      isChannelActive,
+                    ),
                     buildChannelPopupMenuButton(
                       context: context,
                       networkBloc: networkBloc,
@@ -179,7 +197,10 @@ class ChannelListWidget extends StatelessWidget {
   }
 
   Widget _buildChannelNameWidget(
-      BuildContext context, Channel channel, bool isChannelActive) {
+    BuildContext context,
+    Channel channel,
+    bool isChannelActive,
+  ) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
@@ -208,7 +229,10 @@ class ChannelListWidget extends StatelessWidget {
   }
 
   Widget _buildChannelIconWidget(
-      BuildContext context, IconData iconData, bool isChannelActive) {
+    BuildContext context,
+    IconData iconData,
+    bool isChannelActive,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
       child: Icon(

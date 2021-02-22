@@ -8,9 +8,9 @@ part of 'channel_preferences_model.dart';
 
 ChannelPreferences _$ChannelPreferencesFromJson(Map<String, dynamic> json) {
   return ChannelPreferences(
-    json['localId'] as int,
-    json['password'] as String,
-    json['name'] as String,
+    name: json['name'] as String,
+    password: json['password'] as String,
+    localId: json['localId'] as int,
   );
 }
 

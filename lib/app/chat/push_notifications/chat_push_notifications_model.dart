@@ -1,4 +1,3 @@
-
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logging/logging.dart';
@@ -12,7 +11,10 @@ class ChatPushMessageNotification {
   final String title;
   final String body;
 
-  ChatPushMessageNotification(this.title, this.body);
+  ChatPushMessageNotification(
+    this.title,
+    this.body,
+  );
 
   @override
   String toString() {
@@ -30,13 +32,18 @@ class ChatPushMessage {
   final ChatPushMessageNotification notification;
   final ChatPushMessageData data;
 
-  ChatPushMessage(this.type, this.notification, this.data);
+  ChatPushMessage(
+    this.type,
+    this.notification,
+    this.data,
+  );
 
   @override
-  String toString() {
-    return 'ChatPushMessage{type: $type, notification: $notification,'
-        ' data: $data}';
-  }
+  String toString() => 'ChatPushMessage{'
+      'type: $type, '
+      'notification: $notification, '
+      'data: $data'
+      '}';
 }
 
 @JsonSerializable()
@@ -51,14 +58,24 @@ class ChatPushMessageData {
   final String timestamp;
   final String title;
 
-  ChatPushMessageData(this.messageId, this.chanId, this.body, this.type,
-      this.timestamp, this.title);
+  ChatPushMessageData(
+    this.messageId,
+    this.chanId,
+    this.body,
+    this.type,
+    this.timestamp,
+    this.title,
+  );
 
   @override
-  String toString() {
-    return 'ChatPushMessageData{messageId: $messageId, chanId: $chanId, '
-        'body: $body, type: $type, timestamp: $timestamp, title: $title}';
-  }
+  String toString() => 'ChatPushMessageData{'
+        'messageId: $messageId, '
+        'chanId: $chanId, '
+        'body: $body, '
+        'type: $type, '
+        'timestamp: $timestamp, '
+        'title: $title'
+        '}';
 
   factory ChatPushMessageData.fromJson(Map<dynamic, dynamic> json) =>
       _$ChatPushMessageDataFromJson(json);

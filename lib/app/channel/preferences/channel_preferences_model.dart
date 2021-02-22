@@ -10,16 +10,18 @@ class ChannelPreferences extends IJsonObject {
   final String name;
   final String password;
 
-  ChannelPreferences(this.localId, this.password, this.name);
-
-  ChannelPreferences.name(
-      {@required this.name, @required this.password, this.localId});
+  ChannelPreferences({
+    @required this.name,
+    @required this.password,
+    this.localId,
+  });
 
   @override
-  String toString() {
-    return 'ChatChannelPreferences{localId: $localId, '
-        'name: $name, password: $password}';
-  }
+  String toString() => 'ChatChannelPreferences{'
+        'localId: $localId, '
+        'name: $name, '
+        'password: $password'
+        '}';
 
   factory ChannelPreferences.fromJson(Map<String, dynamic> json) =>
       _$ChannelPreferencesFromJson(json);

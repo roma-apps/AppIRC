@@ -22,7 +22,9 @@ class WhoIsSpecialMessageBodyWidget
 
   @override
   Widget build(BuildContext context) {
-    String actualHostNameValue = calculateActualHostName(body);
+    String actualHostNameValue = calculateActualHostName(
+      body,
+    );
 
     var child = Column(
       children: <Widget>[
@@ -79,32 +81,50 @@ class WhoIsSpecialMessageBodyWidget
           color: IAppIrcUiColorTheme.of(context).primaryDark,
           iconData: Icons.account_box,
         ),
-        child
+        child,
       ],
     );
   }
 
   @override
   String getBodyRawText(BuildContext context) {
-    return _buildWhoIsRawBody(context: context, whoIsBody: body);
+    return _buildWhoIsRawBody(
+      context: context,
+      whoIsBody: body,
+    );
   }
 }
 
-Widget _buildWhoIsSpecialMessageHeaderWidget(
-    {@required BuildContext context,
-    @required DateTime date,
-    @required String fromNick,
-    @required IconData iconData,
-    @required Color color}) {
+Widget _buildWhoIsSpecialMessageHeaderWidget({
+  @required BuildContext context,
+  @required DateTime date,
+  @required String fromNick,
+  @required IconData iconData,
+  @required Color color,
+}) {
   var spans = <InlineSpan>[];
   spans.add(
-      buildMessageDateTextSpan(context: context, date: date, color: color));
+    buildMessageDateTextSpan(
+      context: context,
+      date: date,
+      color: color,
+    ),
+  );
 
-  spans.add(buildMessageIconWidgetSpan(iconData: iconData, color: color));
+  spans.add(
+    buildMessageIconWidgetSpan(
+      iconData: iconData,
+      color: color,
+    ),
+  );
 
   if (fromNick?.isNotEmpty == true) {
-    spans.add(buildHighlightedNicknameButtonWidgetSpan(
-        context: context, nick: fromNick));
+    spans.add(
+      buildHighlightedNicknameButtonWidgetSpan(
+        context: context,
+        nick: fromNick,
+      ),
+    );
   }
 
   return buildMessageRichText(spans);
@@ -115,27 +135,30 @@ Widget _buildWhoIsRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
-              child: Text(label),
-            ),
-            Flexible(
-                child: Text(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
+            child: Text(label),
+          ),
+          Flexible(
+            child: Text(
               value,
               softWrap: true,
-            ))
-          ]),
+            ),
+          )
+        ],
+      ),
     );
   } else {
     return SizedBox.shrink();
   }
 }
 
-String _buildWhoIsRawBody(
-    {@required BuildContext context,
-    @required WhoIsSpecialMessageBody whoIsBody}) {
+String _buildWhoIsRawBody({
+  @required BuildContext context,
+  @required WhoIsSpecialMessageBody whoIsBody,
+}) {
   String actualHostNameValue = calculateActualHostName(whoIsBody);
 
   var rawBody = _buildWhoIsRawRow(

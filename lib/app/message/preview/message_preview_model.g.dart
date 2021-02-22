@@ -8,15 +8,15 @@ part of 'message_preview_model.dart';
 
 MessagePreview _$MessagePreviewFromJson(Map<String, dynamic> json) {
   return MessagePreview(
-    json['head'] as String,
-    json['body'] as String,
-    json['canDisplay'] as bool,
-    json['shown'] as bool,
-    json['link'] as String,
-    json['thumb'] as String,
-    json['media'] as String,
-    json['mediaType'] as String,
-    _$enumDecodeNullable(_$MessagePreviewTypeEnumMap, json['type']),
+    head: json['head'] as String,
+    body: json['body'] as String,
+    canDisplay: json['canDisplay'] as bool,
+    shown: json['shown'] as bool,
+    link: json['link'] as String,
+    thumb: json['thumb'] as String,
+    media: json['media'] as String,
+    mediaType: json['mediaType'] as String,
+    type: _$enumDecodeNullable(_$MessagePreviewTypeEnumMap, json['type']),
   );
 }
 

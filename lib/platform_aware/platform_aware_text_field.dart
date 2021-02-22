@@ -43,33 +43,36 @@ PlatformTextField buildPlatformTextField({
 
   materialBuilder = (_, __) {
     return MaterialTextFieldData(
+      enabled: enabled,
+      enableInteractiveSelection: true,
+      style: _editStyle,
+      decoration: InputDecoration(
         enabled: enabled,
-        enableInteractiveSelection: true,
-        style: _editStyle,
-        decoration: InputDecoration(
-            enabled: enabled,
-            labelText: label,
-            hintText: hint,
-            labelStyle: _labelStyle,
-            hintStyle: _hintStyle));
+        labelText: label,
+        hintText: hint,
+        labelStyle: _labelStyle,
+        hintStyle: _hintStyle,
+      ),
+    );
   };
 
   cupertinoBuilder = (_, __) => CupertinoTextFieldData(
-      enabled: enabled,
-      placeholder: hint,
-      padding: EdgeInsets.all(8),
-      style: _editStyle,
-      prefixMode: OverlayVisibilityMode.notEditing,
-      prefix: label != null
-          ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                label,
-                style: _labelStyle,
-              ),
-            )
-          : null,
-      placeholderStyle: _hintStyle);
+        enabled: enabled,
+        placeholder: hint,
+        padding: EdgeInsets.all(8),
+        style: _editStyle,
+        prefixMode: OverlayVisibilityMode.notEditing,
+        prefix: label != null
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  label,
+                  style: _labelStyle,
+                ),
+              )
+            : null,
+        placeholderStyle: _hintStyle,
+      );
 
   var platformTextField = PlatformTextField(
     keyboardType: keyboardType,

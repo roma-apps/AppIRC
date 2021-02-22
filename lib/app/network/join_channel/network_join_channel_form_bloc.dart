@@ -7,18 +7,27 @@ class NetworkJoinChannelFormBloc extends FormBloc {
   FormValueFieldBloc<String> channelFieldBloc;
   FormValueFieldBloc<String> passwordFieldBloc;
 
-  NetworkJoinChannelFormBloc(
-      {String startChannel = "", String startPassword = ""}) {
+  NetworkJoinChannelFormBloc({
+    String startChannel = "",
+    String startPassword = "",
+  }) {
     channelFieldBloc = FormValueFieldBloc<String>(startChannel, validators: [
       NoWhitespaceTextValidator.instance,
       NotEmptyTextValidator.instance
     ]);
-    passwordFieldBloc = FormValueFieldBloc<String>(startPassword,
-        validators: [NoWhitespaceTextValidator.instance]);
+    passwordFieldBloc = FormValueFieldBloc<String>(
+      startPassword,
+      validators: [
+        NoWhitespaceTextValidator.instance,
+      ],
+    );
   }
 
   @override
-  List<FormFieldBloc> get children => [channelFieldBloc, passwordFieldBloc];
+  List<FormFieldBloc> get children => [
+        channelFieldBloc,
+        passwordFieldBloc,
+      ];
 
   String extractChannel() => channelFieldBloc.value;
 

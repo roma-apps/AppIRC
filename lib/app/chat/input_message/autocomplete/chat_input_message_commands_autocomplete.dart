@@ -1,7 +1,4 @@
-
 import 'package:flutter_appirc/autocomplete/autocomplete.dart';
-
-
 
 class CommandsAutoCompleter extends AutoCompleter {
   final List<String> commands;

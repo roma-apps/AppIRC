@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:flutter_appirc/socketio/socket_io_service.dart';
 import 'package:flutter_appirc/socketio/socketio_model.dart';
 import 'package:logging/logging.dart';
@@ -121,10 +120,15 @@ class SocketIOInstanceBloc extends DisposableOwner {
 
     _logger.fine(() => "init _socketIO = $_socketIO");
 
-    addDisposable(disposable: _listenConnectionState((socketState, eventName) {
-      _logger.fine(() => "onNewState => $socketState eventName = $eventName");
-      _connectionStateController.add(socketState);
-    }));
+    addDisposable(
+      disposable: _listenConnectionState(
+        (socketState, eventName) {
+          _logger
+              .fine(() => "onNewState => $socketState eventName = $eventName");
+          _connectionStateController.add(socketState);
+        },
+      ),
+    );
   }
 
   IDisposable _listenConnectionState(
@@ -157,17 +161,19 @@ class SocketIOInstanceBloc extends DisposableOwner {
     onReconnectError(reconnectErrorListener);
     onReconnecting(reconnectingListener);
 
-    return CustomDisposable(() {
-      offConnect(connectListener);
-      offDisconnect(disconnectListener);
-      offConnectError(connectErrorListener);
-      offConnectTimeout(connectTimeoutListener);
-      offConnecting(connectingListener);
-      offReconnect(reconnectListener);
-      offReconnectFailed(reconnectFailedListener);
-      offReconnectError(reconnectErrorListener);
-      offReconnecting(reconnectingListener);
-    });
+    return CustomDisposable(
+      () {
+        offConnect(connectListener);
+        offDisconnect(disconnectListener);
+        offConnectError(connectErrorListener);
+        offConnectTimeout(connectTimeoutListener);
+        offConnecting(connectingListener);
+        offReconnect(reconnectListener);
+        offReconnectFailed(reconnectFailedListener);
+        offReconnectError(reconnectErrorListener);
+        offReconnecting(reconnectingListener);
+      },
+    );
   }
 
   Future connect() async {
@@ -200,14 +206,14 @@ class SocketIOInstanceBloc extends DisposableOwner {
   }
 
   SocketOptions _createSocketOptions(String host) => SocketOptions(
-      //Socket IO server URI
-      host, //Enable or disable platform channel logging
-      enableLogging: !kReleaseMode && !kProfileMode,
-      transports: [
-        Transports.WEB_SOCKET,
-        Transports.POLLING
-      ], //Enable required transport
-    );
+        //Socket IO server URI
+        host, //Enable or disable platform channel logging
+        enableLogging: !kReleaseMode && !kProfileMode,
+        transports: [
+          Transports.WEB_SOCKET,
+          Transports.POLLING
+        ], //Enable required transport
+      );
 
   Future _connect(SocketIO socketIO) async {
     var connected;

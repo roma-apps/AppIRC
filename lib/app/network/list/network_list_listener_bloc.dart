@@ -10,16 +10,23 @@ abstract class NetworkListListenerBloc extends DisposableOwner {
 
   NetworkListListenerBloc(this.networkListBloc) {
     addDisposable(
-        disposable: networkListBloc.listenForNetworkJoin((networkWithState) {
-      var network = networkWithState.network;
+      disposable: networkListBloc.listenForNetworkJoin(
+        (networkWithState) {
+          var network = networkWithState.network;
 
-      addDisposable(
-          disposable: networkListBloc.listenForNetworkLeave(network, () {
-        onNetworkLeaved(network);
-      }));
+          addDisposable(
+            disposable: networkListBloc.listenForNetworkLeave(
+              network,
+              () {
+                onNetworkLeaved(network);
+              },
+            ),
+          );
 
-      onNetworkJoined(networkWithState);
-    }));
+          onNetworkJoined(networkWithState);
+        },
+      ),
+    );
   }
 
   @mustCallSuper
@@ -31,8 +38,7 @@ abstract class NetworkListListenerBloc extends DisposableOwner {
   void onNetworkLeaved(Network network);
 
   ChannelListBloc getChannelListBloc(Network network) {
-    var chatChannelsListBloc =
-        networkListBloc.getChannelListBloc(network);
+    var chatChannelsListBloc = networkListBloc.getChannelListBloc(network);
 
     return chatChannelsListBloc;
   }

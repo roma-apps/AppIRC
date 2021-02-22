@@ -4,7 +4,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'lounge_upload_file_model.g.dart';
 
-
 @JsonSerializable()
 class LoungeResponseUploadResponseBody {
   final String url;
@@ -26,9 +25,12 @@ class LoungeResponseUploadResponseBody {
 
 abstract class LoungeUploadException implements Exception {
   String get loungeURL;
-  File  get file;
+
+  File get file;
+
   String get uploadAuthToken;
-  int  get maximumPossibleUploadFileSizeInBytes;
+
+  int get maximumPossibleUploadFileSizeInBytes;
 }
 
 class FileSizeExceededLoungeUploadException implements LoungeUploadException {
@@ -46,8 +48,13 @@ class FileSizeExceededLoungeUploadException implements LoungeUploadException {
 
   final int actualSizeInBytes;
 
-  FileSizeExceededLoungeUploadException(this.file, this.loungeURL,
-      this.uploadAuthToken, this.maximumPossibleUploadFileSizeInBytes, this.actualSizeInBytes);
+  FileSizeExceededLoungeUploadException(
+    this.file,
+    this.loungeURL,
+    this.uploadAuthToken,
+    this.maximumPossibleUploadFileSizeInBytes,
+    this.actualSizeInBytes,
+  );
 }
 
 class ServerAuthInvalidLoungeUploadException implements LoungeUploadException {
@@ -63,8 +70,12 @@ class ServerAuthInvalidLoungeUploadException implements LoungeUploadException {
   @override
   final int maximumPossibleUploadFileSizeInBytes;
 
-  ServerAuthInvalidLoungeUploadException(this.file, this.loungeURL,
-      this.uploadAuthToken, this.maximumPossibleUploadFileSizeInBytes);
+  ServerAuthInvalidLoungeUploadException(
+    this.file,
+    this.loungeURL,
+    this.uploadAuthToken,
+    this.maximumPossibleUploadFileSizeInBytes,
+  );
 }
 
 class InvalidHttpResponseBodyLoungeUploadException
@@ -84,11 +95,12 @@ class InvalidHttpResponseBodyLoungeUploadException
   final String responseBody;
 
   InvalidHttpResponseBodyLoungeUploadException(
-      this.file,
-      this.loungeURL,
-      this.uploadAuthToken,
-      this.maximumPossibleUploadFileSizeInBytes,
-      this.responseBody);
+    this.file,
+    this.loungeURL,
+    this.uploadAuthToken,
+    this.maximumPossibleUploadFileSizeInBytes,
+    this.responseBody,
+  );
 }
 
 class InvalidHttpResponseCodeLoungeUploadException
@@ -108,17 +120,15 @@ class InvalidHttpResponseCodeLoungeUploadException
   final int responseCode;
 
   InvalidHttpResponseCodeLoungeUploadException(
-      this.file,
-      this.loungeURL,
-      this.uploadAuthToken,
-      this.maximumPossibleUploadFileSizeInBytes,
-      this.responseCode);
+    this.file,
+    this.loungeURL,
+    this.uploadAuthToken,
+    this.maximumPossibleUploadFileSizeInBytes,
+    this.responseCode,
+  );
 }
 
-
-
-class TimeoutHttpLoungeUploadException
-    implements LoungeUploadException {
+class TimeoutHttpLoungeUploadException implements LoungeUploadException {
   @override
   final File file;
 
@@ -132,8 +142,9 @@ class TimeoutHttpLoungeUploadException
   final int maximumPossibleUploadFileSizeInBytes;
 
   TimeoutHttpLoungeUploadException(
-      this.file,
-      this.loungeURL,
-      this.uploadAuthToken,
-      this.maximumPossibleUploadFileSizeInBytes);
+    this.file,
+    this.loungeURL,
+    this.uploadAuthToken,
+    this.maximumPossibleUploadFileSizeInBytes,
+  );
 }

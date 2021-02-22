@@ -15,11 +15,17 @@ class NetworkPreferencesFormWidget extends StatefulWidget {
   final String buttonText;
 
   NetworkPreferencesFormWidget(
-      this.startValues, this.callback, this.buttonText);
+    this.startValues,
+    this.callback,
+    this.buttonText,
+  );
 
   @override
-  State<StatefulWidget> createState() =>
-      NetworkPreferencesFormWidgetState(startValues, callback, buttonText);
+  State<StatefulWidget> createState() => NetworkPreferencesFormWidgetState(
+        startValues,
+        callback,
+        buttonText,
+      );
 }
 
 class NetworkPreferencesFormWidgetState
@@ -31,11 +37,17 @@ class NetworkPreferencesFormWidgetState
   TextEditingController _channelsController;
 
   NetworkPreferencesFormWidgetState(
-      this.startValues, this.callback, this.buttonText) {
+    this.startValues,
+    this.callback,
+    this.buttonText,
+  ) {
     _channelsController = TextEditingController(
-        text: startValues.channelsWithoutPassword
-            .map((channel) => channel.name)
-            .join(NetworkPreferencesFormBloc.channelsNamesSeparator));
+      text: startValues.channelsWithoutPassword
+          .map((channel) => channel.name)
+          .join(
+            NetworkPreferencesFormBloc.channelsNamesSeparator,
+          ),
+    );
   }
 
   @override

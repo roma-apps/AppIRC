@@ -6,12 +6,12 @@ import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 
 class TextSpecialMessageBodyWidget
     extends SpecialMessageBodyWidget<TextSpecialMessageBody> {
-  TextSpecialMessageBodyWidget(
-      {@required SpecialMessage message,
-        @required TextSpecialMessageBody body,
-        @required bool inSearchResults,
-        @required MessageWidgetType messageWidgetType})
-      : super(
+  TextSpecialMessageBodyWidget({
+    @required SpecialMessage message,
+    @required TextSpecialMessageBody body,
+    @required bool inSearchResults,
+    @required MessageWidgetType messageWidgetType,
+  }) : super(
             message: message,
             body: body,
             inSearchResults: inSearchResults,

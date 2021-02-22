@@ -56,6 +56,7 @@ abstract class LoungeResponseBodyPart {}
 class SignOutLoungeResponseBody {
   static String get eventName => LoungeResponseEventNames.signOut;
 }
+
 class AuthorizedLoungeResponseBody {
   static String get eventName => LoungeResponseEventNames.authorized;
 }
@@ -96,12 +97,20 @@ class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
   final bool shown;
 
   MessagePreviewToggleLoungeResponseBody(
-      this.target, this.msgId, this.link, this.shown);
+    this.target,
+    this.msgId,
+    this.link,
+    this.shown,
+  );
 
   @override
   String toString() {
-    return 'MessagePreviewToggleLoungeResponseBody{target: $target, '
-        'msgId: $msgId, link: $link, shown: $shown}';
+    return 'MessagePreviewToggleLoungeResponseBody{'
+        'target: $target, '
+        'msgId: $msgId, '
+        'link: $link, '
+        'shown: $shown'
+        '}';
   }
 
   factory MessagePreviewToggleLoungeResponseBody.fromJson(
@@ -120,13 +129,18 @@ class MoreLoungeResponseBody extends LoungeResponseBody {
   final List<MsgLoungeResponseBodyPart> messages;
   final int totalMessages;
 
-  MoreLoungeResponseBody(this.chan, this.messages, this.totalMessages);
+  MoreLoungeResponseBody(
+    this.chan,
+    this.messages,
+    this.totalMessages,
+  );
 
   @override
   String toString() {
-    return 'MoreLoungeResponseBody{chan: $chan,'
-        ' totalMessages: $totalMessages'
-        ' messages: $messages,'
+    return 'MoreLoungeResponseBody{'
+        'chan: $chan,'
+        'totalMessages: $totalMessages '
+        'messages: $messages, '
         '}';
   }
 
@@ -144,12 +158,19 @@ class ChangelogLoungeResponseBody extends LoungeResponseBody {
   final dynamic latest;
   final dynamic packages;
 
-  ChangelogLoungeResponseBody(this.current, this.latest, this.packages);
+  ChangelogLoungeResponseBody(
+    this.current,
+    this.latest,
+    this.packages,
+  );
 
   @override
   String toString() {
-    return 'ChangelogLoungeResponseBody{current: $current,'
-        ' latest: $latest, packages: $packages}';
+    return 'ChangelogLoungeResponseBody{'
+        'current: $current, '
+        'latest: $latest, '
+        'packages: $packages'
+        '}';
   }
 
   factory ChangelogLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -165,11 +186,19 @@ class SyncSortLoungeResponseBody extends LoungeResponseBody {
   final String type;
   final String target;
 
-  SyncSortLoungeResponseBody(this.order, this.type, this.target);
+  SyncSortLoungeResponseBody(
+    this.order,
+    this.type,
+    this.target,
+  );
 
   @override
   String toString() {
-    return 'SyncSortLoungeResponseBody{order: $order, type: $type, target: $target}';
+    return 'SyncSortLoungeResponseBody{'
+        'order: $order, '
+        'type: $type, '
+        'target: $target'
+        '}';
   }
 
   factory SyncSortLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -184,11 +213,17 @@ class SettingsNewLoungeResponseBody extends LoungeResponseBody {
   final String name;
   final dynamic value;
 
-  SettingsNewLoungeResponseBody(this.name, this.value);
+  SettingsNewLoungeResponseBody(
+    this.name,
+    this.value,
+  );
 
   @override
   String toString() {
-    return 'SettingsNewLoungeResponseBody{name: $name, value: $value}';
+    return 'SettingsNewLoungeResponseBody{'
+        'name: $name, '
+        'value: $value'
+        '}';
   }
 
   factory SettingsNewLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -209,7 +244,13 @@ class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String token;
 
   SessionsListLoungeResponseBodyPart(
-      this.current, this.active, this.lastUse, this.ip, this.agent, this.token);
+    this.current,
+    this.active,
+    this.lastUse,
+    this.ip,
+    this.agent,
+    this.token,
+  );
 
   factory SessionsListLoungeResponseBodyPart.fromJson(
           Map<String, dynamic> json) =>
@@ -228,12 +269,21 @@ class MsgLoungeResponseBody extends LoungeResponseBody {
   final int unread;
   final MsgLoungeResponseBodyPart msg;
 
-  MsgLoungeResponseBody(this.chan, this.highlight, this.unread, this.msg);
+  MsgLoungeResponseBody(
+    this.chan,
+    this.highlight,
+    this.unread,
+    this.msg,
+  );
 
   @override
   String toString() {
-    return 'MessageLoungeResponseBody{chan: $chan, '
-        'highlight: $highlight, unread: $unread, msg: $msg}';
+    return 'MessageLoungeResponseBody{'
+        'chan: $chan, '
+        'highlight: $highlight, '
+        'unread: $unread, '
+        'msg: $msg'
+        '}';
   }
 
   factory MsgLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -249,11 +299,17 @@ class MsgSpecialLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final dynamic data;
 
-  MsgSpecialLoungeResponseBody(this.chan, this.data);
+  MsgSpecialLoungeResponseBody(
+    this.chan,
+    this.data,
+  );
 
   @override
   String toString() {
-    return 'MessageSpecialLoungeResponseBody{chan: $chan, data: $data}';
+    return 'MessageSpecialLoungeResponseBody{'
+        'chan: $chan, '
+        'data: $data'
+        '}';
   }
 
   factory MsgSpecialLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -276,24 +332,31 @@ class DefaultsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String username;
 
   DefaultsLoungeResponseBodyPart(
-      this.host,
-      this.port,
-      this.join,
-      this.name,
-      this.nick,
-      this.password,
-      this.realname,
-      this.rejectUnauthorized,
-      this.tls,
-      this.username);
+    this.host,
+    this.port,
+    this.join,
+    this.name,
+    this.nick,
+    this.password,
+    this.realname,
+    this.rejectUnauthorized,
+    this.tls,
+    this.username,
+  );
 
   @override
   String toString() {
-    return 'DefaultsLoungeResponseBodyPart{host: $host,'
-        ' port: $port, join: $join, name: $name, nick: $nick,'
-        ' password: $password, realname: $realname,'
-        ' rejectUnathorized: $rejectUnauthorized,'
-        ' tls: $tls, username: $username}';
+    return 'DefaultsLoungeResponseBodyPart{'
+        'host: $host,'
+        ' port: $port, '
+        'join: $join, '
+        'name: $name, '
+        'nick: $nick, '
+        'password: $password, '
+        'realname: $realname, '
+        'rejectUnathorized: $rejectUnauthorized, '
+        'tls: $tls, '
+        'username: $username}';
   }
 
   factory DefaultsLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
@@ -321,29 +384,32 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
   final String version;
 
   ConfigurationLoungeResponseBody(
-      this.defaultTheme,
-      this.defaults,
-      this.displayNetwork,
-      this.fileUpload,
-      this.ldapEnabled,
-      this.lockNetwork,
-      this.prefetch,
-      this.public,
-      this.useHexIp,
-      this.themes,
-      this.fileUploadMaxFileSize,
-      this.gitCommit,
-      this.version);
+    this.defaultTheme,
+    this.defaults,
+    this.displayNetwork,
+    this.fileUpload,
+    this.ldapEnabled,
+    this.lockNetwork,
+    this.prefetch,
+    this.public,
+    this.useHexIp,
+    this.themes,
+    this.fileUploadMaxFileSize,
+    this.gitCommit,
+    this.version,
+  );
 
   @override
   String toString() {
-    return 'ConfigurationLoungeResponseBody{defaultTheme: $defaultTheme,'
-        ' defaults: $defaults, displayNetwork: $displayNetwork,'
-        ' fileUpload: $fileUpload, ldapEnabled: $ldapEnabled,'
-        ' lockNetwork: $lockNetwork, prefetch: $prefetch,'
-        ' public: $public, useHexIp: $useHexIp, themes: $themes,'
-        ' fileUploadMaxFileSize: $fileUploadMaxFileSize, '
-        'gitCommit: $gitCommit, version: $version}';
+    return 'ConfigurationLoungeResponseBody{'
+        'defaultTheme: $defaultTheme, '
+        'defaults: $defaults, displayNetwork: $displayNetwork, '
+        'fileUpload: $fileUpload, ldapEnabled: $ldapEnabled, '
+        'lockNetwork: $lockNetwork, prefetch: $prefetch, '
+        'public: $public, useHexIp: $useHexIp, themes: $themes, '
+        'fileUploadMaxFileSize: $fileUploadMaxFileSize, '
+        'gitCommit: $gitCommit, version: $version'
+        '}';
   }
 
   factory ConfigurationLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -359,19 +425,25 @@ class AuthLoungeResponseBody extends LoungeResponseBody {
 
   final bool success;
   final int serverHash;
+
   // TODO: remove todo when will be in master branch
   // only available in custom the lounge version
   // https://github.com/xal/thelounge/tree/xal/sign_up
   final bool signUp;
 
-
-  AuthLoungeResponseBody(this.success, this.serverHash, this.signUp);
-
+  AuthLoungeResponseBody(
+    this.success,
+    this.serverHash,
+    this.signUp,
+  );
 
   @override
   String toString() {
-    return 'AuthLoungeResponseBody{success: $success, '
-        'serverHash: $serverHash, signUp: $signUp}';
+    return 'AuthLoungeResponseBody{'
+        'success: $success, '
+        'serverHash: $serverHash, '
+        'signUp: $signUp'
+        '}';
   }
 
   factory AuthLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -380,25 +452,24 @@ class AuthLoungeResponseBody extends LoungeResponseBody {
   Map<String, dynamic> toJson() => _$AuthLoungeResponseBodyToJson(this);
 }
 
-
 @JsonSerializable()
 class RegistrationResponseBody extends LoungeResponseBody {
-
   static const errorTypeInvalid = "invalid";
-  static const errorTypeAlreadyExist= "already_exist";
+  static const errorTypeAlreadyExist = "already_exist";
 
   static String get eventName => LoungeResponseEventNames.signedUp;
 
   final bool success;
   final String errorType;
 
-
   RegistrationResponseBody(this.success, this.errorType);
-
 
   @override
   String toString() {
-    return 'RegistrationResponseBody{success: $success, errorType: $errorType}';
+    return 'RegistrationResponseBody{'
+        'success: $success, '
+        'errorType: $errorType'
+        '}';
   }
 
   factory RegistrationResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -406,7 +477,6 @@ class RegistrationResponseBody extends LoungeResponseBody {
 
   Map<String, dynamic> toJson() => _$RegistrationResponseBodyToJson(this);
 }
-
 
 @JsonSerializable()
 class JoinLoungeResponseBody extends LoungeResponseBody {
@@ -416,11 +486,19 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
   final int index;
   final String network;
 
-  JoinLoungeResponseBody(this.chan, this.index, this.network);
+  JoinLoungeResponseBody(
+    this.chan,
+    this.index,
+    this.network,
+  );
 
   @override
   String toString() {
-    return 'JoinLoungeResponseBody{chan: $chan, index: $index, network: $network}';
+    return 'JoinLoungeResponseBody{'
+        'chan: $chan, '
+        'index: $index, '
+        'network: $network'
+        '}';
   }
 
   factory JoinLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -470,12 +548,19 @@ class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
   final String network;
   final bool secure;
 
-  NetworkStatusLoungeResponseBody(this.connected, this.network, this.secure);
+  NetworkStatusLoungeResponseBody(
+    this.connected,
+    this.network,
+    this.secure,
+  );
 
   @override
   String toString() {
-    return 'NetworkStatusLoungeResponseBody{connected: $connected,'
-        ' network: $network, secure: $secure}';
+    return 'NetworkStatusLoungeResponseBody{'
+        'connected: $connected, '
+        'network: $network, '
+        'secure: $secure'
+        '}';
   }
 
   factory NetworkStatusLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -492,12 +577,17 @@ class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
   final String network;
   final ServerOptionsLoungeResponseBodyPart serverOptions;
 
-  NetworkOptionsLoungeResponseBody(this.network, this.serverOptions);
+  NetworkOptionsLoungeResponseBody(
+    this.network,
+    this.serverOptions,
+  );
 
   @override
   String toString() {
-    return 'NetworkOptionsLoungeResponseBody{network: $network,'
-        ' serverOptions: $serverOptions}';
+    return 'NetworkOptionsLoungeResponseBody{'
+        'network: $network, '
+        'serverOptions: $serverOptions'
+        '}';
   }
 
   factory NetworkOptionsLoungeResponseBody.fromJson(
@@ -521,8 +611,11 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   @override
   String toString() {
-    return 'ServerOptionsLoungeResponseBodyPart{CHANTYPES: $CHANTYPES,'
-        ' NETWORK: $NETWORK, PREFIX: $PREFIX}';
+    return 'ServerOptionsLoungeResponseBodyPart{'
+        'CHANTYPES: $CHANTYPES, '
+        'NETWORK: $NETWORK, '
+        'PREFIX: $PREFIX'
+        '}';
   }
 
   ServerOptionsLoungeResponseBodyPart(
@@ -542,11 +635,17 @@ class ChannelStateLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final int state;
 
-  ChannelStateLoungeResponseBody(this.chan, this.state);
+  ChannelStateLoungeResponseBody(
+    this.chan,
+    this.state,
+  );
 
   @override
   String toString() {
-    return 'ChannelStateLoungeResponseBody{chan: $chan, state: $state}';
+    return 'ChannelStateLoungeResponseBody{'
+        'chan: $chan, '
+        'state: $state'
+        '}';
   }
 
   factory ChannelStateLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
@@ -563,7 +662,12 @@ class UsersLoungeResponseBody extends LoungeResponseBody {
   final int highlight;
   final dynamic msg;
 
-  UsersLoungeResponseBody(this.chan, this.unread, this.msg, this.highlight);
+  UsersLoungeResponseBody(
+    this.chan,
+    this.unread,
+    this.msg,
+    this.highlight,
+  );
 
   factory UsersLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$UsersLoungeResponseBodyFromJson(json);
@@ -572,8 +676,12 @@ class UsersLoungeResponseBody extends LoungeResponseBody {
 
   @override
   String toString() {
-    return 'UsersLoungeResponseBody{chan: $chan, unread: $unread,'
-        ' highlight: $highlight, msg: $msg}';
+    return 'UsersLoungeResponseBody{'
+        'chan: $chan, '
+        'unread: $unread, '
+        'highlight: $highlight, '
+        'msg: $msg'
+        '}';
   }
 }
 
@@ -584,7 +692,10 @@ class NickLoungeResponseBody extends LoungeResponseBody {
   final String network;
   final String nick;
 
-  NickLoungeResponseBody(this.network, this.nick);
+  NickLoungeResponseBody(
+    this.network,
+    this.nick,
+  );
 
   factory NickLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NickLoungeResponseBodyFromJson(json);
@@ -593,7 +704,10 @@ class NickLoungeResponseBody extends LoungeResponseBody {
 
   @override
   String toString() {
-    return 'NickLoungeResponseBody{network: $network, nick: $nick}';
+    return 'NickLoungeResponseBody{'
+        'network: $network, '
+        'nick: $nick'
+        '}';
   }
 }
 
@@ -607,8 +721,10 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   // ignore: non_constant_identifier_names
   final String new_nick;
+
   // ignore: non_constant_identifier_names
   final String new_host;
+
   // ignore: non_constant_identifier_names
   final String new_ident;
   final String text;
@@ -623,22 +739,50 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final int id;
   final WhoIsLoungeResponseBodyPart whois;
 
-
-  MsgLoungeResponseBodyPart(this.from, this.target, this.command, this.type,
-      this.time, this.new_nick, this.new_host, this.new_ident, this.text,
-      this.ctcpMessage, this.hostmask, this.self, this.highlight,
-      this.showInActive, this.users, this.previews, this.params, this.id,
+  MsgLoungeResponseBodyPart(
+      this.from,
+      this.target,
+      this.command,
+      this.type,
+      this.time,
+      this.new_nick,
+      this.new_host,
+      this.new_ident,
+      this.text,
+      this.ctcpMessage,
+      this.hostmask,
+      this.self,
+      this.highlight,
+      this.showInActive,
+      this.users,
+      this.previews,
+      this.params,
+      this.id,
       this.whois);
 
   @override
   String toString() {
-    return 'MsgLoungeResponseBodyPart{from: $from, target: $target, command: '
-        '$command, type: '
-        '$type, time: $time, new_nick: $new_nick, new_host: $new_host,'
-        ' new_ident: $new_ident, text: $text, ctcpMessage: $ctcpMessage,'
-        ' hostmask: $hostmask, self: $self, highlight: $highlight,'
-        ' showInActive: $showInActive, users: $users, previews: $previews,'
-        ' params: $params, id: $id, whois: $whois}';
+    return 'MsgLoungeResponseBodyPart{'
+        'from: $from, '
+        'target: $target, '
+        'command: $command, '
+        'type: $type, '
+        'time: $time, '
+        'new_nick: $new_nick, '
+        'new_host: $new_host, '
+        'new_ident: $new_ident, '
+        'text: $text, '
+        'ctcpMessage: $ctcpMessage,'
+        'hostmask: $hostmask, '
+        'self: $self, '
+        'highlight: $highlight, '
+        'showInActive: $showInActive, '
+        'users: $users, '
+        'previews: $previews, '
+        'params: $params, '
+        'id: $id, '
+        'whois: $whois'
+        '}';
   }
 
   factory MsgLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
@@ -675,13 +819,15 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   @override
   String toString() {
-    return 'WhoIsLoungeResponseBodyPart{account: $account, '
+    return 'WhoIsLoungeResponseBodyPart{'
+        'account: $account, '
         'channels: $channels, hostname: $hostname, '
         'ident: $ident, idle: $idle, idleTime: $idleTime, '
         'logonTime: $logonTime, logon: $logon, nick: $nick, '
         'realName: $real_name, secure: $secure, '
         'actual_ip: $actual_ip, actual_hostname: $actual_hostname, '
-        'server: $server, serverInfo: $server_info}';
+        'server: $server, serverInfo: $server_info'
+        '}';
   }
 
   WhoIsLoungeResponseBodyPart(
@@ -741,14 +887,27 @@ class MsgPreviewLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String mediaType;
   final String type;
 
-  MsgPreviewLoungeResponseBodyPart(this.head, this.body, this.canDisplay,
-      this.shown, this.link, this.thumb, this.media, this.mediaType, this.type);
+  MsgPreviewLoungeResponseBodyPart(
+    this.head,
+    this.body,
+    this.canDisplay,
+    this.shown,
+    this.link,
+    this.thumb,
+    this.media,
+    this.mediaType,
+    this.type,
+  );
 
   @override
   String toString() {
-    return 'MsgPreviewLoungeResponseBodyPart{head: $head, body: $body,'
-        ' canDisplay: $canDisplay, shown: $shown, link: $link,'
-        ' thumb: $thumb, media: $media, mediaType: $mediaType, type: $type}';
+    return 'MsgPreviewLoungeResponseBodyPart{'
+        'head: $head, body: $body, '
+        'canDisplay: $canDisplay, '
+        'shown: $shown, link: $link, '
+        'thumb: $thumb, media: $media, '
+        'mediaType: $mediaType, type: $type'
+        '}';
   }
 
   factory MsgPreviewLoungeResponseBodyPart.fromJson(
@@ -793,8 +952,13 @@ class InitLoungeResponseBody extends LoungeResponseBody {
   final List<NetworkLoungeResponseBodyPart> networks;
   final PushSubscriptionLoungeResponseBodyPart pushSubscription;
 
-  InitLoungeResponseBody(this.active, this.applicationServerKey, this.token,
-      this.networks, this.pushSubscription);
+  InitLoungeResponseBody(
+    this.active,
+    this.applicationServerKey,
+    this.token,
+    this.networks,
+    this.pushSubscription,
+  );
 
   factory InitLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$InitLoungeResponseBodyFromJson(json);
@@ -803,9 +967,12 @@ class InitLoungeResponseBody extends LoungeResponseBody {
 
   @override
   String toString() {
-    return 'InitLoungeResponseBody{active: $active, applicationServerKey: '
-        '$applicationServerKey, token: $token, networks: $networks, '
-        'pushSubscription: $pushSubscription}';
+    return 'InitLoungeResponseBody{'
+        'active: $active, '
+        'applicationServerKey: $applicationServerKey, '
+        'token: $token, networks: $networks, '
+        'pushSubscription: $pushSubscription'
+        '}';
   }
 }
 
@@ -815,12 +982,19 @@ class PushSubscriptionLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String ip;
   final int lastUse;
 
-  PushSubscriptionLoungeResponseBodyPart(this.agent, this.ip, this.lastUse);
+  PushSubscriptionLoungeResponseBodyPart(
+    this.agent,
+    this.ip,
+    this.lastUse,
+  );
 
   @override
   String toString() {
-    return 'PushSubscriptionLoungeResponseBodyPart{agent: $agent,'
-        ' ip: $ip, lastUse: $lastUse}';
+    return 'PushSubscriptionLoungeResponseBodyPart{'
+        'agent: $agent, '
+        'ip: $ip, '
+        'lastUse: $lastUse'
+        '}';
   }
 
   factory PushSubscriptionLoungeResponseBodyPart.fromJson(
@@ -838,7 +1012,10 @@ class NamesLoungeResponseBody extends LoungeResponseBody {
   final int id;
   final List<UserLoungeResponseBodyPart> users;
 
-  NamesLoungeResponseBody(this.id, this.users);
+  NamesLoungeResponseBody(
+    this.id,
+    this.users,
+  );
 
   factory NamesLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NamesLoungeResponseBodyFromJson(json);
@@ -922,7 +1099,11 @@ class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String mode;
   final String nick;
 
-  UserLoungeResponseBodyPart(this.lastMessage, this.mode, this.nick);
+  UserLoungeResponseBodyPart(
+    this.lastMessage,
+    this.mode,
+    this.nick,
+  );
 
   factory UserLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$UserLoungeResponseBodyPartFromJson(json);
@@ -931,8 +1112,10 @@ class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   @override
   String toString() {
-    return 'UserLoungeResponseBodyPart{lastMessage: $lastMessage,'
-        ' mode: $mode, nick: $nick}';
+    return 'UserLoungeResponseBodyPart{'
+        'lastMessage: $lastMessage, '
+        'mode: $mode, nick: $nick'
+        '}';
   }
 }
 
@@ -994,15 +1177,17 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   @override
   String toString() {
-    return 'NetworkLoungeResponseBody{uuid: $uuid, name: $name,'
-        ' host: $host, port: $port, lts: $tls,'
-        ' userDisconnected: $userDisconnected,'
-        ' rejectUnauthorized: $rejectUnauthorized,'
-        ' isCollapsed: $isCollapsed, '
-        'isJoinChannelShown: $isJoinChannelShown,'
-        ' nick: $nick, username: $username, realname: $realname, '
+    return 'NetworkLoungeResponseBody{'
+        'uuid: $uuid, name: $name,'
+        'host: $host, port: $port, lts: $tls, '
+        'userDisconnected: $userDisconnected, '
+        'rejectUnauthorized: $rejectUnauthorized, '
+        'isCollapsed: $isCollapsed, '
+        'isJoinChannelShown: $isJoinChannelShown, '
+        'nick: $nick, username: $username, realname: $realname, '
         'commands: $commands, channels: $channels,'
-        ' serverOptions: $serverOptions, status: $status}';
+        'serverOptions: $serverOptions, status: $status'
+        '}';
   }
 
   factory NetworkLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
@@ -1035,38 +1220,41 @@ class ChannelLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   @override
   String toString() {
-    return 'ChannelLoungeResponseBody{name: $name, type: $type, key: $key,'
-        ' pendingMessage: $pendingMessage, messages: $messages, '
-        'inputHistory: $inputHistory,'
-        ' inputHistoryPosition: $inputHistoryPosition, '
+    return 'ChannelLoungeResponseBody{'
+        'name: $name, type: $type, key: $key, '
+        'pendingMessage: $pendingMessage, messages: $messages, '
+        'inputHistory: $inputHistory, '
+        'inputHistoryPosition: $inputHistoryPosition, '
         'id: $id, moreHistoryAvailable: $moreHistoryAvailable, '
         'historyLoading: $historyLoading, editTopic: $editTopic, '
         'scrolledToBottom: $scrolledToBottom, topic: $topic, '
         'state: $state, firstUnread: $firstUnread, '
         'totalMessages: $totalMessages, '
-        'unread: $unread, highlight: $highlight, users: $users}';
+        'unread: $unread, highlight: $highlight, users: $users'
+        '}';
   }
 
   ChannelLoungeResponseBodyPart(
-      this.name,
-      this.type,
-      this.key,
-      this.pendingMessage,
-      this.messages,
-      this.inputHistory,
-      this.inputHistoryPosition,
-      this.id,
-      this.moreHistoryAvailable,
-      this.historyLoading,
-      this.editTopic,
-      this.scrolledToBottom,
-      this.topic,
-      this.state,
-      this.firstUnread,
-      this.unread,
-      this.highlight,
-      this.users,
-      this.totalMessages);
+    this.name,
+    this.type,
+    this.key,
+    this.pendingMessage,
+    this.messages,
+    this.inputHistory,
+    this.inputHistoryPosition,
+    this.id,
+    this.moreHistoryAvailable,
+    this.historyLoading,
+    this.editTopic,
+    this.scrolledToBottom,
+    this.topic,
+    this.state,
+    this.firstUnread,
+    this.unread,
+    this.highlight,
+    this.users,
+    this.totalMessages,
+  );
 
   factory ChannelLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$ChannelLoungeResponseBodyPartFromJson(json);

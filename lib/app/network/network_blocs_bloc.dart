@@ -12,7 +12,10 @@ import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:provider/provider.dart';
 
 class NetworkBlocsBloc extends NetworkListListenerBloc {
-  static NetworkBlocsBloc of(BuildContext context, {bool listen = true}) =>
+  static NetworkBlocsBloc of(
+    BuildContext context, {
+    bool listen = true,
+  }) =>
       Provider.of<NetworkBlocsBloc>(
         context,
         listen: listen,
@@ -25,16 +28,20 @@ class NetworkBlocsBloc extends NetworkListListenerBloc {
   final ChatActiveChannelBloc _activeChannelBloc;
 
   NetworkBlocsBloc(
-      this._backendService,
-      NetworkListBloc networksListBloc,
-      this._networkStatesBloc,
-      this._channelsStatesBloc,
-      this._activeChannelBloc)
-      : super(networksListBloc) {
-    addDisposable(disposable: CustomDisposable(() {
-      _blocs.values.forEach((bloc) => bloc.dispose());
-      _blocs.clear();
-    }));
+    this._backendService,
+    NetworkListBloc networksListBloc,
+    this._networkStatesBloc,
+    this._channelsStatesBloc,
+    this._activeChannelBloc,
+  ) : super(networksListBloc) {
+    addDisposable(
+      disposable: CustomDisposable(
+        () {
+          _blocs.values.forEach((bloc) => bloc.dispose());
+          _blocs.clear();
+        },
+      ),
+    );
   }
 
   NetworkBloc getNetworkBloc(Network network) => _blocs[network];
@@ -42,8 +49,13 @@ class NetworkBlocsBloc extends NetworkListListenerBloc {
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {
     var network = networkWithState.network;
-    _blocs[network] = NetworkBloc(_backendService, network, _networkStatesBloc,
-        _channelsStatesBloc, _activeChannelBloc);
+    _blocs[network] = NetworkBloc(
+      _backendService,
+      network,
+      _networkStatesBloc,
+      _channelsStatesBloc,
+      _activeChannelBloc,
+    );
   }
 
   @override

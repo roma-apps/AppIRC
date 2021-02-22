@@ -71,14 +71,15 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
                   return DateTime(date.year, date.month, date.day);
                 },
                 groupSeparatorBuilder: _buildGroupSeparator,
-                itemBuilder: (context, message) {
-                  return buildMessageWidget(
-                      message: message,
-                      enableMessageActions: true,
-                      messageWidgetType: MessageWidgetType.formatted,
-                      messageInListState: MessageInListState.name(
-                          inSearchResult: true, searchTerm: result.searchTerm));
-                },
+                itemBuilder: (context, message) => buildMessageWidget(
+                    message: message,
+                    enableMessageActions: true,
+                    messageWidgetType: MessageWidgetType.formatted,
+                    messageInListState: MessageInListState.name(
+                      inSearchResult: true,
+                      searchTerm: result.searchTerm,
+                    ),
+                  ),
               );
             } else {
               return Text(

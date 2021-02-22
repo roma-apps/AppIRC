@@ -2,7 +2,6 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -26,17 +25,21 @@ class ChannelMessageListBloc extends DisposableOwner {
   ChannelMessageListBloc(this.chatPushesService, this.channel) {
     addDisposable(subject: _visibleMessagesBoundsSubject);
 
-    addDisposable(streamSubscription:
-        chatPushesService.chatPushMessageStream.listen((newChatPushMessage) {
-      var data = newChatPushMessage.data;
+    addDisposable(
+      streamSubscription: chatPushesService.chatPushMessageStream.listen(
+        (newChatPushMessage) {
+          var data = newChatPushMessage.data;
 
-      if (data.chanId == channel.remoteId) {
-        if (data.messageId != null) {
-          _visibleMessagesBoundsSubject.add(MessageListVisibleBounds.fromPush(
-              messageRemoteId: data.messageId));
-        }
-      }
-    }));
+          if (data.chanId == channel.remoteId) {
+            if (data.messageId != null) {
+              _visibleMessagesBoundsSubject.add(
+                  MessageListVisibleBounds.fromPush(
+                      messageRemoteId: data.messageId));
+            }
+          }
+        },
+      ),
+    );
   }
 
   void onVisibleMessagesBounds(MessageListVisibleBounds visibleMessagesBounds) {

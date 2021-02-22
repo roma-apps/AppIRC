@@ -7,7 +7,6 @@ import 'package:flutter_appirc/app/network/network_blocs_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:logging/logging.dart';
@@ -18,7 +17,9 @@ var _logger = Logger("network_join_channel_page.dart");
 class NetworkJoinChannelPage extends StatefulWidget {
   final Network network;
 
-  NetworkJoinChannelPage(this.network);
+  NetworkJoinChannelPage(
+    this.network,
+  );
 
   @override
   State<StatefulWidget> createState() => NetworkJoinChannelPageState(network);
@@ -81,17 +82,19 @@ class NetworkJoinChannelPageState extends State<NetworkJoinChannelPage> {
       NetworkJoinChannelFormBloc channelJoinFormBloc,
       NetworkBloc networkBloc) async {
     var dialogResult = await doAsyncOperationWithDialog(
-        context: context,
-        asyncCode: () async {
-          var chatChannelPreferences = ChannelPreferences.name(
-              name: channelJoinFormBloc.extractChannel(),
-              password: channelJoinFormBloc.extractPassword());
-          _logger.fine(() => "startJoinChannel $chatChannelPreferences");
-          var joinResult = await networkBloc.joinChannel(chatChannelPreferences,
-              waitForResult: true);
-          _logger.fine(() => "startJoinChannel result $joinResult");
-        },
-        cancelable: true);
+      context: context,
+      asyncCode: () async {
+        var chatChannelPreferences = ChannelPreferences(
+          name: channelJoinFormBloc.extractChannel(),
+          password: channelJoinFormBloc.extractPassword(),
+        );
+        _logger.fine(() => "startJoinChannel $chatChannelPreferences");
+        var joinResult = await networkBloc.joinChannel(chatChannelPreferences,
+            waitForResult: true);
+        _logger.fine(() => "startJoinChannel result $joinResult");
+      },
+      cancelable: true,
+    );
 
     if (dialogResult.success) {
       _dismissDialog(context);

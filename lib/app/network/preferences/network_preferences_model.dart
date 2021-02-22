@@ -1,4 +1,3 @@
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
@@ -11,6 +10,7 @@ part 'network_preferences_model.g.dart';
 @JsonSerializable()
 class NetworkPreferences extends IJsonObject {
   static const String channelsSeparator = " ";
+
   int get localId => networkConnectionPreferences?.localId;
 
   int get localIdOrUndefined => localId ?? -1;
@@ -19,13 +19,17 @@ class NetworkPreferences extends IJsonObject {
 
   final List<ChannelPreferences> channels;
 
-  NetworkPreferences(this.networkConnectionPreferences, this.channels);
+  NetworkPreferences(
+    this.networkConnectionPreferences,
+    this.channels,
+  );
 
   @override
   String toString() {
     return 'ChatNetworkPreferences{'
         'networkConnectionPreferences: $networkConnectionPreferences, '
-        'channels: $channels}';
+        'channels: $channels'
+        '}';
   }
 
   @JsonKey(ignore: true)
@@ -37,7 +41,7 @@ class NetworkPreferences extends IJsonObject {
   @JsonKey(ignore: true)
   List<ChannelPreferences> get channelsWithPassword => channels
       .where((channel) =>
-  (channel.password != null && channel.password.isNotEmpty))
+          (channel.password != null && channel.password.isNotEmpty))
       .toList();
 
   factory NetworkPreferences.fromJson(Map<String, dynamic> json) =>
@@ -54,25 +58,26 @@ class NetworkConnectionPreferences extends IJsonObject {
   final NetworkServerPreferences serverPreferences;
   final NetworkUserPreferences userPreferences;
 
-  NetworkConnectionPreferences(
-      {@required this.serverPreferences,
-        @required this.userPreferences,
-        this.localId});
+  NetworkConnectionPreferences({
+    @required this.serverPreferences,
+    @required this.userPreferences,
+    this.localId,
+  });
 
   String get name => serverPreferences.name;
 
   @override
   String toString() {
-    return 'NetworkConnectionPreferences{localId: $localId,'
-        ' serverPreferences: $serverPreferences,'
-        ' userPreferences: $userPreferences}';
+    return 'NetworkConnectionPreferences{'
+        'localId: $localId, '
+        'serverPreferences: $serverPreferences, '
+        'userPreferences: $userPreferences'
+        '}';
   }
 
-  factory NetworkConnectionPreferences.fromJson(
-      Map<String, dynamic> json) =>
+  factory NetworkConnectionPreferences.fromJson(Map<String, dynamic> json) =>
       _$NetworkConnectionPreferencesFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() =>
-      _$NetworkConnectionPreferencesToJson(this);
+  Map<String, dynamic> toJson() => _$NetworkConnectionPreferencesToJson(this);
 }

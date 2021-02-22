@@ -48,33 +48,42 @@ class NetworkListBloc extends DisposableOwner {
       channel.localId ??= await _nextChannelLocalId;
     }
 
-    _networksChannelListBlocs[network] = ChannelListBloc(backendService,
-        network, networkWithState.channelsWithState, nextChannelIdGenerator);
+    _networksChannelListBlocs[network] = ChannelListBloc(
+      backendService,
+      network,
+      networkWithState.channelsWithState,
+      nextChannelIdGenerator,
+    );
 
     IDisposable listenForNetworkExit;
-    listenForNetworkExit = backendService.listenForNetworkLeave(network, () {
-      _networksChannelListBlocs.remove(network).dispose();
+    listenForNetworkExit = backendService.listenForNetworkLeave(
+      network,
+      () {
+        _networksChannelListBlocs.remove(network).dispose();
 
-      _networks.remove(network);
+        _networks.remove(network);
 
-      // additional list required
-      // because we want modify original list during iteration
-      var tempListeners = <VoidCallback>[];
-      var originalListeners = _leaveListeners[network];
-      tempListeners.addAll(originalListeners);
-      tempListeners.forEach((listener) => listener());
+        // additional list required
+        // because we want modify original list during iteration
+        var tempListeners = <VoidCallback>[];
+        var originalListeners = _leaveListeners[network];
+        tempListeners.addAll(originalListeners);
+        tempListeners.forEach((listener) => listener());
 
-      // all listeners should dispose itself on leave
-      assert(originalListeners.isEmpty);
+        // all listeners should dispose itself on leave
+        assert(originalListeners.isEmpty);
 
-      _onNetworksChanged(_networks);
-      listenForNetworkExit.dispose();
-    });
+        _onNetworksChanged(_networks);
+        listenForNetworkExit.dispose();
+      },
+    );
     addDisposable(disposable: listenForNetworkExit);
 
     _networks.add(network);
 
-    _joinListeners.forEach((listener) => listener(networkWithState));
+    _joinListeners.forEach(
+      (listener) => listener(networkWithState),
+    );
 
     _onNetworksChanged(_networks);
   }
@@ -84,8 +93,10 @@ class NetworkListBloc extends DisposableOwner {
   }
 
   Future<bool> isNetworkWithNameExist(String name) async {
-    var found = networks.firstWhere((network) => network.name == name,
-        orElse: () => null);
+    var found = networks.firstWhere(
+      (network) => network.name == name,
+      orElse: () => null,
+    );
 
     return found != null;
   }
@@ -116,55 +127,76 @@ class NetworkListBloc extends DisposableOwner {
       _leaveListeners[network] = [];
     }
     _leaveListeners[network].add(listener);
-    return CustomDisposable(() {
-      _leaveListeners[network].remove(listener);
-    });
+    return CustomDisposable(
+      () {
+        _leaveListeners[network].remove(listener);
+      },
+    );
   }
 
   Stream<UnmodifiableListView<Network>> get networksStream =>
-      _networksSubject.stream.map((networks) => UnmodifiableListView(networks));
+      _networksSubject.stream.map(
+        (networks) => UnmodifiableListView(networks),
+      );
 
   UnmodifiableListView<Network> get networks => UnmodifiableListView(_networks);
 
   List<Network> get _networks => _networksSubject.value;
 
-  Stream<int> get networksCountStream => networksStream.map((networks) {
-        if (networks != null) {
-          return 0;
-        } else {
-          return networks?.length;
-        }
-      });
+  Stream<int> get networksCountStream => networksStream.map(
+        (networks) {
+          if (networks != null) {
+            return 0;
+          } else {
+            return networks?.length;
+          }
+        },
+      );
 
   bool get isNetworksEmpty => _networks.isEmpty;
 
-  Stream<bool> get isNetworksEmptyStream => networksStream.map((networks) {
-        if (networks != null) {
-          return true;
-        } else {
-          return networks.isEmpty;
-        }
-      });
+  Stream<bool> get isNetworksEmptyStream => networksStream.map(
+        (networks) {
+          if (networks != null) {
+            return true;
+          } else {
+            return networks.isEmpty;
+          }
+        },
+      );
 
   Future<List<Channel>> get allNetworksChannels async {
     var allChannels = <Channel>[];
-    networks.forEach((network) {
-      allChannels.addAll(network.channels);
-    });
+    networks.forEach(
+      (network) {
+        allChannels.addAll(network.channels);
+      },
+    );
 
     return allChannels;
   }
 
   Future<RequestResult<NetworkWithState>> joinNetwork(
-          NetworkPreferences preferences,
-          {bool waitForResult = false}) async =>
-      await backendService.joinNetwork(preferences,
-          waitForResult: waitForResult);
+    NetworkPreferences preferences, {
+    bool waitForResult = false,
+  }) async =>
+      await backendService.joinNetwork(
+        preferences,
+        waitForResult: waitForResult,
+      );
 
-  Future<RequestResult<bool>> leaveNetwork(Network network,
-          {bool waitForResult = false}) async =>
-      await backendService.leaveNetwork(network, waitForResult: waitForResult);
+  Future<RequestResult<bool>> leaveNetwork(
+    Network network, {
+    bool waitForResult = false,
+  }) async =>
+      await backendService.leaveNetwork(
+        network,
+        waitForResult: waitForResult,
+      );
 
-  Network findNetworkWithChannel(Channel channel) =>
-      networks.firstWhere((network) => network.channels.contains(channel));
+  Network findNetworkWithChannel(Channel channel) => networks.firstWhere(
+        (network) => network.channels.contains(
+          channel,
+        ),
+      );
 }

@@ -4,7 +4,6 @@ import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more_model.dart';
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -21,21 +20,31 @@ class MessageListLoadMoreBloc extends DisposableOwner {
   final ChannelBloc channelBloc;
   MessageListBloc messageListBloc;
 
-  MessageListLoadMoreBloc(this.channelBloc, this.messageListBloc) {
+  MessageListLoadMoreBloc(
+    this.channelBloc,
+    this.messageListBloc,
+  ) {
     addDisposable(subject: _stateSubject);
 
+    var moreHistoryAvaialble = (channelBloc?.channelState?.moreHistoryAvailable ?? false);
     _stateSubject = BehaviorSubject.seeded(
-      (channelBloc?.channelState?.moreHistoryAvailable ?? false)
+      moreHistoryAvaialble
           ? LoadMoreState.available
           : LoadMoreState.notAvailable,
     );
 
-    addDisposable(streamSubscription:
-        channelBloc.moreHistoryAvailableStream.listen((moreHistoryAvailable) {
-      Future.delayed(Duration(seconds: 1), () {
-        _updateLoadMoreState(moreHistoryAvailable);
-      });
-    }));
+    addDisposable(
+      streamSubscription: channelBloc.moreHistoryAvailableStream.listen(
+        (moreHistoryAvailable) {
+          Future.delayed(
+            Duration(seconds: 1),
+            () {
+              _updateLoadMoreState(moreHistoryAvailable);
+            },
+          );
+        },
+      ),
+    );
   }
 
   Future loadMore() async {

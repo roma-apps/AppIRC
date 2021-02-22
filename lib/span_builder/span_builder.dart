@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
-
 import 'package:flutter_appirc/span_builder/span_builder_model.dart';
 import 'package:logging/logging.dart';
 
@@ -16,10 +15,11 @@ class SpanBuilder {
 
   RegExp regExp;
 
-  SpanBuilder.name(
-      {@required this.highlightString,
-      @required this.highlightTextStyle,
-      @required this.tapCallback}) {
+  SpanBuilder.name({
+    @required this.highlightString,
+    @required this.highlightTextStyle,
+    @required this.tapCallback,
+  }) {
     regExp = RegExp("$highlightString", caseSensitive: false);
   }
 
@@ -42,28 +42,33 @@ class SpanBuilder {
   }
 }
 
-List<TextSpan> createSpans(
-    {@required BuildContext context,
-    @required String text,
-    @required TextStyle defaultTextStyle,
-    @required List<SpanBuilder> spanBuilders}) {
+List<TextSpan> createSpans({
+  @required BuildContext context,
+  @required String text,
+  @required TextStyle defaultTextStyle,
+  @required List<SpanBuilder> spanBuilders,
+}) {
   var builderToRegExpMatches = <SpanBuilder, Iterable<RegExpMatch>>{};
 
   Map<int, List<SpanMatch>> spanHighlightsStartToList = {};
 
-  spanBuilders.forEach((spanBuilder) {
-    Iterable<RegExpMatch> allMatches = spanBuilder.findAllMatches(text);
-    builderToRegExpMatches[spanBuilder] = allMatches;
-    allMatches.forEach((match) {
-      var start = match.start;
-      if (!spanHighlightsStartToList.containsKey(start)) {
-        spanHighlightsStartToList[start] = <SpanMatch>[];
-      }
+  spanBuilders.forEach(
+    (spanBuilder) {
+      Iterable<RegExpMatch> allMatches = spanBuilder.findAllMatches(text);
+      builderToRegExpMatches[spanBuilder] = allMatches;
+      allMatches.forEach(
+        (match) {
+          var start = match.start;
+          if (!spanHighlightsStartToList.containsKey(start)) {
+            spanHighlightsStartToList[start] = <SpanMatch>[];
+          }
 
-      spanHighlightsStartToList[start]
-          .add(SpanMatch(match.start, match.end, spanBuilder));
-    });
-  });
+          spanHighlightsStartToList[start]
+              .add(SpanMatch(match.start, match.end, spanBuilder));
+        },
+      );
+    },
+  );
 
   if (spanHighlightsStartToList.isNotEmpty) {
     var spans = <TextSpan>[];
@@ -107,13 +112,21 @@ List<TextSpan> createSpans(
 
     // add last non-highlighted text part
     if (lastSpanIndex < text.length) {
-      spans.add(TextSpan(
+      spans.add(
+        TextSpan(
           text: text.substring(lastSpanIndex, text.length),
-          style: defaultTextStyle));
+          style: defaultTextStyle,
+        ),
+      );
     }
     return spans;
   } else {
-    return [TextSpan(text: text, style: defaultTextStyle)];
+    return [
+      TextSpan(
+        text: text,
+        style: defaultTextStyle,
+      ),
+    ];
   }
 }
 
@@ -122,7 +135,11 @@ abstract class WordSpanBuilder {
   final TextStyle highlightTextStyle;
   final SpanTapCallback tapCallback;
 
-  WordSpanBuilder(this.findRegExp, this.highlightTextStyle, {this.tapCallback});
+  WordSpanBuilder(
+    this.findRegExp,
+    this.highlightTextStyle, {
+    this.tapCallback,
+  });
 
   TextSpan createTextSpan(String word) {
     TapGestureRecognizer gestureRecognizer;
@@ -133,7 +150,10 @@ abstract class WordSpanBuilder {
         };
     }
     var textSpan = TextSpan(
-        text: word, style: highlightTextStyle, recognizer: gestureRecognizer);
+      text: word,
+      style: highlightTextStyle,
+      recognizer: gestureRecognizer,
+    );
 
     return textSpan;
   }

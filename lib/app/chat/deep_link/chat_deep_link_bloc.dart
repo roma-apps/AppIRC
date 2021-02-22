@@ -10,7 +10,6 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:logging/logging.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -24,11 +23,12 @@ class ChatDeepLinkBloc extends DisposableOwner {
   final ChatInitBloc _chatInitBloc;
 
   ChatDeepLinkBloc(
-      this._backendService,
-      this._chatInitBloc,
-      this._networksListBloc,
-      this._networksBlocsBloc,
-      this._activeChannelBloc) {
+    this._backendService,
+    this._chatInitBloc,
+    this._networksListBloc,
+    this._networksBlocsBloc,
+    this._activeChannelBloc,
+  ) {
     _chatInitBloc.stateStream.listen((newState) {
       if (newState == ChatInitState.finished) {
         _initUniLinks();
@@ -88,15 +88,24 @@ class ChatDeepLinkBloc extends DisposableOwner {
         networkForDeepLink = networks.first;
       }
 
-      _logger.fine(() => "onNewDeepLink networkForDeepLink $networkForDeepLink");
+      _logger
+          .fine(() => "onNewDeepLink networkForDeepLink $networkForDeepLink");
 
-      var channelPreferences =
-          ChannelPreferences.name(name: chatDeepLink.channel, password: null);
+      var channelPreferences = ChannelPreferences(
+        name: chatDeepLink.channel,
+        password: null,
+      );
       if (networkForDeepLink != null) {
         _joinChannelFromDeepLink(
-            networkForDeepLink, chatDeepLink, channelPreferences);
+          networkForDeepLink,
+          chatDeepLink,
+          channelPreferences,
+        );
       } else {
-        _joinNetworkWithChannelFromDeepLink(chatDeepLink, channelPreferences);
+        _joinNetworkWithChannelFromDeepLink(
+          chatDeepLink,
+          channelPreferences,
+        );
       }
     }
   }
@@ -105,26 +114,35 @@ class ChatDeepLinkBloc extends DisposableOwner {
       ChatDeepLink chatDeepLink, ChannelPreferences channelPreferences) {
     var defaultNetwork = _backendService.chatConfig.defaultNetwork;
     var serverPreferences = NetworkPreferences(
-        NetworkConnectionPreferences(
-            userPreferences: defaultNetwork.userPreferences,
-            serverPreferences: NetworkServerPreferences(
-                name: chatDeepLink.host,
-                serverHost: chatDeepLink.host,
-                serverPort: chatDeepLink.port?.toString(),
-                useTls: defaultNetwork.serverPreferences.useTls,
-                useOnlyTrustedCertificates: defaultNetwork
-                    .serverPreferences.useOnlyTrustedCertificates)),
-        [channelPreferences]);
+      NetworkConnectionPreferences(
+        userPreferences: defaultNetwork.userPreferences,
+        serverPreferences: NetworkServerPreferences(
+          name: chatDeepLink.host,
+          serverHost: chatDeepLink.host,
+          serverPort: chatDeepLink.port?.toString(),
+          useTls: defaultNetwork.serverPreferences.useTls,
+          useOnlyTrustedCertificates:
+              defaultNetwork.serverPreferences.useOnlyTrustedCertificates,
+        ),
+      ),
+      [
+        channelPreferences,
+      ],
+    );
 
     _networksListBloc.joinNetwork(serverPreferences);
   }
 
-  void _joinChannelFromDeepLink(Network networkForDeepLink,
-      ChatDeepLink chatDeepLink, ChannelPreferences channelPreferences) {
+  void _joinChannelFromDeepLink(
+    Network networkForDeepLink,
+    ChatDeepLink chatDeepLink,
+    ChannelPreferences channelPreferences,
+  ) {
     var channelsBloc = _networksListBloc.getChannelListBloc(networkForDeepLink);
-    var channelForDeepLink = channelsBloc.channels.firstWhere((channel) {
-      return channel.name == chatDeepLink.channel;
-    }, orElse: () => null);
+    var channelForDeepLink = channelsBloc.channels.firstWhere(
+      (channel) => channel.name == chatDeepLink.channel,
+      orElse: () => null,
+    );
 
     if (channelForDeepLink != null) {
       _activeChannelBloc.changeActiveChanel(channelForDeepLink);

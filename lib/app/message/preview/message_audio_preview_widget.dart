@@ -3,8 +3,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';
 import 'package:video_player/video_player.dart';
 
-Widget buildMessageAudioPreview(
-        {@required BuildContext context, @required  MessagePreview preview}) =>
+Widget buildMessageAudioPreview({
+  @required BuildContext context,
+  @required MessagePreview preview,
+}) =>
     MessageAudioPreviewWidget(preview.media);
 
 class MessageAudioPreviewWidget extends StatefulWidget {

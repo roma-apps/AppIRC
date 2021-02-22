@@ -13,8 +13,9 @@ class NetworkUserPreferencesFormWidget extends StatefulWidget {
   NetworkUserPreferencesFormWidget(this.startValues);
 
   @override
-  State<StatefulWidget> createState() =>
-      NetworkUserPreferencesFormState(startValues);
+  State<StatefulWidget> createState() => NetworkUserPreferencesFormState(
+        startValues,
+      );
 }
 
 class NetworkUserPreferencesFormState

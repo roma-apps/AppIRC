@@ -11,12 +11,12 @@ import 'package:flutter_appirc/app/message/special/body/whois/message_special_wh
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 
 class SpecialMessageWidget extends MessageWidget<SpecialMessage> {
-  SpecialMessageWidget(
-      {@required SpecialMessage message,
-      @required MessageInListState messageInListState,
-      @required bool enableMessageActions,
-      @required MessageWidgetType messageWidgetType})
-      : super(
+  SpecialMessageWidget({
+    @required SpecialMessage message,
+    @required MessageInListState messageInListState,
+    @required bool enableMessageActions,
+    @required MessageWidgetType messageWidgetType,
+  }) : super(
             message: message,
             messageInListState: messageInListState,
             enableMessageActions: enableMessageActions,
@@ -33,7 +33,7 @@ class SpecialMessageWidget extends MessageWidget<SpecialMessage> {
         break;
 
       default:
-        throw "Invalud message widget type $messageWidgetType";
+        throw "Invalid message widget type $messageWidgetType";
     }
   }
 

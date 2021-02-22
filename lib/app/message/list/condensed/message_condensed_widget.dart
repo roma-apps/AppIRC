@@ -30,47 +30,70 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _buildCondensedTitle(
-                context, widget._condensedMessageListItem, expanded),
-            _buildCondensedBody(context, widget._condensedMessageListItem),
+              context,
+              widget._condensedMessageListItem,
+              expanded,
+            ),
+            _buildCondensedBody(
+              context,
+              widget._condensedMessageListItem,
+            ),
           ]);
     } else {
       return _buildCondensedTitle(
-          context, widget._condensedMessageListItem, expanded);
+        context,
+        widget._condensedMessageListItem,
+        expanded,
+      );
     }
   }
 
-  Widget _buildCondensedTitle(BuildContext context,
-      CondensedMessageListItem condensedMessageListItem, bool expanded) {
-    return Row(
+  Widget _buildCondensedTitle(
+    BuildContext context,
+    CondensedMessageListItem condensedMessageListItem,
+    bool expanded,
+  ) =>
+      Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: _buildCondensedTitleMessage(
-                  context, condensedMessageListItem),
+                context,
+                condensedMessageListItem,
+              ),
             ),
           ),
           Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _buildCondensedTitleButton(
-                  context, condensedMessageListItem, expanded)),
-        ]);
-  }
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: _buildCondensedTitleButton(
+              context,
+              condensedMessageListItem,
+              expanded,
+            ),
+          ),
+        ],
+      );
 
   Widget _buildCondensedBody(
-      BuildContext context, CondensedMessageListItem condensedMessageListItem) {
+    BuildContext context,
+    CondensedMessageListItem condensedMessageListItem,
+  ) {
 //    MessageListBloc messageListBloc = Provider.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: condensedMessageListItem.messages.map((message) {
-        return buildMessageWidget(
+      children: condensedMessageListItem.messages.map(
+        (message) {
+          return buildMessageWidget(
             message: message,
             enableMessageActions: true,
             messageWidgetType: MessageWidgetType.formatted,
-            messageInListState: notInSearchState);
-      }).toList(),
+            messageInListState: notInSearchState,
+          );
+        },
+      ).toList(),
     );
   }
 
@@ -80,18 +103,20 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
   ) {
     Map<RegularMessageType, List<ChatMessage>> groupedByType = {};
 
-    condensedMessageListItem.messages.forEach((message) {
-      if (message is RegularMessage) {
-        var regularMessageType = message.regularMessageType;
-        if (!groupedByType.containsKey(regularMessageType)) {
-          groupedByType[regularMessageType] = <ChatMessage>[];
-        }
+    condensedMessageListItem.messages.forEach(
+      (message) {
+        if (message is RegularMessage) {
+          var regularMessageType = message.regularMessageType;
+          if (!groupedByType.containsKey(regularMessageType)) {
+            groupedByType[regularMessageType] = <ChatMessage>[];
+          }
 
-        groupedByType[regularMessageType].add(message);
-      } else {
-        throw "Invalid message type $message";
-      }
-    });
+          groupedByType[regularMessageType].add(message);
+        } else {
+          throw "Invalid message type $message";
+        }
+      },
+    );
 
     var textString = groupedByType.keys
         .map(

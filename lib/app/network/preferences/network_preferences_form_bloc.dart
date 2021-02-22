@@ -71,20 +71,26 @@ class NetworkPreferencesFormBloc extends FormBloc {
           userPreferences: userFormBloc.extractData()),
       channelsFieldBloc.value
           .split(NetworkPreferences.channelsSeparator)
-          .map((channelName) =>
-              ChannelPreferences.name(name: channelName, password: ""))
+          .map(
+            (channelName) => ChannelPreferences(
+              name: channelName,
+              password: "",
+            ),
+          )
           .toList());
 }
 
 CustomValidator<String> buildNetworkValidator(NetworkListBloc networkListBloc) {
-  var networkValidator = CustomValidator<String>((networkName) async {
-    var alreadyExist =
-        await networkListBloc.isNetworkWithNameExist(networkName);
-    ValidationError error;
-    if (alreadyExist) {
-      error = NotUniqueTextValidationError();
-    }
-    return error;
-  });
+  var networkValidator = CustomValidator<String>(
+    (networkName) async {
+      var alreadyExist =
+          await networkListBloc.isNetworkWithNameExist(networkName);
+      ValidationError error;
+      if (alreadyExist) {
+        error = NotUniqueTextValidationError();
+      }
+      return error;
+    },
+  );
   return networkValidator;
 }

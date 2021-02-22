@@ -13,13 +13,23 @@ class ChannelInfoSpecialMessageBody extends SpecialMessageBody {
   final int usersCount;
 
   @override
-  bool isContainsText(String searchTerm, {@required bool ignoreCase}) {
+  bool isContainsText(
+    String searchTerm, {
+    @required bool ignoreCase,
+  }) {
     var contains = false;
 
-    contains |= isContainsSearchTerm(name, searchTerm, ignoreCase: ignoreCase);
+    contains |= isContainsSearchTerm(
+      name,
+      searchTerm,
+      ignoreCase: ignoreCase,
+    );
     if (!contains) {
-      contains |=
-          isContainsSearchTerm(topic, searchTerm, ignoreCase: ignoreCase);
+      contains |= isContainsSearchTerm(
+        topic,
+        searchTerm,
+        ignoreCase: ignoreCase,
+      );
     }
 
     return contains;
@@ -27,14 +37,18 @@ class ChannelInfoSpecialMessageBody extends SpecialMessageBody {
 
   @override
   String toString() {
-    return 'ChannelInfoSpecialMessageBody{name: $name, '
-        'topic: $topic, usersCount: $usersCount}';
+    return 'ChannelInfoSpecialMessageBody{'
+        'name: $name, '
+        'topic: $topic, '
+        'usersCount: $usersCount'
+        '}';
   }
 
-  ChannelInfoSpecialMessageBody(this.name, this.topic, this.usersCount);
-
-  ChannelInfoSpecialMessageBody.name(
-      {@required this.name, @required this.topic, @required this.usersCount});
+  ChannelInfoSpecialMessageBody({
+    @required this.name,
+    @required this.topic,
+    @required this.usersCount,
+  });
 
   factory ChannelInfoSpecialMessageBody.fromJson(Map<String, dynamic> json) =>
       _$ChannelInfoSpecialMessageBodyFromJson(json);
@@ -44,8 +58,10 @@ class ChannelInfoSpecialMessageBody extends SpecialMessageBody {
 
   @override
   Future<List<String>> extractLinks() async {
-    return await findUrls([
-      topic
-    ]);
+    return await findUrls(
+      [
+        topic,
+      ],
+    );
   }
 }

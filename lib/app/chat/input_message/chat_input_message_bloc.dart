@@ -7,7 +7,6 @@ import 'package:flutter_appirc/app/chat/input_message/autocomplete/chat_input_me
 import 'package:flutter_appirc/app/chat/input_message/autocomplete/chat_input_message_names_autocomplete.dart';
 import 'package:flutter_appirc/autocomplete/autocomplete.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:logging/logging.dart';
 
 var _logger = Logger("chat_input_message_bloc.dart");
@@ -37,7 +36,9 @@ class ChatInputMessageBloc extends DisposableOwner {
   @override
   Future dispose() async {
     await super.dispose();
-    await autoCompleters.forEach((autoCompleter) => autoCompleter.dispose(),);
+    await autoCompleters.forEach(
+      (autoCompleter) => autoCompleter.dispose(),
+    );
   }
 
   Future<List<String>> calculateAutoCompleteSuggestions(String pattern) async {
@@ -45,8 +46,11 @@ class ChatInputMessageBloc extends DisposableOwner {
 
     if (pattern != null && pattern.isNotEmpty) {
       for (var provider in autoCompleters) {
-        suggestions
-            .addAll(await provider.calculateAutoCompleteSuggestions(pattern));
+        suggestions.addAll(
+          await provider.calculateAutoCompleteSuggestions(
+            pattern,
+          ),
+        );
       }
     }
 
@@ -70,8 +74,7 @@ class ChatInputMessageBloc extends DisposableOwner {
     messageController.selection =
         TextSelection.fromPosition(TextPosition(offset: newMessage.length));
 
-    _logger.fine(() =>
-    "after onAutoCompleteSelected $currentMessage "
+    _logger.fine(() => "after onAutoCompleteSelected $currentMessage "
         "replaceText = $replaceText "
         "newMessage = $newMessage");
   }

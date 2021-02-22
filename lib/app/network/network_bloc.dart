@@ -22,8 +22,13 @@ class NetworkBloc extends DisposableOwner {
   final ChannelStatesBloc _channelsStateBloc;
   final ChatActiveChannelBloc _activeChannelBloc;
 
-  NetworkBloc(this._backendService, this.network, this._networksStateBloc,
-      this._channelsStateBloc, this._activeChannelBloc);
+  NetworkBloc(
+    this._backendService,
+    this.network,
+    this._networksStateBloc,
+    this._channelsStateBloc,
+    this._activeChannelBloc,
+  );
 
   NetworkState get _networkState => _networksStateBloc.getNetworkState(network);
 
@@ -34,7 +39,12 @@ class NetworkBloc extends DisposableOwner {
       NetworkTitle(_networkState.name, _networkState.nick);
 
   Stream<NetworkTitle> get networkTitleStream => _networkStateStream
-      .map((state) => NetworkTitle(_networkState.name, _networkState.nick))
+      .map(
+        (state) => NetworkTitle(
+          _networkState.name,
+          _networkState.nick,
+        ),
+      )
       .distinct();
 
   String get networkNick => _networkState.nick;
@@ -52,45 +62,64 @@ class NetworkBloc extends DisposableOwner {
   Stream<bool> get networkConnectedStream =>
       _networkStateStream.map((state) => state?.connected).distinct();
 
-  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
-          {bool waitForResult = false}) async =>
-      await _backendService.printNetworkAvailableChannels(network,
-          waitForResult: waitForResult);
+  Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels({
+    bool waitForResult = false,
+  }) async =>
+      await _backendService.printNetworkAvailableChannels(
+        network,
+        waitForResult: waitForResult,
+      );
 
-  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
-          {bool waitForResult = false}) async =>
-      await _backendService.printNetworkIgnoredUsers(network,
-          waitForResult: waitForResult);
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers({
+    bool waitForResult = false,
+  }) async =>
+      await _backendService.printNetworkIgnoredUsers(
+        network,
+        waitForResult: waitForResult,
+      );
 
-  Future<RequestResult<bool>> enableNetwork(
-          {bool waitForResult = false}) async =>
-      await _backendService.enableNetwork(network,
-          waitForResult: waitForResult);
+  Future<RequestResult<bool>> enableNetwork({
+    bool waitForResult = false,
+  }) async =>
+      await _backendService.enableNetwork(
+        network,
+        waitForResult: waitForResult,
+      );
 
-  Future<RequestResult<bool>> disableNetwork(
-          {bool waitForResult = false}) async =>
-      await _backendService.disableNetwork(network,
-          waitForResult: waitForResult);
+  Future<RequestResult<bool>> disableNetwork({
+    bool waitForResult = false,
+  }) async =>
+      await _backendService.disableNetwork(
+        network,
+        waitForResult: waitForResult,
+      );
 
   Future<RequestResult<Network>> editNetworkSettings(
-          NetworkPreferences preferences,
-          {bool waitForResult = false}) async =>
-      await _backendService.editNetworkSettings(network, preferences,
-          waitForResult: waitForResult);
+    NetworkPreferences preferences, {
+    bool waitForResult = false,
+  }) async =>
+      await _backendService.editNetworkSettings(
+        network,
+        preferences,
+        waitForResult: waitForResult,
+      );
 
   Future<RequestResult<ChannelWithState>> joinChannel(
     ChannelPreferences preferences, {
     bool waitForResult = false,
   }) async {
     var alreadyJoinedChannel = network.channels.firstWhere(
-        (channel) => channel.name == preferences.name,
-        orElse: () => null);
+      (channel) => channel.name == preferences.name,
+      orElse: () => null,
+    );
 
     if (alreadyJoinedChannel != null) {
       await _activeChannelBloc.changeActiveChanel(alreadyJoinedChannel);
 
-      var channelState =
-          _channelsStateBloc.getChannelState(network, alreadyJoinedChannel);
+      var channelState = _channelsStateBloc.getChannelState(
+        network,
+        alreadyJoinedChannel,
+      );
       var initMessages = <ChatMessage>[];
       var initUsers = <ChannelUser>[];
       return RequestResult.withResponse(
@@ -110,8 +139,9 @@ class NetworkBloc extends DisposableOwner {
     }
   }
 
-  Future<RequestResult<bool>> leaveNetwork(
-          {bool waitForResult = false}) async =>
+  Future<RequestResult<bool>> leaveNetwork({
+    bool waitForResult = false,
+  }) async =>
       await _backendService.leaveNetwork(
         network,
         waitForResult: waitForResult,

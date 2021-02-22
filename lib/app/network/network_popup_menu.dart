@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_edit_preferences_page.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:logging/logging.dart';
@@ -20,26 +19,31 @@ Widget buildNetworkPopupMenuButton({
   @required Color iconColor,
 }) {
   return StreamBuilder<bool>(
-      stream: networkBloc.networkConnectedStream,
-      initialData: networkBloc.networkConnected,
-      builder: (context, snapshot) {
-        var connected = snapshot.data ?? false;
-        return createPlatformPopupMenuButton(
-          context,
-          child: Icon(
-            Icons.more_vert,
-            color: iconColor,
-          ),
-          actions: _buildDropdownItems(
-              context: context, connected: connected, networkBloc: networkBloc),
-        );
-      });
+    stream: networkBloc.networkConnectedStream,
+    initialData: networkBloc.networkConnected,
+    builder: (context, snapshot) {
+      var connected = snapshot.data ?? false;
+      return createPlatformPopupMenuButton(
+        context,
+        child: Icon(
+          Icons.more_vert,
+          color: iconColor,
+        ),
+        actions: _buildDropdownItems(
+          context: context,
+          connected: connected,
+          networkBloc: networkBloc,
+        ),
+      );
+    },
+  );
 }
 
-List<PlatformAwarePopupMenuAction> _buildDropdownItems(
-    {@required BuildContext context,
-    @required bool connected,
-    @required NetworkBloc networkBloc}) {
+List<PlatformAwarePopupMenuAction> _buildDropdownItems({
+  @required BuildContext context,
+  @required bool connected,
+  @required NetworkBloc networkBloc,
+}) {
   _logger.fine(() => "_buildDropdownItems $connected");
 
   ChatBackendService backendService = Provider.of(context);

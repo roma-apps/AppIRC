@@ -18,24 +18,44 @@ class NetworkUserPreferencesFormBloc extends FormBloc {
           NotEmptyTextValidator.instance,
           NoWhitespaceTextValidator.instance
         ]);
-    passwordFieldBloc = FormValueFieldBloc<String>(preferences.password,
-        validators: [NoWhitespaceTextValidator.instance]);
-    realNameFieldBloc = FormValueFieldBloc<String>(preferences.realName,
-        validators: [NotEmptyTextValidator.instance]);
-    userNameFieldBloc = FormValueFieldBloc<String>(preferences.username,
-        validators: [NotEmptyTextValidator.instance]);
-    commandsFieldBloc = FormValueFieldBloc<String>(preferences.commands,
-        validators: [], visible: isNeedShowCommands);
+    passwordFieldBloc = FormValueFieldBloc<String>(
+      preferences.password,
+      validators: [
+        NoWhitespaceTextValidator.instance,
+      ],
+    );
+    realNameFieldBloc = FormValueFieldBloc<String>(
+      preferences.realName,
+      validators: [
+        NotEmptyTextValidator.instance,
+      ],
+    );
+    userNameFieldBloc = FormValueFieldBloc<String>(
+      preferences.username,
+      validators: [
+        NotEmptyTextValidator.instance,
+      ],
+    );
+    commandsFieldBloc = FormValueFieldBloc<String>(
+      preferences.commands,
+      validators: [],
+      visible: isNeedShowCommands,
+    );
   }
 
   @override
-  List<FormFieldBloc> get children =>
-      [nickFieldBloc, passwordFieldBloc, realNameFieldBloc, userNameFieldBloc];
+  List<FormFieldBloc> get children => [
+        nickFieldBloc,
+        passwordFieldBloc,
+        realNameFieldBloc,
+        userNameFieldBloc,
+      ];
 
   NetworkUserPreferences extractData() => NetworkUserPreferences(
-      nickname: nickFieldBloc.value,
-      password: passwordFieldBloc.value,
-      realName: realNameFieldBloc.value,
-      username: userNameFieldBloc.value,
-      commands: commandsFieldBloc.value);
+        nickname: nickFieldBloc.value,
+        password: passwordFieldBloc.value,
+        realName: realNameFieldBloc.value,
+        username: userNameFieldBloc.value,
+        commands: commandsFieldBloc.value,
+      );
 }

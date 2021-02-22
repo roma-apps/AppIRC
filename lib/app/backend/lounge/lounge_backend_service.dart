@@ -28,7 +28,6 @@ import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/irc/irc_commands_model.dart';
-
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
@@ -172,11 +171,12 @@ class LoungeBackendService extends DisposableOwner
               " auth $auth");
 
           var result = await authAfterReconnect(
-              token: authToken,
-              activeChannelId: currentChannelExtractor()?.remoteId,
-              lastMessageId: await lastMessageRemoteIdExtractor(),
-              user: loungePreferences?.authPreferences?.username,
-              waitForResult: true);
+            token: authToken,
+            activeChannelId: currentChannelExtractor()?.remoteId,
+            lastMessageId: await lastMessageRemoteIdExtractor(),
+            user: loungePreferences?.authPreferences?.username,
+            waitForResult: true,
+          );
 
           _logger.fine(() => "auth after reconnecting result $result");
         }
@@ -705,14 +705,14 @@ class LoungeBackendService extends DisposableOwner
             var preferences;
 
             if (request != null) {
-              preferences = ChannelPreferences.name(
+              preferences = ChannelPreferences(
                 localId: request.preferences.localId,
                 name: parsed.chan.name,
                 password: request.preferences.password,
               );
               _pendingRequests.remove(request);
             } else {
-              preferences = ChannelPreferences.name(
+              preferences = ChannelPreferences(
                 name: parsed.chan.name,
                 password: "",
               );
@@ -961,19 +961,31 @@ class LoungeBackendService extends DisposableOwner
   }
 
   @override
-  IDisposable listenForMessagePreviews(Network network, Channel channel,
-      ChannelMessagePreviewListener listener) {
+  IDisposable listenForMessagePreviews(
+    Network network,
+    Channel channel,
+    ChannelMessagePreviewListener listener,
+  ) {
     var disposable = CompositeDisposable([]);
     disposable.add(
       createEventListenerDisposable(
         (MsgPreviewLoungeResponseBody.eventName),
         (raw) {
           var parsed = MsgPreviewLoungeResponseBody.fromJson(
-              _preProcessRawDataEncodeDecodeJson(raw));
+            _preProcessRawDataEncodeDecodeJson(
+              raw,
+            ),
+          );
 
           if (parsed.chan == channel.remoteId) {
-            listener(MessagePreviewForRemoteMessageId(
-                parsed.id, toMessagePreview(parsed.preview)));
+            listener(
+              MessagePreviewForRemoteMessageId(
+                remoteMessageId: parsed.id,
+                messagePreview: toMessagePreview(
+                  parsed.preview,
+                ),
+              ),
+            );
           }
         },
       ),
@@ -1057,12 +1069,18 @@ class LoungeBackendService extends DisposableOwner
         (NetworkStatusLoungeResponseBody.eventName),
         (raw) {
           var parsed = NetworkStatusLoungeResponseBody.fromJson(
-              _preProcessRawDataEncodeDecodeJson(raw));
+            _preProcessRawDataEncodeDecodeJson(
+              raw,
+            ),
+          );
 
           if (parsed.network == network.remoteId) {
             var currentState = currentStateExtractor();
-            var newState =
-                toNetworkState(parsed, currentState.nick, network.name);
+            var newState = toNetworkState(
+              parsed,
+              currentState.nick,
+              network.name,
+            );
             listener(newState);
           }
         },
@@ -1087,8 +1105,10 @@ class LoungeBackendService extends DisposableOwner
   }
 
   @override
-  Future<RequestResult<bool>> sendDevicePushFCMTokenToServer(String newToken,
-      {bool waitForResult = false}) async {
+  Future<RequestResult<bool>> sendDevicePushFCMTokenToServer(
+    String newToken, {
+    bool waitForResult = false,
+  }) async {
     _logger.fine(() => "sendDevicePushFCMTokenToServer $newToken");
 
     await _sendRequest(
@@ -1103,66 +1123,95 @@ class LoungeBackendService extends DisposableOwner
 
   @override
   Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels(
-      Network network,
-      {bool waitForResult = false}) async {
+    Network network, {
+    bool waitForResult = false,
+  }) async {
     if (waitForResult) {
       throw NotImplementedYetLoungeException();
     }
     _sendInputRequest(
-        network, network.lobbyChannel, ChannelsListIRCCommand().asRawString);
+      network,
+      network.lobbyChannel,
+      ChannelsListIRCCommand().asRawString,
+    );
     return RequestResult.notWaitForResponse();
   }
 
   @override
   Future<RequestResult<RegularMessage>> printChannelBannedUsers(
-      Network network, Channel channel,
-      {bool waitForResult = false}) async {
-    if (waitForResult) {
-      throw NotImplementedYetLoungeException();
-    }
-    _sendInputRequest(network, channel, BanListIRCCommand().asRawString);
-    return RequestResult.notWaitForResponse();
-  }
-
-  @override
-  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(Network network,
-      {bool waitForResult = false}) async {
+    Network network,
+    Channel channel, {
+    bool waitForResult = false,
+  }) async {
     if (waitForResult) {
       throw NotImplementedYetLoungeException();
     }
     _sendInputRequest(
-        network, network.lobbyChannel, IgnoreListIRCCommand().asRawString);
+      network,
+      channel,
+      BanListIRCCommand().asRawString,
+    );
+    return RequestResult.notWaitForResponse();
+  }
+
+  @override
+  Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers(
+    Network network, {
+    bool waitForResult = false,
+  }) async {
+    if (waitForResult) {
+      throw NotImplementedYetLoungeException();
+    }
+    _sendInputRequest(
+      network,
+      network.lobbyChannel,
+      IgnoreListIRCCommand().asRawString,
+    );
     return RequestResult.notWaitForResponse();
   }
 
   @override
   Future<RequestResult<RegularMessage>> sendChannelRawMessage(
-      Network network, Channel channel, String rawMessage,
-      {bool waitForResult = false}) async {
+    Network network,
+    Channel channel,
+    String rawMessage, {
+    bool waitForResult = false,
+  }) async {
     if (waitForResult) {
       throw NotImplementedYetLoungeException();
     }
-    _sendInputRequest(network, channel, rawMessage);
+    _sendInputRequest(
+      network,
+      channel,
+      rawMessage,
+    );
     return RequestResult.notWaitForResponse();
   }
 
   @override
   IDisposable listenForChannelNames(
-      Network network, Channel channel, Function(List<ChannelUser>) listener) {
+    Network network,
+    Channel channel,
+    Function(List<ChannelUser>) listener,
+  ) {
     var disposable = CompositeDisposable([]);
-    disposable.add(createEventListenerDisposable(
-        (NamesLoungeResponseBody.eventName), (raw) {
-      var parsed = NamesLoungeResponseBody.fromJson(
-          _preProcessRawDataEncodeDecodeJson(raw));
+    disposable.add(
+      createEventListenerDisposable(
+        (NamesLoungeResponseBody.eventName),
+        (raw) {
+          var parsed = NamesLoungeResponseBody.fromJson(
+              _preProcessRawDataEncodeDecodeJson(raw));
 
-      _logger.fine(() => "listenForChannelUsers $parsed for $channel");
+          _logger.fine(() => "listenForChannelUsers $parsed for $channel");
 
-      if (parsed.id == channel.remoteId) {
-        listener(parsed.users
-            .map((loungeUser) => toChannelUser(loungeUser))
-            .toList());
-      }
-    }));
+          if (parsed.id == channel.remoteId) {
+            listener(parsed.users
+                .map((loungeUser) => toChannelUser(loungeUser))
+                .toList());
+          }
+        },
+      ),
+    );
 
     return disposable;
   }
@@ -1195,21 +1244,25 @@ class LoungeBackendService extends DisposableOwner
     await _socketIOInstanceBloc.dispose();
   }
 
-  void _sendInputRequest(Network network, Channel channel, String message) {
+  void _sendInputRequest(
+    Network network,
+    Channel channel,
+    String message,
+  ) {
     if (_isCollapseClientSideCommand(message)) {
       _channelTogglePreviewSubject.add(
         ToggleChannelPreviewData(
-          network,
-          channel,
-          false,
+          network: network,
+          channel: channel,
+          allPreviewsShown: false,
         ),
       );
     } else if (_isExpandClientSideCommand(message)) {
       _channelTogglePreviewSubject.add(
         ToggleChannelPreviewData(
-          network,
-          channel,
-          true,
+          network: network,
+          channel: channel,
+          allPreviewsShown: true,
         ),
       );
     } else {
@@ -1242,13 +1295,19 @@ class LoungeBackendService extends DisposableOwner
     String uploadFileToken;
 
     var disposable = _createEventListenerDisposable(
-        _socketIOInstanceBloc, UploadAuthLoungeResponseBody.eventName, (raw) {
-      var parsed = UploadAuthLoungeResponseBody.fromRaw(raw);
+      _socketIOInstanceBloc,
+      UploadAuthLoungeResponseBody.eventName,
+      (raw) {
+        var parsed = UploadAuthLoungeResponseBody.fromRaw(raw);
 
-      uploadFileToken = parsed.uploadAuthToken;
-    });
-    await _socketIOInstanceBloc
-        .emit(toSocketIOCommand(UploadAuthLoungeEmptyRequest()));
+        uploadFileToken = parsed.uploadAuthToken;
+      },
+    );
+    await _socketIOInstanceBloc.emit(
+      toSocketIOCommand(
+        UploadAuthLoungeEmptyRequest(),
+      ),
+    );
 
     await _doWaitForResult(() => uploadFileToken);
 
@@ -1256,7 +1315,11 @@ class LoungeBackendService extends DisposableOwner
 
     String loungeUrl = loungePreferences.hostPreferences.host;
     var uploadedFileRemoteURL = await uploadFileToLounge(
-        loungeUrl, file, uploadFileToken, chatConfig.fileUploadMaxSizeInBytes);
+      loungeUrl,
+      file,
+      uploadFileToken,
+      chatConfig.fileUploadMaxSizeInBytes,
+    );
 
     return RequestResult.withResponse(uploadedFileRemoteURL);
   }
@@ -1448,19 +1511,20 @@ class LoungeBackendService extends DisposableOwner
     preview.shown = shownInverted;
     await _sendRequest(
       MsgPreviewToggleLoungeJsonRequest.name(
-          target: channel.remoteId,
-          msgId: message.messageRemoteId,
-          link: preview.link,
-          shown: shownInverted),
+        target: channel.remoteId,
+        msgId: message.messageRemoteId,
+        link: preview.link,
+        shown: shownInverted,
+      ),
       isNeedAddRequestToPending: false,
     );
 
-    var chatTogglePreview = ToggleMessagePreviewData.name(
-      network,
-      channel,
-      message,
-      preview,
-      shownInverted,
+    var chatTogglePreview = ToggleMessagePreviewData(
+      network: network,
+      channel: channel,
+      message: message,
+      preview: preview,
+      newShownValue: shownInverted,
     );
 
     _messageTogglePreviewSubject.add(chatTogglePreview);
@@ -1474,8 +1538,10 @@ class LoungeBackendService extends DisposableOwner
   }
 }
 
-IDisposable _listenForConfiguration(SocketIOInstanceBloc _socketIoService,
-    Function(ConfigurationLoungeResponseBody) listener) {
+IDisposable _listenForConfiguration(
+  SocketIOInstanceBloc _socketIoService,
+  Function(ConfigurationLoungeResponseBody) listener,
+) {
   var disposable = CompositeDisposable([]);
   disposable.add(
     _createEventListenerDisposable(
@@ -1594,8 +1660,10 @@ IDisposable _listenForAuthorized(
   return disposable;
 }
 
-IDisposable _listenForInit(SocketIOInstanceBloc _socketIoService,
-    Function(ChatInitInformation init) listener) {
+IDisposable _listenForInit(
+  SocketIOInstanceBloc _socketIoService,
+  Function(ChatInitInformation init) listener,
+) {
   var disposable = CompositeDisposable([]);
   disposable.add(
     _createEventListenerDisposable(

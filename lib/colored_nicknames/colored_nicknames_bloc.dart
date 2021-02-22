@@ -15,9 +15,10 @@ class ColoredNicknamesBloc extends DisposableOwner {
 
   Color getColorForNick(String nick) {
     if (!_nickToColor.containsKey(nick)) {
-      _nickToColor[nick] = _colors[(_currentColorIndex++ % _colors.length)];
+      var index = (_currentColorIndex++ % _colors.length);
+      _nickToColor[nick] = _colors[index];
     }
 
     return _nickToColor[nick];
-  }
+    }
 }

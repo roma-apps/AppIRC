@@ -51,11 +51,12 @@ Widget createPlatformPopupMenuButton(
 }
 
 Widget _buildCupertinoPopupButton(
-    BuildContext context,
-    Widget child,
-    List<PlatformAwarePopupMenuAction> actions,
-    bool enabled,
-    bool isNeedPadding) {
+  BuildContext context,
+  Widget child,
+  List<PlatformAwarePopupMenuAction> actions,
+  bool enabled,
+  bool isNeedPadding,
+) {
   var onPressed;
 
   if (enabled) {
@@ -171,23 +172,32 @@ Widget _buildMaterialPopupButton(
 }
 
 List<PopupMenuItem<PlatformAwarePopupMenuAction>> _convertToMaterialActions(
-    List<PlatformAwarePopupMenuAction> actions) {
-  return actions
-      .map((action) => _buildDropdownMenuItemRow(
-          text: action.text, iconData: action.iconData, value: action))
-      .toList();
-}
+  List<PlatformAwarePopupMenuAction> actions,
+) =>
+    actions
+        .map(
+          (action) => _buildDropdownMenuItemRow(
+            text: action.text,
+            iconData: action.iconData,
+            value: action,
+          ),
+        )
+        .toList();
 
-PopupMenuItem<T> _buildDropdownMenuItemRow<T>(
-        {@required String text,
-        @required IconData iconData,
-        @required T value}) =>
+PopupMenuItem<T> _buildDropdownMenuItemRow<T>({
+  @required String text,
+  @required IconData iconData,
+  @required T value,
+}) =>
     PopupMenuItem<T>(
       value: value,
       child: _buildRow(iconData, text),
     );
 
-Row _buildRow(IconData iconData, String text) {
+Row _buildRow(
+  IconData iconData,
+  String text,
+) {
   return Row(
     children: <Widget>[
       Icon(iconData),

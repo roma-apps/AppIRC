@@ -29,7 +29,10 @@ class NetworkJoinChannelFormWidgetState
   TextEditingController _channelController;
   TextEditingController _passwordController;
 
-  NetworkJoinChannelFormWidgetState(this.startChannelName, this.startPassword) {
+  NetworkJoinChannelFormWidgetState(
+    this.startChannelName,
+    this.startPassword,
+  ) {
     _channelController = TextEditingController(text: startChannelName);
     _passwordController = TextEditingController(text: startPassword);
   }

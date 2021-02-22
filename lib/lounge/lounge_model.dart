@@ -131,13 +131,20 @@ class LoungePreferences implements IJsonObject {
   @override
   int get hashCode => hostPreferences.hashCode ^ authPreferences.hashCode;
 
-  LoungePreferences(this.hostPreferences, {this.authPreferences});
+  LoungePreferences(
+    this.hostPreferences, {
+    this.authPreferences,
+  });
 
-  LoungePreferences.name(
-      {@required this.hostPreferences, @required this.authPreferences});
+  LoungePreferences.name({
+    @required this.hostPreferences,
+    @required this.authPreferences,
+  });
 
-  static LoungePreferences empty =
-      LoungePreferences.name(hostPreferences: null, authPreferences: null);
+  static LoungePreferences empty = LoungePreferences.name(
+    hostPreferences: null,
+    authPreferences: null,
+  );
 
   @override
   Map<String, dynamic> toJson() => _$LoungePreferencesToJson(this);
@@ -147,7 +154,9 @@ class LoungePreferences implements IJsonObject {
 
   @override
   String toString() {
-    return 'LoungePreferences{connectionPreferences: $hostPreferences,'
-        ' authPreferences: $authPreferences}';
+    return 'LoungePreferences{'
+        'connectionPreferences: $hostPreferences, '
+        'authPreferences: $authPreferences'
+        '}';
   }
 }

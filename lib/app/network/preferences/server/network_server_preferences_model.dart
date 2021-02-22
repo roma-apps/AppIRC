@@ -22,9 +22,13 @@ class NetworkServerPreferences extends IJsonObject {
 
   @override
   String toString() {
-    return 'ChatNetworkServerPreferences{name: $name, serverHost: '
-        '$serverHost, serverPort: $serverPort, useTls: $useTls, '
-        'useOnlyTrustedCertificates: $useOnlyTrustedCertificates}';
+    return 'ChatNetworkServerPreferences{'
+        'name: $name, '
+        'serverHost: $serverHost, '
+        'serverPort: $serverPort, '
+        'useTls: $useTls, '
+        'useOnlyTrustedCertificates: $useOnlyTrustedCertificates'
+        '}';
   }
 
   factory NetworkServerPreferences.fromJson(Map<String, dynamic> json) =>
@@ -32,4 +36,23 @@ class NetworkServerPreferences extends IJsonObject {
 
   @override
   Map<String, dynamic> toJson() => _$NetworkServerPreferencesToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkServerPreferences &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          serverHost == other.serverHost &&
+          serverPort == other.serverPort &&
+          useTls == other.useTls &&
+          useOnlyTrustedCertificates == other.useOnlyTrustedCertificates;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      serverHost.hashCode ^
+      serverPort.hashCode ^
+      useTls.hashCode ^
+      useOnlyTrustedCertificates.hashCode;
 }

@@ -19,12 +19,18 @@ class DaysDateSeparatorMessageListItemWidget extends StatelessWidget {
   }
 }
 
-Container _buildDateWidget(BuildContext context, DateTime date) {
+Container _buildDateWidget(
+  BuildContext context,
+  DateTime date,
+) {
   var dateString = _onlyDateFormatter.format(date);
   return buildMessageDateWidget(context, dateString);
 }
 
-Container buildMessageDateWidget(BuildContext context, String dateString) {
+Container buildMessageDateWidget(
+  BuildContext context,
+  String dateString,
+) {
   var borderSide = BorderSide(color: Colors.grey);
   return Container(
     decoration: BoxDecoration(border: Border(top: borderSide)),

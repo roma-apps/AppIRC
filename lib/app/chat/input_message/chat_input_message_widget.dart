@@ -33,18 +33,25 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
   Widget build(BuildContext context) {
     var children = <Widget>[
       Flexible(
-          child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-          child: _buildInputMessageField(context),
+        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: _buildInputMessageField(context),
+          ),
         ),
-      )),
+      ),
       _buildSendButton(context),
     ];
 
     var chatUploadBloc = Provider.of<ChatUploadBloc>(context);
     if (chatUploadBloc.isUploadSupported) {
-      children.insert(0, _buildUploadButton(context, chatUploadBloc));
+      children.insert(
+        0,
+        _buildUploadButton(
+          context,
+          chatUploadBloc,
+        ),
+      );
     }
 
     return _buildContainer(context, children);
@@ -134,7 +141,6 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
             );
           },
           ios: () {
-
             return CupertinoTypeAheadData(
               textFieldConfiguration: CupertinoTextFieldConfiguration(
                 autofocus: false,
@@ -153,43 +159,47 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
   }
 
   Widget _buildUploadButton(
-      BuildContext context, ChatUploadBloc chatUploadBloc) {
+    BuildContext context,
+    ChatUploadBloc chatUploadBloc,
+  ) {
     ChatConnectionBloc chatConnectionBloc = Provider.of(context);
     var channelBloc = ChannelBloc.of(context);
 
     return StreamBuilder<bool>(
-        stream: chatConnectionBloc.isConnectedStream,
-        initialData: chatConnectionBloc.isConnected,
-        builder: (context, snapshot) {
-          var connected = snapshot.data;
+      stream: chatConnectionBloc.isConnectedStream,
+      initialData: chatConnectionBloc.isConnected,
+      builder: (context, snapshot) {
+        var connected = snapshot.data;
 
-          return createPlatformPopupMenuButton(context,
-              child: Icon(Icons.attach_file),
-              actions: _buildAttachMenuItems(
-                  context, chatUploadBloc, channelBloc.inputMessageBloc),
-              enabled: connected);
-        });
+        return createPlatformPopupMenuButton(context,
+            child: Icon(Icons.attach_file),
+            actions: _buildAttachMenuItems(
+                context, chatUploadBloc, channelBloc.inputMessageBloc),
+            enabled: connected);
+      },
+    );
   }
 
   Widget _buildSendButton(BuildContext context) {
     ChatConnectionBloc chatConnectionBloc = Provider.of(context);
 
     return StreamBuilder<bool>(
-        stream: chatConnectionBloc.isConnectedStream,
-        initialData: chatConnectionBloc.isConnected,
-        builder: (context, snapshot) {
-          var connected = snapshot.data;
-          var pressed;
-          if (connected) {
-            pressed = () {
-              ChatInputMessageBloc inputMessageBloc =
-                  ChannelBloc.of(context).inputMessageBloc;
-              inputMessageBloc.sendMessage();
-            };
-          }
-          return PlatformIconButton(
-              icon: Icon(Icons.message), onPressed: pressed);
-        });
+      stream: chatConnectionBloc.isConnectedStream,
+      initialData: chatConnectionBloc.isConnected,
+      builder: (context, snapshot) {
+        var connected = snapshot.data;
+        var pressed;
+        if (connected) {
+          pressed = () {
+            ChatInputMessageBloc inputMessageBloc =
+                ChannelBloc.of(context).inputMessageBloc;
+            inputMessageBloc.sendMessage();
+          };
+        }
+        return PlatformIconButton(
+            icon: Icon(Icons.message), onPressed: pressed);
+      },
+    );
   }
 
   List<PlatformAwarePopupMenuAction> _buildAttachMenuItems(
@@ -285,8 +295,12 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
     });
   }
 
-  Future _uploadFile(BuildContext context, ChatUploadBloc chatUploadBloc,
-      File pickedFile, ChatInputMessageBloc inputMessageBloc) async {
+  Future _uploadFile(
+    BuildContext context,
+    ChatUploadBloc chatUploadBloc,
+    File pickedFile,
+    ChatInputMessageBloc inputMessageBloc,
+  ) async {
     try {
       var asyncDialogResult = await doAsyncOperationWithDialog(
         context: context,

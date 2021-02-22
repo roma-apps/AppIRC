@@ -8,51 +8,57 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 
-abstract class ChannelListListenerBloc
-    extends NetworkListListenerBloc {
+abstract class ChannelListListenerBloc extends NetworkListListenerBloc {
   ChannelListListenerBloc(NetworkListBloc networksListBloc)
       : super(networksListBloc);
 
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {
     var network = networkWithState.network;
-    ChannelListBloc chatChannelsListBloc =
-        getChannelListBloc(network);
+    ChannelListBloc chatChannelsListBloc = getChannelListBloc(network);
 
-    networkWithState.channelsWithState.forEach((channelWithState) {
-      onChannelJoined(network, channelWithState);
-      var channel = channelWithState.channel;
-      addDisposable(
-          disposable: _subscribeForChannelLeave(
-              chatChannelsListBloc, network, channel));
-    });
+    networkWithState.channelsWithState.forEach(
+      (channelWithState) {
+        onChannelJoined(network, channelWithState);
+        var channel = channelWithState.channel;
+        addDisposable(
+            disposable: _subscribeForChannelLeave(
+                chatChannelsListBloc, network, channel));
+      },
+    );
 
-    var channelJoinListener = chatChannelsListBloc
-        .listenForChannelJoin(((channelWithState) {
-      var channel = channelWithState.channel;
+    var channelJoinListener = chatChannelsListBloc.listenForChannelJoin(
+      (channelWithState) {
+        var channel = channelWithState.channel;
 
-      addDisposable(
-          disposable: _subscribeForChannelLeave(
-              chatChannelsListBloc, network, channel));
+        addDisposable(
+            disposable: _subscribeForChannelLeave(
+                chatChannelsListBloc, network, channel));
 
-      onChannelJoined(network, channelWithState);
-    }));
+        onChannelJoined(network, channelWithState);
+      },
+    );
 
     addDisposable(disposable: channelJoinListener);
   }
 
   @override
   void onNetworkLeaved(Network network) {
-    network.channels.forEach((channel) => onChannelLeaved(network, channel));
+    network.channels.forEach(
+      (channel) => onChannelLeaved(
+        network,
+        channel,
+      ),
+    );
   }
 
   IDisposable _subscribeForChannelLeave(
-      ChannelListBloc chatChannelsListBloc,
-      Network network,
-      Channel channel) {
+    ChannelListBloc chatChannelsListBloc,
+    Network network,
+    Channel channel,
+  ) {
     IDisposable leaveListener;
-    leaveListener =
-        chatChannelsListBloc.listenForChannelLeave(channel, () {
+    leaveListener = chatChannelsListBloc.listenForChannelLeave(channel, () {
       onChannelLeaved(network, channel);
       leaveListener.dispose();
     });
@@ -61,10 +67,15 @@ abstract class ChannelListListenerBloc
 
   @mustCallSuper
   @protected
-  void onChannelLeaved(Network network, Channel channel);
+  void onChannelLeaved(
+    Network network,
+    Channel channel,
+  );
 
   @mustCallSuper
   @protected
   void onChannelJoined(
-      Network network, ChannelWithState channelWithState);
+    Network network,
+    ChannelWithState channelWithState,
+  );
 }

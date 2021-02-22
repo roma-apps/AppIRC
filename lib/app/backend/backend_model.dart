@@ -66,8 +66,8 @@ class RequestResult<T> {
   @override
   String toString() {
     return 'RequestResult{'
-        'isSentSuccessfully: $isSentSuccessfully,'
-        ' result: $result'
+        'isSentSuccessfully: $isSentSuccessfully, '
+        'result: $result'
         '}';
   }
 

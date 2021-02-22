@@ -15,4 +15,31 @@ class ErrorData {
     @required this.titleCreator,
     @required this.contentCreator,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ErrorData &&
+          runtimeType == other.runtimeType &&
+          error == other.error &&
+          stackTrace == other.stackTrace &&
+          titleCreator == other.titleCreator &&
+          contentCreator == other.contentCreator;
+
+  @override
+  int get hashCode =>
+      error.hashCode ^
+      stackTrace.hashCode ^
+      titleCreator.hashCode ^
+      contentCreator.hashCode;
+
+  @override
+  String toString() {
+    return 'ErrorData{'
+        'error: $error, '
+        'stackTrace: $stackTrace, '
+        'titleCreator: $titleCreator, '
+        'contentCreator: $contentCreator'
+        '}';
+  }
 }

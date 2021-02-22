@@ -3,7 +3,11 @@ class ChatDeepLink {
   final int port;
   final String channel;
 
-  ChatDeepLink(this.host, this.port, this.channel);
+  ChatDeepLink(
+    this.host,
+    this.port,
+    this.channel,
+  );
 
   @override
   String toString() {

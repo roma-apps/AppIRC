@@ -12,7 +12,6 @@ import 'package:flutter_appirc/app/message/special/message_special_widget.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
@@ -23,33 +22,38 @@ var _logger = Logger("message_widget.dart");
 
 enum MessageWidgetType { formatted, raw }
 
-Widget buildMessageWidget(
-    {@required ChatMessage message,
-    @required bool enableMessageActions,
-    @required MessageInListState messageInListState,
-    @required MessageWidgetType messageWidgetType}) {
+Widget buildMessageWidget({
+  @required ChatMessage message,
+  @required bool enableMessageActions,
+  @required MessageInListState messageInListState,
+  @required MessageWidgetType messageWidgetType,
+}) {
   Widget child;
   switch (message.chatMessageType) {
     case ChatMessageType.regular:
       child = RegularMessageWidget(
-          message: message,
-          messageInListState: messageInListState,
-          enableMessageActions: enableMessageActions,
-          messageWidgetType: messageWidgetType);
+        message: message,
+        messageInListState: messageInListState,
+        enableMessageActions: enableMessageActions,
+        messageWidgetType: messageWidgetType,
+      );
       break;
     case ChatMessageType.special:
       child = SpecialMessageWidget(
-          message: message,
-          messageInListState: messageInListState,
-          enableMessageActions: enableMessageActions,
-          messageWidgetType: messageWidgetType);
+        message: message,
+        messageInListState: messageInListState,
+        enableMessageActions: enableMessageActions,
+        messageWidgetType: messageWidgetType,
+      );
       break;
   }
   return child;
 }
 
-final MessageInListState notInSearchState =
-    MessageInListState.name(inSearchResult: false, searchTerm: null);
+final MessageInListState notInSearchState = MessageInListState.name(
+  inSearchResult: false,
+  searchTerm: null,
+);
 
 abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   final T message;
@@ -138,7 +142,9 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
   Widget buildMessageBody(BuildContext context, ChatMessage message);
 
-  Decoration _createMessageDecoration({@required BuildContext context}) {
+  Decoration _createMessageDecoration({
+    @required BuildContext context,
+  }) {
     var decoration;
     bool isHighlightByServer;
 
@@ -159,8 +165,10 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
 var _timeFormatter = DateFormat().add_Hm();
 
-WidgetSpan buildHighlightedNicknameButtonWidgetSpan(
-    {@required BuildContext context, @required String nick}) {
+WidgetSpan buildHighlightedNicknameButtonWidgetSpan({
+  @required BuildContext context,
+  @required String nick,
+}) {
   return WidgetSpan(
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -170,8 +178,10 @@ WidgetSpan buildHighlightedNicknameButtonWidgetSpan(
   );
 }
 
-WidgetSpan buildMessageIconWidgetSpan(
-    {@required IconData iconData, @required Color color}) {
+WidgetSpan buildMessageIconWidgetSpan({
+  @required IconData iconData,
+  @required Color color,
+}) {
   return WidgetSpan(
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -214,7 +224,10 @@ RichText buildMessageRichText(List<InlineSpan> spans) {
 var _dateFormatter = DateFormat().add_yMd().add_Hms();
 
 Widget buildMessageRawBody(
-    BuildContext context, ChatMessage message, String text) {
+  BuildContext context,
+  ChatMessage message,
+  String text,
+) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.start,

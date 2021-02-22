@@ -96,24 +96,26 @@ class SpecialMessageDB implements ChatMessageDB {
       DateTime.fromMicrosecondsSinceEpoch(message.dateMicrosecondsSinceEpoch);
 
   SpecialMessageDB(
-      this.localId,
-      this.channelLocalId,
-      this.chatMessageTypeId,
-      this.channelRemoteId,
-      this.dataJsonEncoded,
-      this.specialTypeId,
-      this.dateMicrosecondsSinceEpoch,
-      this.linksJsonEncoded);
+    this.localId,
+    this.channelLocalId,
+    this.chatMessageTypeId,
+    this.channelRemoteId,
+    this.dataJsonEncoded,
+    this.specialTypeId,
+    this.dateMicrosecondsSinceEpoch,
+    this.linksJsonEncoded,
+  );
 
-  SpecialMessageDB.name(
-      {this.localId,
-      this.channelLocalId,
-      this.chatMessageTypeId = chatMessageTypeSpecialId,
-      @required this.channelRemoteId,
-      @required this.dataJsonEncoded,
-      @required this.specialTypeId,
-      @required this.dateMicrosecondsSinceEpoch,
-      @required this.linksJsonEncoded});
+  SpecialMessageDB.name({
+    this.localId,
+    this.channelLocalId,
+    this.chatMessageTypeId = chatMessageTypeSpecialId,
+    @required this.channelRemoteId,
+    @required this.dataJsonEncoded,
+    @required this.specialTypeId,
+    @required this.dateMicrosecondsSinceEpoch,
+    @required this.linksJsonEncoded,
+  });
 }
 
 SpecialMessageType specialMessageTypeIdToType(int id) {
@@ -149,13 +151,16 @@ int specialMessageTypeTypeToId(SpecialMessageType type) {
 
 SpecialMessageDB toSpecialMessageDB(SpecialMessage specialMessage) =>
     SpecialMessageDB.name(
-        channelRemoteId: specialMessage.channelRemoteId,
-        dataJsonEncoded: json.encode(specialMessage.data),
-        specialTypeId: specialMessageTypeTypeToId(specialMessage.specialType),
-        linksJsonEncoded: specialMessage.linksInText != null
-            ? json.encode(specialMessage.linksInText)
-            : null,
-        dateMicrosecondsSinceEpoch: specialMessage.date.microsecondsSinceEpoch);
+      channelRemoteId: specialMessage.channelRemoteId,
+      dataJsonEncoded: json.encode(specialMessage.data),
+      specialTypeId: specialMessageTypeTypeToId(specialMessage.specialType),
+      linksJsonEncoded: specialMessage.linksInText != null
+          ? json.encode(
+              specialMessage.linksInText,
+            )
+          : null,
+      dateMicrosecondsSinceEpoch: specialMessage.date.microsecondsSinceEpoch,
+    );
 
 SpecialMessage specialMessageDBToChatMessage(SpecialMessageDB messageDB) {
   var type = specialMessageTypeIdToType(messageDB.specialTypeId);

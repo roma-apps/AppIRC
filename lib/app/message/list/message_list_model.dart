@@ -15,23 +15,25 @@ class MessageListVisibleBounds {
 
   MessageListVisibleBounds.fromPush({@required int messageRemoteId})
       : this._name(
-            minRegularMessageRemoteId: messageRemoteId,
-            maxRegularMessageRemoteId: messageRemoteId,
-            updateType: MessageListVisibleBoundsUpdateType.push);
+          minRegularMessageRemoteId: messageRemoteId,
+          maxRegularMessageRemoteId: messageRemoteId,
+          updateType: MessageListVisibleBoundsUpdateType.push,
+        );
 
   MessageListVisibleBounds.fromUi(
       {@required int minRegularMessageRemoteId,
       @required int maxRegularMessageRemoteId})
       : this._name(
-            minRegularMessageRemoteId: minRegularMessageRemoteId,
-            maxRegularMessageRemoteId: maxRegularMessageRemoteId,
-            updateType: MessageListVisibleBoundsUpdateType.ui);
+          minRegularMessageRemoteId: minRegularMessageRemoteId,
+          maxRegularMessageRemoteId: maxRegularMessageRemoteId,
+          updateType: MessageListVisibleBoundsUpdateType.ui,
+        );
 
   @override
-  String toString() {
-    return 'VisibleMessagesBounds{min: $minRegularMessageRemoteId,'
-        ' max: $maxRegularMessageRemoteId}';
-  }
+  String toString() => 'VisibleMessagesBounds{'
+      'min: $minRegularMessageRemoteId, '
+      'max: $maxRegularMessageRemoteId'
+      '}';
 }
 
 enum MessageListVisibleBoundsUpdateType { push, ui }
@@ -66,7 +68,10 @@ class SimpleMessageListItem extends MessageListItem {
       message is RegularMessage ? message : null;
 
   @override
-  bool isContainsText(String searchTerm, {bool ignoreCase}) =>
+  bool isContainsText(
+    String searchTerm, {
+    @required bool ignoreCase,
+  }) =>
       message.isContainsText(searchTerm, ignoreCase: ignoreCase);
 }
 
@@ -77,7 +82,10 @@ abstract class MessageListItem {
 
   bool isContainsMessageWithRemoteId(int firstUnreadRemoteMessageId);
 
-  bool isContainsText(String searchTerm, {bool ignoreCase});
+  bool isContainsText(
+    String searchTerm, {
+    @required bool ignoreCase,
+  });
 }
 
 class MessageListState {
@@ -85,10 +93,11 @@ class MessageListState {
   final List<ChatMessage> newItems;
   final MessageListUpdateType updateType;
 
-  MessageListState.name(
-      {@required this.items,
-      @required this.newItems,
-      @required this.updateType});
+  MessageListState.name({
+    @required this.items,
+    @required this.newItems,
+    @required this.updateType,
+  });
 
   static MessageListState get empty => MessageListState.name(
         items: [],
@@ -100,8 +109,8 @@ class MessageListState {
   String toString() {
     return 'MessageListState{'
         'items: $items,'
-        'newItems: $newItems,'
-        ' updateType: $updateType'
+        'newItems: $newItems, '
+        'updateType: $updateType'
         '}';
   }
 
@@ -122,10 +131,29 @@ class MessageListLoadMore {
   final List<ChatMessage> messages;
   final int totalMessages;
 
-  MessageListLoadMore(this.messages, this.totalMessages);
+  MessageListLoadMore({
+    @required this.messages,
+    @required this.totalMessages,
+  });
 
-  MessageListLoadMore.name(
-      {@required this.messages, @required this.totalMessages});
+  @override
+  String toString() {
+    return 'MessageListLoadMore{'
+        'messages: $messages, '
+        'totalMessages: $totalMessages'
+        '}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessageListLoadMore &&
+          runtimeType == other.runtimeType &&
+          messages == other.messages &&
+          totalMessages == other.totalMessages;
+
+  @override
+  int get hashCode => messages.hashCode ^ totalMessages.hashCode;
 }
 
 bool isHaveMessageRemoteId(
@@ -142,8 +170,29 @@ class MessageListJumpDestination {
   final MessageListItem selectedFoundItem;
   final double alignment;
 
-  MessageListJumpDestination(
-      {@required this.items,
-      @required this.selectedFoundItem,
-      @required this.alignment});
+  MessageListJumpDestination({
+    @required this.items,
+    @required this.selectedFoundItem,
+    @required this.alignment,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessageListJumpDestination &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          selectedFoundItem == other.selectedFoundItem &&
+          alignment == other.alignment;
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ selectedFoundItem.hashCode ^ alignment.hashCode;
+
+  @override
+  String toString() => 'MessageListJumpDestination{'
+        'items: $items, '
+        'selectedFoundItem: $selectedFoundItem, '
+        'alignment: $alignment'
+        '}';
 }

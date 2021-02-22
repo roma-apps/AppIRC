@@ -20,26 +20,28 @@ abstract class NetworkPreferencesPage extends StatefulWidget {
   final String buttonText;
   final String titleText;
 
-  NetworkPreferencesPage.name(
-      {@required this.titleText,
-      @required this.startValues,
-      @required this.isNeedShowChannels,
-      @required this.isNeedShowCommands,
-      @required this.serverPreferencesEnabled,
-      @required this.serverPreferencesVisible,
-      @required this.buttonText});
+  NetworkPreferencesPage.name({
+    @required this.titleText,
+    @required this.startValues,
+    @required this.isNeedShowChannels,
+    @required this.isNeedShowCommands,
+    @required this.serverPreferencesEnabled,
+    @required this.serverPreferencesVisible,
+    @required this.buttonText,
+  });
 
   @override
   State<StatefulWidget> createState() {
     return NetworkPreferencesPageState(
-        titleText,
-        startValues,
-        successCallback,
-        isNeedShowChannels,
-        isNeedShowCommands,
-        serverPreferencesEnabled,
-        serverPreferencesVisible,
-        buttonText);
+      titleText,
+      startValues,
+      successCallback,
+      isNeedShowChannels,
+      isNeedShowCommands,
+      serverPreferencesEnabled,
+      serverPreferencesVisible,
+      buttonText,
+    );
   }
 }
 

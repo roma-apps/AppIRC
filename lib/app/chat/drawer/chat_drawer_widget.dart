@@ -22,7 +22,9 @@ import 'package:provider/provider.dart';
 class ChatDrawerWidget extends StatelessWidget {
   final VoidCallback onActionCallback;
 
-  ChatDrawerWidget({this.onActionCallback});
+  ChatDrawerWidget({
+    this.onActionCallback,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -131,12 +133,15 @@ class ChatDrawerWidget extends StatelessWidget {
       );
 
   Widget _buildSignOutButton(BuildContext context) => PlatformIconButton(
-      onPressed: () async {
-        var loungeBackendService = Provider.of<LoungeBackendService>(context);
+        onPressed: () async {
+          var loungeBackendService = Provider.of<LoungeBackendService>(context);
 
-        loungeBackendService.signOut();
-      },
-      icon: Icon(Icons.exit_to_app));
+          loungeBackendService.signOut();
+        },
+        icon: Icon(
+          Icons.exit_to_app,
+        ),
+      );
 }
 
 class AppSkinDayNightIconButton extends StatelessWidget {

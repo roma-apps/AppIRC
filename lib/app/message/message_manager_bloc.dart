@@ -15,7 +15,6 @@ import 'package:flutter_appirc/app/message/special/message_special_model.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
-
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -34,15 +33,20 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   Stream<ChatMessage> get messageUpdateStream => _messageUpdateSubject.stream;
 
   MessageManagerBloc(
-      this._backendService, NetworkListBloc networksListBloc, this._db)
-      : super(networksListBloc) {
+    this._backendService,
+    NetworkListBloc networksListBloc,
+    this._db,
+  ) : super(networksListBloc) {
     _logger.fine(() => "Create ChannelMessagesSaverBloc");
 
     addDisposable(subject: _messageUpdateSubject);
   }
 
   IDisposable listenForMessages(
-      Network network, Channel channel, ChannelMessageListener listener) {
+    Network network,
+    Channel channel,
+    ChannelMessageListener listener,
+  ) {
     var key = channel.remoteId;
     if (!_channelsMessagesListeners.containsKey(key)) {
       _channelsMessagesListeners[key] = [];
@@ -58,18 +62,24 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   }
 
   @override
-  void onChannelJoined(Network network, ChannelWithState channelWithState) {
+  void onChannelJoined(
+    Network network,
+    ChannelWithState channelWithState,
+  ) {
     Channel channel = channelWithState.channel;
 
     _logger.fine(() => "listen for messages from channel $channel");
 
     _logger.fine(() => "onChannelJoined _onNewMessages "
         "${channelWithState.initMessages.length}");
-    _onNewMessages(MessagesForChannel.name(
+    _onNewMessages(
+      MessagesForChannel.name(
         isNeedCheckAdditionalLoadMore: true,
         channel: channel,
         messages: channelWithState.initMessages,
-        isNeedCheckAlreadyExistInLocalStorage: true));
+        isNeedCheckAlreadyExistInLocalStorage: true,
+      ),
+    );
 
     var channelDisposable = CompositeDisposable([]);
 
@@ -102,7 +112,10 @@ class MessageManagerBloc extends ChannelListListenerBloc {
         network,
         channel,
         (ToggleMessagePreviewData togglePreview) async {
-          var newMessage = await _togglePreview(channel, togglePreview);
+          var newMessage = await _togglePreview(
+            channel,
+            togglePreview,
+          );
 
           _messageUpdateSubject.add(newMessage);
         },
@@ -118,30 +131,38 @@ class MessageManagerBloc extends ChannelListListenerBloc {
   Future<ChatMessage> _togglePreview(
       Channel channel, ToggleMessagePreviewData togglePreview) async {
     var previewForMessage = MessagePreviewForRemoteMessageId(
-        togglePreview.message.messageRemoteId, togglePreview.preview);
+      remoteMessageId: togglePreview.message.messageRemoteId,
+      messagePreview: togglePreview.preview,
+    );
 
     var oldMessageDB = await _db.regularMessagesDao
         .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
-    var foundOldMessage = message.previews.firstWhere((preview) {
-      return preview.link == previewForMessage.messagePreview.link;
-    }, orElse: () => null);
+    var foundOldMessage = message.previews.firstWhere(
+      (preview) {
+        return preview.link == previewForMessage.messagePreview.link;
+      },
+      orElse: () => null,
+    );
 
     foundOldMessage.shown = togglePreview.newShownValue;
 
     var newMessageDB = toRegularMessageDB(message);
     newMessageDB.localId = oldMessageDB.localId;
-    await _db.regularMessagesDao.updateRegularMessage(newMessageDB);
+    await _db.regularMessagesDao.updateRegularMessage(
+      newMessageDB,
+    );
 
     return message;
   }
 
   Future<ChatMessage> _updatePreview(Channel channel,
       MessagePreviewForRemoteMessageId previewForMessage) async {
-    var oldMessageDB = await _db.regularMessagesDao
-        .findMessageWithRemoteId(previewForMessage.remoteMessageId);
+    var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
+      previewForMessage.remoteMessageId,
+    );
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
 
@@ -192,10 +213,11 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     var key = messagesForChannel.channel.remoteId;
     if (_channelsMessagesListeners.containsKey(key)) {
-      _channelsMessagesListeners[key]
-          .forEach((ChannelMessageListener listener) {
-        listener(messagesForChannel);
-      });
+      _channelsMessagesListeners[key].forEach(
+        (ChannelMessageListener listener) {
+          listener(messagesForChannel);
+        },
+      );
     }
 
 //    _realtimeMessagesSubject.add(messagesForChannel);

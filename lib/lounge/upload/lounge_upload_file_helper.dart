@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-
 import 'package:flutter_appirc/lounge/upload/lounge_upload_file_model.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
@@ -21,7 +20,11 @@ Future<String> uploadFileToLounge(String loungeURL, File file,
     String uploadAuthToken, int maximumPossibleUploadFileSizeInBytes) async {
   if (uploadAuthToken?.isNotEmpty != true) {
     throw ServerAuthInvalidLoungeUploadException(
-        file, loungeURL, uploadAuthToken, maximumPossibleUploadFileSizeInBytes);
+      file,
+      loungeURL,
+      uploadAuthToken,
+      maximumPossibleUploadFileSizeInBytes,
+    );
   }
 
   if (maximumPossibleUploadFileSizeInBytes != null &&
@@ -29,17 +32,30 @@ Future<String> uploadFileToLounge(String loungeURL, File file,
     var fileLength = await file.length();
 
     if (fileLength > maximumPossibleUploadFileSizeInBytes) {
-      throw FileSizeExceededLoungeUploadException(file, loungeURL,
-          uploadAuthToken, maximumPossibleUploadFileSizeInBytes, fileLength);
+      throw FileSizeExceededLoungeUploadException(
+        file,
+        loungeURL,
+        uploadAuthToken,
+        maximumPossibleUploadFileSizeInBytes,
+        fileLength,
+      );
     }
   }
 
   loungeURL = _removeTrailingSlashIfExist(loungeURL);
 
-  var postUri = _calculatePostURI(loungeURL, uploadAuthToken);
+  var postUri = _calculatePostURI(
+    loungeURL,
+    uploadAuthToken,
+  );
   _logger.fine(() => "uploadFileToLounge $postUri");
-  var request = MultipartRequest(_uploadMultipartRequestMethod, postUri);
-  request.files.add(await _createPostMultipartFile(file));
+  var request = MultipartRequest(
+    _uploadMultipartRequestMethod,
+    postUri,
+  );
+  request.files.add(
+    await _createPostMultipartFile(file),
+  );
 
   var response = await request.send();
 
@@ -74,39 +90,62 @@ Future<String> uploadFileToLounge(String loungeURL, File file,
     await listener.cancel();
 
     if (timeout) {
-      throw TimeoutHttpLoungeUploadException(file, loungeURL, uploadAuthToken,
-          maximumPossibleUploadFileSizeInBytes);
+      throw TimeoutHttpLoungeUploadException(
+        file,
+        loungeURL,
+        uploadAuthToken,
+        maximumPossibleUploadFileSizeInBytes,
+      );
     } else {
       _logger
           .fine(() => "uploadFileToLounge response body $decodedResponseBody");
 
       var responseBody = LoungeResponseUploadResponseBody.fromJson(
-          json.decode(decodedResponseBody));
+        json.decode(
+          decodedResponseBody,
+        ),
+      );
 
       if (responseBody?.url == null) {
         throw InvalidHttpResponseBodyLoungeUploadException(
-            file,
-            loungeURL,
-            uploadAuthToken,
-            maximumPossibleUploadFileSizeInBytes,
-            decodedResponseBody);
+          file,
+          loungeURL,
+          uploadAuthToken,
+          maximumPossibleUploadFileSizeInBytes,
+          decodedResponseBody,
+        );
       } else {
-        return _calculateUploadedFileURL(loungeURL, responseBody?.url);
+        return _calculateUploadedFileURL(
+          loungeURL,
+          responseBody?.url,
+        );
       }
     }
   } else {
-    throw InvalidHttpResponseCodeLoungeUploadException(file, loungeURL,
-        uploadAuthToken, maximumPossibleUploadFileSizeInBytes, responseCode);
+    throw InvalidHttpResponseCodeLoungeUploadException(
+      file,
+      loungeURL,
+      uploadAuthToken,
+      maximumPossibleUploadFileSizeInBytes,
+      responseCode,
+    );
   }
 }
 
-String _calculateUploadedFileURL(String loungeURL, String relativePath) =>
+String _calculateUploadedFileURL(
+  String loungeURL,
+  String relativePath,
+) =>
     loungeURL + "/" + relativePath;
 
 Future<MultipartFile> _createPostMultipartFile(File file) async {
   return MultipartFile.fromBytes(
-      _uploadFileResponseBodyRelativePathFieldName, await file.readAsBytes(),
-      filename: basename(file.path));
+    _uploadFileResponseBodyRelativePathFieldName,
+    await file.readAsBytes(),
+    filename: basename(
+      file.path,
+    ),
+  );
 }
 
 Uri _calculatePostURI(String loungeURL, String uploadAuthToken) =>

@@ -19,8 +19,11 @@ class MessagePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return buildPlatformScaffold(context,
-        appBar: _buildAppBar(context), body: _buildBody(context));
+    return buildPlatformScaffold(
+      context,
+      appBar: _buildAppBar(context),
+      body: _buildBody(context),
+    );
   }
 
   PlatformAppBar _buildAppBar(BuildContext context) {
@@ -59,10 +62,11 @@ class MessagePage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: buildMessageWidget(
-              message: message,
-              messageInListState: notInSearchState,
-              messageWidgetType: MessageWidgetType.raw,
-              enableMessageActions: false),
+            message: message,
+            messageInListState: notInSearchState,
+            messageWidgetType: MessageWidgetType.raw,
+            enableMessageActions: false,
+          ),
         ),
       ),
     );

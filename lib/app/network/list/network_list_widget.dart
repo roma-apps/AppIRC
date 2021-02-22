@@ -130,8 +130,13 @@ class NetworkListWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildChannelItemWidget(BuildContext context, Network network,
-      Channel channel, bool expanded, bool isChannelActive) {
+  Widget _buildChannelItemWidget(
+    BuildContext context,
+    Network network,
+    Channel channel,
+    bool expanded,
+    bool isChannelActive,
+  ) {
     IconData networkExpandedStateIcon = _calculateExpandIconData(expanded);
 
     var networkBloc = NetworkBlocsBloc.of(context).getNetworkBloc(network);
@@ -148,11 +153,28 @@ class NetworkListWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          _buildToggleExpandButton(context, networkBloc.network,
-              networkExpandedStateIcon, isChannelActive, expanded),
-          _buildNetworkTitle(context, networkBloc, isChannelActive),
-          _buildConnectionIcon(context, networkBloc, isChannelActive),
-          buildChannelUnreadCountBadge(context, channelBloc, isChannelActive),
+          _buildToggleExpandButton(
+            context,
+            networkBloc.network,
+            networkExpandedStateIcon,
+            isChannelActive,
+            expanded,
+          ),
+          _buildNetworkTitle(
+            context,
+            networkBloc,
+            isChannelActive,
+          ),
+          _buildConnectionIcon(
+            context,
+            networkBloc,
+            isChannelActive,
+          ),
+          buildChannelUnreadCountBadge(
+            context,
+            channelBloc,
+            isChannelActive,
+          ),
           buildNetworkPopupMenuButton(
             context: context,
             networkBloc: networkBloc,
@@ -232,11 +254,12 @@ class NetworkListWidget extends StatelessWidget {
   }
 
   PlatformIconButton _buildToggleExpandButton(
-      BuildContext context,
-      Network network,
-      IconData networkExpandedStateIcon,
-      bool isChannelActive,
-      bool expanded) {
+    BuildContext context,
+    Network network,
+    IconData networkExpandedStateIcon,
+    bool isChannelActive,
+    bool expanded,
+  ) {
     var preferencesService = ILocalPreferencesService.of(context);
     return PlatformIconButton(
       icon: Icon(

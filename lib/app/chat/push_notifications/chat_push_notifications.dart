@@ -6,7 +6,6 @@ import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
-
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:flutter_appirc/pushes/push_service.dart';
 import 'package:logging/logging.dart';
@@ -22,17 +21,19 @@ class ChatPushesService extends DisposableOwner {
   final ChatInitBloc _chatInitBloc;
 
   Stream<ChatPushMessage> get chatPushMessageStream =>
-      _pushesService.messageStream.map((pushMessage) {
-        Map<String, dynamic> data = _remapToStringObjectMap(pushMessage);
+      _pushesService.messageStream.map(
+        (pushMessage) {
+          Map<String, dynamic> data = _remapToStringObjectMap(pushMessage);
 
-        if (Platform.isIOS) {
-          return _parseChatPushMessageOnAndroid(pushMessage, data);
-        } else if (Platform.isAndroid) {
-          return _parseChatPushMessageOnIOS(data, pushMessage);
-        } else {
-          throw Exception("Platform not supported");
-        }
-      });
+          if (Platform.isIOS) {
+            return _parseChatPushMessageOnAndroid(pushMessage, data);
+          } else if (Platform.isAndroid) {
+            return _parseChatPushMessageOnIOS(data, pushMessage);
+          } else {
+            throw Exception("Platform not supported");
+          }
+        },
+      );
 
   Map<String, dynamic> _remapToStringObjectMap(PushMessage pushMessage) {
     return pushMessage.data
@@ -83,34 +84,48 @@ class ChatPushesService extends DisposableOwner {
   ChatPushesService(
       this._pushesService, this._backendService, this._chatInitBloc) {
     addDisposable(
-        streamSubscription: _chatInitBloc.stateStream.listen((newState) {
-      if (newState == ChatInitState.finished) {
-        var token = _pushesService.token;
-        if (token != null) {
-          _backendService.sendDevicePushFCMTokenToServer(token);
-        }
-      }
-    }));
-
-    addDisposable(streamSubscription:
-        _backendService.connectionStateStream.listen((connectionState) {
-      var token = _pushesService.token;
-
-      if (token != null && connectionState == ChatConnectionState.connected) {
-        _backendService.sendDevicePushFCMTokenToServer(token);
-      }
-    }));
-    addDisposable(
-        streamSubscription: _pushesService.tokenStream.listen((token) {
-      if (token != null &&
-          _backendService.connectionState == ChatConnectionState.connected) {
-        _backendService.sendDevicePushFCMTokenToServer(token);
-      }
-    }));
+      streamSubscription: _chatInitBloc.stateStream.listen(
+        (newState) {
+          if (newState == ChatInitState.finished) {
+            var token = _pushesService.token;
+            if (token != null) {
+              _backendService.sendDevicePushFCMTokenToServer(token);
+            }
+          }
+        },
+      ),
+    );
 
     addDisposable(
-        streamSubscription: _pushesService.messageStream.listen((pushMessage) {
-      _logger.fine(() => "newPushMessage $pushMessage");
-    }));
+      streamSubscription: _backendService.connectionStateStream.listen(
+        (connectionState) {
+          var token = _pushesService.token;
+
+          if (token != null &&
+              connectionState == ChatConnectionState.connected) {
+            _backendService.sendDevicePushFCMTokenToServer(token);
+          }
+        },
+      ),
+    );
+    addDisposable(
+      streamSubscription: _pushesService.tokenStream.listen(
+        (token) {
+          if (token != null &&
+              _backendService.connectionState ==
+                  ChatConnectionState.connected) {
+            _backendService.sendDevicePushFCMTokenToServer(token);
+          }
+        },
+      ),
+    );
+
+    addDisposable(
+      streamSubscription: _pushesService.messageStream.listen(
+        (pushMessage) {
+          _logger.fine(() => "newPushMessage $pushMessage");
+        },
+      ),
+    );
   }
 }

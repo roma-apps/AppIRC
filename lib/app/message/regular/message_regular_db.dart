@@ -93,9 +93,9 @@ abstract class RegularMessageDao {
 
   Future findRegularMessageLocalIds(
       List<RegularMessage> regularMessages) async {
-    for(var regularMessage in regularMessages) {
+    for (var regularMessage in regularMessages) {
       var regularMessageDB =
-      await findMessageLocalIdWithRemoteId(regularMessage.messageRemoteId);
+          await findMessageLocalIdWithRemoteId(regularMessage.messageRemoteId);
       var localId = (regularMessageDB)?.localId;
 
       regularMessage.messageLocalId = localId;
@@ -103,22 +103,36 @@ abstract class RegularMessageDao {
   }
 
   @transaction
-  Future upsertRegularMessages(
-      List<RegularMessage> messages) async {
+  Future upsertRegularMessages(List<RegularMessage> messages) async {
     return await Future.wait(
-        messages.map((message) async => await upsertRegularMessage(message)));
+      messages.map(
+        (message) async => await upsertRegularMessage(
+          message,
+        ),
+      ),
+    );
   }
 
   @transaction
   Future insertRegularMessages(List<RegularMessageDB> messages) async {
     return await Future.wait(
-        messages.map((message) async => await insertRegularMessage(message)));
+      messages.map(
+        (message) async => await insertRegularMessage(
+          message,
+        ),
+      ),
+    );
   }
 
   @transaction
   Future updateRegularMessages(List<RegularMessageDB> messages) async {
     return await Future.wait(
-        messages.map((message) async => await updateRegularMessage(message)));
+      messages.map(
+        (message) async => await updateRegularMessage(
+          message,
+        ),
+      ),
+    );
   }
 
   @Query('DELETE FROM RegularMessageDB')
@@ -411,8 +425,7 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
   throw Exception("Invalid RegularMessageType = $type");
 }
 
-RegularMessageDB toRegularMessageDB(
-        RegularMessage regularMessage) =>
+RegularMessageDB toRegularMessageDB(RegularMessage regularMessage) =>
     RegularMessageDB.name(
         messageRemoteId: regularMessage.messageRemoteId,
         command: regularMessage.command,
@@ -420,9 +433,15 @@ RegularMessageDB toRegularMessageDB(
         text: regularMessage.text,
         regularMessageTypeId:
             regularMessageTypeTypeToId(regularMessage.regularMessageType),
-        self: regularMessage.self != null ? regularMessage.self ? 1 : 0 : null,
+        self: regularMessage.self != null
+            ? regularMessage.self
+                ? 1
+                : 0
+            : null,
         highlight: regularMessage.highlight != null
-            ? regularMessage.highlight ? 1 : 0
+            ? regularMessage.highlight
+                ? 1
+                : 0
             : null,
         paramsJsonEncoded: json.encode(regularMessage.params),
         nicknamesJsonEncoded: json.encode(regularMessage.nicknames),
@@ -441,41 +460,44 @@ RegularMessageDB toRegularMessageDB(
         newNick: regularMessage.newNick,
         channelRemoteId: regularMessage.channelRemoteId);
 
-RegularMessage
-    regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
-        RegularMessage
-            .name(messageDB.channelRemoteId,
-                messageLocalId: messageDB.localId,
-                messageRemoteId: messageDB.messageRemoteId,
-                command: messageDB.command,
-                hostMask: messageDB.hostMask,
-                text: messageDB.text,
-                params: messageDB.paramsJsonEncoded != null
-                    ? _convertParams(messageDB)
-                    : null,
-                regularMessageType:
-                    regularMessageTypeIdToType(messageDB.regularMessageTypeId),
-                self: messageDB.self != null
-                    ? messageDB.self == 0 ? false : true
-                    : null,
-                highlight: messageDB.highlight != null
-                    ? messageDB.highlight == 0 ? false : true
-                    : null,
-                previews: messageDB.previewsJsonEncoded != null
-                    ? _convertPreviews(messageDB)
-                    : null,
-                linksInText: messageDB.linksJsonEncoded != null
-                    ? convertLinks(messageDB)
-                    : null,
-                date: DateTime.fromMicrosecondsSinceEpoch(
-                    messageDB.dateMicrosecondsSinceEpoch),
-                fromRemoteId: messageDB.fromRemoteId,
-                fromNick: messageDB.fromNick,
-                fromMode: messageDB.fromMode,
-                newNick: messageDB.newNick,
-                nicknames: messageDB.nicknamesJsonEncoded != null
-                    ? _convertNicknames(messageDB)
-                    : null);
+RegularMessage regularMessageDBToChatMessage(RegularMessageDB messageDB) =>
+    RegularMessage.name(
+      messageDB.channelRemoteId,
+      messageLocalId: messageDB.localId,
+      messageRemoteId: messageDB.messageRemoteId,
+      command: messageDB.command,
+      hostMask: messageDB.hostMask,
+      text: messageDB.text,
+      params: messageDB.paramsJsonEncoded != null
+          ? _convertParams(messageDB)
+          : null,
+      regularMessageType:
+          regularMessageTypeIdToType(messageDB.regularMessageTypeId),
+      self: messageDB.self != null
+          ? messageDB.self == 0
+              ? false
+              : true
+          : null,
+      highlight: messageDB.highlight != null
+          ? messageDB.highlight == 0
+              ? false
+              : true
+          : null,
+      previews: messageDB.previewsJsonEncoded != null
+          ? _convertPreviews(messageDB)
+          : null,
+      linksInText:
+          messageDB.linksJsonEncoded != null ? convertLinks(messageDB) : null,
+      date: DateTime.fromMicrosecondsSinceEpoch(
+          messageDB.dateMicrosecondsSinceEpoch),
+      fromRemoteId: messageDB.fromRemoteId,
+      fromNick: messageDB.fromNick,
+      fromMode: messageDB.fromMode,
+      newNick: messageDB.newNick,
+      nicknames: messageDB.nicknamesJsonEncoded != null
+          ? _convertNicknames(messageDB)
+          : null,
+    );
 
 List<String> _convertNicknames(RegularMessageDB messageDB) {
   var decoded = json.decode(messageDB.nicknamesJsonEncoded);

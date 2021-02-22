@@ -17,7 +17,6 @@ import 'package:flutter_appirc/app/network/preferences/network_preferences_model
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
-
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
@@ -26,7 +25,8 @@ import 'package:logging/logging.dart';
 var _logger = Logger("lounge_model_adapter.dart");
 
 Future<ChatInitInformation> toChatInitInformation(
-    InitLoungeResponseBody parsed) async {
+  InitLoungeResponseBody parsed,
+) async {
   var loungeNetworks = parsed.networks;
   var networksWithState = <NetworkWithState>[];
   var channelsWithState = <ChannelWithState>[];
@@ -52,35 +52,42 @@ Future<ChatInitInformation> toChatInitInformation(
 }
 
 ChatConfig toChatConfig(
-        ConfigurationLoungeResponseBody loungeConfig, List<String> commands) =>
-    ChatConfig.name(
-        defaultNetwork: NetworkConnectionPreferences(
-            serverPreferences: NetworkServerPreferences(
-                name: loungeConfig.defaults.name,
-                serverHost: loungeConfig.defaults.host,
-                serverPort: loungeConfig.defaults.port.toString(),
-                useTls: loungeConfig.defaults.tls,
-                useOnlyTrustedCertificates:
-                    loungeConfig.defaults.rejectUnauthorized),
-            userPreferences: NetworkUserPreferences(
-                nickname: loungeConfig.defaults.nick,
-                realName: loungeConfig.defaults.realname,
-                username: loungeConfig.defaults.username,
-                password: loungeConfig.defaults.password,
-                commands: null)),
-        defaultChannels: loungeConfig.defaults.join,
-        fileUpload: loungeConfig.fileUpload,
-        displayNetwork: loungeConfig.displayNetwork,
-        lockNetwork: loungeConfig.lockNetwork,
-        ldapEnabled: loungeConfig.ldapEnabled,
-        prefetch: loungeConfig.prefetch,
-        public: loungeConfig.public,
-        useHexIp: loungeConfig.useHexIp,
-        fileUploadMaxSizeInBytes: loungeConfig.fileUploadMaxFileSize,
-        commands: commands);
+  ConfigurationLoungeResponseBody loungeConfig,
+  List<String> commands,
+) =>
+    ChatConfig(
+      defaultNetwork: NetworkConnectionPreferences(
+        serverPreferences: NetworkServerPreferences(
+          name: loungeConfig.defaults.name,
+          serverHost: loungeConfig.defaults.host,
+          serverPort: loungeConfig.defaults.port.toString(),
+          useTls: loungeConfig.defaults.tls,
+          useOnlyTrustedCertificates: loungeConfig.defaults.rejectUnauthorized,
+        ),
+        userPreferences: NetworkUserPreferences(
+          nickname: loungeConfig.defaults.nick,
+          realName: loungeConfig.defaults.realname,
+          username: loungeConfig.defaults.username,
+          password: loungeConfig.defaults.password,
+          commands: null,
+        ),
+      ),
+      defaultChannels: loungeConfig.defaults.join,
+      fileUpload: loungeConfig.fileUpload,
+      displayNetwork: loungeConfig.displayNetwork,
+      lockNetwork: loungeConfig.lockNetwork,
+      ldapEnabled: loungeConfig.ldapEnabled,
+      prefetch: loungeConfig.prefetch,
+      public: loungeConfig.public,
+      useHexIp: loungeConfig.useHexIp,
+      fileUploadMaxSizeInBytes: loungeConfig.fileUploadMaxFileSize,
+      commands: commands,
+    );
 
 Future<ChatMessage> toChatMessage(
-    Channel channel, MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
+  Channel channel,
+  MsgLoungeResponseBodyPart msgLoungeResponseBody,
+) async {
   var regularMessageType = detectRegularMessageType(msgLoungeResponseBody.type);
 
   if (regularMessageType == RegularMessageType.whoIs) {
@@ -143,7 +150,9 @@ Future<ChatMessage> toChatMessage(
 }
 
 Future<SpecialMessage> toWhoIsSpecialMessage(
-    Channel channel, MsgLoungeResponseBodyPart msgLoungeResponseBody) async {
+  Channel channel,
+  MsgLoungeResponseBodyPart msgLoungeResponseBody,
+) async {
   var whoIsSpecialBody = toWhoIsSpecialMessageBody(msgLoungeResponseBody.whois);
 
   return SpecialMessage(
@@ -158,8 +167,10 @@ Future<SpecialMessage> toWhoIsSpecialMessage(
 // Return list instead of one message
 // because lounge SpecialMessageType.CHANNELS_LIST_ITEM message
 // contains several ChatSpecialMessages
-Future<List<SpecialMessage>> toSpecialMessages(Channel channel,
-    MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody) async {
+Future<List<SpecialMessage>> toSpecialMessages(
+  Channel channel,
+  MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
+) async {
   var messageType =
       detectSpecialMessageType(messageSpecialLoungeResponseBody.data);
 
@@ -177,9 +188,10 @@ Future<List<SpecialMessage>> toSpecialMessages(Channel channel,
 }
 
 Future<List<SpecialMessage>> toChannelsListSpecialMessages(
-    MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
-    Channel channel,
-    SpecialMessageType messageType) async {
+  MsgSpecialLoungeResponseBody messageSpecialLoungeResponseBody,
+  Channel channel,
+  SpecialMessageType messageType,
+) async {
   var iterable = messageSpecialLoungeResponseBody.data as Iterable;
 
   var specialMessages = <SpecialMessage>[];
@@ -188,9 +200,10 @@ Future<List<SpecialMessage>> toChannelsListSpecialMessages(
     var loungeChannelItem =
         ChannelListItemSpecialMessageLoungeResponseBodyPart.fromJson(item);
     var channelInfoSpecialMessageBody = ChannelInfoSpecialMessageBody(
-        loungeChannelItem.channel,
-        loungeChannelItem.topic,
-        loungeChannelItem.num_users);
+      name: loungeChannelItem.channel,
+      topic: loungeChannelItem.topic,
+      usersCount: loungeChannelItem.num_users,
+    );
 
     specialMessages.add(
       SpecialMessage(
@@ -300,7 +313,9 @@ ChannelType detectChannelType(String typeString) {
 }
 
 ChannelState toChannelState(
-    ChannelLoungeResponseBodyPart loungeChannel, ChannelType type) {
+  ChannelLoungeResponseBodyPart loungeChannel,
+  ChannelType type,
+) {
   // Private and special messages are always connected, but lounge sometimes
   // don't provide connected state for them
   var isConnected = type == ChannelType.query || type == ChannelType.special
@@ -316,34 +331,48 @@ ChannelState toChannelState(
     moreHistoryAvailable =
         loungeChannel.totalMessages > loungeChannel.messages.length;
   }
-  return ChannelState.name(
-      topic: loungeChannel.topic,
-      firstUnreadRemoteMessageId: loungeChannel.firstUnread,
-      editTopicPossible: loungeChannel.editTopic,
-      unreadCount: loungeChannel.unread,
-      connected: isConnected,
-      highlighted: loungeChannel.highlight != null,
-      moreHistoryAvailable: moreHistoryAvailable);
+  return ChannelState(
+    topic: loungeChannel.topic,
+    firstUnreadRemoteMessageId: loungeChannel.firstUnread,
+    editTopicPossible: loungeChannel.editTopic,
+    unreadCount: loungeChannel.unread,
+    connected: isConnected,
+    highlighted: loungeChannel.highlight != null,
+    moreHistoryAvailable: moreHistoryAvailable,
+  );
 }
 
-NetworkState toNetworkState(NetworkStatusLoungeResponseBody loungeNetworkStatus,
-        String nick, String name) =>
+NetworkState toNetworkState(
+  NetworkStatusLoungeResponseBody loungeNetworkStatus,
+  String nick,
+  String name,
+) =>
     NetworkState.name(
-        connected: loungeNetworkStatus.connected,
-        secure: loungeNetworkStatus.secure,
-        nick: nick,
-        name: name);
+      connected: loungeNetworkStatus.connected,
+      secure: loungeNetworkStatus.secure,
+      nick: nick,
+      name: name,
+    );
 
 Future<MessageListLoadMore> toChatLoadMore(
-    Channel channel, MoreLoungeResponseBody moreLoungeResponseBody) async {
+  Channel channel,
+  MoreLoungeResponseBody moreLoungeResponseBody,
+) async {
   var messages = <ChatMessage>[];
 
   for (var loungeMessage in moreLoungeResponseBody.messages) {
-    messages.add(await toChatMessage(channel, loungeMessage));
+    messages.add(
+      await toChatMessage(
+        channel,
+        loungeMessage,
+      ),
+    );
   }
 
-  return MessageListLoadMore.name(
-      messages: messages, totalMessages: moreLoungeResponseBody.totalMessages);
+  return MessageListLoadMore(
+    messages: messages,
+    totalMessages: moreLoungeResponseBody.totalMessages,
+  );
 }
 
 RegularMessageType detectRegularMessageType(String stringType) {
@@ -439,9 +468,10 @@ String toLoungeBoolean(bool boolValue) {
 }
 
 NetworkEditLoungeJsonRequest toNetworkEditLoungeRequestBody(
-    String remoteId,
-    NetworkUserPreferences userPreferences,
-    NetworkServerPreferences serverPreferences) {
+  String remoteId,
+  NetworkUserPreferences userPreferences,
+  NetworkServerPreferences serverPreferences,
+) {
   return NetworkEditLoungeJsonRequest.name(
     username: userPreferences.username,
     nick: userPreferences.nickname,
@@ -459,7 +489,8 @@ NetworkEditLoungeJsonRequest toNetworkEditLoungeRequestBody(
 }
 
 WhoIsSpecialMessageBody toWhoIsSpecialMessageBody(
-        WhoIsLoungeResponseBodyPart loungeWhoIs) =>
+  WhoIsLoungeResponseBodyPart loungeWhoIs,
+) =>
     WhoIsSpecialMessageBody.name(
         account: loungeWhoIs.account,
         channels: loungeWhoIs.channels,
@@ -478,7 +509,8 @@ WhoIsSpecialMessageBody toWhoIsSpecialMessageBody(
         actualIp: loungeWhoIs.actual_ip);
 
 MessagePreview toMessagePreview(
-    MsgPreviewLoungeResponseBodyPart loungePreview) {
+  MsgPreviewLoungeResponseBodyPart loungePreview,
+) {
   var thumb = loungePreview.thumb;
 
   // Sometimes lounge server prefetch remote image and fails
@@ -489,16 +521,17 @@ MessagePreview toMessagePreview(
   if (thumb?.startsWith("storage") == true) {
     thumb = loungePreview.link;
   }
-  return MessagePreview.name(
-      head: loungePreview.head,
-      body: loungePreview.body,
-      canDisplay: loungePreview.canDisplay,
-      shown: loungePreview.shown,
-      link: loungePreview.link,
-      thumb: thumb,
-      type: detectMessagePreviewType(loungePreview.type),
-      media: loungePreview.media,
-      mediaType: loungePreview.mediaType);
+  return MessagePreview(
+    head: loungePreview.head,
+    body: loungePreview.body,
+    canDisplay: loungePreview.canDisplay,
+    shown: loungePreview.shown,
+    link: loungePreview.link,
+    thumb: thumb,
+    type: detectMessagePreviewType(loungePreview.type),
+    media: loungePreview.media,
+    mediaType: loungePreview.mediaType,
+  );
 }
 
 MessagePreviewType detectMessagePreviewType(String type) {
@@ -527,41 +560,61 @@ MessagePreviewType detectMessagePreviewType(String type) {
 }
 
 Future<ChannelWithState> toChannelWithState(
-    ChannelLoungeResponseBodyPart loungeChannel) async {
+  ChannelLoungeResponseBodyPart loungeChannel,
+) async {
   var channel = Channel(
-      ChannelPreferences.name(
-          name: loungeChannel.name,
-          // Network channels which exists on network join doesn't use passwords
-          password: ""),
-      detectChannelType(loungeChannel.type),
-      loungeChannel.id);
-  var channelState = toChannelState(loungeChannel, channel.type);
+    ChannelPreferences(
+      name: loungeChannel.name,
+      // Network channels which exists on network join doesn't use passwords
+      password: "",
+    ),
+    detectChannelType(loungeChannel.type),
+    loungeChannel.id,
+  );
+  var channelState = toChannelState(
+    loungeChannel,
+    channel.type,
+  );
 
   var initMessages = <ChatMessage>[];
   if (loungeChannel.messages != null) {
     for (var loungeMessage in loungeChannel.messages) {
-      initMessages.add(await toChatMessage(channel, loungeMessage));
+      initMessages.add(
+        await toChatMessage(
+          channel,
+          loungeMessage,
+        ),
+      );
     }
   }
 
   var initUsers = loungeChannel.users
       ?.map((loungeUser) => toChannelUser(loungeUser))
       ?.toList();
-  var channelWithState =
-      ChannelWithState(channel, channelState, initMessages, initUsers);
+  var channelWithState = ChannelWithState(
+    channel,
+    channelState,
+    initMessages,
+    initUsers,
+  );
   return channelWithState;
 }
 
-ChannelUser toChannelUser(UserLoungeResponseBodyPart loungeUser) {
-  return ChannelUser.name(nick: loungeUser.nick, mode: loungeUser.mode);
-}
+ChannelUser toChannelUser(UserLoungeResponseBodyPart loungeUser) => ChannelUser(
+      nick: loungeUser.nick,
+      mode: loungeUser.mode,
+    );
 
 Future<NetworkWithState> toNetworkWithState(
     NetworkLoungeResponseBodyPart loungeNetwork) async {
   var channelsWithState = <ChannelWithState>[];
 
   for (var loungeChannel in loungeNetwork.channels) {
-    channelsWithState.add(await toChannelWithState(loungeChannel));
+    channelsWithState.add(
+      await toChannelWithState(
+        loungeChannel,
+      ),
+    );
   }
 
   var channels = channelsWithState
@@ -571,32 +624,44 @@ Future<NetworkWithState> toNetworkWithState(
   var nick = loungeNetwork.nick;
   NetworkConnectionPreferences connectionPreferences =
       NetworkConnectionPreferences(
-          serverPreferences:
-              NetworkServerPreferences(
-                  name: loungeNetwork.name,
-                  serverHost: loungeNetwork.host,
-                  serverPort: loungeNetwork.port.toString(),
-                  useTls: loungeNetwork.tls,
-                  useOnlyTrustedCertificates: loungeNetwork.rejectUnauthorized),
-          userPreferences: NetworkUserPreferences(
-              nickname: nick,
-              password: null,
-              commands: null,
-              realName: loungeNetwork.realname,
-              username: loungeNetwork.username));
-  var network = Network(connectionPreferences, loungeNetwork.uuid, channels);
+    serverPreferences: NetworkServerPreferences(
+        name: loungeNetwork.name,
+        serverHost: loungeNetwork.host,
+        serverPort: loungeNetwork.port.toString(),
+        useTls: loungeNetwork.tls,
+        useOnlyTrustedCertificates: loungeNetwork.rejectUnauthorized),
+    userPreferences: NetworkUserPreferences(
+      nickname: nick,
+      password: null,
+      commands: null,
+      realName: loungeNetwork.realname,
+      username: loungeNetwork.username,
+    ),
+  );
+  var network = Network(
+    connectionPreferences,
+    loungeNetwork.uuid,
+    channels,
+  );
 
   var loungeNetworkStatus = loungeNetwork.status;
 
-  var networkState = toNetworkState(loungeNetworkStatus, nick, network.name);
+  var networkState = toNetworkState(
+    loungeNetworkStatus,
+    nick,
+    network.name,
+  );
 
   // TODO: open ticket for lounge
   // Strange field, it should be inside networkStatus.
   // Sometimes network status connected == false but network actually connected
   networkState.connected = !loungeNetwork.userDisconnected;
 
-  var networkWithState =
-      NetworkWithState(network, networkState, channelsWithState);
+  var networkWithState = NetworkWithState(
+    network,
+    networkState,
+    channelsWithState,
+  );
   return networkWithState;
 }
 
@@ -606,7 +671,10 @@ ChatRegistrationResult toChatRegistrationResult(
     return ChatRegistrationResult.success();
   } else {
     return ChatRegistrationResult.fail(
-        toChatRegistrationErrorType(parsed.errorType));
+      toChatRegistrationErrorType(
+        parsed.errorType,
+      ),
+    );
   }
 }
 

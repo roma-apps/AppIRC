@@ -10,14 +10,12 @@ abstract class SpecialMessageBodyWidget<T extends SpecialMessageBody>
   final bool inSearchResults;
   final MessageWidgetType messageWidgetType;
 
-  SpecialMessageBodyWidget(
-      {@required this.message,
-      @required this.body,
-      @required this.inSearchResults,
-      @required this.messageWidgetType
-      });
+  SpecialMessageBodyWidget({
+    @required this.message,
+    @required this.body,
+    @required this.inSearchResults,
+    @required this.messageWidgetType,
+  });
 
   String getBodyRawText(BuildContext context);
 }
-
-

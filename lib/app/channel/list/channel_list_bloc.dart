@@ -28,10 +28,11 @@ class ChannelListBloc extends DisposableOwner {
   int get _nextChannelLocalId => _nextChannelIdGenerator();
 
   ChannelListBloc(
-      this._backendService,
-      this.network,
-      List<ChannelWithState> startChannelsWithState,
-      this._nextChannelIdGenerator) {
+    this._backendService,
+    this.network,
+    List<ChannelWithState> startChannelsWithState,
+    this._nextChannelIdGenerator,
+  ) {
     addDisposable(subject: _networksChannelsSubject);
 
     _onChannelsChanged(network.channels);
@@ -40,16 +41,18 @@ class ChannelListBloc extends DisposableOwner {
       _onChannelJoined(channelWithState);
     }
 
-    var listenForChannelJoin =
-        _backendService.listenForChannelJoin(network, (channelWithState) async {
-      var channel = channelWithState.channel;
+    var listenForChannelJoin = _backendService.listenForChannelJoin(
+      network,
+      (channelWithState) async {
+        var channel = channelWithState.channel;
 
-      network.channels.add(channel);
+        network.channels.add(channel);
 
-      _onChannelsChanged(network.channels);
+        _onChannelsChanged(network.channels);
 
-      _onChannelJoined(channelWithState);
-    });
+        _onChannelJoined(channelWithState);
+      },
+    );
 
     addDisposable(disposable: listenForChannelJoin);
   }

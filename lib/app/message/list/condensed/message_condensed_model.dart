@@ -11,10 +11,10 @@ class CondensedMessageListItem extends MessageListItem {
   bool isCondensed = true;
 
   @override
-  String toString() {
-    return 'CondensedMessageListItem{messages: $messages,'
-        ' isCondensed: $isCondensed}';
-  }
+  String toString() => 'CondensedMessageListItem{'
+      'messages: $messages,'
+      ' isCondensed: $isCondensed'
+      '}';
 
   @override
   bool operator ==(Object other) =>
@@ -22,6 +22,7 @@ class CondensedMessageListItem extends MessageListItem {
       other is CondensedMessageListItem &&
           runtimeType == other.runtimeType &&
           listEquals(messages, other.messages);
+
   @override
   int get hashCode => messages.hashCode;
 

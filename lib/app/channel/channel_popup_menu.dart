@@ -13,29 +13,39 @@ import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.d
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-Widget buildChannelPopupMenuButton(
-    {@required BuildContext context,
-    @required NetworkBloc networkBloc,
-    @required ChannelBloc channelBloc,
-    @required Color iconColor}) {
+Widget buildChannelPopupMenuButton({
+  @required BuildContext context,
+  @required NetworkBloc networkBloc,
+  @required ChannelBloc channelBloc,
+  @required Color iconColor,
+}) {
   var channel = channelBloc.channel;
   var network = networkBloc.network;
 
   if (channel.type == ChannelType.lobby) {
     return buildNetworkPopupMenuButton(
-        context: context, networkBloc: networkBloc, iconColor: iconColor);
+      context: context,
+      networkBloc: networkBloc,
+      iconColor: iconColor,
+    );
   }
 
-  return createPlatformPopupMenuButton(context,
-      child: Icon(Icons.more_vert, color: iconColor),
-      actions: _buildMenuItems(
-          context: context, network: network, channel: channel));
+  return createPlatformPopupMenuButton(
+    context,
+    child: Icon(Icons.more_vert, color: iconColor),
+    actions: _buildMenuItems(
+      context: context,
+      network: network,
+      channel: channel,
+    ),
+  );
 }
 
-List<PlatformAwarePopupMenuAction> _buildMenuItems(
-    {@required BuildContext context,
-    @required Network network,
-    @required Channel channel}) {
+List<PlatformAwarePopupMenuAction> _buildMenuItems({
+  @required BuildContext context,
+  @required Network network,
+  @required Channel channel,
+}) {
   List<PlatformAwarePopupMenuAction> menuItems;
 
   ChannelBloc channelBloc =
@@ -63,7 +73,9 @@ List<PlatformAwarePopupMenuAction> _buildMenuItems(
 }
 
 List<PlatformAwarePopupMenuAction> _buildChannelMenuItems(
-    BuildContext context, ChannelBloc channelBloc) {
+  BuildContext context,
+  ChannelBloc channelBloc,
+) {
   var items = <PlatformAwarePopupMenuAction>[
     _buildMembersMenuItem(context, channelBloc),
     _buildBannedUsersMenuItem(context, channelBloc),
@@ -75,13 +87,21 @@ List<PlatformAwarePopupMenuAction> _buildChannelMenuItems(
   //  if (channelBloc.channelState.editTopicPossible == true) {
   //    items.insert(0, _buildEditTopicMenuItem(context, channelBloc));
   //  }
-  items.insert(0, _buildEditTopicMenuItem(context, channelBloc));
+  items.insert(
+    0,
+    _buildEditTopicMenuItem(
+      context,
+      channelBloc,
+    ),
+  );
 
   return items;
 }
 
 List<PlatformAwarePopupMenuAction> _buildUserChannelMenuItems(
-    BuildContext context, ChannelBloc channelBloc) {
+  BuildContext context,
+  ChannelBloc channelBloc,
+) {
   return <PlatformAwarePopupMenuAction>[
     _buildUserInformationMenuItem(context, channelBloc),
     _buildCloseMenuItem(context, channelBloc)
@@ -89,7 +109,9 @@ List<PlatformAwarePopupMenuAction> _buildUserChannelMenuItems(
 }
 
 PlatformAwarePopupMenuAction _buildCloseMenuItem(
-    BuildContext context, ChannelBloc channelBloc) {
+  BuildContext context,
+  ChannelBloc channelBloc,
+) {
   return PlatformAwarePopupMenuAction(
     text: S.of(context).chat_channel_action_leave,
     iconData: Icons.clear,
@@ -120,7 +142,9 @@ PlatformAwarePopupMenuAction _buildMembersMenuItem(
     );
 
 PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
-    BuildContext context, ChannelBloc channelBloc) {
+  BuildContext context,
+  ChannelBloc channelBloc,
+) {
   return PlatformAwarePopupMenuAction(
     text: S.of(context).chat_channel_action_user_information,
     iconData: Icons.account_box,
@@ -131,7 +155,9 @@ PlatformAwarePopupMenuAction _buildUserInformationMenuItem(
 }
 
 PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
-    BuildContext context, ChannelBloc channelBloc) {
+  BuildContext context,
+  ChannelBloc channelBloc,
+) {
   return PlatformAwarePopupMenuAction(
     text: S.of(context).chat_channel_action_list_banned,
     iconData: Icons.list,
@@ -142,12 +168,17 @@ PlatformAwarePopupMenuAction _buildBannedUsersMenuItem(
 }
 
 PlatformAwarePopupMenuAction _buildEditTopicMenuItem(
-    BuildContext context, ChannelBloc channelBloc) {
+  BuildContext context,
+  ChannelBloc channelBloc,
+) {
   return PlatformAwarePopupMenuAction(
     text: S.of(context).chat_channel_action_topic,
     iconData: Icons.edit,
     actionCallback: (action) {
-      showTopicDialog(context, channelBloc);
+      showTopicDialog(
+        context,
+        channelBloc,
+      );
     },
   );
 }

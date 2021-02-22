@@ -13,8 +13,12 @@ abstract class ChatMessage {
   List<String> linksInText;
 
   ChatMessage(
-      this.chatMessageType, this.channelRemoteId, this.date, this.linksInText,
-      {this.messageLocalId});
+    this.chatMessageType,
+    this.channelRemoteId,
+    this.date,
+    this.linksInText, {
+    this.messageLocalId,
+  });
 
   bool get isSpecial => chatMessageType == ChatMessageType.special;
 
@@ -55,12 +59,13 @@ class MessagesForChannel {
   final bool isNeedCheckAlreadyExistInLocalStorage;
   final bool isContainsTextSpecialMessage;
 
-  MessagesForChannel.name(
-      {@required this.channel,
-      @required this.messages,
-      @required this.isNeedCheckAlreadyExistInLocalStorage,
-      @required this.isNeedCheckAdditionalLoadMore,
-      this.isContainsTextSpecialMessage = false});
+  MessagesForChannel.name({
+    @required this.channel,
+    @required this.messages,
+    @required this.isNeedCheckAlreadyExistInLocalStorage,
+    @required this.isNeedCheckAdditionalLoadMore,
+    this.isContainsTextSpecialMessage = false,
+  });
 
   @override
   String toString() {
@@ -68,7 +73,8 @@ class MessagesForChannel {
         ' messages: $messages, '
         ' isNeedCheckAlreadyExistInLocalStorage: $isNeedCheckAlreadyExistInLocalStorage, '
         ' isNeedCheckAdditionalLoadMore: $isNeedCheckAdditionalLoadMore, '
-        'isContainsTextSpecialMessage: $isContainsTextSpecialMessage}';
+        'isContainsTextSpecialMessage: $isContainsTextSpecialMessage'
+        '}';
   }
 }
 
@@ -100,10 +106,10 @@ class MessagesList {
 
   @override
   String toString() => 'MessagesList{'
-        'allMessages: $allMessages, '
-        'lastAddedMessages: $lastAddedMessages, '
-        'messageListUpdateType: $messageListUpdateType'
-        '}';
+      'allMessages: $allMessages, '
+      'lastAddedMessages: $lastAddedMessages, '
+      'messageListUpdateType: $messageListUpdateType'
+      '}';
 }
 
 enum MessageListUpdateType {
@@ -117,6 +123,24 @@ class MessageInListState {
   final bool inSearchResult;
   final String searchTerm;
 
-  MessageInListState.name(
-      {@required this.inSearchResult, @required this.searchTerm});
+  MessageInListState.name({
+    @required this.inSearchResult,
+    @required this.searchTerm,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessageInListState &&
+          runtimeType == other.runtimeType &&
+          inSearchResult == other.inSearchResult &&
+          searchTerm == other.searchTerm;
+
+  @override
+  int get hashCode => inSearchResult.hashCode ^ searchTerm.hashCode;
+
+  @override
+  String toString() => 'MessageInListState{'
+        'inSearchResult: $inSearchResult, '
+        'searchTerm: $searchTerm}';
 }

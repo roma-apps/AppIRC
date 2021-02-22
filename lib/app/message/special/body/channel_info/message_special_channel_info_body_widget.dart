@@ -16,17 +16,18 @@ class ChannelInfoSpecialMessageBodyWidget
     extends SpecialMessageBodyWidget<ChannelInfoSpecialMessageBody> {
   final MessageInListState messageInListState;
 
-  ChannelInfoSpecialMessageBodyWidget(
-      {@required SpecialMessage message,
-      @required this.messageInListState,
-      @required ChannelInfoSpecialMessageBody body,
-      @required bool inSearchResults,
-      @required MessageWidgetType messageWidgetType})
-      : super(
-            message: message,
-            body: body,
-            inSearchResults: inSearchResults,
-            messageWidgetType: messageWidgetType);
+  ChannelInfoSpecialMessageBodyWidget({
+    @required SpecialMessage message,
+    @required this.messageInListState,
+    @required ChannelInfoSpecialMessageBody body,
+    @required bool inSearchResults,
+    @required MessageWidgetType messageWidgetType,
+  }) : super(
+          message: message,
+          body: body,
+          inSearchResults: inSearchResults,
+          messageWidgetType: messageWidgetType,
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +38,21 @@ class ChannelInfoSpecialMessageBodyWidget
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              _buildChannelInfoName(context: context, channelName: body.name),
+              _buildChannelInfoName(
+                context: context,
+                channelName: body.name,
+              ),
               _buildChannelInfoUsersCount(
-                  context: context, usersCount: body.usersCount),
+                context: context,
+                usersCount: body.usersCount,
+              ),
             ],
           ),
           _buildChannelInfoTopic(
-              context: context,
-              topic: body.topic,
-              linksInText: message.linksInText ?? []),
+            context: context,
+            topic: body.topic,
+            linksInText: message.linksInText ?? [],
+          ),
         ],
       ),
     );
@@ -65,7 +72,7 @@ class ChannelInfoSpecialMessageBodyWidget
         NetworkBloc networkBloc = NetworkBloc.of(context);
 
         networkBloc.joinChannel(
-          ChannelPreferences.name(
+          ChannelPreferences(
             name: channelName,
             password: password,
           ),

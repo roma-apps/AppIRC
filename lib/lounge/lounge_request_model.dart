@@ -181,16 +181,21 @@ class MsgPreviewToggleLoungeJsonRequest extends LoungeJsonRequest {
   MsgPreviewToggleLoungeJsonRequest(
       this.target, this.msgId, this.link, this.shown);
 
-  MsgPreviewToggleLoungeJsonRequest.name(
-      {@required this.target,
-      @required this.msgId,
-      @required this.link,
-      @required this.shown});
+  MsgPreviewToggleLoungeJsonRequest.name({
+    @required this.target,
+    @required this.msgId,
+    @required this.link,
+    @required this.shown,
+  });
 
   @override
   String toString() {
-    return 'MsgPreviewToggleLoungeJsonRequest{target: $target, '
-        'msgId: $msgId, link: $link, shown: $shown}';
+    return 'MsgPreviewToggleLoungeJsonRequest{'
+        'target: $target, '
+        'msgId: $msgId, '
+        'link: $link, '
+        'shown: $shown'
+        '}';
   }
 
   @override
@@ -286,10 +291,15 @@ class AuthLoginLoungeJsonRequestBody extends LoungeJsonRequest {
     return 'AuthLoungeJsonRequestBody{user: $user, password: $password}';
   }
 
-  AuthLoginLoungeJsonRequestBody(this.user, this.password);
+  AuthLoginLoungeJsonRequestBody(
+    this.user,
+    this.password,
+  );
 
-  AuthLoginLoungeJsonRequestBody.name(
-      {@required this.user, @required this.password});
+  AuthLoginLoungeJsonRequestBody.name({
+    @required this.user,
+    @required this.password,
+  });
 
   @override
   Map<String, dynamic> toJson() => _$AuthLoginLoungeJsonRequestBodyToJson(this);
@@ -333,19 +343,19 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.networkEdit;
 
-  NetworkEditLoungeJsonRequest.name(
-      {@required this.uuid,
-      @required String host,
-      @required String name,
-      @required String nick,
-      @required String port,
-      @required String realname,
-      @required String password,
-      @required String rejectUnauthorized,
-      @required String tls,
-      @required String username,
-      @required String commands})
-      : super.name(
+  NetworkEditLoungeJsonRequest.name({
+    @required this.uuid,
+    @required String host,
+    @required String name,
+    @required String nick,
+    @required String port,
+    @required String realname,
+    @required String password,
+    @required String rejectUnauthorized,
+    @required String tls,
+    @required String username,
+    @required String commands,
+  }) : super.name(
           host: host,
           name: name,
           nick: nick,
@@ -370,8 +380,18 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
       String tls,
       String username,
       String commands)
-      : super(host, name, nick, port, realname, password, rejectUnauthorized,
-            tls, username, commands);
+      : super(
+          host,
+          name,
+          nick,
+          port,
+          realname,
+          password,
+          rejectUnauthorized,
+          tls,
+          username,
+          commands,
+        );
 
   @override
   Map<String, dynamic> toJson() => _$NetworkEditLoungeJsonRequestToJson(this);
@@ -413,19 +433,29 @@ class NetworkNewLoungeJsonRequest extends NetworkLoungeJsonRequest {
         );
 
   NetworkNewLoungeJsonRequest(
-      this.join,
-      String host,
-      String name,
-      String nick,
-      String port,
-      String realname,
-      String password,
-      String rejectUnauthorized,
-      String tls,
-      String username,
-      String commands)
-      : super(host, name, nick, port, realname, password, rejectUnauthorized,
-            tls, username, commands);
+    this.join,
+    String host,
+    String name,
+    String nick,
+    String port,
+    String realname,
+    String password,
+    String rejectUnauthorized,
+    String tls,
+    String username,
+    String commands,
+  ) : super(
+          host,
+          name,
+          nick,
+          port,
+          realname,
+          password,
+          rejectUnauthorized,
+          tls,
+          username,
+          commands,
+        );
 
   @override
   Map<String, dynamic> toJson() => _$NetworkNewLoungeJsonRequestToJson(this);
@@ -453,28 +483,30 @@ abstract class NetworkLoungeJsonRequest extends LoungeJsonRequest {
   String get uri => "$host:$port";
 
   NetworkLoungeJsonRequest(
-      this.host,
-      this.name,
-      this.nick,
-      this.port,
-      this.realname,
-      this.password,
-      this.rejectUnauthorized,
-      this.tls,
-      this.username,
-      this.commands);
+    this.host,
+    this.name,
+    this.nick,
+    this.port,
+    this.realname,
+    this.password,
+    this.rejectUnauthorized,
+    this.tls,
+    this.username,
+    this.commands,
+  );
 
-  NetworkLoungeJsonRequest.name(
-      {@required this.host,
-      @required this.commands,
-      @required this.name,
-      @required this.nick,
-      @required this.port,
-      @required this.realname,
-      @required this.rejectUnauthorized,
-      @required this.tls,
-      @required this.username,
-      @required this.password});
+  NetworkLoungeJsonRequest.name({
+    @required this.host,
+    @required this.commands,
+    @required this.name,
+    @required this.nick,
+    @required this.port,
+    @required this.realname,
+    @required this.rejectUnauthorized,
+    @required this.tls,
+    @required this.username,
+    @required this.password,
+  });
 }
 
 bool _toBoolean(String loungeBoolean) =>

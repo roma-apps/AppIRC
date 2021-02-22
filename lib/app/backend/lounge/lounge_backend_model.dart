@@ -16,8 +16,43 @@ class InvalidResponseException extends LoungeException {
   final bool commandReceived;
   final bool chatInitReceived;
 
-  InvalidResponseException(this.preferences, this.authorizedReceived,
-      this.configReceived, this.commandReceived, this.chatInitReceived);
+  InvalidResponseException(
+    this.preferences,
+    this.authorizedReceived,
+    this.configReceived,
+    this.commandReceived,
+    this.chatInitReceived,
+  );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is InvalidResponseException &&
+          runtimeType == other.runtimeType &&
+          preferences == other.preferences &&
+          authorizedReceived == other.authorizedReceived &&
+          configReceived == other.configReceived &&
+          commandReceived == other.commandReceived &&
+          chatInitReceived == other.chatInitReceived;
+
+  @override
+  int get hashCode =>
+      preferences.hashCode ^
+      authorizedReceived.hashCode ^
+      configReceived.hashCode ^
+      commandReceived.hashCode ^
+      chatInitReceived.hashCode;
+
+  @override
+  String toString() {
+    return 'InvalidResponseException{'
+        'preferences: $preferences, '
+        'authorizedReceived: $authorizedReceived, '
+        'configReceived: $configReceived, '
+        'commandReceived: $commandReceived, '
+        'chatInitReceived: $chatInitReceived'
+        '}';
+  }
 }
 
 class NotImplementedYetLoungeException implements LoungeException {
@@ -112,17 +147,19 @@ class LoungeHostInformation {
 
   LoungeHostInformation.notConnected()
       : this._name(
-            connected: false,
-            authRequired: null,
-            registrationSupported: null,
-            authResponse: null);
+          connected: false,
+          authRequired: null,
+          registrationSupported: null,
+          authResponse: null,
+        );
 
   LoungeHostInformation.connectedToPublic()
       : this._name(
-            connected: true,
-            authRequired: false,
-            registrationSupported: false,
-            authResponse: true);
+          connected: true,
+          authRequired: false,
+          registrationSupported: false,
+          authResponse: true,
+        );
 
   LoungeHostInformation.connectedToPrivate(
       {@required bool authResponse, @required bool registrationSupported})
@@ -134,8 +171,27 @@ class LoungeHostInformation {
 
   @override
   String toString() {
-    return 'LoungeHostInformation{connected: $connected,'
-        ' authRequired: $authRequired,'
-        ' registrationSupported: $registrationSupported}';
+    return 'LoungeHostInformation{'
+        'connected: $connected, '
+        'authRequired: $authRequired, '
+        'registrationSupported: $registrationSupported'
+        '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LoungeHostInformation &&
+          runtimeType == other.runtimeType &&
+          connected == other.connected &&
+          authRequired == other.authRequired &&
+          authResponse == other.authResponse &&
+          registrationSupported == other.registrationSupported;
+
+  @override
+  int get hashCode =>
+      connected.hashCode ^
+      authRequired.hashCode ^
+      authResponse.hashCode ^
+      registrationSupported.hashCode;
 }

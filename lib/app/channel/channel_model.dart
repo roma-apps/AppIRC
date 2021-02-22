@@ -32,8 +32,11 @@ class Channel {
 
   @override
   String toString() {
-    return 'Channel{channelPreferences: $channelPreferences,'
-        ' type: $type, remoteId: $remoteId}';
+    return 'Channel{'
+        'channelPreferences: $channelPreferences, '
+        'type: $type, '
+        'remoteId: $remoteId'
+        '}';
   }
 }
 

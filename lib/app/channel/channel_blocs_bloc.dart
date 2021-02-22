@@ -21,26 +21,35 @@ class ChannelBlocsBloc extends ChannelListListenerBloc {
   final ChatPushesService chatPushesService;
   final ChannelStatesBloc _channelsStatesBloc;
 
-  ChannelBlocsBloc(this._backendService, this.chatPushesService,
-      NetworkListBloc networksListBloc, this._channelsStatesBloc)
-      : super(networksListBloc) {
-    addDisposable(disposable: CustomDisposable(() {
-      _blocs.values.forEach((bloc) => _disposeChannelBloc(bloc));
-      _blocs.clear();
-    }));
+  ChannelBlocsBloc(
+    this._backendService,
+    this.chatPushesService,
+    NetworkListBloc networksListBloc,
+    this._channelsStatesBloc,
+  ) : super(networksListBloc) {
+    addDisposable(
+      disposable: CustomDisposable(
+        () {
+          _blocs.values.forEach((bloc) => _disposeChannelBloc(bloc));
+          _blocs.clear();
+        },
+      ),
+    );
   }
 
   void _disposeChannelBloc(ChannelBloc bloc) => bloc.dispose();
 
-  ChannelBloc getChannelBloc(Channel channel) =>
-      _blocs[channel];
+  ChannelBloc getChannelBloc(Channel channel) => _blocs[channel];
 
   @override
-  void onChannelJoined(
-      Network network, ChannelWithState channelWithState) {
+  void onChannelJoined(Network network, ChannelWithState channelWithState) {
     _blocs[channelWithState.channel] = ChannelBloc(
-        _backendService, chatPushesService,  network, channelWithState,
-        _channelsStatesBloc);
+      _backendService,
+      chatPushesService,
+      network,
+      channelWithState,
+      _channelsStatesBloc,
+    );
   }
 
   @override

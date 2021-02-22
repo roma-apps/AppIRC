@@ -6,9 +6,16 @@ class DaysDateSeparatorMessageListItem extends MessageListItem {
   final DateTime dayFirstDate;
   DateTime _dayStartDate;
   final ChatMessage oldestMessage;
-  DaysDateSeparatorMessageListItem(this.oldestMessage, this.dayFirstDate) {
-    _dayStartDate =
-        DateTime(dayFirstDate.year, dayFirstDate.month, dayFirstDate.day);
+
+  DaysDateSeparatorMessageListItem(
+    this.oldestMessage,
+    this.dayFirstDate,
+  ) {
+    _dayStartDate = DateTime(
+      dayFirstDate.year,
+      dayFirstDate.month,
+      dayFirstDate.day,
+    );
   }
 
   @override
@@ -17,6 +24,7 @@ class DaysDateSeparatorMessageListItem extends MessageListItem {
       other is DaysDateSeparatorMessageListItem &&
           runtimeType == other.runtimeType &&
           _dayStartDate == other._dayStartDate;
+
   @override
   int get hashCode => dayFirstDate.hashCode;
 

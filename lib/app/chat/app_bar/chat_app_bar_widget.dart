@@ -7,7 +7,10 @@ class ChatAppBarWidget extends StatelessWidget {
   final String title;
   final String subTitle;
 
-  ChatAppBarWidget(this.title, this.subTitle);
+  ChatAppBarWidget(
+    this.title,
+    this.subTitle,
+  );
 
   @override
   Widget build(BuildContext context) {

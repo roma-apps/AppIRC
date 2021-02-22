@@ -10,11 +10,9 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/app/network/state/network_states_bloc.dart';
-
 import 'package:logging/logging.dart';
 
-var _logger =
-    Logger("chat_preferences_saver_bloc.dart");
+var _logger = Logger("chat_preferences_saver_bloc.dart");
 
 class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
   final ChatBackendService _backendService;
@@ -24,12 +22,12 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
   final ChatInitBloc initBloc;
 
   ChatPreferencesSaverBloc(
-      this._backendService,
-      this._stateBloc,
-      NetworkListBloc networksListBloc,
-      this.chatPreferencesBloc,
-      this.initBloc)
-      : super(networksListBloc);
+    this._backendService,
+    this._stateBloc,
+    NetworkListBloc networksListBloc,
+    this.chatPreferencesBloc,
+    this.initBloc,
+  ) : super(networksListBloc);
 
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {
@@ -39,26 +37,31 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
         .add(NetworkPreferences(network.connectionPreferences, []));
 
     addDisposable(
-        disposable: _backendService.listenForNetworkEdit(network,
-            (NetworkPreferences networkPreferences) {
-      findPreferencesForNetwork(network).networkConnectionPreferences =
-          networkPreferences.networkConnectionPreferences;
-      _onPreferencesChanged();
-    }));
+      disposable: _backendService.listenForNetworkEdit(
+        network,
+        (NetworkPreferences networkPreferences) {
+          findPreferencesForNetwork(network).networkConnectionPreferences =
+              networkPreferences.networkConnectionPreferences;
+          _onPreferencesChanged();
+        },
+      ),
+    );
 
     addDisposable(
-        streamSubscription:
-            _stateBloc.getNetworkStateStream(network).listen((state) {
-      var newNick = state.nick;
-      var oldUserPreferences = findPreferencesForNetwork(network)
-          .networkConnectionPreferences
-          .userPreferences;
+      streamSubscription: _stateBloc.getNetworkStateStream(network).listen(
+        (state) {
+          var newNick = state.nick;
+          var oldUserPreferences = findPreferencesForNetwork(network)
+              .networkConnectionPreferences
+              .userPreferences;
 
-      if (oldUserPreferences.nickname != newNick) {
-        oldUserPreferences.nickname = newNick;
-        _onPreferencesChanged();
-      }
-    }));
+          if (oldUserPreferences.nickname != newNick) {
+            oldUserPreferences.nickname = newNick;
+            _onPreferencesChanged();
+          }
+        },
+      ),
+    );
 
     _onPreferencesChanged();
 
@@ -75,8 +78,7 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
   }
 
   @override
-  void onChannelJoined(
-      Network network, ChannelWithState channelWithState) {
+  void onChannelJoined(Network network, ChannelWithState channelWithState) {
     _logger.fine(() => "onChannelJoined $channelWithState");
 
     var channel = channelWithState.channel;
@@ -122,9 +124,7 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
   void reset() {
     _currentPreferences = ChatPreferences.empty;
     _onPreferencesChanged();
-
   }
 }
 
-bool _isNeedSaveChannel(Channel channel) =>
-    channel.type == ChannelType.channel;
+bool _isNeedSaveChannel(Channel channel) => channel.type == ChannelType.channel;

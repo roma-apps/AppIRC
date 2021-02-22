@@ -18,7 +18,6 @@ import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/async_disposable.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -166,13 +165,18 @@ class _MessageListWidgetState extends State<MessageListWidget> {
       builder:
           (BuildContext context, AsyncSnapshot<MessageListState> snapshot) {
         MessageListState chatMessageListState = snapshot.data;
-        return _buildMessagesList(context, chatMessageListState);
+        return _buildMessagesList(
+          context,
+          chatMessageListState,
+        );
       },
     );
   }
 
   Widget _buildMessagesList(
-      BuildContext context, MessageListState chatMessageListState) {
+    BuildContext context,
+    MessageListState chatMessageListState,
+  ) {
     var items = chatMessageListState.items;
 
     _logger.fine(() => "_buildMessagesList "
@@ -181,7 +185,10 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     if (items == null || items.isEmpty) {
       return _buildListViewEmptyWidget(context);
     } else {
-      return _buildMessagesListWidget(context, chatMessageListState);
+      return _buildMessagesListWidget(
+        context,
+        chatMessageListState,
+      );
     }
   }
 
@@ -193,10 +200,15 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
     MessageListItem initScrollPositionItem =
         chatListMessagesBloc.calculateInitScrollPositionMessage(
-            visibleMessagesBounds, chatMessageListState.items);
+      visibleMessagesBounds,
+      chatMessageListState.items,
+    );
 
     return _buildListWidget(
-        context, chatMessageListState.items, initScrollPositionItem);
+      context,
+      chatMessageListState.items,
+      initScrollPositionItem,
+    );
   }
 
   MessageListJumpDestination nextJumpDestination;
@@ -205,12 +217,14 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     if (nextJumpDestination != null && _scrollController != null) {
       var indexToJump = nextJumpDestination.items?.indexWhere(
           (listItem) => listItem == nextJumpDestination.selectedFoundItem);
-      _logger.fine(() => "_jumpToMessage ${nextJumpDestination.selectedFoundItem}"
-          "indexToJump $indexToJump");
+      _logger
+          .fine(() => "_jumpToMessage ${nextJumpDestination.selectedFoundItem}"
+              "indexToJump $indexToJump");
       try {
         _scrollController?.jumpTo(
-            index: indexToJump + _lastBuildMessagesStartIndex,
-            alignment: nextJumpDestination.alignment);
+          index: indexToJump + _lastBuildMessagesStartIndex,
+          alignment: nextJumpDestination.alignment,
+        );
       } catch (error, stackTrace) {
         _logger.shout(() => "error during _jumpToMessage", error, stackTrace);
       }
@@ -219,15 +233,16 @@ class _MessageListWidgetState extends State<MessageListWidget> {
   }
 
   Widget _buildListWidget(
-      BuildContext context,
-      List<MessageListItem> items,
-//      MessageListSearchState searchState,
-      MessageListItem messageForInitScrollItem) {
+    BuildContext context,
+    List<MessageListItem> items,
+    MessageListItem messageForInitScrollItem,
+  ) {
     _lastBuildItems = items;
     var itemCount = items.length;
 
-    int initialScrollIndex =
-        items.indexWhere((item) => item == messageForInitScrollItem);
+    int initialScrollIndex = items.indexWhere(
+      (item) => item == messageForInitScrollItem,
+    );
 
     // more history
     itemCount += 1;
@@ -260,35 +275,36 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 2.0),
           child: ScrollablePositionedList.builder(
-              initialScrollIndex: initialScrollIndex,
-              itemScrollController: _scrollController,
-              itemPositionsListener: _positionsListener,
-              itemCount: itemCount,
-              initialAlignment: initialAlignment,
-              itemBuilder: (BuildContext context, int index) {
-                _logger.fine(() => "itemBuilder $index items "
-                    "${items.length}");
+            initialScrollIndex: initialScrollIndex,
+            itemScrollController: _scrollController,
+            itemPositionsListener: _positionsListener,
+            itemCount: itemCount,
+            initialAlignment: initialAlignment,
+            itemBuilder: (BuildContext context, int index) {
+              _logger.fine(() => "itemBuilder $index items "
+                  "${items.length}");
 
-                if (index == 0) {
-                  // return the header
-                  // we should pass non-filtered list to extract non-filtered
-                  // oldest message
-                  return MessageListLoadMoreWidget();
-                } else {
-                  // move start index
-                  index -= 1;
-                }
+              if (index == 0) {
+                // return the header
+                // we should pass non-filtered list to extract non-filtered
+                // oldest message
+                return MessageListLoadMoreWidget();
+              } else {
+                // move start index
+                index -= 1;
+              }
 
-                if (index >= items.length || index < 0) {
-                  return null;
-                }
+              if (index >= items.length || index < 0) {
+                return null;
+              }
 
-                var item = items[index];
-                return _buildListItem(
-                  context,
-                  item,
-                );
-              }),
+              var item = items[index];
+              return _buildListItem(
+                context,
+                item,
+              );
+            },
+          ),
         ),
         _buildJumpWidget(context)
       ],
@@ -301,7 +317,8 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     return channelBloc.channel.type != ChannelType.special
         ? Align(
             alignment: Alignment.bottomCenter,
-            child: MessageListJumpToNewestWidget())
+            child: MessageListJumpToNewestWidget(),
+          )
         : SizedBox.shrink();
   }
 
@@ -339,10 +356,11 @@ Widget _buildListItem(
 ) {
   if (item is SimpleMessageListItem) {
     return buildMessageWidget(
-        message: item.message,
-        messageInListState: notInSearchState,
-        enableMessageActions: true,
-        messageWidgetType: MessageWidgetType.formatted);
+      message: item.message,
+      messageInListState: notInSearchState,
+      enableMessageActions: true,
+      messageWidgetType: MessageWidgetType.formatted,
+    );
   } else if (item is CondensedMessageListItem) {
     return CondensedMessageWidget(item);
   } else if (item is DaysDateSeparatorMessageListItem) {

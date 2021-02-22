@@ -52,22 +52,23 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
       this.server,
       this.serverInfo);
 
-  WhoIsSpecialMessageBody.name(
-      {@required this.account,
-      @required this.channels,
-      @required this.hostname,
-      @required this.actualHostname,
-      @required this.actualIp,
-      @required this.ident,
-      @required this.idle,
-      @required this.idleTime,
-      @required this.logonTime,
-      @required this.logon,
-      @required this.nick,
-      @required this.realName,
-      @required this.secure,
-      @required this.server,
-      @required this.serverInfo});
+  WhoIsSpecialMessageBody.name({
+    @required this.account,
+    @required this.channels,
+    @required this.hostname,
+    @required this.actualHostname,
+    @required this.actualIp,
+    @required this.ident,
+    @required this.idle,
+    @required this.idleTime,
+    @required this.logonTime,
+    @required this.logon,
+    @required this.nick,
+    @required this.realName,
+    @required this.secure,
+    @required this.server,
+    @required this.serverInfo,
+  });
 
   factory WhoIsSpecialMessageBody.fromJson(Map<String, dynamic> json) =>
       _$WhoIsSpecialMessageBodyFromJson(json);
@@ -76,17 +77,26 @@ class WhoIsSpecialMessageBody extends SpecialMessageBody {
   Map<String, dynamic> toJson() => _$WhoIsSpecialMessageBodyToJson(this);
 
   @override
-  bool isContainsText(String searchTerm, {@required bool ignoreCase}) =>
-      isContainsSearchTerm(nick, searchTerm, ignoreCase: ignoreCase);
+  bool isContainsText(
+    String searchTerm, {
+    @required bool ignoreCase,
+  }) =>
+      isContainsSearchTerm(
+        nick,
+        searchTerm,
+        ignoreCase: ignoreCase,
+      );
 
   @override
   Future<List<String>> extractLinks() async {
-    return await findUrls([
-      actualHostname,
-      realName,
-      account,
-      server,
-      serverInfo
-    ]);
+    return await findUrls(
+      [
+        actualHostname,
+        realName,
+        account,
+        server,
+        serverInfo,
+      ],
+    );
   }
 }

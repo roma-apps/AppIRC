@@ -13,7 +13,7 @@ class MessagesListJumpToNewestBloc extends DisposableOwner {
   // ignore: close_sinks
   final BehaviorSubject<MessagesListJumpToNewestState> _stateSubject =
       BehaviorSubject.seeded(
-    MessagesListJumpToNewestState.name(
+    MessagesListJumpToNewestState(
       isLastMessageShown: true,
       newMessagesCount: 0,
     ),
