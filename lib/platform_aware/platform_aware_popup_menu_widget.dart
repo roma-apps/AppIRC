@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:logging/logging.dart';
 
@@ -30,6 +31,7 @@ Widget createPlatformPopupMenuButton(
   switch (platformProviderState.platform) {
     case TargetPlatform.android:
       return _buildMaterialPopupButton(
+        context,
         child,
         actions,
         enabled,
@@ -106,6 +108,7 @@ Future showMaterialPopup<T>(BuildContext context, RelativeRect position,
     context: context,
     position: position,
     items: _convertToMaterialActions(
+      context,
       actions,
     ),
   ).then(
@@ -126,7 +129,11 @@ Future showCupertinoPopup<T>(
         actions: actions
             .map(
               (action) => CupertinoActionSheetAction(
-                child: _buildRow(action.iconData, action.text),
+                child: _buildRow(
+                  context,
+                  action.iconData,
+                  action.text,
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                   action.actionCallback(action);
@@ -140,6 +147,7 @@ Future showCupertinoPopup<T>(
 }
 
 Widget _buildMaterialPopupButton(
+  BuildContext context,
   Widget child,
   List<PlatformAwarePopupMenuAction> actions,
   bool enabled,
@@ -161,7 +169,10 @@ Widget _buildMaterialPopupButton(
             : const EdgeInsets.all(0),
         child: child,
       ),
-      itemBuilder: (_) => _convertToMaterialActions(actions),
+      itemBuilder: (_) => _convertToMaterialActions(
+        context,
+        actions,
+      ),
       onSelected: enabled
           ? (PlatformAwarePopupMenuAction selectedItem) {
               selectedItem.actionCallback(selectedItem);
@@ -172,11 +183,13 @@ Widget _buildMaterialPopupButton(
 }
 
 List<PopupMenuItem<PlatformAwarePopupMenuAction>> _convertToMaterialActions(
+  BuildContext context,
   List<PlatformAwarePopupMenuAction> actions,
 ) =>
     actions
         .map(
           (action) => _buildDropdownMenuItemRow(
+            context: context,
             text: action.text,
             iconData: action.iconData,
             value: action,
@@ -185,25 +198,35 @@ List<PopupMenuItem<PlatformAwarePopupMenuAction>> _convertToMaterialActions(
         .toList();
 
 PopupMenuItem<T> _buildDropdownMenuItemRow<T>({
+  @required BuildContext context,
   @required String text,
   @required IconData iconData,
   @required T value,
 }) =>
     PopupMenuItem<T>(
       value: value,
-      child: _buildRow(iconData, text),
+      child: _buildRow(context, iconData, text),
     );
 
 Row _buildRow(
+  BuildContext context,
   IconData iconData,
   String text,
 ) {
   return Row(
     children: <Widget>[
-      Icon(iconData),
+      Icon(
+        iconData,
+        color: IAppIrcUiColorTheme.of(
+          context,
+          listen: false,
+        ).black,
+      ),
       Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Text(text),
+        child: Text(
+          text,
+        ),
       ),
     ],
   );

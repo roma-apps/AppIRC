@@ -134,7 +134,7 @@ class _ChatPageState extends State<ChatPage> {
         var platformIconButton = PlatformIconButton(
           icon: Icon(
             Icons.menu,
-            color: IAppIrcUiColorTheme.of(context).white,
+            // color: IAppIrcUiColorTheme.of(context).white,
           ),
           onPressed: onPressed,
         );
@@ -209,7 +209,7 @@ class _ChatPageState extends State<ChatPage> {
               context: context,
               networkBloc: networkBloc,
               channelBloc: channelBloc,
-              iconColor: IAppIrcUiColorTheme.of(context).white,
+              iconColor: null,
             )
           ];
 
@@ -218,7 +218,7 @@ class _ChatPageState extends State<ChatPage> {
             PlatformIconButton(
               icon: Icon(
                 Icons.search,
-                color: IAppIrcUiColorTheme.of(context).white,
+                // color: IAppIrcUiColorTheme.of(context).white,
               ),
               onPressed: () {
                 _goToSearchPage(context, channel, channelBloc);
@@ -237,7 +237,10 @@ class _ChatPageState extends State<ChatPage> {
     Channel channel,
     ChannelBloc channelBloc,
   ) {
-    ChatDatabaseService databaseProvider = Provider.of(context);
+    ChatDatabaseService databaseProvider = Provider.of(
+      context,
+      listen: false,
+    );
 
     Navigator.push(
       context,

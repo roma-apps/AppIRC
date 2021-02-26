@@ -119,6 +119,7 @@ class NetworkUserPreferencesFormState
           hint:
               S.of(context).irc_connection_preferences_user_field_commands_hint,
           textInputAction: TextInputAction.newline,
+          keyboardType: TextInputType.multiline,
           minLines: 1,
           maxLines: 4,
         ),

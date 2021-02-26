@@ -92,7 +92,10 @@ class NetworkPreferencesPageState extends State<NetworkPreferencesPage> {
       Duration.zero,
       () {
         // we need valid context
-        final chatBloc = Provider.of<NetworkListBloc>(context);
+        final chatBloc = Provider.of<NetworkListBloc>(
+          context,
+          listen: false,
+        );
         _networkValidator = buildNetworkValidator(chatBloc).validator;
       },
     );

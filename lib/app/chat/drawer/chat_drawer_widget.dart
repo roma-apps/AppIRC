@@ -114,7 +114,10 @@ class ChatDrawerWidget extends StatelessWidget {
               builder: (context) {
                 return DisposableProvider<LoungeConnectionBloc>(
                   create: (context) => LoungeConnectionBloc(
-                    Provider.of<SocketIOService>(context),
+                    Provider.of<SocketIOService>(
+                      context,
+                      listen: false,
+                    ),
                     settings.hostPreferences,
                     settings.authPreferences,
                   ),
