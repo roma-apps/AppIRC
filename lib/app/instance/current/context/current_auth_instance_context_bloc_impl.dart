@@ -19,6 +19,7 @@ import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notificatio
 import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/app/context/app_context_bloc_impl.dart';
 import 'package:flutter_appirc/app/instance/current/context/current_auth_instance_context_bloc.dart';
+import 'package:flutter_appirc/app/instance/current/current_auth_instance_bloc.dart';
 import 'package:flutter_appirc/app/message/list/condensed/message_condensed_bloc.dart';
 import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
@@ -53,6 +54,9 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
     ChatDatabase database = chatDatabaseService.chatDatabase;
 
     var globalProviderService = this;
+
+    var currentAuthInstanceBloc =
+        appContextBloc.get<ICurrentAuthInstanceBloc>();
 
     var socketIoService = appContextBloc.get<SocketIOService>();
     var pushesService = appContextBloc.get<PushesService>();
@@ -225,5 +229,17 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
 
     await globalProviderService
         .asyncInitAndRegister<MessageManagerBloc>(messageManagerBloc);
+
+    addDisposable(
+      disposable: loungeBackendService.listenForSignOut(
+        () async {
+          await messageManagerBloc.clearAllMessages();
+
+          chatPreferencesSaverBloc.reset();
+
+          await currentAuthInstanceBloc.logoutCurrentInstance();
+        },
+      ),
+    );
   }
 }

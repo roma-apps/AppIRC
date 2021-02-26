@@ -80,9 +80,9 @@ class LoungeBackendService extends DisposableOwner
   ChatConnectionState get connectionState =>
       mapConnectionState(socketIOInstanceBloc.simpleConnectionState);
 
-
   @override
-  Stream<ChatConfig> get chatConfigStream => loungeBackendConnectBloc.configStream;
+  Stream<ChatConfig> get chatConfigStream =>
+      loungeBackendConnectBloc.configStream;
 
   @override
   ChatConfig get chatConfig => loungeBackendConnectBloc.config;
@@ -173,6 +173,7 @@ class LoungeBackendService extends DisposableOwner
       //  this debug subscription
       // maybe bug in socket io lib
     });
+
 
     loungeBackendConnectBloc = LoungeBackendConnectBloc(
       loungeBackendSocketIoApiWrapperBloc: socketIoApiWrapperBloc,
@@ -672,7 +673,6 @@ class LoungeBackendService extends DisposableOwner
                 ),
               );
             }
-
           }
         },
       ),
@@ -1011,7 +1011,8 @@ class LoungeBackendService extends DisposableOwner
             var nick = loungeNetwork.nick;
             connectionPreferences.userPreferences.nickname = nick;
 
-            NetworkWithState networkWithState = toNetworkWithState(loungeNetwork);
+            NetworkWithState networkWithState =
+                toNetworkWithState(loungeNetwork);
 
             networkWithState.network.localId =
                 request.networkPreferences.localId;
