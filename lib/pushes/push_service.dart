@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:logging/logging.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/subjects.dart';
 
 var _logger = Logger("push_service.dart");
@@ -53,7 +54,7 @@ class PushesService extends DisposableOwner {
 
     await _fcm.setAutoInitEnabled(true);
 
-    await _updateToken();
+    unawaited(_updateToken());
   }
 
   void _onNewToken(String newToken) {
