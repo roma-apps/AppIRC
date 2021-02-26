@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/db/chat_database.dart';
 import 'package:flutter_appirc/app/message/message_manager_bloc.dart';
@@ -18,11 +20,12 @@ import 'package:rxdart/subjects.dart';
 var _logger = Logger("message_loader_bloc.dart");
 
 class MessageLoaderBloc extends DisposableOwner {
-  final ChatBackendService _backendService;
-  final MessageManagerBloc _messagesSaverBloc;
-  final ChatDatabase _db;
-  final Network _network;
-  final Channel _channel;
+  final ChatBackendService backendService;
+  final MessageManagerBloc messagesSaverBloc;
+  final ChatDatabase db;
+  final Network network;
+  final Channel channel;
+  final ChannelBloc channelBloc;
 
   // ignore: close_sinks
   final BehaviorSubject<bool> _isInitFinishedSubject =
@@ -38,13 +41,14 @@ class MessageLoaderBloc extends DisposableOwner {
 
   MessagesList get messagesList => _messagesListSubject?.value;
 
-  MessageLoaderBloc(
-    this._backendService,
-    this._db,
-    this._messagesSaverBloc,
-    this._network,
-    this._channel,
-  ) {
+  MessageLoaderBloc({
+    @required this.backendService,
+    @required this.db,
+    @required this.messagesSaverBloc,
+    @required this.network,
+    @required this.channel,
+    @required this.channelBloc,
+  }) {
     addDisposable(subject: _messagesListSubject);
     addDisposable(subject: _isInitFinishedSubject);
 
@@ -58,12 +62,12 @@ class MessageLoaderBloc extends DisposableOwner {
 
     // history
     var regularMessages =
-        (await _db.regularMessagesDao.getChannelMessagesOrderByDate(
-      _channel.remoteId,
+        (await db.regularMessagesDao.getChannelMessagesOrderByDate(
+      channel.remoteId,
     ))
             .map(regularMessageDBToChatMessage);
-    var specialMessages = (await _db.specialMessagesDao.getChannelMessages(
-      _channel.remoteId,
+    var specialMessages = (await db.specialMessagesDao.getChannelMessages(
+      channel.remoteId,
     ))
         .map(specialMessageDBToChatMessage)
         .toList();
@@ -132,12 +136,12 @@ class MessageLoaderBloc extends DisposableOwner {
     var receivedMessages = <List<ChatMessage>>[];
     // socket listener
     addDisposable(
-      disposable: _messagesSaverBloc.listenForMessages(
-        _network,
-        _channel,
+      disposable: messagesSaverBloc.listenForMessages(
+        network,
+        channel,
         (messagesForChannel) {
           if (_messagesListSubject != null) {
-            _addNewMessages(_network, _channel, messagesForChannel);
+            _addNewMessages(network, channel, messagesForChannel);
           } else {
             receivedMessages.add(messagesForChannel.messages);
           }
@@ -163,9 +167,9 @@ class MessageLoaderBloc extends DisposableOwner {
     _isInitFinishedSubject.add(true);
 
     addDisposable(
-      disposable: _backendService.listenForMessagePreviews(
-        network: _network,
-        channel: _channel,
+      disposable: backendService.listenForMessagePreviews(
+        network: network,
+        channel: channel,
         listener: (previewForMessage) {
           _updatePreview(previewForMessage);
         },
@@ -173,9 +177,9 @@ class MessageLoaderBloc extends DisposableOwner {
     );
 
     addDisposable(
-      disposable: _backendService.listenForMessagePreviewToggle(
-        network: _network,
-        channel: _channel,
+      disposable: backendService.listenForMessagePreviewToggle(
+        network: network,
+        channel: channel,
         listener: (ToggleMessagePreviewData togglePreview) async {
           _onMessagesChanged(
               messagesList.allMessages, [], MessageListUpdateType.notUpdated);
@@ -184,9 +188,9 @@ class MessageLoaderBloc extends DisposableOwner {
     );
 
     addDisposable(
-      disposable: _backendService.listenForChannelPreviewToggle(
-        network: _network,
-        channel: _channel,
+      disposable: backendService.listenForChannelPreviewToggle(
+        network: network,
+        channel: channel,
         listener: (channelToggle) async {
           _toggleMessages(channelToggle);
         },
@@ -202,9 +206,9 @@ class MessageLoaderBloc extends DisposableOwner {
             message.previews.forEach(
               (preview) {
                 if (preview.shown != channelToggle.allPreviewsShown) {
-                  _backendService.togglePreview(
-                    network: _network,
-                    channel: _channel,
+                  backendService.togglePreview(
+                    network: network,
+                    channel: channel,
                     message: message,
                     preview: preview,
                   );
@@ -324,7 +328,7 @@ class MessageLoaderBloc extends DisposableOwner {
     }
 
     var oldestLocalMessage =
-        await _db.regularMessagesDao.getOldestChannelMessage(channel.remoteId);
+        await db.regularMessagesDao.getOldestChannelMessage(channel.remoteId);
 
     // lounge messages id given in chronological order
     if (oldestLocalMessage.messageRemoteId >
@@ -332,8 +336,8 @@ class MessageLoaderBloc extends DisposableOwner {
       // simple load history from remote
       return;
     } else {
-      var newestLocalMessage = await _db.regularMessagesDao
-          .getNewestChannelMessage(channel.remoteId);
+      var newestLocalMessage =
+          await db.regularMessagesDao.getNewestChannelMessage(channel.remoteId);
       if (newestLocalMessage.messageRemoteId <
           newestRemoteMessage.messageRemoteId) {
         // new messages after reconnecting or init
@@ -346,7 +350,7 @@ class MessageLoaderBloc extends DisposableOwner {
               "newestLocalMessage $newestLocalMessage"
               "oldestRemoteMessage $oldestRemoteMessage");
 
-          await _backendService.loadMoreHistory(
+          await backendService.loadMoreHistory(
             network: network,
             channel: channel,
             lastMessageId: oldestRemoteMessage.messageRemoteId,

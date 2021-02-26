@@ -4,17 +4,8 @@ import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class ChatDrawerPage extends StatefulWidget {
-  ChatDrawerPage();
-
-  @override
-  State<StatefulWidget> createState() {
-    return ChatDrawerPageState();
-  }
-}
-
-class ChatDrawerPageState extends State<ChatDrawerPage> {
-  ChatDrawerPageState();
+class ChatDrawerPage extends StatelessWidget {
+  const ChatDrawerPage();
 
   @override
   Widget build(BuildContext context) => buildPlatformScaffold(

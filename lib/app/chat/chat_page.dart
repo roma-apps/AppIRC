@@ -60,21 +60,20 @@ class _ChatPageState extends State<ChatPage> {
           material: (context, platform) => MaterialScaffoldData(
             widgetKey: _scaffoldKey,
             appBar: AppBar(
-              title: _buildAppBarChild(context),
-              leading: buildLeading(
-                context,
-                () {
+              title: _ChatPageAppBarChild(),
+              leading: _ChatPageAppBarLeadingWidget(
+                onPressed: () {
                   _scaffoldKey.currentState.openDrawer();
                 },
               ),
               actions: <Widget>[
-                _buildTrailing(context),
+                _ChatPageAppBarTrailingWidget(),
               ],
             ),
             drawer: Drawer(
               child: ChatDrawerWidget(),
             ),
-            body: _buildBody(context),
+            body: _ChatPageBodyWidget(),
           ),
         );
         break;
@@ -84,9 +83,8 @@ class _ChatPageState extends State<ChatPage> {
           iosContentBottomPadding: true,
           iosContentPadding: false,
           appBar: PlatformAppBar(
-            leading: buildLeading(
-              context,
-              () {
+            leading: _ChatPageAppBarLeadingWidget(
+              onPressed: () {
                 Navigator.push(
                   context,
                   platformPageRoute(
@@ -97,369 +95,42 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
             trailingActions: [
-              _buildTrailing(context),
+              _ChatPageAppBarTrailingWidget(),
             ],
-            title: _buildAppBarChild(context),
+            title: _ChatPageAppBarChild(),
           ),
-          body: _buildBody(
-            context,
-          ),
+          body: _ChatPageBodyWidget(),
         );
         break;
       default:
         throw "NotSupportedPlatform";
     }
   }
+}
 
-  Widget buildLeading(
-    BuildContext context,
-    Function() onPressed,
-  ) {
-    return _buildMenuIcon(context, onPressed);
-  }
+class _ChatPageNoActiveChannelWidget extends StatelessWidget {
+  const _ChatPageNoActiveChannelWidget({
+    Key key,
+  }) : super(key: key);
 
-  Widget _buildMenuIcon(
-    BuildContext context,
-    Function() onPressed,
-  ) {
-    ChannelListUnreadCountBloc chatUnreadBloc =
-        Provider.of<ChannelListUnreadCountBloc>(context);
-
-    return StreamBuilder<int>(
-      stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
-      initialData: chatUnreadBloc.channelsWithUnreadMessagesCount,
-      builder: (context, snapshot) {
-        var unreadCount = snapshot.data;
-
-        var platformIconButton = PlatformIconButton(
-          icon: Icon(
-            Icons.menu,
-            // color: IAppIrcUiColorTheme.of(context).white,
-          ),
-          onPressed: onPressed,
-        );
-        if (unreadCount > 0) {
-          // badge hide part of button clickable area
-          double rightMargin = 15.0;
-
-          if (isMaterial(context)) {
-            rightMargin = 15;
-          } else if (isCupertino(context)) {
-            rightMargin = 5;
-          }
-          return GestureDetector(
-            onTap: onPressed,
-            child: Stack(children: <Widget>[
-              platformIconButton,
-              Positioned(
-                right: rightMargin,
-                top: 10,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  constraints: BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    "$unreadCount",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              )
-            ]),
-          );
-        } else {
-          return platformIconButton;
-        }
-      },
-    );
-  }
-
-  Widget _buildTrailing(BuildContext context) {
-    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
-
-    return StreamBuilder<Channel>(
-      stream: activeChannelBloc.activeChannelStream,
-      builder:
-          (BuildContext context, AsyncSnapshot<Channel> activeChannelSnapshot) {
-        var channel = activeChannelSnapshot.data;
-        if (channel == null) {
-          return const SizedBox.shrink();
-        } else {
-          var channelBloc =
-              ChannelBlocsBloc.of(context).getChannelBloc(channel);
-
-          List<Widget> items = [
-            ChannelPopupMenuButtonWidget(iconColor: null),
-          ];
-
-          items.insert(
-            0,
-            PlatformIconButton(
-              icon: Icon(
-                Icons.search,
-                // color: IAppIrcUiColorTheme.of(context).white,
-              ),
-              onPressed: () {
-                _goToSearchPage(context, channel, channelBloc);
-              },
-            ),
-          );
-
-          var networkBloc =
-              NetworkBlocsBloc.of(context).getNetworkBloc(channelBloc.network);
-
-          return Provider.value(
-            value: channel,
-            child: Provider.value(
-              value: channelBloc.network,
-              child: Provider.value(
-                value: channelBloc,
-                child: Provider.value(
-                  value: networkBloc,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: items,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  void _goToSearchPage(
-    BuildContext context,
-    Channel channel,
-    ChannelBloc channelBloc,
-  ) {
-    ChatDatabaseService databaseProvider = Provider.of(
-      context,
-      listen: false,
-    );
-
-    Navigator.push(
-      context,
-      platformPageRoute(
-        context: context,
-        builder: (context) {
-          return DisposableProvider<ChatSearchBloc>(
-            create: (context) => ChatSearchBloc(
-              databaseProvider.chatDatabase,
-              channel,
-            ),
-            child: Provider.value(
-              value: channelBloc,
-              child: ChatSearchPage(),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildAppBarChild(BuildContext context) {
-    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
-    var connectionBloc = Provider.of<ChatConnectionBloc>(context);
-
-    return StreamBuilder<Channel>(
-      stream: activeChannelBloc.activeChannelStream,
-      builder:
-          (BuildContext context, AsyncSnapshot<Channel> activeChannelSnapshot) {
-        var channel = activeChannelSnapshot.data;
-        if (channel == null) {
-          return StreamBuilder<ChatConnectionState>(
-            stream: connectionBloc.connectionStateStream,
-            initialData: connectionBloc.connectionState,
-            builder: (BuildContext context,
-                AsyncSnapshot<ChatConnectionState> snapshot) {
-              var connectionState = snapshot.data;
-
-              var title = S.of(context).chat_title;
-
-              String content;
-
-              switch (connectionState) {
-                case ChatConnectionState.connected:
-                  content =
-                      S.of(context).chat_state_connection_status_connected;
-                  break;
-                case ChatConnectionState.connecting:
-                  content =
-                      S.of(context).chat_state_connection_status_connecting;
-                  break;
-                case ChatConnectionState.disconnected:
-                  content =
-                      S.of(context).chat_state_connection_status_disconnected;
-                  break;
-              }
-
-              return ChatAppBarWidget(title, content);
-            },
-          );
-        } else {
-          var channelBloc =
-              ChannelBlocsBloc.of(context).getChannelBloc(channel);
-
-          var networkBlocsBloc = NetworkBlocsBloc.of(context);
-
-          var networkBloc =
-              networkBlocsBloc.getNetworkBloc(channelBloc.network);
-
-          return Provider.value(
-            value: networkBloc,
-            child: Provider.value(
-              value: channel,
-              child: Provider.value(
-                value: channelBloc,
-                child: ChannelTopicTitleAppBarWidget(),
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
-    var networkListBloc = Provider.of<NetworkListBloc>(context);
-
-    _logger.fine(() => "_buildBody");
-    return SafeArea(
-      child: StreamBuilder<Channel>(
-        stream: activeChannelBloc.activeChannelStream,
-        builder: (BuildContext context, AsyncSnapshot<Channel> snapshot) {
-          var activeChannel = snapshot.data;
-
-          _logger.fine(() => "activeChannel stream");
-          if (activeChannel == null) {
-            return StreamBuilder<bool>(
-              stream: networkListBloc.isNetworksEmptyStream,
-              initialData: networkListBloc.isNetworksEmpty,
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                var isEmpty = snapshot.data;
-                if (isEmpty) {
-                  return _buildConnectToNetworkWidget(context);
-                } else {
-                  return _buildNoActiveChannelMessage(context);
-                }
-              },
-            );
-          } else {
-            var network = networkListBloc.findNetworkWithChannel(activeChannel);
-
-            if (network == null) {
-              return SizedBox.shrink();
-            } else {
-              var channelBloc =
-                  ChannelBlocsBloc.of(context).getChannelBloc(activeChannel);
-
-              ChatBackendService backendService = Provider.of(context);
-              ChatDatabaseService chatDatabaseService = Provider.of(context);
-
-              _logger.fine(() => "before stream");
-              return DisposableProvider<MessageLoaderBloc>(
-                create: (context) => MessageLoaderBloc(
-                  backendService,
-                  chatDatabaseService.chatDatabase,
-                  Provider.of<MessageManagerBloc>(context, listen: false),
-                  channelBloc.network,
-                  channelBloc.channel,
-                ),
-                child: Builder(
-                  builder: (context) {
-                    var messagesLoaderBloc =
-                        Provider.of<MessageLoaderBloc>(context);
-                    return StreamBuilder(
-                      stream: messagesLoaderBloc.isInitFinishedStream,
-                      initialData: false,
-                      builder: (context, snapshot) {
-                        var initFinished = snapshot.data;
-                        var length = messagesLoaderBloc
-                            .messagesList?.allMessages?.length;
-                        _logger.fine(() => "initFinished $initFinished "
-                            "messages $length");
-                        if (initFinished && length != null) {
-                          _logger.fine(() =>
-                              "build for activeChannel ${channelBloc.channel.name}");
-
-                          return Provider<ChannelBloc>.value(
-                            value: channelBloc,
-                            child: DisposableProvider<MessageListBloc>(
-                              create: (context) => MessageListBloc(
-                                channelBloc,
-                                channelBloc.messagesBloc,
-                                messagesLoaderBloc,
-                                Provider.of<MessageCondensedBloc>(
-                                  context,
-                                  listen: false,
-                                ),
-                              ),
-                              child: ChannelWidget(),
-                            ),
-                          );
-                        } else {
-                          return _buildLoadingMessagesWidget(context);
-                        }
-                      },
-                    );
-                  },
-                ),
-              );
-            }
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildLoadingMessagesWidget(BuildContext context) =>
-      _buildLoadingWidget(
-        context,
-        S.of(context).chat_messages_list_loading,
-      );
-
-  Widget _buildInitMessagesWidget(BuildContext context) => _buildLoadingWidget(
-        context,
-        S.of(context).chat_state_init,
-      );
-
-  Widget _buildConnectingWidget(BuildContext context) => _buildLoadingWidget(
-        context,
-        S.of(context).chat_state_connection_status_connecting,
-      );
-
-  Widget _buildLoadingWidget(BuildContext context, String message) {
+  @override
+  Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              message,
-              style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
-            ),
-          ),
-          CircularProgressIndicator()
-        ],
+      child: Text(
+        S.of(context).chat_state_active_channel_not_selected,
+        style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
       ),
     );
   }
+}
 
-  Widget _buildConnectToNetworkWidget(BuildContext context) {
+class _ChatPageConnectionWidget extends StatelessWidget {
+  const _ChatPageConnectionWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     var connectionBloc = Provider.of<ChatConnectionBloc>(context);
 
     return StreamBuilder<ChatConnectionState>(
@@ -527,6 +198,15 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  Widget _buildInitMessagesWidget(BuildContext context) =>
+      _ChatPageLoadingWidget(
+        message: S.of(context).chat_state_init,
+      );
+
+  Widget _buildConnectingWidget(BuildContext context) => _ChatPageLoadingWidget(
+        message: S.of(context).chat_state_connection_status_connecting,
+      );
+
   Widget _buildConnectedInitFinishedWidget(BuildContext context) {
     ChatBackendService backendService = Provider.of(context);
     var startValues =
@@ -558,13 +238,389 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+}
 
-  Center _buildNoActiveChannelMessage(BuildContext context) {
+class _ChatPageLoadingWidget extends StatelessWidget {
+  final String message;
+
+  _ChatPageLoadingWidget({
+    @required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
-      child: Text(
-        S.of(context).chat_state_active_channel_not_selected,
-        style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              message,
+              style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+            ),
+          ),
+          const CircularProgressIndicator(),
+        ],
       ),
+    );
+  }
+}
+
+class _ChatPageAppBarChild extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+    var connectionBloc = Provider.of<ChatConnectionBloc>(context);
+
+    return StreamBuilder<Channel>(
+      stream: activeChannelBloc.activeChannelStream,
+      builder:
+          (BuildContext context, AsyncSnapshot<Channel> activeChannelSnapshot) {
+        var channel = activeChannelSnapshot.data;
+        if (channel == null) {
+          return StreamBuilder<ChatConnectionState>(
+            stream: connectionBloc.connectionStateStream,
+            initialData: connectionBloc.connectionState,
+            builder: (BuildContext context,
+                AsyncSnapshot<ChatConnectionState> snapshot) {
+              var connectionState = snapshot.data;
+
+              var title = S.of(context).chat_title;
+
+              String content;
+
+              switch (connectionState) {
+                case ChatConnectionState.connected:
+                  content =
+                      S.of(context).chat_state_connection_status_connected;
+                  break;
+                case ChatConnectionState.connecting:
+                  content =
+                      S.of(context).chat_state_connection_status_connecting;
+                  break;
+                case ChatConnectionState.disconnected:
+                  content =
+                      S.of(context).chat_state_connection_status_disconnected;
+                  break;
+              }
+
+              return ChatAppBarWidget(title, content);
+            },
+          );
+        } else {
+          var channelBloc =
+              ChannelBlocsBloc.of(context).getChannelBloc(channel);
+
+          var networkBlocsBloc = NetworkBlocsBloc.of(context);
+
+          var networkBloc =
+              networkBlocsBloc.getNetworkBloc(channelBloc.network);
+
+          return Provider.value(
+            value: networkBloc,
+            child: Provider.value(
+              value: channel,
+              child: Provider.value(
+                value: channelBloc,
+                child: const ChannelTopicTitleAppBarWidget(),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+class _ChatPageAppBarTrailingWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+
+    return StreamBuilder<Channel>(
+      stream: activeChannelBloc.activeChannelStream,
+      builder:
+          (BuildContext context, AsyncSnapshot<Channel> activeChannelSnapshot) {
+        var channel = activeChannelSnapshot.data;
+        if (channel == null) {
+          return const SizedBox.shrink();
+        } else {
+          var channelBloc =
+              ChannelBlocsBloc.of(context).getChannelBloc(channel);
+
+          List<Widget> items = [
+            ChannelPopupMenuButtonWidget(iconColor: null),
+          ];
+
+          items.insert(
+            0,
+            PlatformIconButton(
+              icon: Icon(
+                Icons.search,
+                // color: IAppIrcUiColorTheme.of(context).white,
+              ),
+              onPressed: () {
+                _goToSearchPage(context, channel, channelBloc);
+              },
+            ),
+          );
+
+          var networkBloc =
+              NetworkBlocsBloc.of(context).getNetworkBloc(channelBloc.network);
+
+          return Provider.value(
+            value: channel,
+            child: Provider.value(
+              value: channelBloc.network,
+              child: Provider.value(
+                value: channelBloc,
+                child: Provider.value(
+                  value: networkBloc,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: items,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+class _ChatPageAppBarLeadingWidget extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _ChatPageAppBarLeadingWidget({
+    @required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ChannelListUnreadCountBloc chatUnreadBloc =
+        Provider.of<ChannelListUnreadCountBloc>(context);
+
+    return StreamBuilder<int>(
+      stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
+      initialData: chatUnreadBloc.channelsWithUnreadMessagesCount,
+      builder: (context, snapshot) {
+        var unreadCount = snapshot.data;
+
+        var platformIconButton = PlatformIconButton(
+          icon: Icon(
+            Icons.menu,
+            // color: IAppIrcUiColorTheme.of(context).white,
+          ),
+          onPressed: onPressed,
+        );
+        if (unreadCount > 0) {
+          // badge hide part of button clickable area
+          double rightMargin = 15.0;
+
+          if (isMaterial(context)) {
+            rightMargin = 15;
+          } else if (isCupertino(context)) {
+            rightMargin = 5;
+          }
+          return GestureDetector(
+            onTap: onPressed,
+            child: Stack(children: <Widget>[
+              platformIconButton,
+              Positioned(
+                right: rightMargin,
+                top: 10,
+                child: Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    "$unreadCount",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            ]),
+          );
+        } else {
+          return platformIconButton;
+        }
+      },
+    );
+  }
+}
+
+void _goToSearchPage(
+  BuildContext context,
+  Channel channel,
+  ChannelBloc channelBloc,
+) {
+  ChatDatabaseService databaseProvider = Provider.of(
+    context,
+    listen: false,
+  );
+
+  Navigator.push(
+    context,
+    platformPageRoute(
+      context: context,
+      builder: (context) {
+        return DisposableProvider<ChatSearchBloc>(
+          create: (context) => ChatSearchBloc(
+            databaseProvider.chatDatabase,
+            channel,
+          ),
+          child: Provider.value(
+            value: channelBloc,
+            child: ChatSearchPage(),
+          ),
+        );
+      },
+    ),
+  );
+}
+
+class _ChatPageBodyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+
+    return SafeArea(
+      child: StreamBuilder<Channel>(
+        stream: activeChannelBloc.activeChannelStream,
+        builder: (BuildContext context, AsyncSnapshot<Channel> snapshot) {
+          var activeChannel = snapshot.data;
+
+          return Provider.value(
+            value: activeChannel,
+            child: _ChatPageBodyActiveChannelWidget(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ChatPageBodyActiveChannelWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var activeChannel = Provider.of<Channel>(context);
+
+    var networkListBloc = Provider.of<NetworkListBloc>(context);
+
+    _logger.fine(() => "activeChannel $activeChannel");
+    if (activeChannel == null) {
+      return const _ChatPageBodyNoActiveChannelWidget();
+    } else {
+      var network = networkListBloc.findNetworkWithChannel(activeChannel);
+
+      if (network == null) {
+        return const SizedBox.shrink();
+      } else {
+        var channelBlocsBloc = ChannelBlocsBloc.of(context);
+
+        return ProxyProvider<Channel, ChannelBloc>(
+          update: (context, channel, _) =>
+              channelBlocsBloc.getChannelBloc(activeChannel),
+          child: _ChatPageBodyActiveChannelBodyWidget(),
+        );
+      }
+    }
+  }
+}
+
+class _ChatPageBodyActiveChannelBodyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var channelBloc = ChannelBloc.of(context);
+
+    ChatBackendService backendService = Provider.of(context);
+    ChatDatabaseService chatDatabaseService = Provider.of(context);
+
+    _logger.fine(() => "before stream");
+    return DisposableProxyProvider<ChannelBloc, MessageLoaderBloc>(
+      update: (context, channelBloc, _) => MessageLoaderBloc(
+        backendService: backendService,
+        db: chatDatabaseService.chatDatabase,
+        messagesSaverBloc:
+            Provider.of<MessageManagerBloc>(context, listen: false),
+        network: channelBloc.network,
+        channel: channelBloc.channel,
+        channelBloc: channelBloc,
+      ),
+      child: Builder(
+        builder: (context) {
+          var messagesLoaderBloc = Provider.of<MessageLoaderBloc>(context);
+          return StreamBuilder(
+            stream: messagesLoaderBloc.isInitFinishedStream,
+            initialData: false,
+            builder: (context, snapshot) {
+              var initFinished = snapshot.data;
+              var length = messagesLoaderBloc.messagesList?.allMessages?.length;
+              _logger.fine(() => "initFinished $initFinished "
+                  "messages $length");
+              if (initFinished && length != null) {
+                _logger.fine(() =>
+                    "build for activeChannel ${channelBloc.channel.name}");
+
+                return DisposableProxyProvider<MessageLoaderBloc,
+                    MessageListBloc>(
+                  update: (context, messagesLoaderBloc, _) => MessageListBloc(
+                    messagesLoaderBloc.channelBloc,
+                    messagesLoaderBloc.channelBloc.messagesBloc,
+                    messagesLoaderBloc,
+                    Provider.of<MessageCondensedBloc>(
+                      context,
+                      listen: false,
+                    ),
+                  ),
+                  child: ChannelWidget(),
+                );
+              } else {
+                return _ChatPageLoadingWidget(
+                  message: S.of(context).chat_messages_list_loading,
+                );
+              }
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ChatPageBodyNoActiveChannelWidget extends StatelessWidget {
+  const _ChatPageBodyNoActiveChannelWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var networkListBloc = Provider.of<NetworkListBloc>(context);
+    return StreamBuilder<bool>(
+      stream: networkListBloc.isNetworksEmptyStream,
+      initialData: networkListBloc.isNetworksEmpty,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        var isEmpty = snapshot.data;
+        if (isEmpty) {
+          return const _ChatPageConnectionWidget();
+        } else {
+          return const _ChatPageNoActiveChannelWidget();
+        }
+      },
     );
   }
 }

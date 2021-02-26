@@ -171,11 +171,13 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       builder: (context, snapshot) {
         var connected = snapshot.data;
 
-        return createPlatformPopupMenuButton(context,
-            child: Icon(Icons.attach_file),
-            actions: _buildAttachMenuItems(
-                context, chatUploadBloc, channelBloc.inputMessageBloc),
-            enabled: connected);
+        return createPlatformPopupMenuButton(
+          context,
+          child: Icon(Icons.attach_file),
+          actions: _buildAttachMenuItems(
+              context, chatUploadBloc, channelBloc.inputMessageBloc),
+          enabled: connected,
+        );
       },
     );
   }
@@ -188,16 +190,20 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
       initialData: chatConnectionBloc.isConnected,
       builder: (context, snapshot) {
         var connected = snapshot.data;
-        var pressed;
+        var onPressed;
         if (connected) {
-          pressed = () {
-            ChatInputMessageBloc inputMessageBloc =
-                ChannelBloc.of(context).inputMessageBloc;
+          onPressed = () {
+            ChatInputMessageBloc inputMessageBloc = ChannelBloc.of(
+              context,
+              listen: false,
+            ).inputMessageBloc;
             inputMessageBloc.sendMessage();
           };
         }
         return PlatformIconButton(
-            icon: Icon(Icons.message), onPressed: pressed);
+          icon: Icon(Icons.message),
+          onPressed: onPressed,
+        );
       },
     );
   }

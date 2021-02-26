@@ -67,4 +67,6 @@ class ChannelTopicTitleAppBarWidget extends StatelessWidget {
       },
     );
   }
+
+  const ChannelTopicTitleAppBarWidget();
 }
