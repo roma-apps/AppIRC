@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/login/lounge_login_form_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
@@ -28,9 +29,13 @@ class LoungeAuthPreferencesFormWidgetState
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    var loungeLoginFormBloc = Provider.of<LoungeLoginFormBloc>(context, listen: false);
+    var loungeAuthPreferencesFormBloc =
+        Provider.of<LoungeAuthPreferencesFormBloc>(
+      context,
+      listen: false,
+    );
 
-    var startPreferences = loungeLoginFormBloc.extractData();
+    var startPreferences = loungeAuthPreferencesFormBloc.extractData();
 
     _usernameController = TextEditingController(
       text: startPreferences?.username,
@@ -49,7 +54,7 @@ class LoungeAuthPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var loungeLoginFormBloc = Provider.of<LoungeLoginFormBloc>(context);
+    var loungeAuthPreferencesFormBloc = Provider.of<LoungeAuthPreferencesFormBloc>(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
@@ -59,18 +64,18 @@ class LoungeAuthPreferencesFormWidgetState
         ),
         buildFormTextRow(
           context: context,
-          bloc: loungeLoginFormBloc.usernameFieldBloc,
+          bloc: loungeAuthPreferencesFormBloc.usernameFieldBloc,
           controller: _usernameController,
           icon: Icons.account_box,
           label: S.of(context).lounge_preferences_auth_field_username_label,
           hint: S.of(context).lounge_preferences_auth_field_username_hint,
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.none,
-          nextBloc: loungeLoginFormBloc.passwordFieldBloc,
+          nextBloc: loungeAuthPreferencesFormBloc.passwordFieldBloc,
         ),
         buildFormTextRow(
           context: context,
-          bloc: loungeLoginFormBloc.passwordFieldBloc,
+          bloc: loungeAuthPreferencesFormBloc.passwordFieldBloc,
           controller: _passwordController,
           icon: Icons.lock,
           label: S.of(context).lounge_preferences_auth_field_password_label,
