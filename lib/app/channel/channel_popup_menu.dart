@@ -16,8 +16,11 @@ import 'package:provider/provider.dart';
 class ChannelPopupMenuButtonWidget extends StatelessWidget {
   final Color iconColor;
 
+  final bool isNeedPadding;
+
   const ChannelPopupMenuButtonWidget({
     @required this.iconColor,
+    this.isNeedPadding = true,
   });
 
   @override
@@ -31,6 +34,7 @@ class ChannelPopupMenuButtonWidget extends StatelessWidget {
     if (channel.type == ChannelType.lobby) {
       return buildNetworkPopupMenuButton(
         context: context,
+        isNeedPadding: isNeedPadding,
         networkBloc: networkBloc,
         iconColor: iconColor,
       );
@@ -38,6 +42,7 @@ class ChannelPopupMenuButtonWidget extends StatelessWidget {
 
     return createPlatformPopupMenuButton(
       context,
+      isNeedPadding: isNeedPadding,
       child: Icon(Icons.more_vert, color: iconColor),
       actions: _buildMenuItems(
         context: context,

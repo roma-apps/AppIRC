@@ -81,7 +81,7 @@ class _ChatPageState extends State<ChatPage> {
         return buildPlatformScaffold(
           context,
           iosContentBottomPadding: true,
-          iosContentPadding: false,
+          iosContentPadding: true,
           appBar: PlatformAppBar(
             leading: _ChatPageAppBarLeadingWidget(
               onPressed: () {
@@ -339,6 +339,8 @@ class _ChatPageAppBarTrailingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
 
+    var platformProviderState = PlatformProvider.of(context);
+
     return StreamBuilder<Channel>(
       stream: activeChannelBloc.activeChannelStream,
       builder:
@@ -351,12 +353,19 @@ class _ChatPageAppBarTrailingWidget extends StatelessWidget {
               ChannelBlocsBloc.of(context).getChannelBloc(channel);
 
           List<Widget> items = [
-            ChannelPopupMenuButtonWidget(iconColor: null),
+            ChannelPopupMenuButtonWidget(
+              iconColor: null,
+              isNeedPadding:
+                  platformProviderState.platform != TargetPlatform.iOS,
+            ),
           ];
 
           items.insert(
             0,
             PlatformIconButton(
+              padding: platformProviderState.platform == TargetPlatform.iOS
+                  ? EdgeInsets.zero
+                  : EdgeInsets.all(8.0),
               icon: Icon(
                 Icons.search,
                 // color: IAppIrcUiColorTheme.of(context).white,
@@ -404,6 +413,8 @@ class _ChatPageAppBarLeadingWidget extends StatelessWidget {
     ChannelListUnreadCountBloc chatUnreadBloc =
         Provider.of<ChannelListUnreadCountBloc>(context);
 
+    var platformProviderState = PlatformProvider.of(context);
+
     return StreamBuilder<int>(
       stream: chatUnreadBloc.channelsWithUnreadMessagesCountStream,
       initialData: chatUnreadBloc.channelsWithUnreadMessagesCount,
@@ -411,6 +422,9 @@ class _ChatPageAppBarLeadingWidget extends StatelessWidget {
         var unreadCount = snapshot.data;
 
         var platformIconButton = PlatformIconButton(
+          padding: platformProviderState.platform == TargetPlatform.iOS
+              ? EdgeInsets.zero
+              : EdgeInsets.all(8.0),
           icon: Icon(
             Icons.menu,
             // color: IAppIrcUiColorTheme.of(context).white,

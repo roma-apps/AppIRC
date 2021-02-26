@@ -68,7 +68,11 @@ Widget _buildCupertinoPopupButton(
   }
 
   if (child is Icon) {
-    return PlatformIconButton(icon: child, onPressed: onPressed);
+    return PlatformIconButton(
+      icon: child,
+      padding: isNeedPadding ? EdgeInsets.all(8.0) : EdgeInsets.zero,
+      onPressed: onPressed,
+    );
   } else {
     var childWithPadding = Padding(
       padding:

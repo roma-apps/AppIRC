@@ -17,6 +17,7 @@ Widget buildNetworkPopupMenuButton({
   @required BuildContext context,
   @required NetworkBloc networkBloc,
   @required Color iconColor,
+  bool isNeedPadding = true,
 }) {
   return StreamBuilder<bool>(
     stream: networkBloc.networkConnectedStream,
@@ -25,6 +26,7 @@ Widget buildNetworkPopupMenuButton({
       var connected = snapshot.data ?? false;
       return createPlatformPopupMenuButton(
         context,
+        isNeedPadding: isNeedPadding,
         child: Icon(
           Icons.more_vert,
           color: iconColor,
