@@ -10,7 +10,7 @@ import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
-final _logger = Logger("lounge_backend_connection_bloc.dart");
+final _logger = Logger("lounge_backend_connect_bloc.dart");
 
 class LoungeBackendConnectBloc extends DisposableOwner {
   final LoungeBackendSocketIoApiWrapperBloc loungeBackendSocketIoApiWrapperBloc;

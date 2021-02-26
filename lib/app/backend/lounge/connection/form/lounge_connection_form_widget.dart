@@ -250,7 +250,7 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                     listen: false,
                   );
                   var loungePreferences = connectionFormBloc.extractData();
-                  var asyncResult = await doAsyncOperationWithDialog(
+                  var asyncResult = await doAsyncOperationWithDialog<LoungeConnectAndAuthDetails>(
                     context: context,
                     asyncCode: () async {
                       var socketIOService = Provider.of<SocketIOService>(
@@ -261,7 +261,7 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                       SocketIOInstanceBloc socketIOInstanceBloc;
                       LoungeBackendConnectBloc loungeBackendConnectBloc;
 
-                      LoungeConnectDetails connectDetails;
+                      LoungeConnectAndAuthDetails loungeConnectAndAuthDetails;
                       try {
                         socketIOInstanceBloc = SocketIOInstanceBloc(
                           uri: loungePreferences.hostPreferences.host,
@@ -281,14 +281,14 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                               loungePreferences.authPreferences,
                         );
 
-                        connectDetails = await loungeBackendConnectBloc
-                            .connectAndWaitForResult();
+                        loungeConnectAndAuthDetails = await loungeBackendConnectBloc
+                            .connectAndLoginAndWaitForResult();
                       } finally {
                         await socketIOInstanceBloc?.dispose();
                         await loungeBackendConnectBloc?.dispose();
                       }
 
-                      return connectDetails;
+                      return loungeConnectAndAuthDetails;
                     },
                     cancelable: true,
                   );
@@ -296,12 +296,11 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                   if (!asyncResult.canceled) {
                     var requestResult = asyncResult.result;
 
-                    if (requestResult.isSocketTimeout) {
+                    if (requestResult.connectDetails.isSocketTimeout) {
                       await showLoungeTimeoutAlertDialog(context);
                     } else {
-                      if (!requestResult
-                          .isLoungeNotSentRequiredDataAndTimeoutReached) {
-                        var success = requestResult.isSuccess;
+                      if (requestResult.authPerformComplexLoungeResponse != null) {
+                        var success =requestResult.authPerformComplexLoungeResponse.isSuccess;
 
                         if (success) {
                           successCallback(
@@ -314,7 +313,7 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                       } else {
                         await showLoungeConnectionErrorAlertDialog(
                           context,
-                          requestResult,
+                          null
                         );
                       }
                     }

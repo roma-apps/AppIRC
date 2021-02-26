@@ -69,7 +69,8 @@ class ChatDrawerWidget extends StatelessWidget {
               builder: (context) {
                 var networkEnabled = !backendService.chatConfig.lockNetwork;
                 var titleText = S.of(context).irc_connection_new_title;
-                var buttonText = S.of(context).irc_connection_new_action_connect;
+                var buttonText =
+                    S.of(context).irc_connection_new_action_connect;
                 var newChatNetworkPage = NewNetworkPreferencesPage(
                   titleText: titleText,
                   buttonText: buttonText,
@@ -138,7 +139,10 @@ class ChatDrawerWidget extends StatelessWidget {
 
   Widget _buildSignOutButton(BuildContext context) => PlatformIconButton(
         onPressed: () async {
-          var loungeBackendService = Provider.of<LoungeBackendService>(context);
+          var loungeBackendService = Provider.of<LoungeBackendService>(
+            context,
+            listen: false,
+          );
 
           loungeBackendService.signOut();
         },

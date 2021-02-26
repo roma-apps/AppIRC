@@ -1995,7 +1995,8 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String host;
   final int port;
   final bool tls;
-  final bool userDisconnected;
+
+  bool get userDisconnected => status.connected != true;
   final bool rejectUnauthorized;
   final bool isCollapsed;
   final bool isJoinChannelShown;
@@ -2013,7 +2014,6 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
     @required this.host,
     @required this.port,
     @required this.tls,
-    @required this.userDisconnected,
     @required this.rejectUnauthorized,
     @required this.isCollapsed,
     @required this.isJoinChannelShown,
