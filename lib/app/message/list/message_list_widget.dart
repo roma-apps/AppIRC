@@ -331,17 +331,25 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         var connected = snapshot.data;
 
         if (connected) {
-          return Center(
-            child: Text(
-              S.of(context).chat_messages_list_empty_connected,
-              style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Text(
+                S.of(context).chat_messages_list_empty_connected,
+                textAlign: TextAlign.center,
+                style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+              ),
             ),
           );
         } else {
-          return Center(
-            child: Text(
-              S.of(context).chat_messages_list_empty_not_connected,
-              style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Text(
+                S.of(context).chat_messages_list_empty_not_connected,
+                textAlign: TextAlign.center,
+                style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+              ),
             ),
           );
         }

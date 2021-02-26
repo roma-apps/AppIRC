@@ -431,6 +431,9 @@ RegularMessageType detectRegularMessageType(String stringType) {
     case MessageTypeLoungeConstants.notice:
       type = RegularMessageType.notice;
       break;
+    case MessageTypeLoungeConstants.monospaceBlock:
+      type = RegularMessageType.monospaceBlock;
+      break;
     case MessageTypeLoungeConstants.error:
       type = RegularMessageType.error;
       break;

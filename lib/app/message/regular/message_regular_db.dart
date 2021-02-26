@@ -321,6 +321,9 @@ RegularMessageType regularMessageTypeIdToType(int id) {
     case 24:
       return RegularMessageType.ctcp;
       break;
+    case 25:
+      return RegularMessageType.monospaceBlock;
+      break;
   }
 
   throw Exception("Invalid RegularMessageType id $id");
@@ -399,6 +402,9 @@ int regularMessageTypeTypeToId(RegularMessageType type) {
       break;
     case RegularMessageType.ctcp:
       return 24;
+      break;
+    case RegularMessageType.monospaceBlock:
+      return 25;
       break;
   }
   throw Exception("Invalid RegularMessageType = $type");

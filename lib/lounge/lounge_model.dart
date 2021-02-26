@@ -47,6 +47,7 @@ class MessageTypeLoungeConstants {
   static const motd = "motd";
   static const whois = "whois";
   static const notice = "notice";
+  static const monospaceBlock = "monospace_block";
   static const error = "error";
   static const away = "away";
   static const back = "back";

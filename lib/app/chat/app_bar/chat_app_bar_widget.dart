@@ -45,10 +45,10 @@ Widget _buildSubTitle(BuildContext context, String subTitle) => Text(
       subTitle,
       overflow: TextOverflow.fade,
       softWrap: false,
-      style: IAppIrcUiTextTheme.of(context).subHeaderDarkGrey,
+      style: IAppIrcUiTextTheme.of(context).bigTallBoldLightGrey,
     );
 
 Widget _buildTitle(BuildContext context, String title) => Text(
       title,
-      style: IAppIrcUiTextTheme.of(context).dialogTitleBoldDarkGrey,
+      style: IAppIrcUiTextTheme.of(context).bigTallLightGrey,
     );

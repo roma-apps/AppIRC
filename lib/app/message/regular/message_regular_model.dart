@@ -172,6 +172,7 @@ enum RegularMessageType {
   mode,
   motd,
   notice,
+  monospaceBlock,
   error,
   away,
   back,

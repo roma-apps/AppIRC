@@ -206,7 +206,7 @@ class NetworkListWidget extends StatelessWidget {
         return buildConnectionIcon(
           context,
           isChannelActive
-              ? IAppIrcUiColorTheme.of(context).primary
+              ? IAppIrcUiColorTheme.of(context).lightGrey
               : IAppIrcUiColorTheme.of(context).darkGrey,
           connected,
         );
@@ -246,7 +246,7 @@ class NetworkListWidget extends StatelessWidget {
               child: Text(
                 networkTitle,
                 style: isChannelActive
-                    ? IAppIrcUiTextTheme.of(context).mediumPrimary
+                    ? IAppIrcUiTextTheme.of(context).mediumLightGrey
                     : IAppIrcUiTextTheme.of(context).mediumDarkGrey,
               ),
             );
@@ -268,7 +268,7 @@ class NetworkListWidget extends StatelessWidget {
       icon: Icon(
         networkExpandedStateIcon,
         color: isChannelActive
-            ? IAppIrcUiColorTheme.of(context).primary
+            ? IAppIrcUiColorTheme.of(context).lightGrey
             : IAppIrcUiColorTheme.of(context).darkGrey,
       ),
       onPressed: () {

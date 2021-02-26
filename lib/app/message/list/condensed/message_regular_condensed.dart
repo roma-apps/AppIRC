@@ -36,6 +36,9 @@ bool isPossibleToCondenseMessage(ChatMessage message) {
       case RegularMessageType.notice:
         return false;
         break;
+      case RegularMessageType.monospaceBlock:
+        return false;
+        break;
       case RegularMessageType.error:
         return false;
         break;

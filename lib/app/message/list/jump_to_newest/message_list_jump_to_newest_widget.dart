@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appirc/app/message/list/jump_to_newest/message_list_jump_to_newest_bloc.dart';
 import 'package:flutter_appirc/app/message/list/jump_to_newest/message_list_jump_to_newest_model.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -31,8 +31,9 @@ class MessageListJumpToNewestWidget extends StatelessWidget {
                 messagesListJumpToNewestBloc.jumpToLatestMessage();
               },
               child: Container(
-                decoration:
-                    BoxDecoration(color: Theme.of(context).backgroundColor),
+                decoration: BoxDecoration(
+                  color: IAppIrcUiColorTheme.of(context).lightGrey,
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.center,

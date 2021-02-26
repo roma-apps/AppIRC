@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/lounge/connection/login/lounge_login_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_widget.dart';
 import 'package:flutter_appirc/form/form_title_widget.dart';
@@ -54,7 +53,8 @@ class LoungeAuthPreferencesFormWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var loungeAuthPreferencesFormBloc = Provider.of<LoungeAuthPreferencesFormBloc>(context);
+    var loungeAuthPreferencesFormBloc =
+        Provider.of<LoungeAuthPreferencesFormBloc>(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[

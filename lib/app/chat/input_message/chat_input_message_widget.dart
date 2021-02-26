@@ -60,7 +60,7 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
   Container _buildContainer(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: IAppIrcUiColorTheme.of(context).primary,
+        color: IAppIrcUiColorTheme.of(context).ultraLightGrey,
       ),
       child: Padding(
         padding: const EdgeInsets.all(4.0),

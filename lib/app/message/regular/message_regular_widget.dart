@@ -248,6 +248,10 @@ String _getMessageTitleString(BuildContext context, RegularMessage message) {
     case RegularMessageType.notice:
       title = S.of(context).chat_message_regular_sub_message_notice;
       break;
+    case RegularMessageType.monospaceBlock:
+      // same as notice
+      title = S.of(context).chat_message_regular_sub_message_notice;
+      break;
     case RegularMessageType.error:
       title = S.of(context).chat_message_regular_sub_message_error;
       break;
@@ -341,6 +345,9 @@ IconData _getMessageIcon(RegularMessage message) {
     case RegularMessageType.notice:
       icon = Icons.info;
       break;
+    case RegularMessageType.monospaceBlock:
+      icon = Icons.info;
+      break;
     case RegularMessageType.error:
       icon = Icons.error;
       break;
@@ -419,6 +426,9 @@ Color findMessageColorByType(RegularMessageType regularMessageType) {
       color = Colors.grey;
       break;
     case RegularMessageType.notice:
+      color = Colors.grey;
+      break;
+    case RegularMessageType.monospaceBlock:
       color = Colors.grey;
       break;
     case RegularMessageType.error:
