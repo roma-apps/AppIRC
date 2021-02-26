@@ -65,7 +65,7 @@ dependencies:
   firebase_crashlytics: ^0.2.1
 
   # handle click on irc:// links
-  uni_links: ^0.2.0
+  uni_links: ^0.4.0
 
   # sqlite orm to store messages in DB instead of RAM
   floor: ^0.18.0
