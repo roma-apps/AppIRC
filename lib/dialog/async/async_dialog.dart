@@ -35,7 +35,7 @@ Future<AsyncDialogResult<T>> doAsyncOperationWithDialog<T>({
   if (showProgressDialog) {
     progressDialog = IndeterminateProgressDialog(
         cancelable: cancelable,
-        contentMessage: contentMessage ?? S.of(context).dialog_progress_content,
+        contentMessage: contentMessage,
         cancelableOperation: cancelableOperation);
     progressDialog.show(context);
   }
