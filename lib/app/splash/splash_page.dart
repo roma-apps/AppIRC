@@ -5,8 +5,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return buildPlatformScaffold(
-      context,
+    return PlatformScaffold(
       body: SafeArea(
         child: const _SplashPageBody(),
       ),
