@@ -245,7 +245,6 @@ ConfigurationLoungeResponseBody _$ConfigurationLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return ConfigurationLoungeResponseBody(
     public: json['public'] as bool,
-    lockNetwork: json['lockNetwork'] as bool,
     useHexIp: json['useHexIp'] as bool,
     prefetch: json['prefetch'] as bool,
     fileUpload: json['fileUpload'] as bool,
@@ -258,12 +257,12 @@ ConfigurationLoungeResponseBody _$ConfigurationLoungeResponseBodyFromJson(
     applicationServerKey: json['applicationServerKey'] as String,
     version: json['version'] as String,
     gitCommit: json['gitCommit'] as String,
-    displayNetwork: json['displayNetwork'] as bool,
+    lockNetwork: json['lockNetwork'] as bool,
     themes: json['themes'] as List,
     defaultTheme: json['defaultTheme'] as String,
     fileUploadMaxFileSize: json['fileUploadMaxFileSize'] as int,
-    signUp: json['signUp'] as bool,
-    fcmPushEnabled: json['fcmPushEnabled'] as bool,
+    signUp: json['signUp'] as bool ?? false,
+    fcmPushEnabled: json['fcmPushEnabled'] as bool ?? false,
   );
 }
 
@@ -281,7 +280,6 @@ Map<String, dynamic> _$ConfigurationLoungeResponseBodyToJson(
       'applicationServerKey': instance.applicationServerKey,
       'version': instance.version,
       'gitCommit': instance.gitCommit,
-      'displayNetwork': instance.displayNetwork,
       'themes': instance.themes,
       'defaultTheme': instance.defaultTheme,
       'fileUploadMaxFileSize': instance.fileUploadMaxFileSize,

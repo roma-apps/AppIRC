@@ -104,6 +104,33 @@ class ChatLoginResult {
     @required this.config,
     @required this.chatInit,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatLoginResult &&
+          runtimeType == other.runtimeType &&
+          success == other.success &&
+          isAuthUsed == other.isAuthUsed &&
+          config == other.config &&
+          chatInit == other.chatInit;
+
+  @override
+  int get hashCode =>
+      success.hashCode ^
+      isAuthUsed.hashCode ^
+      config.hashCode ^
+      chatInit.hashCode;
+
+  @override
+  String toString() {
+    return 'ChatLoginResult{'
+        'success: $success, '
+        'isAuthUsed: $isAuthUsed, '
+        'config: $config, '
+        'chatInit: $chatInit'
+        '}';
+  }
 }
 
 class ChatRegistrationResult<T> {
@@ -119,6 +146,29 @@ class ChatRegistrationResult<T> {
 
   ChatRegistrationResult.fail(RegistrationErrorType errorType)
       : this._private(success: false, errorType: errorType);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatRegistrationResult &&
+          runtimeType == other.runtimeType &&
+          success == other.success &&
+          errorType == other.errorType;
+
+  @override
+  int get hashCode => success.hashCode ^ errorType.hashCode;
+
+  @override
+  String toString() {
+    return 'ChatRegistrationResult{'
+        'success: $success, '
+        'errorType: $errorType'
+        '}';
+  }
 }
 
-enum RegistrationErrorType { alreadyExist, invalid, unknown }
+enum RegistrationErrorType {
+  alreadyExist,
+  invalid,
+  unknown,
+}

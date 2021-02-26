@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
@@ -17,11 +18,12 @@ class NetworkServerPreferencesFormBloc extends FormBloc {
   final bool enabled;
   final bool visible;
 
-  NetworkServerPreferencesFormBloc(
-    NetworkServerPreferences preferences,
-    this.networkValidator,
-    this.enabled,
-    this.visible,
+  NetworkServerPreferencesFormBloc({
+    @required NetworkServerPreferences preferences,
+    @required this.networkValidator,
+    @required this.enabled,
+    @required this.visible,
+  }
   ) {
     nameFieldBloc = FormValueFieldBloc<String>(
       preferences.name,

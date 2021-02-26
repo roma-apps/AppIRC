@@ -80,13 +80,12 @@ class LoungeBackendService extends DisposableOwner
   ChatConnectionState get connectionState =>
       mapConnectionState(socketIOInstanceBloc.simpleConnectionState);
 
-  BehaviorSubject<ChatConfig> chatConfigSubject = BehaviorSubject();
 
   @override
-  Stream<ChatConfig> get chatConfigStream => chatConfigSubject.stream;
+  Stream<ChatConfig> get chatConfigStream => loungeBackendConnectBloc.configStream;
 
   @override
-  ChatConfig get chatConfig => chatConfigSubject.value;
+  ChatConfig get chatConfig => loungeBackendConnectBloc.config;
 
   @override
   ChatInitInformation get chatInit => loungeBackendConnectBloc?.chatInit;
@@ -127,10 +126,8 @@ class LoungeBackendService extends DisposableOwner
   }) {
     addDisposable(subject: signOutSubject);
     addDisposable(subject: connectionStateSubject);
-    addDisposable(subject: chatConfigSubject);
     addDisposable(subject: editNetworkRequests);
     addDisposable(subject: messageTogglePreviewSubject);
-    addDisposable(subject: chatConfigSubject);
   }
 
   Future<int> Function() lastMessageRemoteIdExtractor;
@@ -182,13 +179,6 @@ class LoungeBackendService extends DisposableOwner
       loungeAuthPreferences: loungePreferences.authPreferences,
     );
     addDisposable(disposable: loungeBackendConnectBloc);
-
-    addDisposable(
-      streamSubscription: loungeBackendConnectBloc.configStream.listen(
-        (config) => chatConfigSubject.add(config),
-      ),
-    );
-
     addDisposable(
       streamSubscription:
           socketIOInstanceBloc.simpleConnectionStateStream.listen(

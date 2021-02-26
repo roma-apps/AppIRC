@@ -5,6 +5,7 @@ import 'package:flutter_appirc/app/backend/lounge/api/lounge_backend_socket_io_a
 import 'package:flutter_appirc/app/backend/lounge/connect/lounge_backend_connect_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connect/lounge_backend_connect_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_form_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/login/lounge_login_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/login/lounge_login_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_model.dart';
@@ -198,7 +199,10 @@ class LoungeConnectionFormWidget extends StatelessWidget {
           child: ProxyProvider<LoungeConnectionFormBloc,
               LoungeAuthPreferencesFormBloc>(
             update: (context, value, _) => value.loginFormBloc,
-            child: LoungeLoginFormWidget(),
+            child: ProxyProvider<LoungeConnectionFormBloc, LoungeLoginFormBloc>(
+              update: (context, value, _) => value.loginFormBloc,
+              child: LoungeLoginFormWidget(),
+            ),
           ),
         ),
         _buildLoginButton(context),
@@ -241,13 +245,18 @@ class LoungeConnectionFormWidget extends StatelessWidget {
           onPressed: dataValid
               ? () async {
                   var connectionFormBloc =
-                      Provider.of<LoungeConnectionFormBloc>(context);
+                      Provider.of<LoungeConnectionFormBloc>(
+                    context,
+                    listen: false,
+                  );
                   var loungePreferences = connectionFormBloc.extractData();
                   var asyncResult = await doAsyncOperationWithDialog(
                     context: context,
                     asyncCode: () async {
-                      var socketIOService =
-                          Provider.of<SocketIOService>(context);
+                      var socketIOService = Provider.of<SocketIOService>(
+                        context,
+                        listen: false,
+                      );
 
                       SocketIOInstanceBloc socketIOInstanceBloc;
                       LoungeBackendConnectBloc loungeBackendConnectBloc;
@@ -352,7 +361,8 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                   var connectionFormBloc =
                       Provider.of<LoungeConnectionFormBloc>(context);
                   var loungePreferences = connectionFormBloc.extractData();
-                  var asyncResult = await doAsyncOperationWithDialog<SignedUpLoungeResponseBody>(
+                  var asyncResult = await doAsyncOperationWithDialog<
+                      SignedUpLoungeResponseBody>(
                     context: context,
                     asyncCode: () async {
                       var socketIOService =
@@ -391,7 +401,8 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                   if (!asyncResult.canceled) {
                     var requestResult = asyncResult.result;
 
-                    var registrationResult = toChatRegistrationResult(requestResult);
+                    var registrationResult =
+                        toChatRegistrationResult(requestResult);
 
                     if (registrationResult.success) {
                       successCallback(context, loungePreferences);

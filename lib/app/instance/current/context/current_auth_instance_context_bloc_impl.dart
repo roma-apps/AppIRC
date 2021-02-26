@@ -113,7 +113,7 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
     await globalProviderService
         .asyncInitAndRegister<NetworkStatesBloc>(networkStatesBloc);
 
-    var _startPreferences = chatPreferencesBloc.value ?? ChatPreferences.empty;
+    var startPreferences = chatPreferencesBloc.value ?? ChatPreferences.empty;
 
     var connectionBloc = ChatConnectionBloc(loungeBackendService);
 
@@ -121,10 +121,10 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
         .asyncInitAndRegister<ChatConnectionBloc>(connectionBloc);
 
     var chatInitBloc = ChatInitBloc(
-      loungeBackendService,
-      connectionBloc,
-      networksListBloc,
-      _startPreferences,
+      backendService: loungeBackendService,
+      connectionBloc: connectionBloc,
+      networksListBloc: networksListBloc,
+      startPreferences: startPreferences,
     );
 
     await globalProviderService

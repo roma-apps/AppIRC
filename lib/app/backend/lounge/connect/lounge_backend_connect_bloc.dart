@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/api/lounge_backend_socket_io_api_wrapper_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connect/lounge_backend_connect_model.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_model_adapter.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
+import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -14,7 +16,10 @@ class LoungeBackendConnectBloc extends DisposableOwner {
   final LoungeBackendSocketIoApiWrapperBloc loungeBackendSocketIoApiWrapperBloc;
 
   final BehaviorSubject<LoungeConnectDetails> connectDetailsSubject =
-      BehaviorSubject();
+      BehaviorSubject.seeded(null);
+
+  final BehaviorSubject<AuthPerformComplexLoungeResponse>
+      authPerformResponseSubject = BehaviorSubject.seeded(null);
 
   Stream<LoungeConnectDetails> get connectDetailsStream =>
       connectDetailsSubject.stream;
@@ -35,9 +40,6 @@ class LoungeBackendConnectBloc extends DisposableOwner {
           .toLoungeBackendConnectState();
 
   final LoungeAuthPreferences loungeAuthPreferences;
-
-  final BehaviorSubject<AuthPerformComplexLoungeResponse>
-      authPerformResponseSubject = BehaviorSubject();
 
   Stream<AuthPerformComplexLoungeResponse> get authPerformResponseStream =>
       authPerformResponseSubject.stream;
@@ -67,22 +69,100 @@ class LoungeBackendConnectBloc extends DisposableOwner {
   Stream<LoungeBackendMode> get backendModeStream =>
       connectDetailsStream.map((connectDetails) => connectDetails?.backendMode);
 
-  ChatInitInformation chatInit;
-  BehaviorSubject<ChatConfig> configSubject = BehaviorSubject();
+  ChatInitInformation get chatInit {
+    InitLoungeResponseBody initLoungeResponseBody;
+    switch (backendMode) {
+      case LoungeBackendMode.private:
+        initLoungeResponseBody = authPerformResponse
+            ?.authSuccessComplexLoungeResponse?.initLoungeResponseBody;
+        break;
+      case LoungeBackendMode.public:
+        initLoungeResponseBody = connectDetails?.publicPart
+            ?.authSuccessComplexLoungeResponse?.initLoungeResponseBody;
+        break;
+    }
 
-  ChatConfig get config => configSubject.value;
+    if (initLoungeResponseBody != null) {
+      return toChatInitInformation(initLoungeResponseBody);
+    } else {
+      return null;
+    }
+  }
 
-  Stream<ChatConfig> get configStream => configSubject.stream;
+  ChatConfig get config {
+    ConfigurationLoungeResponseBody configLoungeResponseBody;
+    CommandsLoungeResponseBody commandsLoungeResponseBody;
+    switch (backendMode) {
+      case LoungeBackendMode.private:
+        configLoungeResponseBody = authPerformResponse
+            ?.authSuccessComplexLoungeResponse?.configurationLoungeResponseBody;
+        commandsLoungeResponseBody = authPerformResponse
+            ?.authSuccessComplexLoungeResponse?.commandsLoungeResponseBody;
+        break;
+      case LoungeBackendMode.public:
+        configLoungeResponseBody = connectDetails?.publicPart
+            ?.authSuccessComplexLoungeResponse?.configurationLoungeResponseBody;
+        commandsLoungeResponseBody = connectDetails?.publicPart
+            ?.authSuccessComplexLoungeResponse?.commandsLoungeResponseBody;
+        break;
+    }
+
+    if (configLoungeResponseBody != null) {
+      return toChatConfig(
+          loungeConfig: configLoungeResponseBody,
+          commands: commandsLoungeResponseBody?.commands);
+    } else {
+      return null;
+    }
+  }
+
+  Stream<ChatConfig> get configStream => Rx.combineLatest2(
+        connectDetailsStream,
+        authPerformResponseStream,
+        (connectDetails, authPerformResponse) {
+          ConfigurationLoungeResponseBody configLoungeResponseBody;
+          CommandsLoungeResponseBody commandsLoungeResponseBody;
+          switch (backendMode) {
+            case LoungeBackendMode.private:
+              configLoungeResponseBody = authPerformResponse
+                  ?.authSuccessComplexLoungeResponse
+                  ?.configurationLoungeResponseBody;
+              commandsLoungeResponseBody = authPerformResponse
+                  ?.authSuccessComplexLoungeResponse
+                  ?.commandsLoungeResponseBody;
+              break;
+            case LoungeBackendMode.public:
+              configLoungeResponseBody = connectDetails
+                  ?.publicPart
+                  ?.authSuccessComplexLoungeResponse
+                  ?.configurationLoungeResponseBody;
+              commandsLoungeResponseBody = connectDetails
+                  ?.publicPart
+                  ?.authSuccessComplexLoungeResponse
+                  ?.commandsLoungeResponseBody;
+              break;
+          }
+
+          if (configLoungeResponseBody != null) {
+            return toChatConfig(
+                loungeConfig: configLoungeResponseBody,
+                commands: commandsLoungeResponseBody?.commands);
+          } else {
+            return null;
+          }
+        },
+      );
 
   Future<LoungeConnectDetails> connectAndWaitForResult() async {
     _logger.finest(() => "connectAndWaitForResult");
     var loungeConnectDetails =
-    await loungeBackendSocketIoApiWrapperBloc.connectAndWaitForResponse();
+        await loungeBackendSocketIoApiWrapperBloc.connectAndWaitForResponse();
 
     connectDetailsSubject.add(loungeConnectDetails);
 
     return loungeConnectDetails;
   }
+
   Future<LoungeConnectAndAuthDetails> connectAndLoginAndWaitForResult() async {
     _logger.finest(() => "connectAndLoginAndWaitForResult");
     var loungeConnectDetails =

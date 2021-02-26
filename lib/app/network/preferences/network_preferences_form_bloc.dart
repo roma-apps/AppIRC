@@ -31,10 +31,10 @@ class NetworkPreferencesFormBloc extends FormBloc {
     @required this.serverPreferencesVisible,
   }) {
     serverFormBloc = NetworkServerPreferencesFormBloc(
-      preferences.networkConnectionPreferences.serverPreferences,
-      networkValidator,
-      serverPreferencesEnabled,
-      serverPreferencesVisible,
+      preferences:preferences.networkConnectionPreferences.serverPreferences,
+      networkValidator:networkValidator,
+      enabled:serverPreferencesEnabled,
+      visible:serverPreferencesVisible,
     );
     userFormBloc = NetworkUserPreferencesFormBloc(
       preferences.networkConnectionPreferences.userPreferences,

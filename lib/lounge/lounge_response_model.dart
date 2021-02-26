@@ -801,20 +801,23 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
   final String applicationServerKey;
   final String version;
   final String gitCommit;
-  final bool displayNetwork;
+
+  bool get displayNetwork => !lockNetwork;
+
   final List<dynamic> themes;
   final String defaultTheme;
   final int fileUploadMaxFileSize;
 
   // custom field, available only in forked TheLounge, see Readme.md
+  @JsonKey(defaultValue: false)
   final bool signUp;
 
   // custom field, available only in forked TheLounge, see Readme.md
+  @JsonKey(defaultValue: false)
   final bool fcmPushEnabled;
 
   const ConfigurationLoungeResponseBody({
     @required this.public,
-    @required this.lockNetwork,
     @required this.useHexIp,
     @required this.prefetch,
     @required this.fileUpload,
@@ -824,7 +827,7 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
     @required this.applicationServerKey,
     @required this.version,
     @required this.gitCommit,
-    @required this.displayNetwork,
+    @required this.lockNetwork,
     @required this.themes,
     @required this.defaultTheme,
     @required this.fileUploadMaxFileSize,

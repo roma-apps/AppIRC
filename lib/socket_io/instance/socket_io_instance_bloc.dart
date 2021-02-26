@@ -79,12 +79,12 @@ class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
 
     DateTime startTime = DateTime.now();
 
-    T result = await resultChecker();
+    T result;
     try {
       await action();
 
       while (result == null) {
-        await Future.delayed(_defaultCheckResultIntervalDuration);
+        result = await resultChecker();
         DateTime now = DateTime.now();
 
         var diff = now.difference(startTime).abs();
@@ -92,6 +92,7 @@ class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
         if (diff > timeoutDuration) {
           throw TimeoutException("Socket IO timeout", timeoutDuration);
         }
+        await Future.delayed(_defaultCheckResultIntervalDuration);
       }
     } finally {
       await listenDisposable?.dispose();
