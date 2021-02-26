@@ -10,7 +10,6 @@ class RequestLoungeEventNames {
   static const String names = "names";
   static const String input = "input";
   static const String open = "open";
-  static const String auth = "auth";
   static const String uploadAuth = "upload:auth";
 
   static const String more = "more";
@@ -21,39 +20,75 @@ class RequestLoungeEventNames {
   static const String pushRegister = "push:register";
   static const String pushUnregister = "push:unregister";
 
+  static const String authPerform = "auth:perform";
+
   static const String signUp = "sign-up";
 }
 
 abstract class LoungeRequest {
   String get eventName;
 
-  LoungeRequest();
+  const LoungeRequest();
 }
 
-abstract class LoungeEmptyRequest extends LoungeRequest {}
+abstract class LoungeEmptyRequest extends LoungeRequest {
+  const LoungeEmptyRequest();
+}
 
 class UploadAuthLoungeEmptyRequest extends LoungeEmptyRequest {
   @override
   String get eventName => RequestLoungeEventNames.uploadAuth;
+
+  const UploadAuthLoungeEmptyRequest();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UploadAuthLoungeEmptyRequest && runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
+
+  @override
+  String toString() {
+    return 'UploadAuthLoungeEmptyRequest{}';
+  }
 }
 
 class SignOutLoungeEmptyRequest extends LoungeEmptyRequest {
   @override
   String get eventName => RequestLoungeEventNames.signOut;
+
+  const SignOutLoungeEmptyRequest();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SignOutLoungeEmptyRequest && runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
+
+  @override
+  String toString() {
+    return 'SignOutLoungeEmptyRequest{}';
+  }
 }
 
 abstract class LoungeJsonRequest extends LoungeRequest {
   Map<String, dynamic> toJson();
+
+  const LoungeJsonRequest();
 }
 
 abstract class LoungeRawRequest<T> extends LoungeRequest {
   final T body;
 
-  LoungeRawRequest({@required this.body});
+  const LoungeRawRequest({@required this.body});
 }
 
 class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
-  ChannelOpenedLoungeRawRequest({
+  const ChannelOpenedLoungeRawRequest({
     @required int channelRemoteId,
   }) : super(
           body: channelRemoteId,
@@ -61,14 +96,30 @@ class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
 
   @override
   String get eventName => RequestLoungeEventNames.open;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChannelOpenedLoungeRawRequest &&
+          runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
+
+  @override
+  String toString() {
+    return 'ChannelOpenedLoungeRawRequest{}';
+  }
 }
 
+// not available in original lounge code
 @JsonSerializable()
 class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
-  final String token;
+  @JsonKey(name: "token")
+  final String fcmToken;
 
   PushFCMTokenLoungeJsonRequest({
-    @required this.token,
+    @required this.fcmToken,
   }) : super();
 
   @override
@@ -82,7 +133,9 @@ class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
 
   @override
   String toString() {
-    return 'PushFCMTokenLoungeJsonRequest{token: $token}';
+    return 'PushFCMTokenLoungeJsonRequest{'
+        'fcmToken: $fcmToken'
+        '}';
   }
 
   @override
@@ -90,10 +143,10 @@ class PushFCMTokenLoungeJsonRequest extends LoungeJsonRequest {
       identical(this, other) ||
       other is PushFCMTokenLoungeJsonRequest &&
           runtimeType == other.runtimeType &&
-          token == other.token;
+          fcmToken == other.fcmToken;
 
   @override
-  int get hashCode => token.hashCode;
+  int get hashCode => fcmToken.hashCode;
 }
 
 @JsonSerializable()
@@ -101,11 +154,12 @@ class InputLoungeJsonRequest extends LoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.input;
 
-  final int target;
+  @JsonKey(name: "target")
+  final int targetChannelRemoteId;
   final String text;
 
-  InputLoungeJsonRequest({
-    @required this.target,
+  const InputLoungeJsonRequest({
+    @required this.targetChannelRemoteId,
     @required this.text,
   });
 
@@ -117,7 +171,10 @@ class InputLoungeJsonRequest extends LoungeJsonRequest {
 
   @override
   String toString() {
-    return 'InputLoungeJsonRequest{target: $target, content: $text}';
+    return 'InputLoungeJsonRequest{'
+        'target: $targetChannelRemoteId, '
+        'content: $text'
+        '}';
   }
 
   @override
@@ -125,11 +182,11 @@ class InputLoungeJsonRequest extends LoungeJsonRequest {
       identical(this, other) ||
       other is InputLoungeJsonRequest &&
           runtimeType == other.runtimeType &&
-          target == other.target &&
+          targetChannelRemoteId == other.targetChannelRemoteId &&
           text == other.text;
 
   @override
-  int get hashCode => target.hashCode ^ text.hashCode;
+  int get hashCode => targetChannelRemoteId.hashCode ^ text.hashCode;
 }
 
 @JsonSerializable()
@@ -137,12 +194,14 @@ class MoreLoungeJsonRequest extends LoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.more;
 
-  final int target;
-  final int lastId;
+  @JsonKey(name: "target")
+  final int targetChannelRemoteId;
+  @JsonKey(name: "lastId")
+  final int lastMessageRemoteId;
 
-  MoreLoungeJsonRequest({
-    @required this.target,
-    @required this.lastId,
+  const MoreLoungeJsonRequest({
+    @required this.targetChannelRemoteId,
+    @required this.lastMessageRemoteId,
   });
 
   @override
@@ -152,35 +211,39 @@ class MoreLoungeJsonRequest extends LoungeJsonRequest {
       _$MoreLoungeJsonRequestFromJson(json);
 
   @override
-  String toString() {
-    return 'MoreLoungeJsonRequest{target: $target, lastId: $lastId}';
-  }
+  String toString() => 'MoreLoungeJsonRequest{'
+      'targetChannelRemoteId: $targetChannelRemoteId, '
+      'lastMessageRemoteId: $lastMessageRemoteId'
+      '}';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MoreLoungeJsonRequest &&
           runtimeType == other.runtimeType &&
-          target == other.target &&
-          lastId == other.lastId;
+          targetChannelRemoteId == other.targetChannelRemoteId &&
+          lastMessageRemoteId == other.lastMessageRemoteId;
 
   @override
-  int get hashCode => target.hashCode ^ lastId.hashCode;
+  int get hashCode =>
+      targetChannelRemoteId.hashCode ^ lastMessageRemoteId.hashCode;
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class MsgPreviewToggleLoungeJsonRequest extends LoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.msgPreviewToggle;
 
-  final int target;
-  final int msgId;
+  @JsonKey(name: "target")
+  final int targetChannelRemoteId;
+  @JsonKey(name: "msgId")
+  final int messageRemoteId;
   final String link;
   final bool shown;
 
-  MsgPreviewToggleLoungeJsonRequest({
-    @required this.target,
-    @required this.msgId,
+  const MsgPreviewToggleLoungeJsonRequest({
+    @required this.targetChannelRemoteId,
+    @required this.messageRemoteId,
     @required this.link,
     @required this.shown,
   });
@@ -188,12 +251,29 @@ class MsgPreviewToggleLoungeJsonRequest extends LoungeJsonRequest {
   @override
   String toString() {
     return 'MsgPreviewToggleLoungeJsonRequest{'
-        'target: $target, '
-        'msgId: $msgId, '
+        'targetChannelRemoteId: $targetChannelRemoteId, '
+        'messageRemoteId: $messageRemoteId, '
         'link: $link, '
         'shown: $shown'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MsgPreviewToggleLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          targetChannelRemoteId == other.targetChannelRemoteId &&
+          messageRemoteId == other.messageRemoteId &&
+          link == other.link &&
+          shown == other.shown;
+
+  @override
+  int get hashCode =>
+      targetChannelRemoteId.hashCode ^
+      messageRemoteId.hashCode ^
+      link.hashCode ^
+      shown.hashCode;
 
   @override
   Map<String, dynamic> toJson() =>
@@ -209,10 +289,11 @@ class NamesLoungeJsonRequest extends LoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.names;
 
-  final int target;
+  @JsonKey(name: "target")
+  final int targetChannelRemoteId;
 
-  NamesLoungeJsonRequest({
-    @required this.target,
+  const NamesLoungeJsonRequest({
+    @required this.targetChannelRemoteId,
   });
 
   @override
@@ -226,39 +307,42 @@ class NamesLoungeJsonRequest extends LoungeJsonRequest {
       identical(this, other) ||
       other is NamesLoungeJsonRequest &&
           runtimeType == other.runtimeType &&
-          target == other.target;
+          targetChannelRemoteId == other.targetChannelRemoteId;
 
   @override
-  int get hashCode => target.hashCode;
+  int get hashCode => targetChannelRemoteId.hashCode;
 
   @override
   String toString() {
-    return 'NamesLoungeJsonRequest{target: $target}';
+    return 'NamesLoungeJsonRequest{'
+        'targetChannelRemoteId: $targetChannelRemoteId'
+        '}';
   }
 }
 
+// not available in original lounge code
 @JsonSerializable()
-class RegistrationLoungeJsonRequest extends LoungeJsonRequest {
+class SignUpLoungeJsonRequest extends LoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.signUp;
   final String user;
   final String password;
 
-  RegistrationLoungeJsonRequest({
+  const SignUpLoungeJsonRequest({
     @required this.user,
     @required this.password,
   });
 
   @override
-  Map<String, dynamic> toJson() => _$RegistrationLoungeJsonRequestToJson(this);
+  Map<String, dynamic> toJson() => _$SignUpLoungeJsonRequestToJson(this);
 
-  factory RegistrationLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
-      _$RegistrationLoungeJsonRequestFromJson(json);
+  factory SignUpLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$SignUpLoungeJsonRequestFromJson(json);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RegistrationLoungeJsonRequest &&
+      other is SignUpLoungeJsonRequest &&
           runtimeType == other.runtimeType &&
           user == other.user &&
           password == other.password;
@@ -275,67 +359,78 @@ class RegistrationLoungeJsonRequest extends LoungeJsonRequest {
   }
 }
 
-@JsonSerializable()
-class AuthLoginLoungeJsonRequestBody extends LoungeJsonRequest {
+@JsonSerializable(includeIfNull: false)
+class AuthPerformLoungeJsonRequest extends LoungeJsonRequest {
   @override
-  String get eventName => RequestLoungeEventNames.auth;
+  String get eventName => RequestLoungeEventNames.authPerform;
 
   final String user;
   final String password;
+  final String token;
+  @JsonKey(name: "lastMessage")
+  final int lastMessageRemoteId;
+  @JsonKey(name: "openChannel")
+  final int openChannelRemoteId;
+  final bool hasConfig;
+
+  const AuthPerformLoungeJsonRequest({
+    @required this.user,
+    @required this.password,
+    @required this.token,
+    @required this.lastMessageRemoteId,
+    @required this.openChannelRemoteId,
+    @required this.hasConfig,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthPerformLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          user == other.user &&
+          password == other.password &&
+          token == other.token &&
+          lastMessageRemoteId == other.lastMessageRemoteId &&
+          openChannelRemoteId == other.openChannelRemoteId &&
+          hasConfig == other.hasConfig;
+
+  @override
+  int get hashCode =>
+      user.hashCode ^
+      password.hashCode ^
+      token.hashCode ^
+      lastMessageRemoteId.hashCode ^
+      openChannelRemoteId.hashCode ^
+      hasConfig.hashCode;
 
   @override
   String toString() {
-    return 'AuthLoungeJsonRequestBody{user: $user, password: $password}';
+    return 'AuthPerformLoungeJsonRequestBody{'
+        'user: $user, '
+        'password: $password, '
+        'token: $token, '
+        'lastMessageRemoteId: $lastMessageRemoteId, '
+        'openChannelRemoteId: $openChannelRemoteId, '
+        'hasConfig: $hasConfig'
+        '}';
   }
-
-  AuthLoginLoungeJsonRequestBody({
-    @required this.user,
-    @required this.password,
-  });
-
-  @override
-  Map<String, dynamic> toJson() => _$AuthLoginLoungeJsonRequestBodyToJson(this);
-
-  factory AuthLoginLoungeJsonRequestBody.fromJson(Map<dynamic, dynamic> json) =>
-      _$AuthLoginLoungeJsonRequestBodyFromJson(json);
-}
-
-@JsonSerializable()
-class AuthReconnectLoungeJsonRequestBody extends LoungeJsonRequest {
-  @override
-  String get eventName => RequestLoungeEventNames.auth;
-
-  @JsonKey(name: "lastMessage")
-  int lastMessageId;
-  @JsonKey(name: "openChannel")
-  int openChannelId;
-  final String user;
-  final String token;
-
-  AuthReconnectLoungeJsonRequestBody({
-    @required this.lastMessageId,
-    @required this.openChannelId,
-    @required this.user,
-    @required this.token,
-  });
 
   @override
   Map<String, dynamic> toJson() =>
-      _$AuthReconnectLoungeJsonRequestBodyToJson(this);
+      _$AuthPerformLoungeJsonRequestToJson(this);
 
-  factory AuthReconnectLoungeJsonRequestBody.fromJson(
-          Map<dynamic, dynamic> json) =>
-      _$AuthReconnectLoungeJsonRequestBodyFromJson(json);
+  factory AuthPerformLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$AuthPerformLoungeJsonRequestFromJson(json);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
-  final String uuid;
-
   @override
   String get eventName => RequestLoungeEventNames.networkEdit;
 
-  NetworkEditLoungeJsonRequest({
+  final String uuid;
+
+  const NetworkEditLoungeJsonRequest({
     @required this.uuid,
     @required String host,
     @required String name,
@@ -361,6 +456,54 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
         );
 
   @override
+  String toString() {
+    return 'NetworkEditLoungeJsonRequest{'
+        'uuid: $uuid, '
+        'host: $host, '
+        'name: $name, '
+        'nick: $nick, '
+        'port: $port, '
+        'realname: $realname, '
+        'password: $password, '
+        'rejectUnauthorized: $rejectUnauthorized, '
+        'tls: $tls, '
+        'username: $username, '
+        'commands: $commands'
+        '}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkEditLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          uuid == other.uuid &&
+          host == other.host &&
+          name == other.name &&
+          nick == other.nick &&
+          port == other.port &&
+          realname == other.realname &&
+          password == other.password &&
+          rejectUnauthorized == other.rejectUnauthorized &&
+          tls == other.tls &&
+          username == other.username &&
+          commands == other.commands;
+
+  @override
+  int get hashCode =>
+      uuid.hashCode ^
+      host.hashCode ^
+      name.hashCode ^
+      nick.hashCode ^
+      port.hashCode ^
+      realname.hashCode ^
+      password.hashCode ^
+      rejectUnauthorized.hashCode ^
+      tls.hashCode ^
+      username.hashCode ^
+      commands.hashCode;
+
+  @override
   Map<String, dynamic> toJson() => _$NetworkEditLoungeJsonRequestToJson(this);
 
   factory NetworkEditLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
@@ -369,12 +512,12 @@ class NetworkEditLoungeJsonRequest extends NetworkLoungeJsonRequest {
 
 @JsonSerializable()
 class NetworkNewLoungeJsonRequest extends NetworkLoungeJsonRequest {
-  final String join;
-
   @override
   String get eventName => RequestLoungeEventNames.networkNew;
 
-  NetworkNewLoungeJsonRequest({
+  final String join;
+
+  const NetworkNewLoungeJsonRequest({
     @required this.join,
     @required String host,
     @required String name,
@@ -398,6 +541,54 @@ class NetworkNewLoungeJsonRequest extends NetworkLoungeJsonRequest {
           username: username,
           commands: commands,
         );
+
+  @override
+  String toString() {
+    return 'NetworkNewLoungeJsonRequest{'
+        'join: $join, '
+        'host: $host, '
+        'name: $name, '
+        'nick: $nick, '
+        'port: $port, '
+        'realname: $realname, '
+        'password: $password, '
+        'rejectUnauthorized: $rejectUnauthorized, '
+        'tls: $tls, '
+        'username: $username, '
+        'commands: $commands'
+        '}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkNewLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          join == other.join &&
+          host == other.host &&
+          name == other.name &&
+          nick == other.nick &&
+          port == other.port &&
+          realname == other.realname &&
+          password == other.password &&
+          rejectUnauthorized == other.rejectUnauthorized &&
+          tls == other.tls &&
+          username == other.username &&
+          commands == other.commands;
+
+  @override
+  int get hashCode =>
+      join.hashCode ^
+      host.hashCode ^
+      name.hashCode ^
+      nick.hashCode ^
+      port.hashCode ^
+      realname.hashCode ^
+      password.hashCode ^
+      rejectUnauthorized.hashCode ^
+      tls.hashCode ^
+      username.hashCode ^
+      commands.hashCode;
 
   @override
   Map<String, dynamic> toJson() => _$NetworkNewLoungeJsonRequestToJson(this);
@@ -424,7 +615,7 @@ abstract class NetworkLoungeJsonRequest extends LoungeJsonRequest {
 
   String get uri => "$host:$port";
 
-  NetworkLoungeJsonRequest({
+  const NetworkLoungeJsonRequest({
     @required this.host,
     @required this.commands,
     @required this.name,

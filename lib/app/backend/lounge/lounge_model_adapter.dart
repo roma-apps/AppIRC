@@ -25,22 +25,22 @@ import 'package:logging/logging.dart';
 
 var _logger = Logger("lounge_model_adapter.dart");
 
-Future<ChatInitInformation> toChatInitInformation(
+ChatInitInformation toChatInitInformation(
   InitLoungeResponseBody initLoungeResponseBody,
-) async {
+) {
   var loungeNetworks = initLoungeResponseBody.networks;
   var networksWithState = <NetworkWithState>[];
   var channelsWithState = <ChannelWithState>[];
   for (var loungeNetwork in loungeNetworks) {
     networksWithState.add(
-      await toNetworkWithState(
+      toNetworkWithState(
         loungeNetwork,
       ),
     );
 
     for (var loungeChannel in loungeNetwork.channels) {
       channelsWithState.add(
-        await toChannelWithState(
+        toChannelWithState(
           loungeChannel,
         ),
       );
@@ -93,14 +93,14 @@ ChatConfig toChatConfig({
       commands: commands,
     );
 
-Future<ChatMessage> toChatMessage(
+ChatMessage toChatMessage(
   Channel channel,
   MsgLoungeResponseBodyPart msgLoungeResponseBody,
-) async {
+) {
   var regularMessageType = detectRegularMessageType(msgLoungeResponseBody.type);
 
   if (regularMessageType == RegularMessageType.whoIs) {
-    return await toWhoIsSpecialMessage(
+    return toWhoIsSpecialMessage(
       channel: channel,
       msgLoungeResponseBody: msgLoungeResponseBody,
     );
@@ -163,10 +163,10 @@ Future<ChatMessage> toChatMessage(
   }
 }
 
-Future<SpecialMessage> toWhoIsSpecialMessage({
+SpecialMessage toWhoIsSpecialMessage({
   @required Channel channel,
   @required MsgLoungeResponseBodyPart msgLoungeResponseBody,
-}) async {
+}) {
   var whoIsSpecialBody = toWhoIsSpecialMessageBody(msgLoungeResponseBody.whois);
 
   return SpecialMessage(
@@ -586,9 +586,9 @@ MessagePreviewType detectMessagePreviewType(String type) {
   throw Exception("Invalid MessagePreviewType type $type");
 }
 
-Future<ChannelWithState> toChannelWithState(
+ChannelWithState toChannelWithState(
   ChannelLoungeResponseBodyPart loungeChannel,
-) async {
+) {
   var channel = Channel(
     ChannelPreferences(
       name: loungeChannel.name,
@@ -607,7 +607,7 @@ Future<ChannelWithState> toChannelWithState(
   if (loungeChannel.messages != null) {
     for (var loungeMessage in loungeChannel.messages) {
       initMessages.add(
-        await toChatMessage(
+        toChatMessage(
           channel,
           loungeMessage,
         ),
@@ -639,14 +639,14 @@ ChannelUser toChannelUser(UserLoungeResponseBodyPart loungeUser) => ChannelUser(
       channels: null,
     );
 
-Future<NetworkWithState> toNetworkWithState(
+NetworkWithState toNetworkWithState(
   NetworkLoungeResponseBodyPart loungeNetwork,
-) async {
+) {
   var channelsWithState = <ChannelWithState>[];
 
   for (var loungeChannel in loungeNetwork.channels) {
     channelsWithState.add(
-      await toChannelWithState(
+      toChannelWithState(
         loungeChannel,
       ),
     );
@@ -706,7 +706,7 @@ Future<NetworkWithState> toNetworkWithState(
 }
 
 ChatRegistrationResult toChatRegistrationResult(
-  RegistrationResponseBody registrationResponseBody,
+  SignedUpLoungeResponseBody registrationResponseBody,
 ) {
   if (registrationResponseBody.success) {
     return ChatRegistrationResult.success();
@@ -721,10 +721,10 @@ ChatRegistrationResult toChatRegistrationResult(
 
 RegistrationErrorType toChatRegistrationErrorType(String errorType) {
   switch (errorType) {
-    case RegistrationResponseBody.errorTypeInvalid:
+    case SignedUpLoungeResponseBody.errorTypeInvalid:
       return RegistrationErrorType.invalid;
       break;
-    case RegistrationResponseBody.errorTypeAlreadyExist:
+    case SignedUpLoungeResponseBody.errorTypeAlreadyExist:
       return RegistrationErrorType.alreadyExist;
       break;
     default:

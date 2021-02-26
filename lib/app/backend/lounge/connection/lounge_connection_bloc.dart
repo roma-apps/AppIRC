@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_model.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
+import 'package:flutter_appirc/app/backend/lounge/connect/lounge_backend_connect_model.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -20,6 +20,7 @@ class LoungeConnectionBloc extends DisposableOwner {
 
   // todo: should be final or subject
   LoungeHostPreferences hostPreferences;
+
   // todo: should be final or subject
   LoungeAuthPreferences authPreferences;
 
@@ -31,12 +32,13 @@ class LoungeConnectionBloc extends DisposableOwner {
   Stream<LoungeAuthState> get stateStream => _stateSubject.stream;
 
   // ignore: close_sinks
-  BehaviorSubject<LoungeHostInformation> _hostInformationSubject;
+  BehaviorSubject<LoungeConnectDetails> _loungeConnectDetailsSubject;
 
-  LoungeHostInformation get hostInformation => _hostInformationSubject?.value;
+  LoungeConnectDetails get hostInformation =>
+      _loungeConnectDetailsSubject?.value;
 
-  Stream<LoungeHostInformation> get hostInformationStream =>
-      _hostInformationSubject.stream;
+  Stream<LoungeConnectDetails> get hostInformationStream =>
+      _loungeConnectDetailsSubject.stream;
 
   bool get connected => hostInformation?.connected ?? false;
 
@@ -57,12 +59,10 @@ class LoungeConnectionBloc extends DisposableOwner {
       _stateSubject = BehaviorSubject();
     }
 
-    _hostInformationSubject = BehaviorSubject.seeded(
-      LoungeHostInformation.notConnected(),
-    );
+    _loungeConnectDetailsSubject = BehaviorSubject();
 
     addDisposable(subject: _stateSubject);
-    addDisposable(subject: _hostInformationSubject);
+    addDisposable(subject: _loungeConnectDetailsSubject);
   }
 
   bool get isRegistrationSupported =>
@@ -74,9 +74,11 @@ class LoungeConnectionBloc extends DisposableOwner {
         ),
       );
 
-  bool _extractIsRegistrationSupported(LoungeHostInformation hostInformation) {
+  bool _extractIsRegistrationSupported(LoungeConnectDetails hostInformation) {
     return hostInformation?.connected == true ??
-        hostInformation?.registrationSupported == true;
+        hostInformation
+                ?.privatePart?.signUpAvailableResponseBody?.signUpAvailable ==
+            true;
   }
 
   void onAuthPreferencesChanged(LoungeAuthPreferences authPreferences) {
@@ -93,14 +95,12 @@ class LoungeConnectionBloc extends DisposableOwner {
     }
     this.hostPreferences = hostPreferences;
 
-    _hostInformationSubject.add(
-      LoungeHostInformation.notConnected(),
-    );
+    _loungeConnectDetailsSubject.add(null);
     _stateSubject.add(null);
   }
 
   void onHostConnectionResult(LoungeHostPreferences hostPreferences,
-      LoungeHostInformation hostInformation) {
+      LoungeConnectDetails hostInformation) {
     _logger.fine(() => "onHostConnectionResult "
         "hostInformation $hostInformation");
     if (hostInformation == null) {
@@ -109,9 +109,9 @@ class LoungeConnectionBloc extends DisposableOwner {
 
     hostInformation = hostInformation;
     var connected = hostInformation.connected;
-    _hostInformationSubject.add(hostInformation);
+    _loungeConnectDetailsSubject.add(hostInformation);
 
-    if (connected && hostInformation.authRequired && state == null) {
+    if (connected && hostInformation.isPrivateMode && state == null) {
       _stateSubject.add(LoungeAuthState.login);
     } else {
       _stateSubject.add(null);

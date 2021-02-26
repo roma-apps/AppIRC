@@ -52,14 +52,6 @@ abstract class ChatBackendService implements IDisposable {
     bool waitForResult = false,
   });
 
-  Future<RequestResult<ChatInitInformation>> authAfterReconnect({
-    @required String token,
-    @required int activeChannelId,
-    @required int lastMessageId,
-    @required String user,
-    bool waitForResult = false,
-  });
-
   Future<RequestResult<NetworkWithState>> joinNetwork({
     @required NetworkPreferences networkPreferences,
     bool waitForResult = false,

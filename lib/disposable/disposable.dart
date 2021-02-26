@@ -9,8 +9,7 @@ abstract class IDisposable {
   Future dispose();
 }
 
-
-class CustomDisposable extends IDisposable {
+class CustomDisposable implements IDisposable {
   final FutureOr Function() _disposeCallback;
 
   @override

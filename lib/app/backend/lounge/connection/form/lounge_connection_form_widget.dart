@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
+import 'package:flutter_appirc/app/backend/lounge/api/lounge_backend_socket_io_api_wrapper_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connect/lounge_backend_connect_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connect/lounge_backend_connect_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_form_bloc.dart';
-import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/login/lounge_login_form_widget.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/registration/lounge_registration_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/registration/lounge_registration_form_widget.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_dialog_widgets.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_model_adapter.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/auth/lounge_auth_preferences_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_preferences_form_widget.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog.dart';
 import 'package:flutter_appirc/dialog/async/async_dialog_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:flutter_appirc/lounge/lounge_response_model.dart';
+import 'package:flutter_appirc/socket_io/instance/socket_io_instance_bloc.dart';
+import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -66,26 +70,27 @@ class LoungeConnectionFormWidget extends StatelessWidget {
   StreamBuilder<LoungeAuthState> _buildAuthForm(BuildContext context) {
     LoungeConnectionBloc connectionBloc = Provider.of(context);
     return StreamBuilder<LoungeAuthState>(
-        stream: connectionBloc.stateStream,
-        initialData: connectionBloc.state,
-        builder: (context, snapshot) {
-          var state = snapshot.data;
+      stream: connectionBloc.stateStream,
+      initialData: connectionBloc.state,
+      builder: (context, snapshot) {
+        var state = snapshot.data;
 
-          if (state == null) {
-            return SizedBox.shrink();
-          }
+        if (state == null) {
+          return SizedBox.shrink();
+        }
 
-          switch (state) {
-            case LoungeAuthState.login:
-              return _buildLoginForm(context);
-              break;
-            case LoungeAuthState.registration:
-              return _buildRegistrationForm(context);
-              break;
-          }
+        switch (state) {
+          case LoungeAuthState.login:
+            return _buildLoginForm(context);
+            break;
+          case LoungeAuthState.registration:
+            return _buildRegistrationForm(context);
+            break;
+        }
 
-          throw "Invalid state $state";
-        });
+        throw "Invalid state $state";
+      },
+    );
   }
 
   StreamBuilder<bool> _buildConnectButton(BuildContext context) {
@@ -105,14 +110,41 @@ class LoungeConnectionFormWidget extends StatelessWidget {
           return PlatformButton(
             onPressed: () async {
               var loungePreferences = formBloc.extractData();
-              AsyncDialogResult<RequestResult<LoungeHostInformation>>
-                  asyncResult = await doAsyncOperationWithDialog(
+              AsyncDialogResult<LoungeConnectDetails> asyncResult =
+                  await doAsyncOperationWithDialog(
                 context: context,
-                asyncCode: () {
-                  return retrieveLoungeHostInformation(
-                    socketIoService:SocketIOService.of(context, listen: false),
-                    hostPreferences:loungePreferences.hostPreferences,
-                  );
+                asyncCode: () async {
+                  SocketIOInstanceBloc socketIOInstanceBloc;
+                  LoungeBackendConnectBloc loungeBackendConnectBloc;
+
+                  LoungeConnectDetails result;
+
+                  try {
+                    socketIOInstanceBloc = SocketIOInstanceBloc(
+                      socketIoService: SocketIOService.of(
+                        context,
+                        listen: false,
+                      ),
+                      uri: loungePreferences.hostPreferences.host,
+                    );
+
+                    await socketIOInstanceBloc.performAsyncInit();
+
+                    loungeBackendConnectBloc = LoungeBackendConnectBloc(
+                      loungeAuthPreferences: loungePreferences.authPreferences,
+                      loungeBackendSocketIoApiWrapperBloc:
+                          LoungeBackendSocketIoApiWrapperBloc(
+                        socketIOInstanceBloc: socketIOInstanceBloc,
+                      ),
+                    );
+
+                    result = await loungeBackendConnectBloc
+                        .connectAndWaitForResult();
+                  } finally {
+                    await socketIOInstanceBloc?.dispose();
+                    await loungeBackendConnectBloc?.dispose();
+                  }
+                  return result;
                 },
                 cancelable: true,
               );
@@ -120,27 +152,31 @@ class LoungeConnectionFormWidget extends StatelessWidget {
               if (!asyncResult.canceled) {
                 var requestResult = asyncResult.result;
 
-                if (requestResult.isTimeout) {
+                if (requestResult.isSocketTimeout) {
                   await showLoungeTimeoutAlertDialog(context);
                 } else {
-                  if (requestResult.isResponseReceived) {
-                    var hostInformation = requestResult.result;
+                  if (!requestResult
+                      .isLoungeNotSentRequiredDataAndTimeoutReached) {
+                    var hostInformation = requestResult;
 
                     if (hostInformation.connected &&
-                        !hostInformation.authRequired) {
+                        !hostInformation.isPrivateMode) {
                       successCallback(context, loungePreferences);
                     } else {
                       connectionBloc.onHostConnectionResult(
-                          loungePreferences.hostPreferences, hostInformation);
+                        loungePreferences.hostPreferences,
+                        hostInformation,
+                      );
 
                       if (!hostInformation.connected) {
                         await showLoungeConnectionErrorAlertDialog(
-                            context, requestResult.error);
+                          context,
+                          null,
+                        );
                       }
                     }
                   } else {
-                    await showLoungeConnectionErrorAlertDialog(
-                        context, requestResult.error);
+                    await showLoungeConnectionErrorAlertDialog(context, null);
                   }
                 }
               }
@@ -210,10 +246,40 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                   var asyncResult = await doAsyncOperationWithDialog(
                     context: context,
                     asyncCode: () async {
-                      return await tryLoginToLounge(
-                        socketIoService: Provider.of<SocketIOService>(context),
-                        loungePreferences: loungePreferences,
-                      );
+                      var socketIOService =
+                          Provider.of<SocketIOService>(context);
+
+                      SocketIOInstanceBloc socketIOInstanceBloc;
+                      LoungeBackendConnectBloc loungeBackendConnectBloc;
+
+                      LoungeConnectDetails connectDetails;
+                      try {
+                        socketIOInstanceBloc = SocketIOInstanceBloc(
+                          uri: loungePreferences.hostPreferences.host,
+                          socketIoService: socketIOService,
+                        );
+
+                        await socketIOInstanceBloc.performAsyncInit();
+
+                        var loungeBackendSocketIoApiWrapperBloc =
+                            LoungeBackendSocketIoApiWrapperBloc(
+                                socketIOInstanceBloc: socketIOInstanceBloc);
+
+                        loungeBackendConnectBloc = LoungeBackendConnectBloc(
+                          loungeBackendSocketIoApiWrapperBloc:
+                              loungeBackendSocketIoApiWrapperBloc,
+                          loungeAuthPreferences:
+                              loungePreferences.authPreferences,
+                        );
+
+                        connectDetails = await loungeBackendConnectBloc
+                            .connectAndWaitForResult();
+                      } finally {
+                        await socketIOInstanceBloc?.dispose();
+                        await loungeBackendConnectBloc?.dispose();
+                      }
+
+                      return connectDetails;
                     },
                     cancelable: true,
                   );
@@ -221,13 +287,14 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                   if (!asyncResult.canceled) {
                     var requestResult = asyncResult.result;
 
-                    if (requestResult.isTimeout) {
+                    if (requestResult.isSocketTimeout) {
                       await showLoungeTimeoutAlertDialog(context);
                     } else {
-                      if (requestResult.isResponseReceived) {
-                        ChatLoginResult loginResult = requestResult.result;
+                      if (!requestResult
+                          .isLoungeNotSentRequiredDataAndTimeoutReached) {
+                        var success = requestResult.isSuccess;
 
-                        if (loginResult.success) {
+                        if (success) {
                           successCallback(
                             context,
                             loungePreferences,
@@ -238,7 +305,7 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                       } else {
                         await showLoungeConnectionErrorAlertDialog(
                           context,
-                          requestResult.error,
+                          requestResult,
                         );
                       }
                     }
@@ -285,13 +352,38 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                   var connectionFormBloc =
                       Provider.of<LoungeConnectionFormBloc>(context);
                   var loungePreferences = connectionFormBloc.extractData();
-                  var asyncResult = await doAsyncOperationWithDialog(
+                  var asyncResult = await doAsyncOperationWithDialog<SignedUpLoungeResponseBody>(
                     context: context,
                     asyncCode: () async {
-                      return await registerOnLounge(
-                        socketIoService:Provider.of<SocketIOService>(context),
-                        loungePreferences:loungePreferences,
-                      );
+                      var socketIOService =
+                          Provider.of<SocketIOService>(context);
+
+                      SocketIOInstanceBloc socketIOInstanceBloc;
+
+                      SignedUpLoungeResponseBody signedUpLoungeResponseBody;
+                      try {
+                        socketIOInstanceBloc = SocketIOInstanceBloc(
+                          uri: loungePreferences.hostPreferences.host,
+                          socketIoService: socketIOService,
+                        );
+
+                        await socketIOInstanceBloc.performAsyncInit();
+
+                        var loungeBackendSocketIoApiWrapperBloc =
+                            LoungeBackendSocketIoApiWrapperBloc(
+                                socketIOInstanceBloc: socketIOInstanceBloc);
+
+                        signedUpLoungeResponseBody =
+                            await loungeBackendSocketIoApiWrapperBloc
+                                .sendSignUpAndWaitForResult(
+                          user: loungePreferences.authPreferences.username,
+                          password: loungePreferences.authPreferences.password,
+                        );
+                      } finally {
+                        await socketIOInstanceBloc?.dispose();
+                      }
+
+                      return signedUpLoungeResponseBody;
                     },
                     cancelable: true,
                   );
@@ -299,36 +391,24 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                   if (!asyncResult.canceled) {
                     var requestResult = asyncResult.result;
 
-                    if (requestResult.isTimeout) {
-                      await showLoungeTimeoutAlertDialog(context);
-                    } else {
-                      if (requestResult.isResponseReceived) {
-                        ChatRegistrationResult registrationResult =
-                            requestResult.result;
+                    var registrationResult = toChatRegistrationResult(requestResult);
 
-                        if (registrationResult.success) {
-                          successCallback(context, loungePreferences);
-                        } else {
-                          switch (registrationResult.errorType) {
-                            case RegistrationErrorType.alreadyExist:
-                              await showLoungeRegistrationAlreadyExistAlertDialog(
-                                  context);
-                              break;
-                            case RegistrationErrorType.invalid:
-                              await showLoungeRegistrationInvalidAlertDialog(
-                                  context);
-                              break;
-                            case RegistrationErrorType.unknown:
-                              await showLoungeRegistrationUnknownAlertDialog(
-                                  context);
-                              break;
-                          }
-                        }
-                      } else {
-                        await showLoungeConnectionErrorAlertDialog(
-                          context,
-                          requestResult.error,
-                        );
+                    if (registrationResult.success) {
+                      successCallback(context, loungePreferences);
+                    } else {
+                      switch (registrationResult.errorType) {
+                        case RegistrationErrorType.alreadyExist:
+                          await showLoungeRegistrationAlreadyExistAlertDialog(
+                              context);
+                          break;
+                        case RegistrationErrorType.invalid:
+                          await showLoungeRegistrationInvalidAlertDialog(
+                              context);
+                          break;
+                        case RegistrationErrorType.unknown:
+                          await showLoungeRegistrationUnknownAlertDialog(
+                              context);
+                          break;
                       }
                     }
                   }

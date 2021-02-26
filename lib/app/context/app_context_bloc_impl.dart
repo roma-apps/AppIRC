@@ -22,7 +22,7 @@ import 'package:flutter_appirc/local_preferences/local_preferences_service.dart'
 import 'package:flutter_appirc/local_preferences/shared_preferences_local_preferences_service_impl.dart';
 import 'package:flutter_appirc/provider/provider_context_bloc_impl.dart';
 import 'package:flutter_appirc/pushes/push_service.dart';
-import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:flutter_appirc/ui/theme/system/brightness/ui_theme_system_brightness_bloc.dart';
 import 'package:flutter_appirc/ui/theme/system/brightness/ui_theme_system_brightness_bloc_impl.dart';
 import 'package:logging/logging.dart';

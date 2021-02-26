@@ -29,7 +29,7 @@ import 'package:flutter_appirc/disposable/disposable_provider.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/localization/localization_model.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
-import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:flutter_appirc/ui/theme/system/brightness/ui_theme_system_brightness_handler_widget.dart';
 import 'package:flutter_appirc/ui/theme/ui_theme_proxy_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

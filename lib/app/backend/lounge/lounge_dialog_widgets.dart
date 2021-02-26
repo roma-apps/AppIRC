@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_alert_dialog.dart';
 
@@ -37,7 +36,7 @@ Future showLoungeConnectionErrorAlertDialog(
 }
 
 Future showLoungeInvalidResponseDialog(
-    BuildContext context, InvalidResponseException exception) async {
+    BuildContext context) async {
   String title = S.of(context).lounge_dialog_invalid_response_error_title;
   String content = S.of(context).lounge_dialog_invalid_response_error_content;
 

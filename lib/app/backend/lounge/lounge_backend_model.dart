@@ -1,58 +1,28 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_model_adapter.dart';
 import 'package:flutter_appirc/app/channel/preferences/channel_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/irc/irc_commands_model.dart';
-import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_request_model.dart';
 
-abstract class LoungeException implements Exception {}
+abstract class LoungeComplexResponse {
+  DateTime allRequiredDataReceivedTime;
 
-class InvalidResponseException extends LoungeException {
-  final LoungePreferences preferences;
+  List<dynamic> get optionalFields;
 
-  final bool authorizedReceived;
-  final bool configReceived;
-  final bool commandReceived;
-  final bool chatInitReceived;
+  List<dynamic> get requiredFields;
 
-  InvalidResponseException(
-    this.preferences,
-    this.authorizedReceived,
-    this.configReceived,
-    this.commandReceived,
-    this.chatInitReceived,
-  );
+  bool get isAllFieldsExist => isRequiredFieldsExist && isOptionalFieldsExist;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is InvalidResponseException &&
-          runtimeType == other.runtimeType &&
-          preferences == other.preferences &&
-          authorizedReceived == other.authorizedReceived &&
-          configReceived == other.configReceived &&
-          commandReceived == other.commandReceived &&
-          chatInitReceived == other.chatInitReceived;
+  bool get isOptionalFieldsExist => !optionalFields.contains(null);
 
-  @override
-  int get hashCode =>
-      preferences.hashCode ^
-      authorizedReceived.hashCode ^
-      configReceived.hashCode ^
-      commandReceived.hashCode ^
-      chatInitReceived.hashCode;
+  bool get isRequiredFieldsExist => !requiredFields.contains(null);
 
-  @override
-  String toString() {
-    return 'InvalidResponseException{'
-        'preferences: $preferences, '
-        'authorizedReceived: $authorizedReceived, '
-        'configReceived: $configReceived, '
-        'commandReceived: $commandReceived, '
-        'chatInitReceived: $chatInitReceived'
-        '}';
-  }
+  LoungeComplexResponse();
+}
+
+abstract class LoungeException implements Exception {
+  const LoungeException();
 }
 
 class NotImplementedYetLoungeException implements LoungeException {
@@ -60,29 +30,17 @@ class NotImplementedYetLoungeException implements LoungeException {
 }
 
 class ChatJoinChannelInputLoungeJsonRequest extends InputLoungeJsonRequest {
-  ChannelPreferences preferences;
+  final ChannelPreferences preferences;
 
   ChatJoinChannelInputLoungeJsonRequest({
     @required this.preferences,
-    @required int target,
+    @required int targetChannelRemoteId,
   }) : super(
-          target: target,
-          text: JoinIRCCommand(
-            channelName: preferences.name,
-            password: preferences.password,
-          ).asRawString,
-        );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is ChatJoinChannelInputLoungeJsonRequest &&
-          runtimeType == other.runtimeType &&
-          preferences == other.preferences;
-
-  @override
-  int get hashCode => super.hashCode ^ preferences.hashCode;
+            targetChannelRemoteId: targetChannelRemoteId,
+            text: JoinIRCCommand(
+              channelName: preferences.name,
+              password: preferences.password,
+            ).asRawString);
 
   @override
   String toString() {
@@ -110,89 +68,14 @@ class ChatNetworkNewLoungeJsonRequest extends NetworkNewLoungeJsonRequest {
               .networkConnectionPreferences.serverPreferences.serverHost,
           port: networkPreferences
               .networkConnectionPreferences.serverPreferences.serverPort,
-          rejectUnauthorized: toLoungeBoolean(
-            networkPreferences.networkConnectionPreferences.serverPreferences
-                .useOnlyTrustedCertificates,
-          ),
-          tls: toLoungeBoolean(
-            networkPreferences
-                .networkConnectionPreferences.serverPreferences.useTls,
-          ),
+          rejectUnauthorized: toLoungeBoolean(networkPreferences
+              .networkConnectionPreferences
+              .serverPreferences
+              .useOnlyTrustedCertificates),
+          tls: toLoungeBoolean(networkPreferences
+              .networkConnectionPreferences.serverPreferences.useTls),
           name: networkPreferences
               .networkConnectionPreferences.serverPreferences.name,
           commands: null, // set command only via edit interface
         );
-}
-
-class LoungeHostInformation {
-  final bool connected;
-
-  final bool authRequired;
-  final bool authResponse;
-
-  // TODO: remove todo when will be in master branch
-  // only available in custom the lounge version
-  // https://github.com/xal/thelounge/tree/xal/sign_up
-  final bool registrationSupported;
-
-  bool get isPublicMode => connected && !authRequired;
-
-  bool get isPrivateMode => connected && authRequired;
-
-  LoungeHostInformation._private(
-      {@required this.connected,
-      @required this.authRequired,
-      @required this.registrationSupported,
-      @required this.authResponse});
-
-  LoungeHostInformation.notConnected()
-      : this._private(
-          connected: false,
-          authRequired: null,
-          registrationSupported: null,
-          authResponse: null,
-        );
-
-  LoungeHostInformation.connectedToPublic()
-      : this._private(
-          connected: true,
-          authRequired: false,
-          registrationSupported: false,
-          authResponse: true,
-        );
-
-  LoungeHostInformation.connectedToPrivate({
-    @required bool authResponse,
-    @required bool registrationSupported,
-  }) : this._private(
-            connected: true,
-            authRequired: true,
-            registrationSupported: registrationSupported,
-            authResponse: authResponse);
-
-  @override
-  String toString() {
-    return 'LoungeHostInformation{'
-        'connected: $connected, '
-        'authRequired: $authRequired, '
-        'registrationSupported: $registrationSupported'
-        '}';
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LoungeHostInformation &&
-          runtimeType == other.runtimeType &&
-          connected == other.connected &&
-          authRequired == other.authRequired &&
-          authResponse == other.authResponse &&
-          registrationSupported == other.registrationSupported;
-
-  @override
-  int get hashCode =>
-      connected.hashCode ^
-      authRequired.hashCode ^
-      authResponse.hashCode ^
-      registrationSupported.hashCode;
 }

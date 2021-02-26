@@ -1,6 +1,6 @@
-import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/login/lounge_login_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
+import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/registration/lounge_registration_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/preferences/host/lounge_host_preferences_form_bloc.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
@@ -15,7 +15,9 @@ class LoungeConnectionFormBloc extends FormBloc {
   LoungeRegistrationFormBloc registrationFormBloc;
 
   bool get isRegistrationSupported =>
-      hostFormBloc?.hostInformation?.registrationSupported ?? false;
+      hostFormBloc?.hostInformation?.privatePart?.signUpAvailableResponseBody
+          ?.signUpAvailable ??
+      false;
 
   LoungeConnectionFormBloc(this.loungeConnectionBloc) {
     var startPreferences = loungeConnectionBloc.preferences;

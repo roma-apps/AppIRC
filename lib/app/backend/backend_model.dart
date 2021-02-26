@@ -91,14 +91,19 @@ class RequestResult<T> {
       error.hashCode;
 }
 
-class ChatLoginResult<T> {
+class ChatLoginResult {
   bool success;
 
   bool isAuthUsed;
   ChatConfig config;
   ChatInitInformation chatInit;
 
-  ChatLoginResult();
+  ChatLoginResult({
+    @required this.success,
+    @required this.isAuthUsed,
+    @required this.config,
+    @required this.chatInit,
+  });
 }
 
 class ChatRegistrationResult<T> {

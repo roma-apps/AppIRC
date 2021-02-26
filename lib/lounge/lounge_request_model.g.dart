@@ -9,20 +9,20 @@ part of 'lounge_request_model.dart';
 PushFCMTokenLoungeJsonRequest _$PushFCMTokenLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return PushFCMTokenLoungeJsonRequest(
-    token: json['token'] as String,
+    fcmToken: json['token'] as String,
   );
 }
 
 Map<String, dynamic> _$PushFCMTokenLoungeJsonRequestToJson(
         PushFCMTokenLoungeJsonRequest instance) =>
     <String, dynamic>{
-      'token': instance.token,
+      'token': instance.fcmToken,
     };
 
 InputLoungeJsonRequest _$InputLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return InputLoungeJsonRequest(
-    target: json['target'] as int,
+    targetChannelRemoteId: json['target'] as int,
     text: json['text'] as String,
   );
 }
@@ -30,105 +30,110 @@ InputLoungeJsonRequest _$InputLoungeJsonRequestFromJson(
 Map<String, dynamic> _$InputLoungeJsonRequestToJson(
         InputLoungeJsonRequest instance) =>
     <String, dynamic>{
-      'target': instance.target,
+      'target': instance.targetChannelRemoteId,
       'text': instance.text,
     };
 
 MoreLoungeJsonRequest _$MoreLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return MoreLoungeJsonRequest(
-    target: json['target'] as int,
-    lastId: json['lastId'] as int,
+    targetChannelRemoteId: json['target'] as int,
+    lastMessageRemoteId: json['lastId'] as int,
   );
 }
 
 Map<String, dynamic> _$MoreLoungeJsonRequestToJson(
         MoreLoungeJsonRequest instance) =>
     <String, dynamic>{
-      'target': instance.target,
-      'lastId': instance.lastId,
+      'target': instance.targetChannelRemoteId,
+      'lastId': instance.lastMessageRemoteId,
     };
 
 MsgPreviewToggleLoungeJsonRequest _$MsgPreviewToggleLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return MsgPreviewToggleLoungeJsonRequest(
-    target: json['target'] as int,
-    msgId: json['msgId'] as int,
+    targetChannelRemoteId: json['target'] as int,
+    messageRemoteId: json['msgId'] as int,
     link: json['link'] as String,
     shown: json['shown'] as bool,
   );
 }
 
 Map<String, dynamic> _$MsgPreviewToggleLoungeJsonRequestToJson(
-        MsgPreviewToggleLoungeJsonRequest instance) =>
-    <String, dynamic>{
-      'target': instance.target,
-      'msgId': instance.msgId,
-      'link': instance.link,
-      'shown': instance.shown,
-    };
+    MsgPreviewToggleLoungeJsonRequest instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('target', instance.targetChannelRemoteId);
+  writeNotNull('msgId', instance.messageRemoteId);
+  writeNotNull('link', instance.link);
+  writeNotNull('shown', instance.shown);
+  return val;
+}
 
 NamesLoungeJsonRequest _$NamesLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return NamesLoungeJsonRequest(
-    target: json['target'] as int,
+    targetChannelRemoteId: json['target'] as int,
   );
 }
 
 Map<String, dynamic> _$NamesLoungeJsonRequestToJson(
         NamesLoungeJsonRequest instance) =>
     <String, dynamic>{
-      'target': instance.target,
+      'target': instance.targetChannelRemoteId,
     };
 
-RegistrationLoungeJsonRequest _$RegistrationLoungeJsonRequestFromJson(
+SignUpLoungeJsonRequest _$SignUpLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return RegistrationLoungeJsonRequest(
+  return SignUpLoungeJsonRequest(
     user: json['user'] as String,
     password: json['password'] as String,
   );
 }
 
-Map<String, dynamic> _$RegistrationLoungeJsonRequestToJson(
-        RegistrationLoungeJsonRequest instance) =>
+Map<String, dynamic> _$SignUpLoungeJsonRequestToJson(
+        SignUpLoungeJsonRequest instance) =>
     <String, dynamic>{
       'user': instance.user,
       'password': instance.password,
     };
 
-AuthLoginLoungeJsonRequestBody _$AuthLoginLoungeJsonRequestBodyFromJson(
+AuthPerformLoungeJsonRequest _$AuthPerformLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return AuthLoginLoungeJsonRequestBody(
+  return AuthPerformLoungeJsonRequest(
     user: json['user'] as String,
     password: json['password'] as String,
-  );
-}
-
-Map<String, dynamic> _$AuthLoginLoungeJsonRequestBodyToJson(
-        AuthLoginLoungeJsonRequestBody instance) =>
-    <String, dynamic>{
-      'user': instance.user,
-      'password': instance.password,
-    };
-
-AuthReconnectLoungeJsonRequestBody _$AuthReconnectLoungeJsonRequestBodyFromJson(
-    Map<String, dynamic> json) {
-  return AuthReconnectLoungeJsonRequestBody(
-    lastMessageId: json['lastMessage'] as int,
-    openChannelId: json['openChannel'] as int,
-    user: json['user'] as String,
     token: json['token'] as String,
+    lastMessageRemoteId: json['lastMessage'] as int,
+    openChannelRemoteId: json['openChannel'] as int,
+    hasConfig: json['hasConfig'] as bool,
   );
 }
 
-Map<String, dynamic> _$AuthReconnectLoungeJsonRequestBodyToJson(
-        AuthReconnectLoungeJsonRequestBody instance) =>
-    <String, dynamic>{
-      'lastMessage': instance.lastMessageId,
-      'openChannel': instance.openChannelId,
-      'user': instance.user,
-      'token': instance.token,
-    };
+Map<String, dynamic> _$AuthPerformLoungeJsonRequestToJson(
+    AuthPerformLoungeJsonRequest instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('user', instance.user);
+  writeNotNull('password', instance.password);
+  writeNotNull('token', instance.token);
+  writeNotNull('lastMessage', instance.lastMessageRemoteId);
+  writeNotNull('openChannel', instance.openChannelRemoteId);
+  writeNotNull('hasConfig', instance.hasConfig);
+  return val;
+}
 
 NetworkEditLoungeJsonRequest _$NetworkEditLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
@@ -148,20 +153,28 @@ NetworkEditLoungeJsonRequest _$NetworkEditLoungeJsonRequestFromJson(
 }
 
 Map<String, dynamic> _$NetworkEditLoungeJsonRequestToJson(
-        NetworkEditLoungeJsonRequest instance) =>
-    <String, dynamic>{
-      'host': instance.host,
-      'name': instance.name,
-      'nick': instance.nick,
-      'port': instance.port,
-      'realname': instance.realname,
-      'password': instance.password,
-      'rejectUnauthorized': instance.rejectUnauthorized,
-      'tls': instance.tls,
-      'username': instance.username,
-      'commands': instance.commands,
-      'uuid': instance.uuid,
-    };
+    NetworkEditLoungeJsonRequest instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('host', instance.host);
+  writeNotNull('name', instance.name);
+  writeNotNull('nick', instance.nick);
+  writeNotNull('port', instance.port);
+  writeNotNull('realname', instance.realname);
+  writeNotNull('password', instance.password);
+  writeNotNull('rejectUnauthorized', instance.rejectUnauthorized);
+  writeNotNull('tls', instance.tls);
+  writeNotNull('username', instance.username);
+  writeNotNull('commands', instance.commands);
+  writeNotNull('uuid', instance.uuid);
+  return val;
+}
 
 NetworkNewLoungeJsonRequest _$NetworkNewLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
@@ -181,17 +194,25 @@ NetworkNewLoungeJsonRequest _$NetworkNewLoungeJsonRequestFromJson(
 }
 
 Map<String, dynamic> _$NetworkNewLoungeJsonRequestToJson(
-        NetworkNewLoungeJsonRequest instance) =>
-    <String, dynamic>{
-      'host': instance.host,
-      'name': instance.name,
-      'nick': instance.nick,
-      'port': instance.port,
-      'realname': instance.realname,
-      'password': instance.password,
-      'rejectUnauthorized': instance.rejectUnauthorized,
-      'tls': instance.tls,
-      'username': instance.username,
-      'commands': instance.commands,
-      'join': instance.join,
-    };
+    NetworkNewLoungeJsonRequest instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('host', instance.host);
+  writeNotNull('name', instance.name);
+  writeNotNull('nick', instance.nick);
+  writeNotNull('port', instance.port);
+  writeNotNull('realname', instance.realname);
+  writeNotNull('password', instance.password);
+  writeNotNull('rejectUnauthorized', instance.rejectUnauthorized);
+  writeNotNull('tls', instance.tls);
+  writeNotNull('username', instance.username);
+  writeNotNull('commands', instance.commands);
+  val['join'] = instance.join;
+  return val;
+}

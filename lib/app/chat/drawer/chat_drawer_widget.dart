@@ -16,7 +16,7 @@ import 'package:flutter_appirc/app/ui/theme/dark/dark_appirc_ui_theme_model.dart
 import 'package:flutter_appirc/app/ui/theme/light/light_appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/disposable/disposable_provider.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
-import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 

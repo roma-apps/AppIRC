@@ -28,7 +28,7 @@ import 'package:flutter_appirc/local_preferences/local_preferences_service.dart'
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider_context_bloc_impl.dart';
 import 'package:flutter_appirc/pushes/push_service.dart';
-import 'package:flutter_appirc/socketio/socket_io_service.dart';
+import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:logging/logging.dart';
 
 var _logger = Logger("current_auth_instance_context_bloc_imp.dart");

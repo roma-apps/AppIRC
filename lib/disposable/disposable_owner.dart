@@ -8,7 +8,7 @@ import 'package:rxdart/subjects.dart';
 
 import 'disposable.dart';
 
-class DisposableOwner extends IDisposable {
+class DisposableOwner implements IDisposable {
   @override
   bool isDisposed = false;
   final CompositeDisposable _compositeDisposable = CompositeDisposable([]);

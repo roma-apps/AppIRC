@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
+import 'package:flutter_appirc/app/backend/lounge/connect/lounge_backend_connect_model.dart';
 import 'package:flutter_appirc/form/field/form_field_bloc.dart';
 import 'package:flutter_appirc/form/field/text/form_text_field_validation.dart';
 import 'package:flutter_appirc/form/form_bloc.dart';
@@ -12,14 +12,14 @@ class LoungeHostPreferencesFormBloc extends FormBloc {
   final FormValueFieldBloc<String> hostFieldBloc;
 
   // ignore: close_sinks
-  final BehaviorSubject<LoungeHostInformation> hostInformationSubject;
+  final BehaviorSubject<LoungeConnectDetails> hostInformationSubject;
 
-  Stream<LoungeHostInformation> get hostInformationStream =>
+  Stream<LoungeConnectDetails> get hostInformationStream =>
       hostInformationSubject.stream;
 
-  LoungeHostInformation get hostInformation => hostInformationSubject.value;
+  LoungeConnectDetails get hostInformation => hostInformationSubject.value;
 
-  set hostInformation(LoungeHostInformation newHostInformation) {
+  set hostInformation(LoungeConnectDetails newHostInformation) {
     hostInformationSubject.add(newHostInformation);
   }
 
@@ -28,9 +28,10 @@ class LoungeHostPreferencesFormBloc extends FormBloc {
 
   bool get connected => hostInformation?.connected;
 
-  LoungeHostPreferencesFormBloc(LoungeHostPreferences startPreferences,
-      LoungeHostInformation startHostInformation)
-      : hostFieldBloc = FormValueFieldBloc<String>(
+  LoungeHostPreferencesFormBloc(
+    LoungeHostPreferences startPreferences,
+    LoungeConnectDetails startHostInformation,
+  )   : hostFieldBloc = FormValueFieldBloc<String>(
           startPreferences.host,
           validators: [
             NotEmptyTextValidator.instance,

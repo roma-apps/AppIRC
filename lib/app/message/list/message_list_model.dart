@@ -7,14 +7,14 @@ class MessageListVisibleBounds {
   final int maxRegularMessageRemoteId;
   final MessageListVisibleBoundsUpdateType updateType;
 
-  MessageListVisibleBounds._name({
+  MessageListVisibleBounds._private({
     @required this.minRegularMessageRemoteId,
     @required this.maxRegularMessageRemoteId,
     @required this.updateType,
   });
 
   MessageListVisibleBounds.fromPush({@required int messageRemoteId})
-      : this._name(
+      : this._private(
           minRegularMessageRemoteId: messageRemoteId,
           maxRegularMessageRemoteId: messageRemoteId,
           updateType: MessageListVisibleBoundsUpdateType.push,
@@ -23,7 +23,7 @@ class MessageListVisibleBounds {
   MessageListVisibleBounds.fromUi(
       {@required int minRegularMessageRemoteId,
       @required int maxRegularMessageRemoteId})
-      : this._name(
+      : this._private(
           minRegularMessageRemoteId: minRegularMessageRemoteId,
           maxRegularMessageRemoteId: maxRegularMessageRemoteId,
           updateType: MessageListVisibleBoundsUpdateType.ui,

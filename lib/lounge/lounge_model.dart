@@ -5,6 +5,11 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'lounge_model.g.dart';
 
+enum LoungeBackendMode {
+  private,
+  public,
+}
+
 class LoungeConstants {
   static const String channelsNamesSeparator = " ";
 }

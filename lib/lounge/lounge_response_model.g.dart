@@ -10,10 +10,10 @@ MessagePreviewToggleLoungeResponseBody
     _$MessagePreviewToggleLoungeResponseBodyFromJson(
         Map<String, dynamic> json) {
   return MessagePreviewToggleLoungeResponseBody(
-    json['target'] as int,
-    json['msgId'] as int,
-    json['link'] as String,
-    json['shown'] as bool,
+    target: json['target'] as int,
+    msgId: json['msgId'] as int,
+    link: json['link'] as String,
+    shown: json['shown'] as bool,
   );
 }
 
@@ -29,13 +29,13 @@ Map<String, dynamic> _$MessagePreviewToggleLoungeResponseBodyToJson(
 MoreLoungeResponseBody _$MoreLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MoreLoungeResponseBody(
-    json['chan'] as int,
-    (json['messages'] as List)
+    chan: json['chan'] as int,
+    messages: (json['messages'] as List)
         ?.map((e) => e == null
             ? null
             : MsgLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    json['totalMessages'] as int,
+    totalMessages: json['totalMessages'] as int,
   );
 }
 
@@ -50,9 +50,9 @@ Map<String, dynamic> _$MoreLoungeResponseBodyToJson(
 ChangelogLoungeResponseBody _$ChangelogLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return ChangelogLoungeResponseBody(
-    json['current'],
-    json['latest'],
-    json['packages'],
+    current: json['current'],
+    latest: json['latest'],
+    packages: json['packages'],
   );
 }
 
@@ -67,9 +67,9 @@ Map<String, dynamic> _$ChangelogLoungeResponseBodyToJson(
 SyncSortLoungeResponseBody _$SyncSortLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return SyncSortLoungeResponseBody(
-    (json['order'] as List)?.map((e) => e as int)?.toList(),
-    json['type'] as String,
-    json['target'] as String,
+    order: (json['order'] as List)?.map((e) => e as int)?.toList(),
+    type: json['type'] as String,
+    target: json['target'] as String,
   );
 }
 
@@ -84,8 +84,8 @@ Map<String, dynamic> _$SyncSortLoungeResponseBodyToJson(
 SettingsNewLoungeResponseBody _$SettingsNewLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return SettingsNewLoungeResponseBody(
-    json['name'] as String,
-    json['value'],
+    name: json['name'] as String,
+    value: json['value'],
   );
 }
 
@@ -96,15 +96,60 @@ Map<String, dynamic> _$SettingsNewLoungeResponseBodyToJson(
       'value': instance.value,
     };
 
+SettingsAllLoungeResponseBody _$SettingsAllLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return SettingsAllLoungeResponseBody(
+    advanced: json['advanced'] as bool,
+    autocomplete: json['autocomplete'] as bool,
+    awayMessage: json['awayMessage'] as String,
+    coloredNicks: json['coloredNicks'] as bool,
+    highlightExceptions: json['highlightExceptions'] as String,
+    highlights: json['highlights'] as String,
+    links: json['links'] as bool,
+    media: json['media'] as bool,
+    motd: json['motd'] as bool,
+    nickPostfix: json['nickPostfix'] as String,
+    notifyAllMessages: json['notifyAllMessages'] as bool,
+    showSeconds: json['showSeconds'] as bool,
+    statusMessages: json['statusMessages'] as String,
+    theme: json['theme'] as String,
+    uploadCanvas: json['uploadCanvas'] as bool,
+    use12hClock: json['use12hClock'] as bool,
+    userStyles: json['userStyles'] as String,
+  );
+}
+
+Map<String, dynamic> _$SettingsAllLoungeResponseBodyToJson(
+        SettingsAllLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'advanced': instance.advanced,
+      'autocomplete': instance.autocomplete,
+      'awayMessage': instance.awayMessage,
+      'coloredNicks': instance.coloredNicks,
+      'highlightExceptions': instance.highlightExceptions,
+      'highlights': instance.highlights,
+      'links': instance.links,
+      'media': instance.media,
+      'motd': instance.motd,
+      'nickPostfix': instance.nickPostfix,
+      'notifyAllMessages': instance.notifyAllMessages,
+      'showSeconds': instance.showSeconds,
+      'statusMessages': instance.statusMessages,
+      'theme': instance.theme,
+      'uploadCanvas': instance.uploadCanvas,
+      'use12hClock': instance.use12hClock,
+      'userStyles': instance.userStyles,
+    };
+
 SessionsListLoungeResponseBodyPart _$SessionsListLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return SessionsListLoungeResponseBodyPart(
-    json['current'] as bool,
-    json['active'] as int,
-    json['lastUse'] as int,
-    json['ip'] as String,
-    json['agent'] as String,
-    json['token'] as String,
+    current: json['current'] as bool,
+    active: json['active'] as int,
+    lastUse: json['lastUse'] as int,
+    ip: json['ip'] as String,
+    agent: json['agent'] as String,
+    token: json['token'] as String,
   );
 }
 
@@ -122,10 +167,10 @@ Map<String, dynamic> _$SessionsListLoungeResponseBodyPartToJson(
 MsgLoungeResponseBody _$MsgLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MsgLoungeResponseBody(
-    json['chan'] as int,
-    json['highlight'] as int,
-    json['unread'] as int,
-    json['msg'] == null
+    chan: json['chan'] as int,
+    highlight: json['highlight'] as int,
+    unread: json['unread'] as int,
+    msg: json['msg'] == null
         ? null
         : MsgLoungeResponseBodyPart.fromJson(
             json['msg'] as Map<String, dynamic>),
@@ -144,8 +189,8 @@ Map<String, dynamic> _$MsgLoungeResponseBodyToJson(
 MsgSpecialLoungeResponseBody _$MsgSpecialLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MsgSpecialLoungeResponseBody(
-    json['chan'] as int,
-    json['data'],
+    chan: json['chan'] as int,
+    data: json['data'],
   );
 }
 
@@ -156,104 +201,104 @@ Map<String, dynamic> _$MsgSpecialLoungeResponseBodyToJson(
       'data': instance.data,
     };
 
-DefaultsLoungeResponseBodyPart _$DefaultsLoungeResponseBodyPartFromJson(
-    Map<String, dynamic> json) {
-  return DefaultsLoungeResponseBodyPart(
-    json['host'] as String,
-    json['port'] as int,
-    json['join'] as String,
-    json['name'] as String,
-    json['nick'] as String,
-    json['password'] as String,
-    json['realname'] as String,
-    json['rejectUnauthorized'] as bool,
-    json['tls'] as bool,
-    json['username'] as String,
+ConfigurationDefaultsLoungeResponseBodyPart
+    _$ConfigurationDefaultsLoungeResponseBodyPartFromJson(
+        Map<String, dynamic> json) {
+  return ConfigurationDefaultsLoungeResponseBodyPart(
+    name: json['name'] as String,
+    host: json['host'] as String,
+    port: json['port'] as int,
+    password: json['password'] as String,
+    tls: json['tls'] as bool,
+    rejectUnauthorized: json['rejectUnauthorized'] as bool,
+    nick: json['nick'] as String,
+    username: json['username'] as String,
+    realname: json['realname'] as String,
+    join: json['join'] as String,
+    leaveMessage: json['leaveMessage'] as String,
+    sasl: json['sasl'] as String,
+    saslAccount: json['saslAccount'] as String,
+    saslPassword: json['saslPassword'] as String,
   );
 }
 
-Map<String, dynamic> _$DefaultsLoungeResponseBodyPartToJson(
-        DefaultsLoungeResponseBodyPart instance) =>
+Map<String, dynamic> _$ConfigurationDefaultsLoungeResponseBodyPartToJson(
+        ConfigurationDefaultsLoungeResponseBodyPart instance) =>
     <String, dynamic>{
+      'name': instance.name,
       'host': instance.host,
       'port': instance.port,
-      'join': instance.join,
-      'name': instance.name,
-      'nick': instance.nick,
       'password': instance.password,
-      'realname': instance.realname,
-      'rejectUnauthorized': instance.rejectUnauthorized,
       'tls': instance.tls,
+      'rejectUnauthorized': instance.rejectUnauthorized,
+      'nick': instance.nick,
       'username': instance.username,
+      'realname': instance.realname,
+      'join': instance.join,
+      'leaveMessage': instance.leaveMessage,
+      'sasl': instance.sasl,
+      'saslAccount': instance.saslAccount,
+      'saslPassword': instance.saslPassword,
     };
 
 ConfigurationLoungeResponseBody _$ConfigurationLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return ConfigurationLoungeResponseBody(
-    json['defaultTheme'] as String,
-    json['defaults'] == null
+    public: json['public'] as bool,
+    lockNetwork: json['lockNetwork'] as bool,
+    useHexIp: json['useHexIp'] as bool,
+    prefetch: json['prefetch'] as bool,
+    fileUpload: json['fileUpload'] as bool,
+    ldapEnabled: json['ldapEnabled'] as bool,
+    defaults: json['defaults'] == null
         ? null
-        : DefaultsLoungeResponseBodyPart.fromJson(
+        : ConfigurationDefaultsLoungeResponseBodyPart.fromJson(
             json['defaults'] as Map<String, dynamic>),
-    json['displayNetwork'] as bool,
-    json['fileUpload'] as bool,
-    json['ldapEnabled'] as bool,
-    json['lockNetwork'] as bool,
-    json['prefetch'] as bool,
-    json['public'] as bool,
-    json['useHexIp'] as bool,
-    json['themes'] as List,
-    json['fileUploadMaxFileSize'] as int,
-    json['gitCommit'] as String,
-    json['version'] as String,
+    isUpdateAvailable: json['isUpdateAvailable'] as bool,
+    applicationServerKey: json['applicationServerKey'] as String,
+    version: json['version'] as String,
+    gitCommit: json['gitCommit'] as String,
+    displayNetwork: json['displayNetwork'] as bool,
+    themes: json['themes'] as List,
+    defaultTheme: json['defaultTheme'] as String,
+    fileUploadMaxFileSize: json['fileUploadMaxFileSize'] as int,
+    signUp: json['signUp'] as bool,
+    fcmPushEnabled: json['fcmPushEnabled'] as bool,
   );
 }
 
 Map<String, dynamic> _$ConfigurationLoungeResponseBodyToJson(
         ConfigurationLoungeResponseBody instance) =>
     <String, dynamic>{
-      'defaultTheme': instance.defaultTheme,
-      'defaults': instance.defaults,
-      'displayNetwork': instance.displayNetwork,
+      'public': instance.public,
+      'lockNetwork': instance.lockNetwork,
+      'useHexIp': instance.useHexIp,
+      'prefetch': instance.prefetch,
       'fileUpload': instance.fileUpload,
       'ldapEnabled': instance.ldapEnabled,
-      'lockNetwork': instance.lockNetwork,
-      'prefetch': instance.prefetch,
-      'public': instance.public,
-      'useHexIp': instance.useHexIp,
-      'themes': instance.themes,
-      'fileUploadMaxFileSize': instance.fileUploadMaxFileSize,
-      'gitCommit': instance.gitCommit,
+      'defaults': instance.defaults?.toJson(),
+      'isUpdateAvailable': instance.isUpdateAvailable,
+      'applicationServerKey': instance.applicationServerKey,
       'version': instance.version,
-    };
-
-AuthLoungeResponseBody _$AuthLoungeResponseBodyFromJson(
-    Map<String, dynamic> json) {
-  return AuthLoungeResponseBody(
-    json['success'] as bool,
-    json['serverHash'] as int,
-    json['signUp'] as bool,
-  );
-}
-
-Map<String, dynamic> _$AuthLoungeResponseBodyToJson(
-        AuthLoungeResponseBody instance) =>
-    <String, dynamic>{
-      'success': instance.success,
-      'serverHash': instance.serverHash,
+      'gitCommit': instance.gitCommit,
+      'displayNetwork': instance.displayNetwork,
+      'themes': instance.themes,
+      'defaultTheme': instance.defaultTheme,
+      'fileUploadMaxFileSize': instance.fileUploadMaxFileSize,
       'signUp': instance.signUp,
+      'fcmPushEnabled': instance.fcmPushEnabled,
     };
 
-RegistrationResponseBody _$RegistrationResponseBodyFromJson(
+SignedUpLoungeResponseBody _$SignedUpLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
-  return RegistrationResponseBody(
-    json['success'] as bool,
-    json['errorType'] as String,
+  return SignedUpLoungeResponseBody(
+    success: json['success'] as bool,
+    errorType: json['errorType'] as String,
   );
 }
 
-Map<String, dynamic> _$RegistrationResponseBodyToJson(
-        RegistrationResponseBody instance) =>
+Map<String, dynamic> _$SignedUpLoungeResponseBodyToJson(
+        SignedUpLoungeResponseBody instance) =>
     <String, dynamic>{
       'success': instance.success,
       'errorType': instance.errorType,
@@ -262,12 +307,12 @@ Map<String, dynamic> _$RegistrationResponseBodyToJson(
 JoinLoungeResponseBody _$JoinLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return JoinLoungeResponseBody(
-    json['chan'] == null
+    chan: json['chan'] == null
         ? null
         : ChannelLoungeResponseBodyPart.fromJson(
             json['chan'] as Map<String, dynamic>),
-    json['index'] as int,
-    json['network'] as String,
+    index: json['index'] as int,
+    network: json['network'] as String,
   );
 }
 
@@ -282,7 +327,7 @@ Map<String, dynamic> _$JoinLoungeResponseBodyToJson(
 PartLoungeResponseBody _$PartLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return PartLoungeResponseBody(
-    json['chan'] as int,
+    chan: json['chan'] as int,
   );
 }
 
@@ -295,7 +340,7 @@ Map<String, dynamic> _$PartLoungeResponseBodyToJson(
 QuitLoungeResponseBody _$QuitLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return QuitLoungeResponseBody(
-    json['network'] as String,
+    network: json['network'] as String,
   );
 }
 
@@ -308,9 +353,9 @@ Map<String, dynamic> _$QuitLoungeResponseBodyToJson(
 NetworkStatusLoungeResponseBody _$NetworkStatusLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return NetworkStatusLoungeResponseBody(
-    json['connected'] as bool,
-    json['network'] as String,
-    json['secure'] as bool,
+    connected: json['connected'] as bool,
+    network: json['network'] as String,
+    secure: json['secure'] as bool,
   );
 }
 
@@ -325,10 +370,10 @@ Map<String, dynamic> _$NetworkStatusLoungeResponseBodyToJson(
 NetworkOptionsLoungeResponseBody _$NetworkOptionsLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return NetworkOptionsLoungeResponseBody(
-    json['network'] as String,
-    json['serverOptions'] == null
+    network: json['network'] as String,
+    serverOptions: json['serverOptions'] == null
         ? null
-        : ServerOptionsLoungeResponseBodyPart.fromJson(
+        : NetworkServerOptionsLoungeResponseBodyPart.fromJson(
             json['serverOptions'] as Map<String, dynamic>),
   );
 }
@@ -340,17 +385,18 @@ Map<String, dynamic> _$NetworkOptionsLoungeResponseBodyToJson(
       'serverOptions': instance.serverOptions,
     };
 
-ServerOptionsLoungeResponseBodyPart
-    _$ServerOptionsLoungeResponseBodyPartFromJson(Map<String, dynamic> json) {
-  return ServerOptionsLoungeResponseBodyPart(
-    (json['CHANTYPES'] as List)?.map((e) => e as String)?.toList(),
-    json['NETWORK'] as String,
-    (json['PREFIX'] as List)?.map((e) => e as String)?.toList(),
+NetworkServerOptionsLoungeResponseBodyPart
+    _$NetworkServerOptionsLoungeResponseBodyPartFromJson(
+        Map<String, dynamic> json) {
+  return NetworkServerOptionsLoungeResponseBodyPart(
+    chanTypes: (json['CHANTYPES'] as List)?.map((e) => e as String)?.toList(),
+    network: json['NETWORK'] as String,
+    prefix: (json['PREFIX'] as List)?.map((e) => e as String)?.toList(),
   );
 }
 
-Map<String, dynamic> _$ServerOptionsLoungeResponseBodyPartToJson(
-        ServerOptionsLoungeResponseBodyPart instance) =>
+Map<String, dynamic> _$NetworkServerOptionsLoungeResponseBodyPartToJson(
+        NetworkServerOptionsLoungeResponseBodyPart instance) =>
     <String, dynamic>{
       'CHANTYPES': instance.chanTypes,
       'NETWORK': instance.network,
@@ -360,8 +406,8 @@ Map<String, dynamic> _$ServerOptionsLoungeResponseBodyPartToJson(
 ChannelStateLoungeResponseBody _$ChannelStateLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return ChannelStateLoungeResponseBody(
-    json['chan'] as int,
-    json['state'] as int,
+    chan: json['chan'] as int,
+    state: json['state'] as int,
   );
 }
 
@@ -375,10 +421,10 @@ Map<String, dynamic> _$ChannelStateLoungeResponseBodyToJson(
 UsersLoungeResponseBody _$UsersLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return UsersLoungeResponseBody(
-    json['chan'] as int,
-    json['unread'] as int,
-    json['msg'],
-    json['highlight'] as int,
+    chan: json['chan'] as int,
+    unread: json['unread'] as int,
+    highlight: json['highlight'] as int,
+    msg: json['msg'],
   );
 }
 
@@ -394,8 +440,8 @@ Map<String, dynamic> _$UsersLoungeResponseBodyToJson(
 NickLoungeResponseBody _$NickLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return NickLoungeResponseBody(
-    json['network'] as String,
-    json['nick'] as String,
+    network: json['network'] as String,
+    nick: json['nick'] as String,
   );
 }
 
@@ -409,36 +455,36 @@ Map<String, dynamic> _$NickLoungeResponseBodyToJson(
 MsgLoungeResponseBodyPart _$MsgLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return MsgLoungeResponseBodyPart(
-    json['from'] == null
+    from: json['from'] == null
         ? null
         : MsgUserLoungeResponseBodyPart.fromJson(
             json['from'] as Map<String, dynamic>),
-    json['target'] == null
+    target: json['target'] == null
         ? null
         : MsgUserLoungeResponseBodyPart.fromJson(
             json['target'] as Map<String, dynamic>),
-    json['command'] as String,
-    json['type'] as String,
-    json['time'] as String,
-    json['new_nick'] as String,
-    json['new_host'] as String,
-    json['new_ident'] as String,
-    json['text'] as String,
-    json['ctcpMessage'] as String,
-    json['hostmask'] as String,
-    json['self'] as bool,
-    json['highlight'] as bool,
-    json['showInActive'] as bool,
-    (json['users'] as List)?.map((e) => e as String)?.toList(),
-    (json['previews'] as List)
+    command: json['command'] as String,
+    type: json['type'] as String,
+    time: json['time'] as String,
+    newNick: json['new_nick'] as String,
+    newHost: json['new_host'] as String,
+    newIdent: json['new_ident'] as String,
+    text: json['text'] as String,
+    ctcpMessage: json['ctcpMessage'] as String,
+    hostmask: json['hostmask'] as String,
+    self: json['self'] as bool,
+    highlight: json['highlight'] as bool,
+    showInActive: json['showInActive'] as bool,
+    users: (json['users'] as List)?.map((e) => e as String)?.toList(),
+    previews: (json['previews'] as List)
         ?.map((e) => e == null
             ? null
             : MsgPreviewLoungeResponseBodyPart.fromJson(
                 e as Map<String, dynamic>))
         ?.toList(),
-    (json['params'] as List)?.map((e) => e as String)?.toList(),
-    json['id'] as int,
-    json['whois'] == null
+    params: (json['params'] as List)?.map((e) => e as String)?.toList(),
+    id: json['id'] as int,
+    whois: json['whois'] == null
         ? null
         : WhoIsLoungeResponseBodyPart.fromJson(
             json['whois'] as Map<String, dynamic>),
@@ -513,9 +559,9 @@ Map<String, dynamic> _$WhoIsLoungeResponseBodyPartToJson(
 MsgUserLoungeResponseBodyPart _$MsgUserLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return MsgUserLoungeResponseBodyPart(
-    json['id'] as int,
-    json['mode'] as String,
-    json['nick'] as String,
+    id: json['id'] as int,
+    mode: json['mode'] as String,
+    nick: json['nick'] as String,
   );
 }
 
@@ -530,15 +576,15 @@ Map<String, dynamic> _$MsgUserLoungeResponseBodyPartToJson(
 MsgPreviewLoungeResponseBodyPart _$MsgPreviewLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return MsgPreviewLoungeResponseBodyPart(
-    json['head'] as String,
-    json['body'] as String,
-    json['canDisplay'] as bool,
-    json['shown'] as bool,
-    json['link'] as String,
-    json['thumb'] as String,
-    json['media'] as String,
-    json['mediaType'] as String,
-    json['type'] as String,
+    head: json['head'] as String,
+    body: json['body'] as String,
+    canDisplay: json['canDisplay'] as bool,
+    shown: json['shown'] as bool,
+    link: json['link'] as String,
+    thumb: json['thumb'] as String,
+    media: json['media'] as String,
+    mediaType: json['mediaType'] as String,
+    type: json['type'] as String,
   );
 }
 
@@ -559,9 +605,9 @@ Map<String, dynamic> _$MsgPreviewLoungeResponseBodyPartToJson(
 MsgPreviewLoungeResponseBody _$MsgPreviewLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MsgPreviewLoungeResponseBody(
-    json['id'] as int,
-    json['chan'] as int,
-    json['preview'] == null
+    id: json['id'] as int,
+    chan: json['chan'] as int,
+    preview: json['preview'] == null
         ? null
         : MsgPreviewLoungeResponseBodyPart.fromJson(
             json['preview'] as Map<String, dynamic>),
@@ -579,17 +625,17 @@ Map<String, dynamic> _$MsgPreviewLoungeResponseBodyToJson(
 InitLoungeResponseBody _$InitLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return InitLoungeResponseBody(
-    json['active'] as int,
-    json['applicationServerKey'] as String,
-    json['token'] as String,
-    (json['networks'] as List)
+    active: json['active'] as int,
+    networks: (json['networks'] as List)
         ?.map((e) => e == null
             ? null
             : NetworkLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    json['pushSubscription'] == null
+    token: json['token'] as String,
+    applicationServerKey: json['applicationServerKey'] as String,
+    pushSubscription: json['pushSubscription'] == null
         ? null
-        : PushSubscriptionLoungeResponseBodyPart.fromJson(
+        : InitPushSubscriptionLoungeResponseBodyPart.fromJson(
             json['pushSubscription'] as Map<String, dynamic>),
   );
 }
@@ -598,24 +644,24 @@ Map<String, dynamic> _$InitLoungeResponseBodyToJson(
         InitLoungeResponseBody instance) =>
     <String, dynamic>{
       'active': instance.active,
-      'applicationServerKey': instance.applicationServerKey,
-      'token': instance.token,
       'networks': instance.networks,
+      'token': instance.token,
+      'applicationServerKey': instance.applicationServerKey,
       'pushSubscription': instance.pushSubscription,
     };
 
-PushSubscriptionLoungeResponseBodyPart
-    _$PushSubscriptionLoungeResponseBodyPartFromJson(
+InitPushSubscriptionLoungeResponseBodyPart
+    _$InitPushSubscriptionLoungeResponseBodyPartFromJson(
         Map<String, dynamic> json) {
-  return PushSubscriptionLoungeResponseBodyPart(
-    json['agent'] as String,
-    json['ip'] as String,
-    json['lastUse'] as int,
+  return InitPushSubscriptionLoungeResponseBodyPart(
+    agent: json['agent'] as String,
+    ip: json['ip'] as String,
+    lastUse: json['lastUse'] as int,
   );
 }
 
-Map<String, dynamic> _$PushSubscriptionLoungeResponseBodyPartToJson(
-        PushSubscriptionLoungeResponseBodyPart instance) =>
+Map<String, dynamic> _$InitPushSubscriptionLoungeResponseBodyPartToJson(
+        InitPushSubscriptionLoungeResponseBodyPart instance) =>
     <String, dynamic>{
       'agent': instance.agent,
       'ip': instance.ip,
@@ -625,8 +671,8 @@ Map<String, dynamic> _$PushSubscriptionLoungeResponseBodyPartToJson(
 NamesLoungeResponseBody _$NamesLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return NamesLoungeResponseBody(
-    json['id'] as int,
-    (json['users'] as List)
+    id: json['id'] as int,
+    users: (json['users'] as List)
         ?.map((e) => e == null
             ? null
             : UserLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
@@ -644,8 +690,8 @@ Map<String, dynamic> _$NamesLoungeResponseBodyToJson(
 TopicLoungeResponseBody _$TopicLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return TopicLoungeResponseBody(
-    json['chan'] as int,
-    json['topic'] as String,
+    chan: json['chan'] as int,
+    topic: json['topic'] as String,
   );
 }
 
@@ -660,7 +706,7 @@ TextSpecialMessageLoungeResponseBodyPart
     _$TextSpecialMessageLoungeResponseBodyPartFromJson(
         Map<String, dynamic> json) {
   return TextSpecialMessageLoungeResponseBodyPart(
-    json['text'] as String,
+    text: json['text'] as String,
   );
 }
 
@@ -674,9 +720,9 @@ ChannelListItemSpecialMessageLoungeResponseBodyPart
     _$ChannelListItemSpecialMessageLoungeResponseBodyPartFromJson(
         Map<String, dynamic> json) {
   return ChannelListItemSpecialMessageLoungeResponseBodyPart(
-    json['channel'] as String,
-    json['topic'] as String,
-    json['num_users'] as int,
+    channel: json['channel'] as String,
+    topic: json['topic'] as String,
+    numUsers: json['num_users'] as int,
   );
 }
 
@@ -692,9 +738,9 @@ Map<String, dynamic>
 UserLoungeResponseBodyPart _$UserLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return UserLoungeResponseBodyPart(
-    json['lastMessage'] as int,
-    json['mode'] as String,
-    json['nick'] as String,
+    lastMessage: json['lastMessage'] as int,
+    mode: json['mode'] as String,
+    nick: json['nick'] as String,
   );
 }
 
@@ -709,7 +755,7 @@ Map<String, dynamic> _$UserLoungeResponseBodyPartToJson(
 NetworkLoungeResponseBody _$NetworkLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return NetworkLoungeResponseBody(
-    (json['networks'] as List)
+    networks: (json['networks'] as List)
         ?.map((e) => e == null
             ? null
             : NetworkLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
@@ -726,29 +772,29 @@ Map<String, dynamic> _$NetworkLoungeResponseBodyToJson(
 NetworkLoungeResponseBodyPart _$NetworkLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return NetworkLoungeResponseBodyPart(
-    json['uuid'] as String,
-    json['name'] as String,
-    json['host'] as String,
-    json['port'] as int,
-    json['tls'] as bool,
-    json['userDisconnected'] as bool,
-    json['rejectUnauthorized'] as bool,
-    json['isCollapsed'] as bool,
-    json['isJoinChannelShown'] as bool,
-    json['nick'] as String,
-    json['username'] as String,
-    json['realname'] as String,
-    json['commands'] as List,
-    (json['channels'] as List)
+    uuid: json['uuid'] as String,
+    name: json['name'] as String,
+    host: json['host'] as String,
+    port: json['port'] as int,
+    tls: json['tls'] as bool,
+    userDisconnected: json['userDisconnected'] as bool,
+    rejectUnauthorized: json['rejectUnauthorized'] as bool,
+    isCollapsed: json['isCollapsed'] as bool,
+    isJoinChannelShown: json['isJoinChannelShown'] as bool,
+    nick: json['nick'] as String,
+    username: json['username'] as String,
+    realname: json['realname'] as String,
+    commands: json['commands'] as List,
+    channels: (json['channels'] as List)
         ?.map((e) => e == null
             ? null
             : ChannelLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    json['serverOptions'] == null
+    serverOptions: json['serverOptions'] == null
         ? null
-        : ServerOptionsLoungeResponseBodyPart.fromJson(
+        : NetworkServerOptionsLoungeResponseBodyPart.fromJson(
             json['serverOptions'] as Map<String, dynamic>),
-    json['status'] == null
+    status: json['status'] == null
         ? null
         : NetworkStatusLoungeResponseBody.fromJson(
             json['status'] as Map<String, dynamic>),
@@ -779,33 +825,33 @@ Map<String, dynamic> _$NetworkLoungeResponseBodyPartToJson(
 ChannelLoungeResponseBodyPart _$ChannelLoungeResponseBodyPartFromJson(
     Map<String, dynamic> json) {
   return ChannelLoungeResponseBodyPart(
-    json['name'] as String,
-    json['type'] as String,
-    json['key'] as String,
-    json['pendingMessage'] as String,
-    (json['messages'] as List)
+    name: json['name'] as String,
+    type: json['type'] as String,
+    key: json['key'] as String,
+    pendingMessage: json['pendingMessage'] as String,
+    messages: (json['messages'] as List)
         ?.map((e) => e == null
             ? null
             : MsgLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    json['inputHistory'] as String,
-    json['inputHistoryPosition'] as int,
-    json['id'] as int,
-    json['moreHistoryAvailable'] as bool,
-    json['historyLoading'] as bool,
-    json['editTopic'] as bool,
-    json['scrolledToBottom'] as bool,
-    json['topic'] as String,
-    json['state'] as int,
-    json['firstUnread'] as int,
-    json['unread'] as int,
-    json['highlight'] as int,
-    (json['users'] as List)
+    inputHistory: json['inputHistory'] as String,
+    inputHistoryPosition: json['inputHistoryPosition'] as int,
+    id: json['id'] as int,
+    moreHistoryAvailable: json['moreHistoryAvailable'] as bool,
+    historyLoading: json['historyLoading'] as bool,
+    editTopic: json['editTopic'] as bool,
+    scrolledToBottom: json['scrolledToBottom'] as bool,
+    topic: json['topic'] as String,
+    state: json['state'] as int,
+    firstUnread: json['firstUnread'] as int,
+    unread: json['unread'] as int,
+    highlight: json['highlight'] as int,
+    users: (json['users'] as List)
         ?.map((e) => e == null
             ? null
             : UserLoungeResponseBodyPart.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    json['totalMessages'] as int,
+    totalMessages: json['totalMessages'] as int,
   );
 }
 

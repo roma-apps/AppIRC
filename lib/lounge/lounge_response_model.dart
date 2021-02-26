@@ -10,8 +10,7 @@ class LoungeResponseEventNames {
   static const String msgSpecial = "msg:special";
   static const String msgPreview = "msg:preview";
   static const String configuration = "configuration";
-  static const String authorized = "authorized";
-  static const String auth = "auth";
+
   static const String commands = "commands";
   static const String topic = "topic";
   static const String names = "names";
@@ -38,6 +37,14 @@ class LoungeResponseEventNames {
   static const String msgPreviewToggle = "msg:preview:toggle";
 
   static const String signedUp = "signed-up";
+
+  static const String authSuccess = "auth:success";
+  static const String authFailed = "auth:failed";
+  static const String authStart = "auth:start";
+
+  static const String pushIsSubscribed = "push:issubscribed";
+
+  static const String signUpAvailable = "sign-up:available";
 }
 
 class MessagePreviewTypeLoungeResponse {
@@ -49,42 +56,173 @@ class MessagePreviewTypeLoungeResponse {
   static const String error = "error";
 }
 
-abstract class LoungeResponseBody extends LoungeResponseBodyPart {}
-
-abstract class LoungeResponseBodyPart {}
-
-class SignOutLoungeResponseBody {
-  static String get eventName => LoungeResponseEventNames.signOut;
+abstract class LoungeResponseBody extends LoungeResponseBodyPart {
+  const LoungeResponseBody();
 }
 
-class AuthorizedLoungeResponseBody {
-  static String get eventName => LoungeResponseEventNames.authorized;
+abstract class LoungeResponseBodyPart {
+  const LoungeResponseBodyPart();
 }
 
-class UploadAuthLoungeResponseBody {
-  String uploadAuthToken;
+class SignUpAvailableLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.signUpAvailable;
 
-  UploadAuthLoungeResponseBody.fromRaw(dynamic raw) {
-    uploadAuthToken = raw?.toString();
+  final bool signUpAvailable;
+
+  SignUpAvailableLoungeResponseBody.fromRaw(dynamic raw)
+      : signUpAvailable = raw?.toString()?.toLowerCase() == 'true';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SignUpAvailableLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          signUpAvailable == other.signUpAvailable;
+
+  @override
+  int get hashCode => signUpAvailable.hashCode;
+
+  @override
+  String toString() {
+    return 'PushIsSubscribedResponseBody{'
+        'signUpAvailable: $signUpAvailable'
+        '}';
   }
-
-  static String get eventName => LoungeResponseEventNames.uploadAuth;
 }
 
-class CommandsLoungeResponseBody {
-  List<String> commands;
+class AuthStartLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.authStart;
 
-  CommandsLoungeResponseBody.fromRaw(dynamic raw) {
+  final String serverHash;
+
+  AuthStartLoungeResponseBody.fromRaw(dynamic raw)
+      : serverHash = raw?.toString();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthStartLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          serverHash == other.serverHash;
+
+  @override
+  int get hashCode => serverHash.hashCode;
+
+  @override
+  String toString() {
+    return 'AuthStartLoungeResponseBody{'
+        'serverHash: $serverHash'
+        '}';
+  }
+}
+
+class PushIsSubscribedLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.pushIsSubscribed;
+
+  final bool isSubscribed;
+
+  PushIsSubscribedLoungeResponseBody.fromRaw(dynamic raw)
+      : isSubscribed = raw?.toString()?.toLowerCase() == 'true';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PushIsSubscribedLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          isSubscribed == other.isSubscribed;
+
+  @override
+  int get hashCode => isSubscribed.hashCode;
+
+  @override
+  String toString() {
+    return 'PushIsSubscribedResponseBody{'
+        'isSubscribed: $isSubscribed'
+        '}';
+  }
+}
+
+class SignOutLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.signOut;
+
+  final String sessionToken;
+
+  SignOutLoungeResponseBody.fromRaw(dynamic raw)
+      : sessionToken = raw?.toString();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SignOutLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          sessionToken == other.sessionToken;
+
+  @override
+  int get hashCode => sessionToken.hashCode;
+
+  @override
+  String toString() {
+    return 'SignOutLoungeResponseBody{sessionToken: $sessionToken}';
+  }
+}
+
+class UploadAuthLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.uploadAuth;
+
+  final String uploadAuthToken;
+
+  UploadAuthLoungeResponseBody.fromRaw(dynamic raw)
+      : uploadAuthToken = raw?.toString();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UploadAuthLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          uploadAuthToken == other.uploadAuthToken;
+
+  @override
+  int get hashCode => uploadAuthToken.hashCode;
+
+  @override
+  String toString() {
+    return 'UploadAuthLoungeResponseBody{uploadAuthToken: $uploadAuthToken}';
+  }
+}
+
+class CommandsLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.commands;
+
+  final List<String> commands;
+
+  CommandsLoungeResponseBody.fromRaw(dynamic raw) : commands = parse(raw);
+
+  static List<String> parse(dynamic raw) {
     var iterable = (raw as Iterable);
 
-    commands = <String>[];
+    var commands = <String>[];
 
     iterable.forEach((obj) {
       commands.add(obj.toString());
     });
+
+    return commands;
   }
 
-  static String get eventName => LoungeResponseEventNames.commands;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CommandsLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          commands == other.commands;
+
+  @override
+  int get hashCode => commands.hashCode;
+
+  @override
+  String toString() {
+    return 'CommandsLoungeResponseBody{commands: $commands}';
+  }
 }
 
 @JsonSerializable()
@@ -96,12 +234,12 @@ class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
   final String link;
   final bool shown;
 
-  MessagePreviewToggleLoungeResponseBody(
-    this.target,
-    this.msgId,
-    this.link,
-    this.shown,
-  );
+  const MessagePreviewToggleLoungeResponseBody({
+    @required this.target,
+    @required this.msgId,
+    @required this.link,
+    @required this.shown,
+  });
 
   @override
   String toString() {
@@ -112,6 +250,20 @@ class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
         'shown: $shown'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessagePreviewToggleLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          target == other.target &&
+          msgId == other.msgId &&
+          link == other.link &&
+          shown == other.shown;
+
+  @override
+  int get hashCode =>
+      target.hashCode ^ msgId.hashCode ^ link.hashCode ^ shown.hashCode;
 
   factory MessagePreviewToggleLoungeResponseBody.fromJson(
           Map<String, dynamic> json) =>
@@ -129,11 +281,11 @@ class MoreLoungeResponseBody extends LoungeResponseBody {
   final List<MsgLoungeResponseBodyPart> messages;
   final int totalMessages;
 
-  MoreLoungeResponseBody(
-    this.chan,
-    this.messages,
-    this.totalMessages,
-  );
+  const MoreLoungeResponseBody({
+    @required this.chan,
+    @required this.messages,
+    @required this.totalMessages,
+  });
 
   @override
   String toString() {
@@ -143,6 +295,19 @@ class MoreLoungeResponseBody extends LoungeResponseBody {
         'messages: $messages, '
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MoreLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan &&
+          messages == other.messages &&
+          totalMessages == other.totalMessages;
+
+  @override
+  int get hashCode =>
+      chan.hashCode ^ messages.hashCode ^ totalMessages.hashCode;
 
   factory MoreLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$MoreLoungeResponseBodyFromJson(json);
@@ -158,11 +323,11 @@ class ChangelogLoungeResponseBody extends LoungeResponseBody {
   final dynamic latest;
   final dynamic packages;
 
-  ChangelogLoungeResponseBody(
-    this.current,
-    this.latest,
-    this.packages,
-  );
+  const ChangelogLoungeResponseBody({
+    @required this.current,
+    @required this.latest,
+    @required this.packages,
+  });
 
   @override
   String toString() {
@@ -172,6 +337,18 @@ class ChangelogLoungeResponseBody extends LoungeResponseBody {
         'packages: $packages'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChangelogLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          current == other.current &&
+          latest == other.latest &&
+          packages == other.packages;
+
+  @override
+  int get hashCode => current.hashCode ^ latest.hashCode ^ packages.hashCode;
 
   factory ChangelogLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ChangelogLoungeResponseBodyFromJson(json);
@@ -186,11 +363,11 @@ class SyncSortLoungeResponseBody extends LoungeResponseBody {
   final String type;
   final String target;
 
-  SyncSortLoungeResponseBody(
-    this.order,
-    this.type,
-    this.target,
-  );
+  const SyncSortLoungeResponseBody({
+    @required this.order,
+    @required this.type,
+    @required this.target,
+  });
 
   @override
   String toString() {
@@ -200,6 +377,18 @@ class SyncSortLoungeResponseBody extends LoungeResponseBody {
         'target: $target'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncSortLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          order == other.order &&
+          type == other.type &&
+          target == other.target;
+
+  @override
+  int get hashCode => order.hashCode ^ type.hashCode ^ target.hashCode;
 
   factory SyncSortLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$SyncSortLoungeResponseBodyFromJson(json);
@@ -213,10 +402,10 @@ class SettingsNewLoungeResponseBody extends LoungeResponseBody {
   final String name;
   final dynamic value;
 
-  SettingsNewLoungeResponseBody(
-    this.name,
-    this.value,
-  );
+  const SettingsNewLoungeResponseBody({
+    @required this.name,
+    @required this.value,
+  });
 
   @override
   String toString() {
@@ -226,10 +415,134 @@ class SettingsNewLoungeResponseBody extends LoungeResponseBody {
         '}';
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SettingsNewLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          value == other.value;
+
+  @override
+  int get hashCode => name.hashCode ^ value.hashCode;
+
   factory SettingsNewLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$SettingsNewLoungeResponseBodyFromJson(json);
 
   Map<String, dynamic> toJson() => _$SettingsNewLoungeResponseBodyToJson(this);
+}
+
+@JsonSerializable()
+class SettingsAllLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.settingAll;
+  final bool advanced;
+  final bool autocomplete;
+  final String awayMessage;
+  final bool coloredNicks;
+  final String highlightExceptions;
+  final String highlights;
+  final bool links;
+  final bool media;
+  final bool motd;
+  final String nickPostfix;
+  final bool notifyAllMessages;
+  final bool showSeconds;
+  final String statusMessages;
+  final String theme;
+  final bool uploadCanvas;
+  final bool use12hClock;
+  final String userStyles;
+
+  const SettingsAllLoungeResponseBody({
+    @required this.advanced,
+    @required this.autocomplete,
+    @required this.awayMessage,
+    @required this.coloredNicks,
+    @required this.highlightExceptions,
+    @required this.highlights,
+    @required this.links,
+    @required this.media,
+    @required this.motd,
+    @required this.nickPostfix,
+    @required this.notifyAllMessages,
+    @required this.showSeconds,
+    @required this.statusMessages,
+    @required this.theme,
+    @required this.uploadCanvas,
+    @required this.use12hClock,
+    @required this.userStyles,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SettingsAllLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          advanced == other.advanced &&
+          autocomplete == other.autocomplete &&
+          awayMessage == other.awayMessage &&
+          coloredNicks == other.coloredNicks &&
+          highlightExceptions == other.highlightExceptions &&
+          highlights == other.highlights &&
+          links == other.links &&
+          media == other.media &&
+          motd == other.motd &&
+          nickPostfix == other.nickPostfix &&
+          notifyAllMessages == other.notifyAllMessages &&
+          showSeconds == other.showSeconds &&
+          statusMessages == other.statusMessages &&
+          theme == other.theme &&
+          uploadCanvas == other.uploadCanvas &&
+          use12hClock == other.use12hClock &&
+          userStyles == other.userStyles;
+
+  @override
+  int get hashCode =>
+      advanced.hashCode ^
+      autocomplete.hashCode ^
+      awayMessage.hashCode ^
+      coloredNicks.hashCode ^
+      highlightExceptions.hashCode ^
+      highlights.hashCode ^
+      links.hashCode ^
+      media.hashCode ^
+      motd.hashCode ^
+      nickPostfix.hashCode ^
+      notifyAllMessages.hashCode ^
+      showSeconds.hashCode ^
+      statusMessages.hashCode ^
+      theme.hashCode ^
+      uploadCanvas.hashCode ^
+      use12hClock.hashCode ^
+      userStyles.hashCode;
+
+  @override
+  String toString() {
+    return 'SettingsAllLoungeResponseBody{'
+        'advanced: $advanced, '
+        'autocomplete: $autocomplete, '
+        'awayMessage: $awayMessage, '
+        'coloredNicks: $coloredNicks, '
+        'highlightExceptions: $highlightExceptions, '
+        'highlights: $highlights, '
+        'links: $links, '
+        'media: $media, '
+        'motd: $motd, '
+        'nickPostfix: $nickPostfix, '
+        'notifyAllMessages: $notifyAllMessages, '
+        'showSeconds: $showSeconds, '
+        'statusMessages: $statusMessages, '
+        'theme: $theme, '
+        'uploadCanvas: $uploadCanvas, '
+        'use12hClock: $use12hClock, '
+        'userStyles: $userStyles'
+        '}';
+  }
+
+  factory SettingsAllLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$SettingsAllLoungeResponseBodyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SettingsAllLoungeResponseBodyToJson(this);
 }
 
 @JsonSerializable()
@@ -243,14 +556,14 @@ class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String agent;
   final String token;
 
-  SessionsListLoungeResponseBodyPart(
-    this.current,
-    this.active,
-    this.lastUse,
-    this.ip,
-    this.agent,
-    this.token,
-  );
+  const SessionsListLoungeResponseBodyPart({
+    @required this.current,
+    @required this.active,
+    @required this.lastUse,
+    @required this.ip,
+    @required this.agent,
+    @required this.token,
+  });
 
   factory SessionsListLoungeResponseBodyPart.fromJson(
           Map<String, dynamic> json) =>
@@ -258,6 +571,37 @@ class SessionsListLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   Map<String, dynamic> toJson() =>
       _$SessionsListLoungeResponseBodyPartToJson(this);
+
+  @override
+  String toString() => 'SessionsListLoungeResponseBodyPart{'
+      'current: $current, '
+      'active: $active, '
+      'lastUse: $lastUse, '
+      'ip: $ip, '
+      'agent: $agent, '
+      'token: $token'
+      '}';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SessionsListLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          current == other.current &&
+          active == other.active &&
+          lastUse == other.lastUse &&
+          ip == other.ip &&
+          agent == other.agent &&
+          token == other.token;
+
+  @override
+  int get hashCode =>
+      current.hashCode ^
+      active.hashCode ^
+      lastUse.hashCode ^
+      ip.hashCode ^
+      agent.hashCode ^
+      token.hashCode;
 }
 
 @JsonSerializable()
@@ -269,12 +613,12 @@ class MsgLoungeResponseBody extends LoungeResponseBody {
   final int unread;
   final MsgLoungeResponseBodyPart msg;
 
-  MsgLoungeResponseBody(
-    this.chan,
-    this.highlight,
-    this.unread,
-    this.msg,
-  );
+  const MsgLoungeResponseBody({
+    @required this.chan,
+    @required this.highlight,
+    @required this.unread,
+    @required this.msg,
+  });
 
   @override
   String toString() {
@@ -285,6 +629,20 @@ class MsgLoungeResponseBody extends LoungeResponseBody {
         'msg: $msg'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MsgLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan &&
+          highlight == other.highlight &&
+          unread == other.unread &&
+          msg == other.msg;
+
+  @override
+  int get hashCode =>
+      chan.hashCode ^ highlight.hashCode ^ unread.hashCode ^ msg.hashCode;
 
   factory MsgLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$MsgLoungeResponseBodyFromJson(json);
@@ -299,10 +657,10 @@ class MsgSpecialLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final dynamic data;
 
-  MsgSpecialLoungeResponseBody(
-    this.chan,
-    this.data,
-  );
+  const MsgSpecialLoungeResponseBody({
+    @required this.chan,
+    @required this.data,
+  });
 
   @override
   String toString() {
@@ -312,6 +670,17 @@ class MsgSpecialLoungeResponseBody extends LoungeResponseBody {
         '}';
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MsgSpecialLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan &&
+          data == other.data;
+
+  @override
+  int get hashCode => chan.hashCode ^ data.hashCode;
+
   factory MsgSpecialLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$MsgSpecialLoungeResponseBodyFromJson(json);
 
@@ -319,36 +688,82 @@ class MsgSpecialLoungeResponseBody extends LoungeResponseBody {
 }
 
 @JsonSerializable()
-class DefaultsLoungeResponseBodyPart extends LoungeResponseBodyPart {
+class ConfigurationDefaultsLoungeResponseBodyPart
+    extends LoungeResponseBodyPart {
+  final String name;
   final String host;
   final int port;
-  final String join;
-  final String name;
-  final String nick;
   final String password;
-  final String realname;
-  final bool rejectUnauthorized;
   final bool tls;
+  final bool rejectUnauthorized;
+  final String nick;
   final String username;
+  final String realname;
+  final String join;
+  final String leaveMessage;
+  final String sasl;
+  final String saslAccount;
+  final String saslPassword;
 
-  DefaultsLoungeResponseBodyPart(
-    this.host,
-    this.port,
-    this.join,
-    this.name,
-    this.nick,
-    this.password,
-    this.realname,
-    this.rejectUnauthorized,
-    this.tls,
-    this.username,
-  );
+  const ConfigurationDefaultsLoungeResponseBodyPart({
+    @required this.name,
+    @required this.host,
+    @required this.port,
+    @required this.password,
+    @required this.tls,
+    @required this.rejectUnauthorized,
+    @required this.nick,
+    @required this.username,
+    @required this.realname,
+    @required this.join,
+    @required this.leaveMessage,
+    @required this.sasl,
+    @required this.saslAccount,
+    @required this.saslPassword,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ConfigurationDefaultsLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          host == other.host &&
+          port == other.port &&
+          password == other.password &&
+          tls == other.tls &&
+          rejectUnauthorized == other.rejectUnauthorized &&
+          nick == other.nick &&
+          username == other.username &&
+          realname == other.realname &&
+          join == other.join &&
+          leaveMessage == other.leaveMessage &&
+          sasl == other.sasl &&
+          saslAccount == other.saslAccount &&
+          saslPassword == other.saslPassword;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      host.hashCode ^
+      port.hashCode ^
+      password.hashCode ^
+      tls.hashCode ^
+      rejectUnauthorized.hashCode ^
+      nick.hashCode ^
+      username.hashCode ^
+      realname.hashCode ^
+      join.hashCode ^
+      leaveMessage.hashCode ^
+      sasl.hashCode ^
+      saslAccount.hashCode ^
+      saslPassword.hashCode;
 
   @override
   String toString() {
     return 'DefaultsLoungeResponseBodyPart{'
-        'host: $host,'
-        ' port: $port, '
+        'host: $host, '
+        'port: $port, '
         'join: $join, '
         'name: $name, '
         'nick: $nick, '
@@ -356,61 +771,130 @@ class DefaultsLoungeResponseBodyPart extends LoungeResponseBodyPart {
         'realname: $realname, '
         'rejectUnathorized: $rejectUnauthorized, '
         'tls: $tls, '
-        'username: $username}';
+        'username: $username'
+        'leaveMessage: $leaveMessage'
+        'sasl: $sasl'
+        'saslAccount: $saslAccount'
+        'saslPassword: $saslPassword'
+        '}';
   }
 
-  factory DefaultsLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
-      _$DefaultsLoungeResponseBodyPartFromJson(json);
+  factory ConfigurationDefaultsLoungeResponseBodyPart.fromJson(
+          Map<String, dynamic> json) =>
+      _$ConfigurationDefaultsLoungeResponseBodyPartFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DefaultsLoungeResponseBodyPartToJson(this);
+  Map<String, dynamic> toJson() =>
+      _$ConfigurationDefaultsLoungeResponseBodyPartToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class ConfigurationLoungeResponseBody extends LoungeResponseBody {
   static String get eventName => LoungeResponseEventNames.configuration;
-
-  final String defaultTheme;
-  final DefaultsLoungeResponseBodyPart defaults;
-  final bool displayNetwork;
+  final bool public;
+  final bool lockNetwork;
+  final bool useHexIp;
+  final bool prefetch;
   final bool fileUpload;
   final bool ldapEnabled;
-  final bool lockNetwork;
-  final bool prefetch;
-  final bool public;
-  final bool useHexIp;
-  final List<dynamic> themes;
-  final int fileUploadMaxFileSize;
-  final String gitCommit;
+  final ConfigurationDefaultsLoungeResponseBodyPart defaults;
+  final bool isUpdateAvailable;
+  final String applicationServerKey;
   final String version;
+  final String gitCommit;
+  final bool displayNetwork;
+  final List<dynamic> themes;
+  final String defaultTheme;
+  final int fileUploadMaxFileSize;
 
-  ConfigurationLoungeResponseBody(
-    this.defaultTheme,
-    this.defaults,
-    this.displayNetwork,
-    this.fileUpload,
-    this.ldapEnabled,
-    this.lockNetwork,
-    this.prefetch,
-    this.public,
-    this.useHexIp,
-    this.themes,
-    this.fileUploadMaxFileSize,
-    this.gitCommit,
-    this.version,
-  );
+  // custom field, available only in forked TheLounge, see Readme.md
+  final bool signUp;
+
+  // custom field, available only in forked TheLounge, see Readme.md
+  final bool fcmPushEnabled;
+
+  const ConfigurationLoungeResponseBody({
+    @required this.public,
+    @required this.lockNetwork,
+    @required this.useHexIp,
+    @required this.prefetch,
+    @required this.fileUpload,
+    @required this.ldapEnabled,
+    @required this.defaults,
+    @required this.isUpdateAvailable,
+    @required this.applicationServerKey,
+    @required this.version,
+    @required this.gitCommit,
+    @required this.displayNetwork,
+    @required this.themes,
+    @required this.defaultTheme,
+    @required this.fileUploadMaxFileSize,
+    @required this.signUp,
+    @required this.fcmPushEnabled,
+  });
 
   @override
   String toString() {
     return 'ConfigurationLoungeResponseBody{'
         'defaultTheme: $defaultTheme, '
-        'defaults: $defaults, displayNetwork: $displayNetwork, '
-        'fileUpload: $fileUpload, ldapEnabled: $ldapEnabled, '
-        'lockNetwork: $lockNetwork, prefetch: $prefetch, '
-        'public: $public, useHexIp: $useHexIp, themes: $themes, '
+        'defaults: $defaults, '
+        'displayNetwork: $displayNetwork, '
+        'fileUpload: $fileUpload, '
+        'ldapEnabled: $ldapEnabled, '
+        'lockNetwork: $lockNetwork, '
+        'prefetch: $prefetch, '
+        'public: $public, '
+        'useHexIp: $useHexIp, '
+        'themes: $themes, '
         'fileUploadMaxFileSize: $fileUploadMaxFileSize, '
-        'gitCommit: $gitCommit, version: $version'
+        'gitCommit: $gitCommit, '
+        'version: $version'
+        'applicationServerKey: $applicationServerKey'
+        'isUpdateAvailable: $isUpdateAvailable'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ConfigurationLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          public == other.public &&
+          lockNetwork == other.lockNetwork &&
+          useHexIp == other.useHexIp &&
+          prefetch == other.prefetch &&
+          fileUpload == other.fileUpload &&
+          ldapEnabled == other.ldapEnabled &&
+          defaults == other.defaults &&
+          isUpdateAvailable == other.isUpdateAvailable &&
+          applicationServerKey == other.applicationServerKey &&
+          version == other.version &&
+          gitCommit == other.gitCommit &&
+          displayNetwork == other.displayNetwork &&
+          themes == other.themes &&
+          defaultTheme == other.defaultTheme &&
+          fileUploadMaxFileSize == other.fileUploadMaxFileSize &&
+          signUp == other.signUp &&
+          fcmPushEnabled == other.fcmPushEnabled;
+
+  @override
+  int get hashCode =>
+      public.hashCode ^
+      lockNetwork.hashCode ^
+      useHexIp.hashCode ^
+      prefetch.hashCode ^
+      fileUpload.hashCode ^
+      ldapEnabled.hashCode ^
+      defaults.hashCode ^
+      isUpdateAvailable.hashCode ^
+      applicationServerKey.hashCode ^
+      version.hashCode ^
+      gitCommit.hashCode ^
+      displayNetwork.hashCode ^
+      themes.hashCode ^
+      defaultTheme.hashCode ^
+      fileUploadMaxFileSize.hashCode ^
+      signUp.hashCode ^
+      fcmPushEnabled.hashCode;
 
   factory ConfigurationLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ConfigurationLoungeResponseBodyFromJson(json);
@@ -419,41 +903,9 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
       _$ConfigurationLoungeResponseBodyToJson(this);
 }
 
+// not supported on original TheLounge
 @JsonSerializable()
-class AuthLoungeResponseBody extends LoungeResponseBody {
-  static String get eventName => LoungeResponseEventNames.auth;
-
-  final bool success;
-  final int serverHash;
-
-  // TODO: remove todo when will be in master branch
-  // only available in custom the lounge version
-  // https://github.com/xal/thelounge/tree/xal/sign_up
-  final bool signUp;
-
-  AuthLoungeResponseBody(
-    this.success,
-    this.serverHash,
-    this.signUp,
-  );
-
-  @override
-  String toString() {
-    return 'AuthLoungeResponseBody{'
-        'success: $success, '
-        'serverHash: $serverHash, '
-        'signUp: $signUp'
-        '}';
-  }
-
-  factory AuthLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$AuthLoungeResponseBodyFromJson(json);
-
-  Map<String, dynamic> toJson() => _$AuthLoungeResponseBodyToJson(this);
-}
-
-@JsonSerializable()
-class RegistrationResponseBody extends LoungeResponseBody {
+class SignedUpLoungeResponseBody extends LoungeResponseBody {
   static const errorTypeInvalid = "invalid";
   static const errorTypeAlreadyExist = "already_exist";
 
@@ -462,7 +914,22 @@ class RegistrationResponseBody extends LoungeResponseBody {
   final bool success;
   final String errorType;
 
-  RegistrationResponseBody(this.success, this.errorType);
+  @override
+  const SignedUpLoungeResponseBody({
+    @required this.success,
+    @required this.errorType,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SignedUpLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          success == other.success &&
+          errorType == other.errorType;
+
+  @override
+  int get hashCode => success.hashCode ^ errorType.hashCode;
 
   @override
   String toString() {
@@ -472,10 +939,10 @@ class RegistrationResponseBody extends LoungeResponseBody {
         '}';
   }
 
-  factory RegistrationResponseBody.fromJson(Map<String, dynamic> json) =>
-      _$RegistrationResponseBodyFromJson(json);
+  factory SignedUpLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$SignedUpLoungeResponseBodyFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RegistrationResponseBodyToJson(this);
+  Map<String, dynamic> toJson() => _$SignedUpLoungeResponseBodyToJson(this);
 }
 
 @JsonSerializable()
@@ -486,11 +953,11 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
   final int index;
   final String network;
 
-  JoinLoungeResponseBody(
-    this.chan,
-    this.index,
-    this.network,
-  );
+  const JoinLoungeResponseBody({
+    @required this.chan,
+    @required this.index,
+    @required this.network,
+  });
 
   @override
   String toString() {
@@ -500,6 +967,18 @@ class JoinLoungeResponseBody extends LoungeResponseBody {
         'network: $network'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JoinLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan &&
+          index == other.index &&
+          network == other.network;
+
+  @override
+  int get hashCode => chan.hashCode ^ index.hashCode ^ network.hashCode;
 
   factory JoinLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$JoinLoungeResponseBodyFromJson(json);
@@ -513,7 +992,26 @@ class PartLoungeResponseBody extends LoungeResponseBody {
 
   final int chan;
 
-  PartLoungeResponseBody(this.chan);
+  const PartLoungeResponseBody({
+    @required this.chan,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PartLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan;
+
+  @override
+  int get hashCode => chan.hashCode;
+
+  @override
+  String toString() {
+    return 'PartLoungeResponseBody{'
+        'chan: $chan'
+        '}';
+  }
 
   factory PartLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$PartLoungeResponseBodyFromJson(json);
@@ -527,7 +1025,19 @@ class QuitLoungeResponseBody extends LoungeResponseBody {
 
   final String network;
 
-  QuitLoungeResponseBody(this.network);
+  const QuitLoungeResponseBody({
+    @required this.network,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is QuitLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          network == other.network;
+
+  @override
+  int get hashCode => network.hashCode;
 
   @override
   String toString() {
@@ -548,11 +1058,11 @@ class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
   final String network;
   final bool secure;
 
-  NetworkStatusLoungeResponseBody(
-    this.connected,
-    this.network,
-    this.secure,
-  );
+  const NetworkStatusLoungeResponseBody({
+    @required this.connected,
+    @required this.network,
+    @required this.secure,
+  });
 
   @override
   String toString() {
@@ -562,6 +1072,18 @@ class NetworkStatusLoungeResponseBody extends LoungeResponseBody {
         'secure: $secure'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkStatusLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          connected == other.connected &&
+          network == other.network &&
+          secure == other.secure;
+
+  @override
+  int get hashCode => connected.hashCode ^ network.hashCode ^ secure.hashCode;
 
   factory NetworkStatusLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NetworkStatusLoungeResponseBodyFromJson(json);
@@ -575,12 +1097,12 @@ class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
   static String get eventName => LoungeResponseEventNames.networkOptions;
 
   final String network;
-  final ServerOptionsLoungeResponseBodyPart serverOptions;
+  final NetworkServerOptionsLoungeResponseBodyPart serverOptions;
 
-  NetworkOptionsLoungeResponseBody(
-    this.network,
-    this.serverOptions,
-  );
+  const NetworkOptionsLoungeResponseBody({
+    @required this.network,
+    @required this.serverOptions,
+  });
 
   @override
   String toString() {
@@ -589,6 +1111,17 @@ class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
         'serverOptions: $serverOptions'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkOptionsLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          network == other.network &&
+          serverOptions == other.serverOptions;
+
+  @override
+  int get hashCode => network.hashCode ^ serverOptions.hashCode;
 
   factory NetworkOptionsLoungeResponseBody.fromJson(
           Map<String, dynamic> json) =>
@@ -599,7 +1132,8 @@ class NetworkOptionsLoungeResponseBody extends LoungeResponseBody {
 }
 
 @JsonSerializable()
-class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
+class NetworkServerOptionsLoungeResponseBodyPart
+    extends LoungeResponseBodyPart {
   @JsonKey(name: "CHANTYPES")
   final List<String> chanTypes;
 
@@ -609,9 +1143,15 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   @JsonKey(name: "PREFIX")
   final List<String> prefix;
 
+  const NetworkServerOptionsLoungeResponseBodyPart({
+    @required this.chanTypes,
+    @required this.network,
+    @required this.prefix,
+  });
+
   @override
   String toString() {
-    return 'ServerOptionsLoungeResponseBodyPart{'
+    return 'NetworkServerOptionsLoungeResponseBodyPart{'
         'chanTypes: $chanTypes, '
         'network: $network, '
         'prefix: $prefix'
@@ -621,7 +1161,7 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ServerOptionsLoungeResponseBodyPart &&
+      other is NetworkServerOptionsLoungeResponseBodyPart &&
           runtimeType == other.runtimeType &&
           chanTypes == other.chanTypes &&
           network == other.network &&
@@ -630,15 +1170,12 @@ class ServerOptionsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   @override
   int get hashCode => chanTypes.hashCode ^ network.hashCode ^ prefix.hashCode;
 
-  ServerOptionsLoungeResponseBodyPart(
-      this.chanTypes, this.network, this.prefix);
-
-  factory ServerOptionsLoungeResponseBodyPart.fromJson(
+  factory NetworkServerOptionsLoungeResponseBodyPart.fromJson(
           Map<String, dynamic> json) =>
-      _$ServerOptionsLoungeResponseBodyPartFromJson(json);
+      _$NetworkServerOptionsLoungeResponseBodyPartFromJson(json);
 
   Map<String, dynamic> toJson() =>
-      _$ServerOptionsLoungeResponseBodyPartToJson(this);
+      _$NetworkServerOptionsLoungeResponseBodyPartToJson(this);
 }
 
 @JsonSerializable()
@@ -647,10 +1184,10 @@ class ChannelStateLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final int state;
 
-  ChannelStateLoungeResponseBody(
-    this.chan,
-    this.state,
-  );
+  const ChannelStateLoungeResponseBody({
+    @required this.chan,
+    @required this.state,
+  });
 
   @override
   String toString() {
@@ -659,6 +1196,17 @@ class ChannelStateLoungeResponseBody extends LoungeResponseBody {
         'state: $state'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChannelStateLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan &&
+          state == other.state;
+
+  @override
+  int get hashCode => chan.hashCode ^ state.hashCode;
 
   factory ChannelStateLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$ChannelStateLoungeResponseBodyFromJson(json);
@@ -672,14 +1220,16 @@ class UsersLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final int unread;
   final int highlight;
+
+  // simple or special
   final dynamic msg;
 
-  UsersLoungeResponseBody(
-    this.chan,
-    this.unread,
-    this.msg,
-    this.highlight,
-  );
+  const UsersLoungeResponseBody({
+    @required this.chan,
+    @required this.unread,
+    @required this.highlight,
+    @required this.msg,
+  });
 
   factory UsersLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$UsersLoungeResponseBodyFromJson(json);
@@ -695,6 +1245,20 @@ class UsersLoungeResponseBody extends LoungeResponseBody {
         'msg: $msg'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UsersLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan &&
+          unread == other.unread &&
+          highlight == other.highlight &&
+          msg == other.msg;
+
+  @override
+  int get hashCode =>
+      chan.hashCode ^ unread.hashCode ^ highlight.hashCode ^ msg.hashCode;
 }
 
 @JsonSerializable()
@@ -704,10 +1268,21 @@ class NickLoungeResponseBody extends LoungeResponseBody {
   final String network;
   final String nick;
 
-  NickLoungeResponseBody(
-    this.network,
-    this.nick,
-  );
+  const NickLoungeResponseBody({
+    @required this.network,
+    @required this.nick,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NickLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          network == other.network &&
+          nick == other.nick;
+
+  @override
+  int get hashCode => network.hashCode ^ nick.hashCode;
 
   factory NickLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NickLoungeResponseBodyFromJson(json);
@@ -751,26 +1326,27 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final int id;
   final WhoIsLoungeResponseBodyPart whois;
 
-  MsgLoungeResponseBodyPart(
-      this.from,
-      this.target,
-      this.command,
-      this.type,
-      this.time,
-      this.newNick,
-      this.newHost,
-      this.newIdent,
-      this.text,
-      this.ctcpMessage,
-      this.hostmask,
-      this.self,
-      this.highlight,
-      this.showInActive,
-      this.users,
-      this.previews,
-      this.params,
-      this.id,
-      this.whois);
+  MsgLoungeResponseBodyPart({
+    @required this.from,
+    @required this.target,
+    @required this.command,
+    @required this.type,
+    @required this.time,
+    @required this.newNick,
+    @required this.newHost,
+    @required this.newIdent,
+    @required this.text,
+    @required this.ctcpMessage,
+    @required this.hostmask,
+    @required this.self,
+    @required this.highlight,
+    @required this.showInActive,
+    @required this.users,
+    @required this.previews,
+    @required this.params,
+    @required this.id,
+    @required this.whois,
+  });
 
   @override
   String toString() {
@@ -796,6 +1372,53 @@ class MsgLoungeResponseBodyPart extends LoungeResponseBodyPart {
         'whois: $whois'
         '}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MsgLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          from == other.from &&
+          target == other.target &&
+          command == other.command &&
+          type == other.type &&
+          time == other.time &&
+          newNick == other.newNick &&
+          newHost == other.newHost &&
+          newIdent == other.newIdent &&
+          text == other.text &&
+          ctcpMessage == other.ctcpMessage &&
+          hostmask == other.hostmask &&
+          self == other.self &&
+          highlight == other.highlight &&
+          showInActive == other.showInActive &&
+          users == other.users &&
+          previews == other.previews &&
+          params == other.params &&
+          id == other.id &&
+          whois == other.whois;
+
+  @override
+  int get hashCode =>
+      from.hashCode ^
+      target.hashCode ^
+      command.hashCode ^
+      type.hashCode ^
+      time.hashCode ^
+      newNick.hashCode ^
+      newHost.hashCode ^
+      newIdent.hashCode ^
+      text.hashCode ^
+      ctcpMessage.hashCode ^
+      hostmask.hashCode ^
+      self.hashCode ^
+      highlight.hashCode ^
+      showInActive.hashCode ^
+      users.hashCode ^
+      previews.hashCode ^
+      params.hashCode ^
+      id.hashCode ^
+      whois.hashCode;
 
   factory MsgLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$MsgLoungeResponseBodyPartFromJson(json);
@@ -833,16 +1456,24 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
   String toString() {
     return 'WhoIsLoungeResponseBodyPart{'
         'account: $account, '
-        'channels: $channels, hostname: $hostname, '
-        'ident: $ident, idle: $idle, idleTime: $idleTime, '
-        'logonTime: $logonTime, logon: $logon, nick: $nick, '
-        'realName: $realName, secure: $secure, '
-        'actualIp: $actualIp, actualHostname: $actualHostname, '
-        'server: $server, serverInfo: $serverInfo'
+        'channels: $channels, '
+        'hostname: $hostname, '
+        'ident: $ident, '
+        'idle: $idle, '
+        'idleTime: $idleTime, '
+        'logonTime: $logonTime, '
+        'logon: $logon, '
+        'nick: $nick, '
+        'realName: $realName, '
+        'secure: $secure, '
+        'actualIp: $actualIp, '
+        'actualHostname: $actualHostname, '
+        'server: $server, '
+        'serverInfo: $serverInfo'
         '}';
   }
 
-  WhoIsLoungeResponseBodyPart({
+  const WhoIsLoungeResponseBodyPart({
     @required this.account,
     @required this.channels,
     @required this.hostname,
@@ -860,6 +1491,45 @@ class WhoIsLoungeResponseBodyPart extends LoungeResponseBodyPart {
     @required this.serverInfo,
   });
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WhoIsLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          account == other.account &&
+          channels == other.channels &&
+          hostname == other.hostname &&
+          ident == other.ident &&
+          actualHostname == other.actualHostname &&
+          actualIp == other.actualIp &&
+          idle == other.idle &&
+          idleTime == other.idleTime &&
+          logonTime == other.logonTime &&
+          logon == other.logon &&
+          nick == other.nick &&
+          realName == other.realName &&
+          secure == other.secure &&
+          server == other.server &&
+          serverInfo == other.serverInfo;
+
+  @override
+  int get hashCode =>
+      account.hashCode ^
+      channels.hashCode ^
+      hostname.hashCode ^
+      ident.hashCode ^
+      actualHostname.hashCode ^
+      actualIp.hashCode ^
+      idle.hashCode ^
+      idleTime.hashCode ^
+      logonTime.hashCode ^
+      logon.hashCode ^
+      nick.hashCode ^
+      realName.hashCode ^
+      secure.hashCode ^
+      server.hashCode ^
+      serverInfo.hashCode;
+
   factory WhoIsLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$WhoIsLoungeResponseBodyPartFromJson(json);
 
@@ -872,11 +1542,31 @@ class MsgUserLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String mode;
   final String nick;
 
-  MsgUserLoungeResponseBodyPart(this.id, this.mode, this.nick);
+  const MsgUserLoungeResponseBodyPart({
+    @required this.id,
+    @required this.mode,
+    @required this.nick,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MsgUserLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          mode == other.mode &&
+          nick == other.nick;
+
+  @override
+  int get hashCode => id.hashCode ^ mode.hashCode ^ nick.hashCode;
 
   @override
   String toString() {
-    return 'MsgFromLoungeResponseBodyPart{id: $id, mode: $mode, nick: $nick}';
+    return 'MsgFromLoungeResponseBodyPart{'
+        'id: $id, '
+        'mode: $mode, '
+        'nick: $nick'
+        '}';
   }
 
   factory MsgUserLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
@@ -897,26 +1587,57 @@ class MsgPreviewLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String mediaType;
   final String type;
 
-  MsgPreviewLoungeResponseBodyPart(
-    this.head,
-    this.body,
-    this.canDisplay,
-    this.shown,
-    this.link,
-    this.thumb,
-    this.media,
-    this.mediaType,
-    this.type,
-  );
+  const MsgPreviewLoungeResponseBodyPart({
+    @required this.head,
+    @required this.body,
+    @required this.canDisplay,
+    @required this.shown,
+    @required this.link,
+    @required this.thumb,
+    @required this.media,
+    @required this.mediaType,
+    @required this.type,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MsgPreviewLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          head == other.head &&
+          body == other.body &&
+          canDisplay == other.canDisplay &&
+          shown == other.shown &&
+          link == other.link &&
+          thumb == other.thumb &&
+          media == other.media &&
+          mediaType == other.mediaType &&
+          type == other.type;
+
+  @override
+  int get hashCode =>
+      head.hashCode ^
+      body.hashCode ^
+      canDisplay.hashCode ^
+      shown.hashCode ^
+      link.hashCode ^
+      thumb.hashCode ^
+      media.hashCode ^
+      mediaType.hashCode ^
+      type.hashCode;
 
   @override
   String toString() {
     return 'MsgPreviewLoungeResponseBodyPart{'
-        'head: $head, body: $body, '
+        'head: $head, '
+        'body: $body, '
         'canDisplay: $canDisplay, '
-        'shown: $shown, link: $link, '
-        'thumb: $thumb, media: $media, '
-        'mediaType: $mediaType, type: $type'
+        'shown: $shown, '
+        'link: $link, '
+        'thumb: $thumb, '
+        'media: $media, '
+        'mediaType: $mediaType, '
+        'type: $type'
         '}';
   }
 
@@ -938,11 +1659,17 @@ class MsgPreviewLoungeResponseBody extends LoungeResponseBody {
   final MsgPreviewLoungeResponseBodyPart preview;
 
   @override
-  String toString() {
-    return 'MsgPreviewLoungeResponseBody{id: $id, chan: $chan, preview: $preview}';
-  }
+  String toString() => 'MsgPreviewLoungeResponseBody{'
+      'id: $id, '
+      'chan: $chan, '
+      'preview: $preview'
+      '}';
 
-  MsgPreviewLoungeResponseBody(this.id, this.chan, this.preview);
+  const MsgPreviewLoungeResponseBody({
+    @required this.id,
+    @required this.chan,
+    @required this.preview,
+  });
 
   factory MsgPreviewLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$MsgPreviewLoungeResponseBodyFromJson(json);
@@ -957,18 +1684,37 @@ class InitLoungeResponseBody extends LoungeResponseBody {
   static final int undefinedActiveID = -1;
 
   final int active;
-  final String applicationServerKey;
-  final String token;
   final List<NetworkLoungeResponseBodyPart> networks;
-  final PushSubscriptionLoungeResponseBodyPart pushSubscription;
+  final String token;
+  final String applicationServerKey;
+  final InitPushSubscriptionLoungeResponseBodyPart pushSubscription;
 
-  InitLoungeResponseBody(
-    this.active,
-    this.applicationServerKey,
-    this.token,
-    this.networks,
-    this.pushSubscription,
-  );
+  const InitLoungeResponseBody({
+    @required this.active,
+    @required this.networks,
+    @required this.token,
+    @required this.applicationServerKey,
+    @required this.pushSubscription,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is InitLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          active == other.active &&
+          networks == other.networks &&
+          token == other.token &&
+          applicationServerKey == other.applicationServerKey &&
+          pushSubscription == other.pushSubscription;
+
+  @override
+  int get hashCode =>
+      active.hashCode ^
+      networks.hashCode ^
+      token.hashCode ^
+      applicationServerKey.hashCode ^
+      pushSubscription.hashCode;
 
   factory InitLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$InitLoungeResponseBodyFromJson(json);
@@ -987,16 +1733,17 @@ class InitLoungeResponseBody extends LoungeResponseBody {
 }
 
 @JsonSerializable()
-class PushSubscriptionLoungeResponseBodyPart extends LoungeResponseBodyPart {
+class InitPushSubscriptionLoungeResponseBodyPart
+    extends LoungeResponseBodyPart {
   final String agent;
   final String ip;
   final int lastUse;
 
-  PushSubscriptionLoungeResponseBodyPart(
-    this.agent,
-    this.ip,
-    this.lastUse,
-  );
+  const InitPushSubscriptionLoungeResponseBodyPart({
+    @required this.agent,
+    @required this.ip,
+    @required this.lastUse,
+  });
 
   @override
   String toString() {
@@ -1007,12 +1754,24 @@ class PushSubscriptionLoungeResponseBodyPart extends LoungeResponseBodyPart {
         '}';
   }
 
-  factory PushSubscriptionLoungeResponseBodyPart.fromJson(
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is InitPushSubscriptionLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          agent == other.agent &&
+          ip == other.ip &&
+          lastUse == other.lastUse;
+
+  @override
+  int get hashCode => agent.hashCode ^ ip.hashCode ^ lastUse.hashCode;
+
+  factory InitPushSubscriptionLoungeResponseBodyPart.fromJson(
           Map<String, dynamic> json) =>
-      _$PushSubscriptionLoungeResponseBodyPartFromJson(json);
+      _$InitPushSubscriptionLoungeResponseBodyPartFromJson(json);
 
   Map<String, dynamic> toJson() =>
-      _$PushSubscriptionLoungeResponseBodyPartToJson(this);
+      _$InitPushSubscriptionLoungeResponseBodyPartToJson(this);
 }
 
 @JsonSerializable()
@@ -1022,10 +1781,10 @@ class NamesLoungeResponseBody extends LoungeResponseBody {
   final int id;
   final List<UserLoungeResponseBodyPart> users;
 
-  NamesLoungeResponseBody(
-    this.id,
-    this.users,
-  );
+  const NamesLoungeResponseBody({
+    @required this.id,
+    @required this.users,
+  });
 
   factory NamesLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NamesLoungeResponseBodyFromJson(json);
@@ -1034,7 +1793,10 @@ class NamesLoungeResponseBody extends LoungeResponseBody {
 
   @override
   String toString() {
-    return 'NamesLoungeResponseBody{id: $id, users: $users}';
+    return 'NamesLoungeResponseBody{'
+        'id: $id, '
+        'users: $users'
+        '}';
   }
 }
 
@@ -1045,12 +1807,29 @@ class TopicLoungeResponseBody extends LoungeResponseBody {
   final int chan;
   final String topic;
 
+  TopicLoungeResponseBody({
+    @required this.chan,
+    @required this.topic,
+  });
+
   @override
   String toString() {
-    return 'TopicLoungeResponseBody{chan: $chan, topic: $topic}';
+    return 'TopicLoungeResponseBody{'
+        'chan: $chan, '
+        'topic: $topic'
+        '}';
   }
 
-  TopicLoungeResponseBody(this.chan, this.topic);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TopicLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          chan == other.chan &&
+          topic == other.topic;
+
+  @override
+  int get hashCode => chan.hashCode ^ topic.hashCode;
 
   factory TopicLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$TopicLoungeResponseBodyFromJson(json);
@@ -1064,10 +1843,24 @@ class TextSpecialMessageLoungeResponseBodyPart extends LoungeResponseBodyPart {
 
   @override
   String toString() {
-    return 'TextSpecialMessageLoungeResponseBodyPart{text: $text}';
+    return 'TextSpecialMessageLoungeResponseBodyPart{'
+        'text: $text'
+        '}';
   }
 
-  TextSpecialMessageLoungeResponseBodyPart(this.text);
+  const TextSpecialMessageLoungeResponseBodyPart({
+    @required this.text,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextSpecialMessageLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          text == other.text;
+
+  @override
+  int get hashCode => text.hashCode;
 
   factory TextSpecialMessageLoungeResponseBodyPart.fromJson(
           Map<String, dynamic> json) =>
@@ -1083,14 +1876,26 @@ class ChannelListItemSpecialMessageLoungeResponseBodyPart
   final String channel;
   final String topic;
 
-  @JsonKey(name:"num_users")
+  @JsonKey(name: "num_users")
   final int numUsers;
 
-  ChannelListItemSpecialMessageLoungeResponseBodyPart(
-    this.channel,
-    this.topic,
-    this.numUsers,
-  );
+  const ChannelListItemSpecialMessageLoungeResponseBodyPart({
+    @required this.channel,
+    @required this.topic,
+    @required this.numUsers,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChannelListItemSpecialMessageLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          channel == other.channel &&
+          topic == other.topic &&
+          numUsers == other.numUsers;
+
+  @override
+  int get hashCode => channel.hashCode ^ topic.hashCode ^ numUsers.hashCode;
 
   @override
   String toString() {
@@ -1115,11 +1920,23 @@ class UserLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String mode;
   final String nick;
 
-  UserLoungeResponseBodyPart(
-    this.lastMessage,
-    this.mode,
-    this.nick,
-  );
+  const UserLoungeResponseBodyPart({
+    @required this.lastMessage,
+    @required this.mode,
+    @required this.nick,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          lastMessage == other.lastMessage &&
+          mode == other.mode &&
+          nick == other.nick;
+
+  @override
+  int get hashCode => lastMessage.hashCode ^ mode.hashCode ^ nick.hashCode;
 
   factory UserLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$UserLoungeResponseBodyPartFromJson(json);
@@ -1143,10 +1960,24 @@ class NetworkLoungeResponseBody extends LoungeResponseBody {
 
   @override
   String toString() {
-    return 'NetworkLoungeResponseBody{networks: $networks}';
+    return 'NetworkLoungeResponseBody{'
+        'networks: $networks'
+        '}';
   }
 
-  NetworkLoungeResponseBody(this.networks);
+  const NetworkLoungeResponseBody({
+    @required this.networks,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          networks == other.networks;
+
+  @override
+  int get hashCode => networks.hashCode;
 
   factory NetworkLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
       _$NetworkLoungeResponseBodyFromJson(json);
@@ -1170,39 +2001,88 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final String realname;
   final List<dynamic> commands;
   final List<ChannelLoungeResponseBodyPart> channels;
-  final ServerOptionsLoungeResponseBodyPart serverOptions;
+  final NetworkServerOptionsLoungeResponseBodyPart serverOptions;
   final NetworkStatusLoungeResponseBody status;
 
-  NetworkLoungeResponseBodyPart(
-      this.uuid,
-      this.name,
-      this.host,
-      this.port,
-      this.tls,
-      this.userDisconnected,
-      this.rejectUnauthorized,
-      this.isCollapsed,
-      this.isJoinChannelShown,
-      this.nick,
-      this.username,
-      this.realname,
-      this.commands,
-      this.channels,
-      this.serverOptions,
-      this.status);
+  const NetworkLoungeResponseBodyPart({
+    @required this.uuid,
+    @required this.name,
+    @required this.host,
+    @required this.port,
+    @required this.tls,
+    @required this.userDisconnected,
+    @required this.rejectUnauthorized,
+    @required this.isCollapsed,
+    @required this.isJoinChannelShown,
+    @required this.nick,
+    @required this.username,
+    @required this.realname,
+    @required this.commands,
+    @required this.channels,
+    @required this.serverOptions,
+    @required this.status,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          uuid == other.uuid &&
+          name == other.name &&
+          host == other.host &&
+          port == other.port &&
+          tls == other.tls &&
+          userDisconnected == other.userDisconnected &&
+          rejectUnauthorized == other.rejectUnauthorized &&
+          isCollapsed == other.isCollapsed &&
+          isJoinChannelShown == other.isJoinChannelShown &&
+          nick == other.nick &&
+          username == other.username &&
+          realname == other.realname &&
+          commands == other.commands &&
+          channels == other.channels &&
+          serverOptions == other.serverOptions &&
+          status == other.status;
+
+  @override
+  int get hashCode =>
+      uuid.hashCode ^
+      name.hashCode ^
+      host.hashCode ^
+      port.hashCode ^
+      tls.hashCode ^
+      userDisconnected.hashCode ^
+      rejectUnauthorized.hashCode ^
+      isCollapsed.hashCode ^
+      isJoinChannelShown.hashCode ^
+      nick.hashCode ^
+      username.hashCode ^
+      realname.hashCode ^
+      commands.hashCode ^
+      channels.hashCode ^
+      serverOptions.hashCode ^
+      status.hashCode;
 
   @override
   String toString() {
     return 'NetworkLoungeResponseBody{'
-        'uuid: $uuid, name: $name,'
-        'host: $host, port: $port, lts: $tls, '
+        'uuid: $uuid, '
+        'name: $name,'
+        'host: $host, '
+        'port: $port, '
+        'lts: $tls, '
         'userDisconnected: $userDisconnected, '
         'rejectUnauthorized: $rejectUnauthorized, '
         'isCollapsed: $isCollapsed, '
         'isJoinChannelShown: $isJoinChannelShown, '
-        'nick: $nick, username: $username, realname: $realname, '
-        'commands: $commands, channels: $channels,'
-        'serverOptions: $serverOptions, status: $status'
+        'nick: $nick, '
+        'username: $username, '
+        'realname: $realname, '
+        'commands: $commands, '
+        'channels: $channels,'
+        'serverOptions: $serverOptions, '
+        'status: $status'
         '}';
   }
 
@@ -1237,40 +2117,96 @@ class ChannelLoungeResponseBodyPart extends LoungeResponseBodyPart {
   @override
   String toString() {
     return 'ChannelLoungeResponseBody{'
-        'name: $name, type: $type, key: $key, '
-        'pendingMessage: $pendingMessage, messages: $messages, '
+        'name: $name, '
+        'type: $type, '
+        'key: $key, '
+        'pendingMessage: $pendingMessage, '
+        'messages: $messages, '
         'inputHistory: $inputHistory, '
         'inputHistoryPosition: $inputHistoryPosition, '
-        'id: $id, moreHistoryAvailable: $moreHistoryAvailable, '
-        'historyLoading: $historyLoading, editTopic: $editTopic, '
-        'scrolledToBottom: $scrolledToBottom, topic: $topic, '
-        'state: $state, firstUnread: $firstUnread, '
+        'id: $id, '
+        'moreHistoryAvailable: $moreHistoryAvailable, '
+        'historyLoading: $historyLoading, '
+        'editTopic: $editTopic, '
+        'scrolledToBottom: $scrolledToBottom, '
+        'topic: $topic, '
+        'state: $state, '
+        'firstUnread: $firstUnread, '
         'totalMessages: $totalMessages, '
-        'unread: $unread, highlight: $highlight, users: $users'
+        'unread: $unread, '
+        'highlight: $highlight, '
+        'users: $users'
         '}';
   }
 
-  ChannelLoungeResponseBodyPart(
-    this.name,
-    this.type,
-    this.key,
-    this.pendingMessage,
-    this.messages,
-    this.inputHistory,
-    this.inputHistoryPosition,
-    this.id,
-    this.moreHistoryAvailable,
-    this.historyLoading,
-    this.editTopic,
-    this.scrolledToBottom,
-    this.topic,
-    this.state,
-    this.firstUnread,
-    this.unread,
-    this.highlight,
-    this.users,
-    this.totalMessages,
-  );
+  const ChannelLoungeResponseBodyPart({
+    @required this.name,
+    @required this.type,
+    @required this.key,
+    @required this.pendingMessage,
+    @required this.messages,
+    @required this.inputHistory,
+    @required this.inputHistoryPosition,
+    @required this.id,
+    @required this.moreHistoryAvailable,
+    @required this.historyLoading,
+    @required this.editTopic,
+    @required this.scrolledToBottom,
+    @required this.topic,
+    @required this.state,
+    @required this.firstUnread,
+    @required this.unread,
+    @required this.highlight,
+    @required this.users,
+    @required this.totalMessages,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChannelLoungeResponseBodyPart &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          type == other.type &&
+          key == other.key &&
+          pendingMessage == other.pendingMessage &&
+          messages == other.messages &&
+          inputHistory == other.inputHistory &&
+          inputHistoryPosition == other.inputHistoryPosition &&
+          id == other.id &&
+          moreHistoryAvailable == other.moreHistoryAvailable &&
+          historyLoading == other.historyLoading &&
+          editTopic == other.editTopic &&
+          scrolledToBottom == other.scrolledToBottom &&
+          topic == other.topic &&
+          state == other.state &&
+          firstUnread == other.firstUnread &&
+          unread == other.unread &&
+          highlight == other.highlight &&
+          users == other.users &&
+          totalMessages == other.totalMessages;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      type.hashCode ^
+      key.hashCode ^
+      pendingMessage.hashCode ^
+      messages.hashCode ^
+      inputHistory.hashCode ^
+      inputHistoryPosition.hashCode ^
+      id.hashCode ^
+      moreHistoryAvailable.hashCode ^
+      historyLoading.hashCode ^
+      editTopic.hashCode ^
+      scrolledToBottom.hashCode ^
+      topic.hashCode ^
+      state.hashCode ^
+      firstUnread.hashCode ^
+      unread.hashCode ^
+      highlight.hashCode ^
+      users.hashCode ^
+      totalMessages.hashCode;
 
   factory ChannelLoungeResponseBodyPart.fromJson(Map<String, dynamic> json) =>
       _$ChannelLoungeResponseBodyPartFromJson(json);

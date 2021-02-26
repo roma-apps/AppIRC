@@ -1,3 +1,0 @@
-enum LoungeAuthState {
-  login, registration
-}
