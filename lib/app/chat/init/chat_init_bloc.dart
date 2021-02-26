@@ -15,7 +15,7 @@ var _logger = Logger("chat_init_bloc.dart");
 class ChatInitBloc extends DisposableOwner {
   final ChatBackendService backendService;
   final ChatConnectionBloc connectionBloc;
-  final NetworkListBloc networksListBloc;
+  final NetworkListBloc networkListBloc;
   final ChatPreferences startPreferences;
 
   bool get isInitNotStarted => state == ChatInitState.notStarted;
@@ -36,7 +36,7 @@ class ChatInitBloc extends DisposableOwner {
   {
     @required this.backendService,
     @required this.connectionBloc,
-    @required this.networksListBloc,
+    @required this.networkListBloc,
     @required this.startPreferences,
 }
   ) {
@@ -88,7 +88,7 @@ class ChatInitBloc extends DisposableOwner {
       } else {
         for (var network
             in backendService.chatInit?.networksWithState ??= []) {
-          await networksListBloc.onNetworkJoined(network);
+          await networkListBloc.onNetworkJoined(network);
         }
       }
       _stateSubject.add(ChatInitState.finished);

@@ -22,18 +22,20 @@ class NetworkBlocsBloc extends NetworkListListenerBloc {
       );
 
   final Map<Network, NetworkBloc> _blocs = {};
-  final ChatBackendService _backendService;
-  final NetworkStatesBloc _networkStatesBloc;
-  final ChannelStatesBloc _channelsStatesBloc;
-  final ChatActiveChannelBloc _activeChannelBloc;
+  final ChatBackendService backendService;
+  final NetworkStatesBloc networkStatesBloc;
+  final ChannelStatesBloc channelsStatesBloc;
+  final ChatActiveChannelBloc activeChannelBloc;
 
-  NetworkBlocsBloc(
-    this._backendService,
-    NetworkListBloc networksListBloc,
-    this._networkStatesBloc,
-    this._channelsStatesBloc,
-    this._activeChannelBloc,
-  ) : super(networksListBloc) {
+  NetworkBlocsBloc({
+    @required this.backendService,
+    @required NetworkListBloc networkListBloc,
+    @required this.networkStatesBloc,
+    @required this.channelsStatesBloc,
+    @required this.activeChannelBloc,
+  }) : super(
+          networkListBloc: networkListBloc,
+        ) {
     addDisposable(
       disposable: CustomDisposable(
         () {
@@ -50,11 +52,11 @@ class NetworkBlocsBloc extends NetworkListListenerBloc {
   void onNetworkJoined(NetworkWithState networkWithState) {
     var network = networkWithState.network;
     _blocs[network] = NetworkBloc(
-      _backendService,
+      backendService,
       network,
-      _networkStatesBloc,
-      _channelsStatesBloc,
-      _activeChannelBloc,
+      networkStatesBloc,
+      channelsStatesBloc,
+      activeChannelBloc,
     );
   }
 

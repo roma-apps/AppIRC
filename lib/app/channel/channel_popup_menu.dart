@@ -13,32 +13,39 @@ import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.d
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-Widget buildChannelPopupMenuButton({
-  @required BuildContext context,
-  @required NetworkBloc networkBloc,
-  @required ChannelBloc channelBloc,
-  @required Color iconColor,
-}) {
-  var channel = channelBloc.channel;
-  var network = networkBloc.network;
+class ChannelPopupMenuButtonWidget extends StatelessWidget {
+  final Color iconColor;
 
-  if (channel.type == ChannelType.lobby) {
-    return buildNetworkPopupMenuButton(
-      context: context,
-      networkBloc: networkBloc,
-      iconColor: iconColor,
+  const ChannelPopupMenuButtonWidget({
+    @required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var networkBloc = NetworkBloc.of(context);
+    var channelBloc = ChannelBloc.of(context);
+
+    var channel = channelBloc.channel;
+    var network = networkBloc.network;
+
+    if (channel.type == ChannelType.lobby) {
+      return buildNetworkPopupMenuButton(
+        context: context,
+        networkBloc: networkBloc,
+        iconColor: iconColor,
+      );
+    }
+
+    return createPlatformPopupMenuButton(
+      context,
+      child: Icon(Icons.more_vert, color: iconColor),
+      actions: _buildMenuItems(
+        context: context,
+        network: network,
+        channel: channel,
+      ),
     );
   }
-
-  return createPlatformPopupMenuButton(
-    context,
-    child: Icon(Icons.more_vert, color: iconColor),
-    actions: _buildMenuItems(
-      context: context,
-      network: network,
-      channel: channel,
-    ),
-  );
 }
 
 List<PlatformAwarePopupMenuAction> _buildMenuItems({

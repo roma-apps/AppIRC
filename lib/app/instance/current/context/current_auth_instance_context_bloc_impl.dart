@@ -50,13 +50,13 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
     _logger.fine(() => "internalAsyncInit");
 
     ChatDatabaseService chatDatabaseService =
-        appContextBloc.get<ChatDatabaseService>();
+    appContextBloc.get<ChatDatabaseService>();
     ChatDatabase database = chatDatabaseService.chatDatabase;
 
     var globalProviderService = this;
 
     var currentAuthInstanceBloc =
-        appContextBloc.get<ICurrentAuthInstanceBloc>();
+    appContextBloc.get<ICurrentAuthInstanceBloc>();
 
     var socketIoService = appContextBloc.get<SocketIOService>();
     var pushesService = appContextBloc.get<PushesService>();
@@ -82,7 +82,7 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
       currentChannelExtractor: currentChannelExtractor,
       lastMessageRemoteIdExtractor: () async {
         var newestMessage =
-            (await database.regularMessagesDao.getNewestAllChannelsMessage());
+        (await database.regularMessagesDao.getNewestAllChannelsMessage());
 
         _logger.finest(() => " newestMessage $newestMessage");
 
@@ -97,22 +97,24 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
     await globalProviderService
         .asyncInitAndRegister<ChatPreferencesBloc>(chatPreferencesBloc);
 
-    var networksListBloc = NetworkListBloc(
+    var networkListBloc = NetworkListBloc(
       loungeBackendService,
       nextNetworkIdGenerator: chatPreferencesBloc.getNextNetworkLocalId,
       nextChannelIdGenerator: chatPreferencesBloc.getNextChannelLocalId,
     );
 
     await globalProviderService
-        .asyncInitAndRegister<NetworkListBloc>(networksListBloc);
+        .asyncInitAndRegister<NetworkListBloc>(networkListBloc);
 
     var messageCondensedBloc = MessageCondensedBloc();
 
     await globalProviderService
         .asyncInitAndRegister<MessageCondensedBloc>(messageCondensedBloc);
 
-    var networkStatesBloc =
-        NetworkStatesBloc(loungeBackendService, networksListBloc);
+    var networkStatesBloc = NetworkStatesBloc(
+      backendService: loungeBackendService,
+      networkListBloc: networkListBloc,
+    );
 
     await globalProviderService
         .asyncInitAndRegister<NetworkStatesBloc>(networkStatesBloc);
@@ -127,7 +129,7 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
     var chatInitBloc = ChatInitBloc(
       backendService: loungeBackendService,
       connectionBloc: connectionBloc,
-      networksListBloc: networksListBloc,
+      networkListBloc: networkListBloc,
       startPreferences: startPreferences,
     );
 
@@ -135,51 +137,51 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
         .asyncInitAndRegister<ChatInitBloc>(chatInitBloc);
 
     var chatPushesService = ChatPushesService(
-      pushesService,
-      loungeBackendService,
-      chatInitBloc,
+      pushesService: pushesService,
+      backendService: loungeBackendService,
+      chatInitBloc: chatInitBloc,
     );
 
     await globalProviderService
         .asyncInitAndRegister<ChatPushesService>(chatPushesService);
 
     activeChannelBloc = ChatActiveChannelBloc(
-      loungeBackendService,
-      chatInitBloc,
-      networksListBloc,
-      localPreferenceService,
-      chatPushesService,
+      backendService: loungeBackendService,
+      chatInitBloc: chatInitBloc,
+      networksListBloc: networkListBloc,
+      preferencesService: localPreferenceService,
+      pushesService: chatPushesService,
     );
 
     await globalProviderService
         .asyncInitAndRegister<ChatActiveChannelBloc>(activeChannelBloc);
 
     var channelsStatesBloc = ChannelStatesBloc(
-      loungeBackendService,
-      database,
-      networksListBloc,
-      activeChannelBloc,
+      backendService: loungeBackendService,
+      db: database,
+      networksListBloc: networkListBloc,
+      activeChannelBloc: activeChannelBloc,
     );
 
     await globalProviderService
         .asyncInitAndRegister<ChannelStatesBloc>(channelsStatesBloc);
 
     var channelsBlocsBloc = ChannelBlocsBloc(
-      loungeBackendService,
-      chatPushesService,
-      networksListBloc,
-      channelsStatesBloc,
+      backendService: loungeBackendService,
+      chatPushesService: chatPushesService,
+      networksListBloc: networkListBloc,
+      channelsStatesBloc: channelsStatesBloc,
     );
 
     await globalProviderService
         .asyncInitAndRegister<ChannelBlocsBloc>(channelsBlocsBloc);
 
     var networksBlocsBloc = NetworkBlocsBloc(
-      loungeBackendService,
-      networksListBloc,
-      networkStatesBloc,
-      channelsStatesBloc,
-      activeChannelBloc,
+      backendService: loungeBackendService,
+      networkListBloc: networkListBloc,
+      networkStatesBloc: networkStatesBloc,
+      channelsStatesBloc: channelsStatesBloc,
+      activeChannelBloc: activeChannelBloc,
     );
 
     await globalProviderService
@@ -188,7 +190,7 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
     var chatDeepLinkBloc = ChatDeepLinkBloc(
       loungeBackendService,
       chatInitBloc,
-      networksListBloc,
+      networkListBloc,
       networksBlocsBloc,
       activeChannelBloc,
     );
@@ -197,34 +199,34 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
         .asyncInitAndRegister<ChatDeepLinkBloc>(chatDeepLinkBloc);
 
     var chatUploadBloc = ChatUploadBloc(
-      loungeBackendService,
+      backendService: loungeBackendService,
     );
 
     await globalProviderService
         .asyncInitAndRegister<ChatUploadBloc>(chatUploadBloc);
 
     var chatUnreadBloc = ChannelListUnreadCountBloc(
-      channelsStatesBloc,
+      channelsStateBloc: channelsStatesBloc,
     );
 
     await globalProviderService
         .asyncInitAndRegister<ChannelListUnreadCountBloc>(chatUnreadBloc);
 
     var chatPreferencesSaverBloc = ChatPreferencesSaverBloc(
-      loungeBackendService,
-      networkStatesBloc,
-      networksListBloc,
-      chatPreferencesBloc,
-      chatInitBloc,
+      backendService: loungeBackendService,
+      stateBloc: networkStatesBloc,
+      networksListBloc: networkListBloc,
+      chatPreferencesBloc: chatPreferencesBloc,
+      initBloc: chatInitBloc,
     );
 
     await globalProviderService.asyncInitAndRegister<ChatPreferencesSaverBloc>(
         chatPreferencesSaverBloc);
 
     var messageManagerBloc = MessageManagerBloc(
-      loungeBackendService,
-      networksListBloc,
-      database,
+      backendService: loungeBackendService,
+      networksListBloc: networkListBloc,
+      db: database,
     );
 
     await globalProviderService
@@ -232,7 +234,7 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
 
     addDisposable(
       disposable: loungeBackendService.listenForSignOut(
-        () async {
+            () async {
           await messageManagerBloc.clearAllMessages();
 
           chatPreferencesSaverBloc.reset();

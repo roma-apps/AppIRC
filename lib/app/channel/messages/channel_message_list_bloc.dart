@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
@@ -22,7 +23,10 @@ class ChannelMessageListBloc extends DisposableOwner {
   MessageListVisibleBounds get visibleMessagesBounds =>
       _visibleMessagesBoundsSubject.value;
 
-  ChannelMessageListBloc(this.chatPushesService, this.channel) {
+  ChannelMessageListBloc({
+    @required this.chatPushesService,
+    @required this.channel,
+  }) {
     addDisposable(subject: _visibleMessagesBoundsSubject);
 
     addDisposable(

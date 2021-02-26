@@ -192,25 +192,13 @@ class _ChatPageState extends State<ChatPage> {
           (BuildContext context, AsyncSnapshot<Channel> activeChannelSnapshot) {
         var channel = activeChannelSnapshot.data;
         if (channel == null) {
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         } else {
-          var networkListBloc = Provider.of<NetworkListBloc>(context);
-
-          var network = networkListBloc.findNetworkWithChannel(channel);
-
-          var networkBloc =
-              NetworkBlocsBloc.of(context).getNetworkBloc(network);
-
           var channelBloc =
               ChannelBlocsBloc.of(context).getChannelBloc(channel);
 
           List<Widget> items = [
-            buildChannelPopupMenuButton(
-              context: context,
-              networkBloc: networkBloc,
-              channelBloc: channelBloc,
-              iconColor: null,
-            )
+            ChannelPopupMenuButtonWidget(iconColor: null),
           ];
 
           items.insert(
@@ -226,7 +214,25 @@ class _ChatPageState extends State<ChatPage> {
             ),
           );
 
-          return Row(mainAxisSize: MainAxisSize.min, children: items);
+          var networkBloc =
+              NetworkBlocsBloc.of(context).getNetworkBloc(channelBloc.network);
+
+          return Provider.value(
+            value: channel,
+            child: Provider.value(
+              value: channelBloc.network,
+              child: Provider.value(
+                value: channelBloc,
+                child: Provider.value(
+                  value: networkBloc,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: items,
+                  ),
+                ),
+              ),
+            ),
+          );
         }
       },
     );
@@ -304,9 +310,21 @@ class _ChatPageState extends State<ChatPage> {
         } else {
           var channelBloc =
               ChannelBlocsBloc.of(context).getChannelBloc(channel);
+
+          var networkBlocsBloc = NetworkBlocsBloc.of(context);
+
+          var networkBloc =
+              networkBlocsBloc.getNetworkBloc(channelBloc.network);
+
           return Provider.value(
-            value: channelBloc,
-            child: ChannelTopicTitleAppBarWidget(),
+            value: networkBloc,
+            child: Provider.value(
+              value: channel,
+              child: Provider.value(
+                value: channelBloc,
+                child: ChannelTopicTitleAppBarWidget(),
+              ),
+            ),
           );
         }
       },

@@ -21,8 +21,8 @@ import 'package:rxdart/subjects.dart';
 var _logger = Logger("message_saver_bloc.dart");
 
 class MessageManagerBloc extends ChannelListListenerBloc {
-  final ChatBackendService _backendService;
-  final ChatDatabase _db;
+  final ChatBackendService backendService;
+  final ChatDatabase db;
 
   final Map<int, IDisposable> _channelsListeners = {};
   final Map<int, List<ChannelMessageListener>> _channelsMessagesListeners = {};
@@ -32,11 +32,13 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
   Stream<ChatMessage> get messageUpdateStream => _messageUpdateSubject.stream;
 
-  MessageManagerBloc(
-    this._backendService,
-    NetworkListBloc networksListBloc,
-    this._db,
-  ) : super(networksListBloc) {
+  MessageManagerBloc({
+    @required this.backendService,
+    @required NetworkListBloc networksListBloc,
+    @required this.db,
+  }) : super(
+          networksListBloc: networksListBloc,
+        ) {
     _logger.fine(() => "Create ChannelMessagesSaverBloc");
 
     addDisposable(subject: _messageUpdateSubject);
@@ -84,11 +86,10 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     var channelDisposable = CompositeDisposable([]);
 
     channelDisposable.add(
-      _backendService.listenForMessages(
-        network:network,
-        channel:channel,
-        listener:
-        (messagesForChannel) {
+      backendService.listenForMessages(
+        network: network,
+        channel: channel,
+        listener: (messagesForChannel) {
           _logger.fine(() => "listenForMessages "
               "${messagesForChannel.messages.length}");
           _onNewMessages(messagesForChannel);
@@ -97,11 +98,10 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     );
 
     channelDisposable.add(
-      _backendService.listenForMessagePreviews(
-        network:network,
-        channel:channel,
-        listener:
-        (previewForMessage) async {
+      backendService.listenForMessagePreviews(
+        network: network,
+        channel: channel,
+        listener: (previewForMessage) async {
           var newMessage = await _updatePreview(channel, previewForMessage);
 
           _messageUpdateSubject.add(newMessage);
@@ -110,11 +110,10 @@ class MessageManagerBloc extends ChannelListListenerBloc {
     );
 
     channelDisposable.add(
-      _backendService.listenForMessagePreviewToggle(
-        network:network,
-        channel:channel,
-        listener:
-        (ToggleMessagePreviewData togglePreview) async {
+      backendService.listenForMessagePreviewToggle(
+        network: network,
+        channel: channel,
+        listener: (ToggleMessagePreviewData togglePreview) async {
           var newMessage = await _togglePreview(
             channel,
             togglePreview,
@@ -138,7 +137,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
       messagePreview: togglePreview.preview,
     );
 
-    var oldMessageDB = await _db.regularMessagesDao
+    var oldMessageDB = await db.regularMessagesDao
         .findMessageWithRemoteId(previewForMessage.remoteMessageId);
 
     var message = regularMessageDBToChatMessage(oldMessageDB);
@@ -154,7 +153,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     var newMessageDB = toRegularMessageDB(message);
     newMessageDB.localId = oldMessageDB.localId;
-    await _db.regularMessagesDao.updateRegularMessage(
+    await db.regularMessagesDao.updateRegularMessage(
       newMessageDB,
     );
 
@@ -163,7 +162,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
   Future<ChatMessage> _updatePreview(Channel channel,
       MessagePreviewForRemoteMessageId previewForMessage) async {
-    var oldMessageDB = await _db.regularMessagesDao.findMessageWithRemoteId(
+    var oldMessageDB = await db.regularMessagesDao.findMessageWithRemoteId(
       previewForMessage.remoteMessageId,
     );
 
@@ -173,7 +172,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
 
     var newMessageDB = toRegularMessageDB(message);
     newMessageDB.localId = oldMessageDB.localId;
-    await _db.regularMessagesDao.updateRegularMessage(newMessageDB);
+    await db.regularMessagesDao.updateRegularMessage(newMessageDB);
 
     return message;
   }
@@ -189,7 +188,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
         if (message.isRegular) {
           var regularMessage = message as RegularMessage;
           var remoteId = regularMessage.messageRemoteId;
-          var localMessage = await _db.regularMessagesDao
+          var localMessage = await db.regularMessagesDao
               .findMessageLocalIdWithRemoteId(remoteId);
 
           if (localMessage?.localId != null) {
@@ -241,7 +240,7 @@ class MessageManagerBloc extends ChannelListListenerBloc {
         .toList();
 
     if (regularMessages.isNotEmpty) {
-      await _db.regularMessagesDao.upsertRegularMessages(regularMessages);
+      await db.regularMessagesDao.upsertRegularMessages(regularMessages);
     }
   }
 
@@ -253,14 +252,14 @@ class MessageManagerBloc extends ChannelListListenerBloc {
         .toList();
 
     if (specialMessages.isNotEmpty) {
-      await _db.specialMessagesDao.upsertSpecialMessages(specialMessages);
+      await db.specialMessagesDao.upsertSpecialMessages(specialMessages);
     }
   }
 
   @override
   void onChannelLeaved(Network network, Channel channel) {
-    _db.specialMessagesDao.deleteChannelSpecialMessages(channel.remoteId);
-    _db.regularMessagesDao.deleteChannelRegularMessages(channel.remoteId);
+    db.specialMessagesDao.deleteChannelSpecialMessages(channel.remoteId);
+    db.regularMessagesDao.deleteChannelRegularMessages(channel.remoteId);
 
     _channelsListeners.remove(channel.remoteId).dispose();
   }
@@ -301,16 +300,16 @@ class MessageManagerBloc extends ChannelListListenerBloc {
       }
     }
 
-    await _db.regularMessagesDao.updateRegularMessages(regularMessagesToUpdate);
-    await _db.specialMessagesDao.updateSpecialMessages(specialMessagesToUpdate);
+    await db.regularMessagesDao.updateRegularMessages(regularMessagesToUpdate);
+    await db.specialMessagesDao.updateSpecialMessages(specialMessagesToUpdate);
   }
 
   Stream<ChatMessage> getMessageUpdateStream(ChatMessage message) =>
       messageUpdateStream.where((updatedMessage) => message == updatedMessage);
 
   Future clearAllMessages() async {
-    await _db.regularMessagesDao.deleteAllRegularMessages();
-    await _db.specialMessagesDao.deleteAllSpecialMessages();
+    await db.regularMessagesDao.deleteAllRegularMessages();
+    await db.specialMessagesDao.deleteAllSpecialMessages();
   }
 }
 

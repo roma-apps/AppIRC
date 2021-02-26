@@ -9,8 +9,11 @@ import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
 
 abstract class ChannelListListenerBloc extends NetworkListListenerBloc {
-  ChannelListListenerBloc(NetworkListBloc networksListBloc)
-      : super(networksListBloc);
+  ChannelListListenerBloc({
+    @required NetworkListBloc networksListBloc,
+  }) : super(
+          networkListBloc: networksListBloc,
+        );
 
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {

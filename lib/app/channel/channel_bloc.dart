@@ -22,14 +22,14 @@ import 'package:rxdart/subjects.dart';
 final Duration _usersListOutDateDuration = Duration(seconds: 15);
 
 class ChannelBloc extends DisposableOwner {
-  final ChatBackendService _backendService;
+  final ChatBackendService backendService;
   final ChatPushesService chatPushesService;
 
   final Network network;
   Channel _channel;
 
   Channel get channel => _channel;
-  final ChannelStatesBloc _channelsStatesBloc;
+  final ChannelStatesBloc channelsStatesBloc;
 
   ChatInputMessageBloc _inputMessageBloc;
 
@@ -39,19 +39,27 @@ class ChannelBloc extends DisposableOwner {
 
   ChatInputMessageBloc get inputMessageBloc => _inputMessageBloc;
 
-  ChannelBloc(this._backendService, this.chatPushesService, this.network,
-      ChannelWithState channelWithState, this._channelsStatesBloc) {
+  ChannelBloc({
+    @required this.backendService,
+    @required this.chatPushesService,
+    @required this.network,
+    @required ChannelWithState channelWithState,
+    @required this.channelsStatesBloc,
+  }) {
     _channel = channelWithState.channel;
     _usersSubject = BehaviorSubject.seeded(channelWithState.initUsers ?? []);
 
-    _messagesBloc = ChannelMessageListBloc(chatPushesService, channel);
+    _messagesBloc = ChannelMessageListBloc(
+      chatPushesService: chatPushesService,
+      channel: channel,
+    );
     addDisposable(
       disposable: _messagesBloc,
     );
 
     addDisposable(subject: _usersSubject);
     addDisposable(
-      disposable: _backendService.listenForChannelNames(
+      disposable: backendService.listenForChannelNames(
         network: network,
         channel: channel,
         listener: (newUsers) {
@@ -60,11 +68,11 @@ class ChannelBloc extends DisposableOwner {
       ),
     );
     addDisposable(
-      disposable: _backendService.listenForChannelUsers(
+      disposable: backendService.listenForChannelUsers(
         network: network,
         channel: channel,
         listener: () {
-          _backendService.requestChannelUsers(
+          backendService.requestChannelUsers(
             network: network,
             channel: channel,
           );
@@ -72,7 +80,7 @@ class ChannelBloc extends DisposableOwner {
       ),
     );
     _inputMessageBloc = ChatInputMessageBloc(
-      _backendService.chatConfig,
+      backendService.chatConfig,
       this,
     );
     addDisposable(disposable: _inputMessageBloc);
@@ -105,20 +113,20 @@ class ChannelBloc extends DisposableOwner {
 
   Future requestUsersListUpdate() async {
     _lastUsersRefreshDate = DateTime.now();
-    await _backendService.requestChannelUsers(
-      network:network,
-      channel:channel,
+    await backendService.requestChannelUsers(
+      network: network,
+      channel: channel,
       waitForResult: false,
     );
   }
 
-  ChannelState get channelState => _channelsStatesBloc.getChannelState(
+  ChannelState get channelState => channelsStatesBloc.getChannelState(
         network,
         channel,
       );
 
   Stream<ChannelState> get _channelStateStream =>
-      _channelsStatesBloc.getChannelStateStream(
+      channelsStatesBloc.getChannelStateStream(
         network,
         channel,
       );
@@ -150,7 +158,7 @@ class ChannelBloc extends DisposableOwner {
   Future<RequestResult<bool>> leaveChannel({
     bool waitForResult = false,
   }) async =>
-      await _backendService.leaveChannel(
+      await backendService.leaveChannel(
         network: network,
         channel: channel,
         waitForResult: waitForResult,
@@ -160,7 +168,7 @@ class ChannelBloc extends DisposableOwner {
     String userNick, {
     bool waitForResult = false,
   }) async =>
-      await _backendService.requestUserInfo(
+      await backendService.requestUserInfo(
         network: network,
         channel: channel,
         userNick: userNick,
@@ -170,7 +178,7 @@ class ChannelBloc extends DisposableOwner {
   Future<RequestResult<ChatMessage>> printChannelBannedUsers({
     bool waitForResult = false,
   }) async =>
-      await _backendService.printChannelBannedUsers(
+      await backendService.printChannelBannedUsers(
         network: network,
         channel: channel,
         waitForResult: waitForResult,
@@ -180,7 +188,7 @@ class ChannelBloc extends DisposableOwner {
     String newTopic, {
     bool waitForResult = false,
   }) async =>
-      await _backendService.editChannelTopic(
+      await backendService.editChannelTopic(
         network: network,
         channel: channel,
         newTopic: newTopic,
@@ -188,7 +196,7 @@ class ChannelBloc extends DisposableOwner {
       );
 
   Future<RequestResult<bool>> onOpenChannel() async =>
-      await _backendService.sendChannelOpenedEventToServer(
+      await backendService.sendChannelOpenedEventToServer(
         network: network,
         channel: channel,
       );
@@ -197,7 +205,7 @@ class ChannelBloc extends DisposableOwner {
     String rawMessage, {
     bool waitForResult = false,
   }) async =>
-      await _backendService.sendChannelRawMessage(
+      await backendService.sendChannelRawMessage(
         network: network,
         channel: channel,
         rawMessage: rawMessage,
@@ -206,7 +214,7 @@ class ChannelBloc extends DisposableOwner {
 
   Future<RequestResult<ChannelWithState>> openDirectMessagesChannel(
           String nick) async =>
-      await _backendService.openDirectMessagesChannel(
+      await backendService.openDirectMessagesChannel(
         network: network,
         channel: channel,
         nick: nick,
@@ -224,7 +232,7 @@ class ChannelBloc extends DisposableOwner {
   Future<RequestResult<MessageListLoadMore>> loadMoreHistory(
     RegularMessage oldestMessage,
   ) async =>
-      await _backendService.loadMoreHistory(
+      await backendService.loadMoreHistory(
         network: network,
         channel: channel,
         lastMessageId: oldestMessage?.messageRemoteId,
@@ -234,7 +242,7 @@ class ChannelBloc extends DisposableOwner {
     RegularMessage message,
     MessagePreview preview,
   ) =>
-      _backendService.togglePreview(
+      backendService.togglePreview(
         network: network,
         channel: channel,
         message: message,

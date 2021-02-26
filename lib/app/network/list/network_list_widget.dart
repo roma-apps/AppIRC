@@ -35,31 +35,27 @@ class NetworkListWidget extends StatelessWidget {
         var networks = snapshot.data ?? [];
 
         if (networks.isNotEmpty) {
-          return _buildNetworksListWidget(networks);
+          return Provider.value(
+            value: networks,
+            child: NetworksListBodyWidget(
+              onActionCallback: onActionCallback,
+            ),
+          );
         } else {
-          return _buildEmptyListWidget(context);
+          return const _NetworkListEmptyWidget();
         }
       },
     );
   }
+}
 
-  Container _buildNetworksListWidget(List<Network> networks) {
-    return Container(
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: networks.length,
-        separatorBuilder: (context, index) => Divider(
-          color: IAppIrcUiColorTheme.of(context).grey,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          var network = networks[index];
-          return _networkItem(context, network);
-        },
-      ),
-    );
-  }
+class _NetworkListEmptyWidget extends StatelessWidget {
+  const _NetworkListEmptyWidget({
+    Key key,
+  }) : super(key: key);
 
-  Center _buildEmptyListWidget(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Text(
         S.of(context).chat_networks_list_empty,
@@ -67,8 +63,18 @@ class NetworkListWidget extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _networkItem(BuildContext context, Network network) {
+class NetworkListItem extends StatelessWidget {
+  final VoidCallback onActionCallback;
+
+  const NetworkListItem({
+    @required this.onActionCallback,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var network = Provider.of<Network>(context);
     var preferencesService = Provider.of<ILocalPreferencesService>(context);
     var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
     var channel = network.lobbyChannel;
@@ -119,9 +125,8 @@ class NetworkListWidget extends StatelessWidget {
         children: <Widget>[
           channelItemRow,
           ChannelListWidget(
-            network,
-            onActionCallback,
-            true,
+            onActionCallback: onActionCallback,
+            isChildInListView: true,
           )
         ],
       );
@@ -149,40 +154,39 @@ class NetworkListWidget extends StatelessWidget {
 
     var row = Provider<ChannelBloc>.value(
       value: channelBloc,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          _buildToggleExpandButton(
-            context,
-            networkBloc.network,
-            networkExpandedStateIcon,
-            isChannelActive,
-            expanded,
-          ),
-          _buildNetworkTitle(
-            context,
-            networkBloc,
-            isChannelActive,
-          ),
-          _buildConnectionIcon(
-            context,
-            networkBloc,
-            isChannelActive,
-          ),
-          buildChannelUnreadCountBadge(
-            context,
-            channelBloc,
-            isChannelActive,
-          ),
-          buildNetworkPopupMenuButton(
-            context: context,
-            networkBloc: networkBloc,
-            iconColor: isChannelActive
-                ? IAppIrcUiColorTheme.of(context).lightGrey
-                : IAppIrcUiColorTheme.of(context).darkGrey,
-          )
-        ],
+      child: Provider.value(
+        value: channel,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            _buildToggleExpandButton(
+              context,
+              networkBloc.network,
+              networkExpandedStateIcon,
+              isChannelActive,
+              expanded,
+            ),
+            _buildNetworkTitle(
+              context,
+              networkBloc,
+              isChannelActive,
+            ),
+            _buildConnectionIcon(
+              context,
+              networkBloc,
+              isChannelActive,
+            ),
+            const ChannelUnreadCountBadgeWidget(),
+            buildNetworkPopupMenuButton(
+              context: context,
+              networkBloc: networkBloc,
+              iconColor: isChannelActive
+                  ? IAppIrcUiColorTheme.of(context).lightGrey
+                  : IAppIrcUiColorTheme.of(context).darkGrey,
+            )
+          ],
+        ),
       ),
     );
     var rowContainer = Container(
@@ -290,5 +294,40 @@ class NetworkListWidget extends StatelessWidget {
       networkExpandedStateIcon = Icons.arrow_right;
     }
     return networkExpandedStateIcon;
+  }
+}
+
+class NetworksListBodyWidget extends StatelessWidget {
+  final VoidCallback onActionCallback;
+
+  const NetworksListBodyWidget({
+    @required this.onActionCallback,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var networks = Provider.of<List<Network>>(context);
+    var networkBlocsBloc = NetworkBlocsBloc.of(context);
+
+    return ListView.separated(
+      shrinkWrap: true,
+      itemCount: networks.length,
+      separatorBuilder: (context, index) => Divider(
+        color: IAppIrcUiColorTheme.of(context).grey,
+      ),
+      itemBuilder: (BuildContext context, int index) {
+        var network = networks[index];
+        return Provider.value(
+          value: network,
+          child: ProxyProvider<Network, NetworkBloc>(
+            update: (context, network, _) =>
+                networkBlocsBloc.getNetworkBloc(network),
+            child: NetworkListItem(
+              onActionCallback: onActionCallback,
+            ),
+          ),
+        );
+      },
+    );
   }
 }

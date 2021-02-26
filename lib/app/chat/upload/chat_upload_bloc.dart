@@ -1,21 +1,24 @@
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_model.dart';
 import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 
 class ChatUploadBloc extends DisposableOwner {
-  final LoungeBackendService _backendService;
+  final LoungeBackendService backendService;
 
-  bool get isUploadSupported => _backendService.chatConfig.fileUpload;
+  bool get isUploadSupported => backendService.chatConfig.fileUpload;
 
   int get maxUploadSizeInBytes =>
-      _backendService.chatConfig.fileUploadMaxSizeInBytes;
+      backendService.chatConfig.fileUploadMaxSizeInBytes;
 
-  ChatUploadBloc(this._backendService);
+  ChatUploadBloc({
+    @required this.backendService,
+  });
 
   Future<RequestResult<String>> uploadFile(File file) =>
-      _backendService.uploadFile(
+      backendService.uploadFile(
         file: file,
       );
 }

@@ -8,7 +8,9 @@ import 'package:flutter_appirc/disposable/disposable_owner.dart';
 abstract class NetworkListListenerBloc extends DisposableOwner {
   final NetworkListBloc networkListBloc;
 
-  NetworkListListenerBloc(this.networkListBloc) {
+  NetworkListListenerBloc({
+    @required this.networkListBloc,
+}) {
     addDisposable(
       disposable: networkListBloc.listenForNetworkJoin(
         (networkWithState) {

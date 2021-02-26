@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:logging/logging.dart';
@@ -18,7 +19,9 @@ class ChannelListUnreadCountBloc extends DisposableOwner {
 
   final ChannelStatesBloc channelsStateBloc;
 
-  ChannelListUnreadCountBloc(this.channelsStateBloc) : super() {
+  ChannelListUnreadCountBloc({
+    @required this.channelsStateBloc,
+  }) : super() {
     addDisposable(subject: _channelsWithUnreadMessagesCountController);
 
     addDisposable(

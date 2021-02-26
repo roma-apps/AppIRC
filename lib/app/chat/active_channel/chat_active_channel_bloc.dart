@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_listener_bloc.dart';
@@ -14,15 +15,25 @@ import 'package:flutter_appirc/local_preferences/local_preference_bloc_impl.dart
 import 'package:flutter_appirc/local_preferences/local_preferences_service.dart';
 import 'package:flutter_appirc/pushes/push_model.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/subjects.dart';
 
 var _preferenceKey = "chat.activeChannel";
 var _logger = Logger("chat_active_channel_bloc.dart");
 
 class ChatActiveChannelBloc extends ChannelListListenerBloc {
-  final ChatBackendService _backendService;
-  final NetworkListBloc _networksListBloc;
-  final ChatInitBloc _chatInitBloc;
+  static ChatActiveChannelBloc of(
+    BuildContext context, {
+    bool listen = true,
+  }) =>
+      Provider.of<ChatActiveChannelBloc>(
+        context,
+        listen: listen,
+      );
+
+  final ChatBackendService backendService;
+  final NetworkListBloc networksListBloc;
+  final ChatInitBloc chatInitBloc;
   final ChatPushesService pushesService;
   IntPreferenceBloc _preferenceBloc;
 
@@ -35,13 +46,23 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
 
   Stream<Channel> get activeChannelStream => _activeChannelSubject.stream;
 
-  ChatActiveChannelBloc(
-    this._backendService,
-    this._chatInitBloc,
-    this._networksListBloc,
-    ILocalPreferencesService preferencesService,
-    this.pushesService,
-  ) : super(_networksListBloc) {
+  Stream<bool> isChannelActiveStream(Channel channel) =>
+      activeChannelStream.map(
+        (activeChannel) => channel.remoteId == activeChannel?.remoteId,
+      );
+
+  bool isChannelActive(Channel channel) =>
+      channel.remoteId == activeChannel?.remoteId;
+
+  ChatActiveChannelBloc({
+    @required this.backendService,
+    @required this.chatInitBloc,
+    @required this.networksListBloc,
+    @required ILocalPreferencesService preferencesService,
+    @required this.pushesService,
+  }) : super(
+          networksListBloc: networksListBloc,
+        ) {
     _preferenceBloc = createActiveChannelPreferenceBloc(preferencesService);
 
     addDisposable(
@@ -68,10 +89,10 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     _logger.finest(() => "start creating");
 
     addDisposable(
-      streamSubscription: _chatInitBloc.stateStream.listen(
+      streamSubscription: chatInitBloc.stateStream.listen(
         (state) {
           if (state == ChatInitState.finished &&
-              _networksListBloc.networks.isNotEmpty) {
+              networksListBloc.networks.isNotEmpty) {
             tryRestoreActiveChannel();
           }
         },
@@ -86,7 +107,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   }
 
   void tryRestoreActiveChannel() async {
-    if (_chatInitBloc.state != ChatInitState.finished) {
+    if (chatInitBloc.state != ChatInitState.finished) {
       return;
     }
 
@@ -96,7 +117,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
 
     if (_channelRemoteIdFromLaunchPushMessage != null) {
       await _restoreFromLaunchPushMessage();
-    } else if (_backendService.chatInit.activeChannelRemoteId != null) {
+    } else if (backendService.chatInit.activeChannelRemoteId != null) {
       await _restoreFromChatInitMessage();
     } else {
       await _restoreFromLocalPreferences();
@@ -108,7 +129,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
       );
 
   Future _restoreFromChatInitMessage() async => await _restoreByRemoteID(
-        _backendService.chatInit.activeChannelRemoteId,
+        backendService.chatInit.activeChannelRemoteId,
       );
 
   Future _restoreByRemoteID(int chatInitActiveChannelRemoteID) async {
@@ -120,7 +141,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
           "$chatInitActiveChannelRemoteID");
       // sometimes required channel already leaved
       // usually when we try to restore active channel by remote config
-      var allChannels = await _networksListBloc.allNetworksChannels;
+      var allChannels = await networksListBloc.allNetworksChannels;
       if (allChannels?.isNotEmpty == true) {
         newActiveChannel = allChannels.first;
       }
@@ -130,7 +151,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   }
 
   Future<Channel> findChannelWithRemoteID(int remoteId) async {
-    var allChannels = await _networksListBloc.allNetworksChannels;
+    var allChannels = await networksListBloc.allNetworksChannels;
     var newActiveChannel = allChannels.firstWhere(
         (channel) => channel.remoteId == remoteId,
         orElse: () => null);
@@ -138,7 +159,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   }
 
   Future _restoreFromLocalPreferences() async {
-    var allChannels = await _networksListBloc.allNetworksChannels;
+    var allChannels = await networksListBloc.allNetworksChannels;
 
     if (allChannels != null && allChannels.isNotEmpty) {
       var savedLocalId = _preferenceBloc.value ?? allChannels.first.localId;
@@ -163,7 +184,7 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
   }
 
   Future<void> changeActiveChanel(Channel newActiveChannel) async {
-    if (_chatInitBloc.state != ChatInitState.finished) {
+    if (chatInitBloc.state != ChatInitState.finished) {
       return;
     }
 
@@ -175,20 +196,19 @@ class ChatActiveChannelBloc extends ChannelListListenerBloc {
     await _preferenceBloc.setValue(newActiveChannel.localId);
     _activeChannelSubject.sink.add(newActiveChannel);
 
-    Network network =
-        _networksListBloc.findNetworkWithChannel(newActiveChannel);
-    await _backendService.sendChannelOpenedEventToServer(
+    Network network = networksListBloc.findNetworkWithChannel(newActiveChannel);
+    await backendService.sendChannelOpenedEventToServer(
       network: network,
       channel: newActiveChannel,
     );
-    await _backendService.requestChannelUsers(
+    await backendService.requestChannelUsers(
       network: network,
       channel: newActiveChannel,
     );
   }
 
   Future _onActiveChannelLeaved() async {
-    var allChannels = await _networksListBloc.allNetworksChannels;
+    var allChannels = await networksListBloc.allNetworksChannels;
 
     if (allChannels.isNotEmpty) {
       await changeActiveChanel(allChannels.first);

@@ -17,16 +17,18 @@ class ChannelBlocsBloc extends ChannelListListenerBloc {
   }
 
   final Map<Channel, ChannelBloc> _blocs = {};
-  final ChatBackendService _backendService;
+  final ChatBackendService backendService;
   final ChatPushesService chatPushesService;
-  final ChannelStatesBloc _channelsStatesBloc;
+  final ChannelStatesBloc channelsStatesBloc;
 
-  ChannelBlocsBloc(
-    this._backendService,
-    this.chatPushesService,
-    NetworkListBloc networksListBloc,
-    this._channelsStatesBloc,
-  ) : super(networksListBloc) {
+  ChannelBlocsBloc({
+    @required this.backendService,
+    @required this.chatPushesService,
+    @required NetworkListBloc networksListBloc,
+    @required this.channelsStatesBloc,
+  }) : super(
+          networksListBloc: networksListBloc,
+        ) {
     addDisposable(
       disposable: CustomDisposable(
         () {
@@ -42,18 +44,28 @@ class ChannelBlocsBloc extends ChannelListListenerBloc {
   ChannelBloc getChannelBloc(Channel channel) => _blocs[channel];
 
   @override
-  void onChannelJoined(Network network, ChannelWithState channelWithState) {
+  void onChannelJoined(
+    Network network,
+    ChannelWithState channelWithState,
+  ) {
     _blocs[channelWithState.channel] = ChannelBloc(
-      _backendService,
-      chatPushesService,
-      network,
-      channelWithState,
-      _channelsStatesBloc,
+      backendService: backendService,
+      chatPushesService: chatPushesService,
+      network: network,
+      channelWithState: channelWithState,
+      channelsStatesBloc: channelsStatesBloc,
     );
   }
 
   @override
-  void onChannelLeaved(Network network, Channel channel) {
-    _disposeChannelBloc(_blocs.remove(channel));
+  void onChannelLeaved(
+    Network network,
+    Channel channel,
+  ) {
+    _disposeChannelBloc(
+      _blocs.remove(
+        channel,
+      ),
+    );
   }
 }

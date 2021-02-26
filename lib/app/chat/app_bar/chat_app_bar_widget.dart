@@ -14,8 +14,8 @@ class ChatAppBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(title != null && title.isNotEmpty);
-    var providerState = PlatformProvider.of(context);
-    var isMaterial = providerState.platform == TargetPlatform.android;
+    var platformProvider = PlatformProvider.of(context);
+    var isMaterial = platformProvider.platform == TargetPlatform.android;
     if (subTitle != null && subTitle.isNotEmpty) {
       return Column(
         //        mainAxisAlignment: MainAxisAlignment.end,

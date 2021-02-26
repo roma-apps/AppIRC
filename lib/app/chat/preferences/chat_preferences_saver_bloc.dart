@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_listener_bloc.dart';
@@ -15,19 +16,21 @@ import 'package:logging/logging.dart';
 var _logger = Logger("chat_preferences_saver_bloc.dart");
 
 class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
-  final ChatBackendService _backendService;
-  final NetworkStatesBloc _stateBloc;
+  final ChatBackendService backendService;
+  final NetworkStatesBloc stateBloc;
   ChatPreferences _currentPreferences = ChatPreferences([]);
   final ChatPreferencesBloc chatPreferencesBloc;
   final ChatInitBloc initBloc;
 
-  ChatPreferencesSaverBloc(
-    this._backendService,
-    this._stateBloc,
-    NetworkListBloc networksListBloc,
-    this.chatPreferencesBloc,
-    this.initBloc,
-  ) : super(networksListBloc);
+  ChatPreferencesSaverBloc({
+    @required this.backendService,
+    @required this.stateBloc,
+    @required NetworkListBloc networksListBloc,
+    @required this.chatPreferencesBloc,
+    @required this.initBloc,
+  }) : super(
+          networksListBloc: networksListBloc,
+        );
 
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {
@@ -37,9 +40,9 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
         .add(NetworkPreferences(network.connectionPreferences, []));
 
     addDisposable(
-      disposable: _backendService.listenForNetworkEdit(
+      disposable: backendService.listenForNetworkEdit(
         network: network,
-        listener:(NetworkPreferences networkPreferences) {
+        listener: (NetworkPreferences networkPreferences) {
           findPreferencesForNetwork(network).networkConnectionPreferences =
               networkPreferences.networkConnectionPreferences;
           _onPreferencesChanged();
@@ -48,7 +51,7 @@ class ChatPreferencesSaverBloc extends ChannelListListenerBloc {
     );
 
     addDisposable(
-      streamSubscription: _stateBloc.getNetworkStateStream(network).listen(
+      streamSubscription: stateBloc.getNetworkStateStream(network).listen(
         (state) {
           var newNick = state.nick;
           var oldUserPreferences = findPreferencesForNetwork(network)

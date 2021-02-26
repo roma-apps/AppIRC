@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
@@ -16,12 +17,12 @@ final String _iosPushMessageNotificationKey = "notification";
 final String _iosPushMessageDataKey = "data";
 
 class ChatPushesService extends DisposableOwner {
-  final PushesService _pushesService;
-  final ChatBackendService _backendService;
-  final ChatInitBloc _chatInitBloc;
+  final PushesService pushesService;
+  final ChatBackendService backendService;
+  final ChatInitBloc chatInitBloc;
 
   Stream<ChatPushMessage> get chatPushMessageStream =>
-      _pushesService.messageStream.map(
+      pushesService.messageStream.map(
         (pushMessage) {
           Map<String, dynamic> data = _remapToStringObjectMap(pushMessage);
 
@@ -81,15 +82,18 @@ class ChatPushesService extends DisposableOwner {
   Map<String, dynamic> _remapForJson(raw) => (raw as Map)
       ?.map((key, value) => MapEntry<String, dynamic>(key.toString(), value));
 
-  ChatPushesService(
-      this._pushesService, this._backendService, this._chatInitBloc) {
+  ChatPushesService({
+    @required this.pushesService,
+    @required this.backendService,
+    @required this.chatInitBloc,
+  }) {
     addDisposable(
-      streamSubscription: _chatInitBloc.stateStream.listen(
+      streamSubscription: chatInitBloc.stateStream.listen(
         (newState) {
           if (newState == ChatInitState.finished) {
-            var token = _pushesService.token;
+            var token = pushesService.token;
             if (token != null) {
-              _backendService.sendDevicePushFCMTokenToServer(newToken: token);
+              backendService.sendDevicePushFCMTokenToServer(newToken: token);
             }
           }
         },
@@ -97,31 +101,30 @@ class ChatPushesService extends DisposableOwner {
     );
 
     addDisposable(
-      streamSubscription: _backendService.connectionStateStream.listen(
+      streamSubscription: backendService.connectionStateStream.listen(
         (connectionState) {
-          var token = _pushesService.token;
+          var token = pushesService.token;
 
           if (token != null &&
               connectionState == ChatConnectionState.connected) {
-            _backendService.sendDevicePushFCMTokenToServer(newToken: token);
+            backendService.sendDevicePushFCMTokenToServer(newToken: token);
           }
         },
       ),
     );
     addDisposable(
-      streamSubscription: _pushesService.tokenStream.listen(
+      streamSubscription: pushesService.tokenStream.listen(
         (token) {
           if (token != null &&
-              _backendService.connectionState ==
-                  ChatConnectionState.connected) {
-            _backendService.sendDevicePushFCMTokenToServer(newToken: token);
+              backendService.connectionState == ChatConnectionState.connected) {
+            backendService.sendDevicePushFCMTokenToServer(newToken: token);
           }
         },
       ),
     );
 
     addDisposable(
-      streamSubscription: _pushesService.messageStream.listen(
+      streamSubscription: pushesService.messageStream.listen(
         (pushMessage) {
           _logger.fine(() => "newPushMessage $pushMessage");
         },

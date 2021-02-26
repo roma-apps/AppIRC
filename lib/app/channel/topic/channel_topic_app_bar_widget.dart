@@ -57,7 +57,10 @@ class ChannelTopicTitleAppBarWidget extends StatelessWidget {
                 ),
               );
             } else {
-              return ChatAppBarWidget(channelName, subTitleText);
+              return ChatAppBarWidget(
+                channelName,
+                subTitleText,
+              );
             }
           },
         );

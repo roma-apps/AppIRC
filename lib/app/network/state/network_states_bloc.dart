@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/list/network_list_listener_bloc.dart';
@@ -11,7 +12,7 @@ import 'package:rxdart/subjects.dart';
 var _logger = Logger("network_states_bloc.dart");
 
 class NetworkStatesBloc extends NetworkListListenerBloc {
-  final ChatBackendService _backendService;
+  final ChatBackendService backendService;
   final Map<String, BehaviorSubject<NetworkState>> _states = {};
 
   Stream<NetworkState> getNetworkStateStream(Network network) =>
@@ -22,8 +23,10 @@ class NetworkStatesBloc extends NetworkListListenerBloc {
 
   String _calculateNetworkKey(Network network) => network.remoteId;
 
-  NetworkStatesBloc(this._backendService, NetworkListBloc networksListBloc)
-      : super(networksListBloc);
+  NetworkStatesBloc({
+    @required this.backendService,
+    @required NetworkListBloc networkListBloc,
+  }) : super(networkListBloc: networkListBloc);
 
   @override
   void onNetworkJoined(NetworkWithState networkWithState) {
@@ -33,7 +36,7 @@ class NetworkStatesBloc extends NetworkListListenerBloc {
         BehaviorSubject<NetworkState>.seeded(networkWithState.state);
 
     addDisposable(
-      disposable: _backendService.listenForNetworkState(
+      disposable: backendService.listenForNetworkState(
         network: network,
         currentStateExtractor: () =>
             _states[_calculateNetworkKey(network)].value,
