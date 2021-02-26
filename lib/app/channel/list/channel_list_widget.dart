@@ -164,7 +164,7 @@ class ChannelListWidget extends StatelessWidget {
                       networkBloc: networkBloc,
                       channelBloc: channelBloc,
                       iconColor: isChannelActive
-                          ? IAppIrcUiColorTheme.of(context).primary
+                          ? IAppIrcUiColorTheme.of(context).darkGrey
                           : IAppIrcUiColorTheme.of(context).darkGrey,
                     )
                   ],
@@ -188,8 +188,8 @@ class ChannelListWidget extends StatelessWidget {
         return buildConnectionIcon(
           context,
           isChannelActive
-              ? IAppIrcUiColorTheme.of(context).primary
-              : IAppIrcUiColorTheme.of(context).white,
+              ? IAppIrcUiColorTheme.of(context).darkGrey
+              : IAppIrcUiColorTheme.of(context).darkGrey,
           networkConnected && channelConnected,
         );
       },
@@ -220,7 +220,7 @@ class ChannelListWidget extends StatelessWidget {
               channel.name,
               style: isChannelActive
                   ? IAppIrcUiTextTheme.of(context).mediumBoldDarkGrey
-                  : IAppIrcUiTextTheme.of(context).mediumBoldWhite,
+                  : IAppIrcUiTextTheme.of(context).mediumBoldDarkGrey,
             ),
           ),
         ),
@@ -238,8 +238,8 @@ class ChannelListWidget extends StatelessWidget {
       child: Icon(
         iconData,
         color: isChannelActive
-            ? IAppIrcUiColorTheme.of(context).primary
-            : IAppIrcUiColorTheme.of(context).white,
+            ? IAppIrcUiColorTheme.of(context).darkGrey
+            : IAppIrcUiColorTheme.of(context).darkGrey,
       ),
     );
   }

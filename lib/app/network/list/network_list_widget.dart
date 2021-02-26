@@ -188,8 +188,8 @@ class NetworkListWidget extends StatelessWidget {
     var rowContainer = Container(
       decoration: BoxDecoration(
         color: isChannelActive
-            ? IAppIrcUiColorTheme.of(context).lightGrey
-            : IAppIrcUiColorTheme.of(context).darkGrey,
+            ? IAppIrcUiColorTheme.of(context).darkGrey
+            : IAppIrcUiColorTheme.of(context).lightGrey,
       ),
       child: row,
     );
@@ -227,7 +227,10 @@ class NetworkListWidget extends StatelessWidget {
           }
           Channel channel = networkBloc.network.lobbyChannel;
 
-          var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(context);
+          var activeChannelBloc = Provider.of<ChatActiveChannelBloc>(
+            context,
+            listen: false,
+          );
 
           await activeChannelBloc.changeActiveChanel(channel);
         },
