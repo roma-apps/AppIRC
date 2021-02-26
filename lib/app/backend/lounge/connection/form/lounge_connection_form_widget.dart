@@ -209,12 +209,12 @@ class LoungeConnectionFormWidget extends StatelessWidget {
           ),
         ),
         _buildLoginButton(context),
-        _buildSwitchToRegistrationButton(context),
+        _buildSwitchToSignUpButton(context),
       ],
     );
   }
 
-  Widget _buildSwitchToRegistrationButton(BuildContext context) {
+  Widget _buildSwitchToSignUpButton(BuildContext context) {
     LoungeConnectionBloc connectionBloc = Provider.of(context);
     return StreamBuilder<bool>(
       stream: connectionBloc.isRegistrationSupportedStream,
@@ -349,7 +349,7 @@ class LoungeConnectionFormWidget extends StatelessWidget {
           ),
         ),
         _buildRegisterButton(context),
-        _buildSwitchToRegisterButton(context),
+        _buildSwitchToSignInButton(context),
       ],
     );
   }
@@ -472,7 +472,7 @@ class LoungeConnectionFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSwitchToRegisterButton(BuildContext context) {
+  Widget _buildSwitchToSignInButton(BuildContext context) {
     LoungeConnectionBloc connectionBloc = Provider.of(context);
     return PlatformButton(
       onPressed: () {

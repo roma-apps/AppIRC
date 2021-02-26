@@ -75,10 +75,9 @@ class LoungeConnectionBloc extends DisposableOwner {
       );
 
   bool _extractIsRegistrationSupported(LoungeConnectDetails hostInformation) {
-    return hostInformation?.connected == true ??
-        hostInformation
-                ?.privatePart?.signUpAvailableResponseBody?.signUpAvailable ==
-            true;
+    return hostInformation
+            ?.privatePart?.signUpAvailableResponseBody?.signUpAvailable ==
+        true;
   }
 
   void onAuthPreferencesChanged(LoungeAuthPreferences authPreferences) {
