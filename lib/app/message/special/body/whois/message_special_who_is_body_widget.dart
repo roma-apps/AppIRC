@@ -29,40 +29,49 @@ class WhoIsSpecialMessageBodyWidget
     var child = Column(
       children: <Widget>[
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_hostmask,
           "${body.ident}@${body.hostname}",
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_actual_hostname,
           actualHostNameValue,
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_real_name,
           body.realName,
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_channels,
           body.channels,
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_secure_connection,
           body.secure.toString(),
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_connected_to,
           "${body.server} (${body.serverInfo})",
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_account,
           body.account,
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_connected_at,
           regularDateFormatter.format(
             body.logonTime,
           ),
         ),
         _buildWhoIsRow(
+          context,
           S.of(context).chat_message_special_who_is_idle_since,
           regularDateFormatter.format(
             body.idleTime,
@@ -130,7 +139,7 @@ Widget _buildWhoIsSpecialMessageHeaderWidget({
   return buildMessageRichText(spans);
 }
 
-Widget _buildWhoIsRow(String label, String value) {
+Widget _buildWhoIsRow(BuildContext context, String label, String value) {
   if (value != null) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -145,6 +154,9 @@ Widget _buildWhoIsRow(String label, String value) {
             child: Text(
               value,
               softWrap: true,
+              style: IAppIrcUiTextTheme.of(context)
+                  .mediumDarkGrey
+                  .copyWith(fontFamily: messagesFontFamily),
             ),
           )
         ],

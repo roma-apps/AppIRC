@@ -3,6 +3,7 @@ import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/special/body/message_special_body_widget.dart';
 import 'package:flutter_appirc/app/message/special/body/text/message_special_text_body_model.dart';
 import 'package:flutter_appirc/app/message/special/message_special_model.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 
 class TextSpecialMessageBodyWidget
     extends SpecialMessageBodyWidget<TextSpecialMessageBody> {
@@ -21,7 +22,12 @@ class TextSpecialMessageBodyWidget
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Text(body.message),
+      child: Text(
+        body.message,
+        style: IAppIrcUiTextTheme.of(context)
+            .mediumDarkGrey
+            .copyWith(fontFamily: messagesFontFamily),
+      ),
     );
   }
 

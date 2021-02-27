@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/app/user/user_widget.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
@@ -14,6 +15,7 @@ SpanBuilder buildNicknameSpanHighlighter({
   return SpanBuilder(
     highlightString: nickname,
     highlightTextStyle: IAppIrcUiTextTheme.of(context).mediumDarkGrey.copyWith(
+          fontFamily: messagesFontFamily,
           color: nickNamesBloc.getColorForNick(
             nickname,
           ),

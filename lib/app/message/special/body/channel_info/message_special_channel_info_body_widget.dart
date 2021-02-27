@@ -80,7 +80,9 @@ class ChannelInfoSpecialMessageBodyWidget
       },
       child: Text(
         channelName,
-        style: IAppIrcUiTextTheme.of(context).mediumPrimary,
+        style: IAppIrcUiTextTheme.of(context).mediumPrimary.copyWith(
+            fontFamily: messagesFontFamily
+        ),
       ),
     );
   }
@@ -111,7 +113,9 @@ class ChannelInfoSpecialMessageBodyWidget
     var spans = createSpans(
       context: context,
       text: topic,
-      defaultTextStyle: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+      defaultTextStyle: IAppIrcUiTextTheme.of(context).mediumDarkGrey.copyWith(
+          fontFamily: messagesFontFamily
+      ),
       spanBuilders: spanBuilders,
     );
     return Padding(

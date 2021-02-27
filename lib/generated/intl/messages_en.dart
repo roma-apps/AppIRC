@@ -82,7 +82,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "chat_channel_topic_dialog_field_edit_label" : MessageLookupByLibrary.simpleMessage("Topic"),
     "chat_channel_topic_dialog_title" : m0,
     "chat_message_action_copy" : MessageLookupByLibrary.simpleMessage("Copy text body"),
-    "chat_message_condensed_join_separator" : MessageLookupByLibrary.simpleMessage(","),
+    "chat_message_condensed_join_separator" : MessageLookupByLibrary.simpleMessage(", "),
     "chat_message_preview_error_server" : MessageLookupByLibrary.simpleMessage("Server failed to fetch preview metadata"),
     "chat_message_preview_loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
     "chat_message_preview_title" : MessageLookupByLibrary.simpleMessage("Preview"),

@@ -137,7 +137,9 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
       child: Text(
         textString,
         softWrap: true,
-        style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+        style: IAppIrcUiTextTheme.of(context).mediumDarkGrey.copyWith(
+              fontFamily: messagesFontFamily,
+            ),
       ),
     );
   }

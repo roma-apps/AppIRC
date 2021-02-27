@@ -18,6 +18,8 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
+const messagesFontFamily = "CourierNew";
+
 var _logger = Logger("message_widget.dart");
 
 enum MessageWidgetType { formatted, raw }
@@ -134,8 +136,12 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
         _logger.fine(() => "StreamBuilder messageState =$message");
         return Container(
-            decoration: _createMessageDecoration(context: context),
-            child: buildMessageBody(context, message));
+          decoration: _createMessageDecoration(context: context),
+          child: buildMessageBody(
+            context,
+            message,
+          ),
+        );
       },
     );
   }
@@ -155,7 +161,7 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
 
     if (isHighlightByServer ??= false) {
       decoration = BoxDecoration(
-        color: IAppIrcUiColorTheme.of(context).primaryDark,
+        color: IAppIrcUiColorTheme.of(context).lightGrey,
       );
     }
 
@@ -173,7 +179,10 @@ WidgetSpan buildHighlightedNicknameButtonWidgetSpan({
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: buildUserNickWithPopupMenu(
-          context: context, nick: nick, actionCallback: null),
+        context: context,
+        nick: nick,
+        actionCallback: null,
+      ),
     ),
   );
 }
@@ -208,6 +217,7 @@ TextSpan buildMessageDateTextSpan({
     text: "$dateString",
     style: IAppIrcUiTextTheme.of(context).mediumDarkGrey.copyWith(
           color: color,
+          fontFamily: messagesFontFamily,
         ),
   );
   return dateTextSpan;
@@ -233,26 +243,32 @@ Widget buildMessageRawBody(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       Align(
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: buildMessageDateWidget(
-                context, _dateFormatter.format(message.date)),
-          )),
-      Card(
-          child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SelectableText(
-          text,
-          toolbarOptions: ToolbarOptions(
-            copy: true,
-            selectAll: true,
-            cut: false,
-            paste: false,
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: buildMessageDateWidget(
+            context,
+            _dateFormatter.format(message.date),
           ),
-          style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
         ),
-      )),
+      ),
+      Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SelectableText(
+            text,
+            toolbarOptions: ToolbarOptions(
+              copy: true,
+              selectAll: true,
+              cut: false,
+              paste: false,
+            ),
+            style: IAppIrcUiTextTheme.of(context)
+                .mediumDarkGrey
+                .copyWith(fontFamily: messagesFontFamily),
+          ),
+        ),
+      ),
     ],
   );
 }

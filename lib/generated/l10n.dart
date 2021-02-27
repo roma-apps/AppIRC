@@ -1305,10 +1305,10 @@ class S {
     );
   }
 
-  /// `,`
+  /// `, `
   String get chat_message_condensed_join_separator {
     return Intl.message(
-      ',',
+      ', ',
       name: 'chat_message_condensed_join_separator',
       desc: '',
       args: [],

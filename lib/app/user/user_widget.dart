@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
+import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_appirc/colored_nicknames/colored_nicknames_bloc.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
@@ -18,6 +19,7 @@ Widget buildUserNickWithPopupMenu({
   Widget child = Text(
     nick,
     style: IAppIrcUiTextTheme.of(context).mediumDarkGrey.copyWith(
+          fontFamily: messagesFontFamily,
           color: nickNamesBloc.getColorForNick(
             nick,
           ),

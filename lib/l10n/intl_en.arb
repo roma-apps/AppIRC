@@ -128,7 +128,7 @@
     "chat_message_title_simple": "Message",
     "chat_message_title_from": "Message from {user}",
     "chat_message_action_copy": "Copy text body",
-    "chat_message_condensed_join_separator": ",",
+    "chat_message_condensed_join_separator": ", ",
     "chat_message_special_channels_list_users": "{users} users",
     "chat_message_special_who_is_hostmask": "Hostmask:",
     "chat_message_special_who_is_actual_hostname": "Actual hostname:",

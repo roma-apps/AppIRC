@@ -337,7 +337,9 @@ class _MessageListWidgetState extends State<MessageListWidget> {
               child: Text(
                 S.of(context).chat_messages_list_empty_connected,
                 textAlign: TextAlign.center,
-                style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+                style: IAppIrcUiTextTheme.of(context)
+                    .mediumDarkGrey
+                    .copyWith(fontFamily: messagesFontFamily),
               ),
             ),
           );
@@ -348,7 +350,9 @@ class _MessageListWidgetState extends State<MessageListWidget> {
               child: Text(
                 S.of(context).chat_messages_list_empty_not_connected,
                 textAlign: TextAlign.center,
-                style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+                style: IAppIrcUiTextTheme.of(context)
+                    .mediumDarkGrey
+                    .copyWith(fontFamily: messagesFontFamily),
               ),
             ),
           );

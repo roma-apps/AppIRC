@@ -34,11 +34,15 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
         return _buildFormattedBody(context);
         break;
       case MessageWidgetType.raw:
-        return buildMessageRawBody(context, message, getBodyRawText(context));
+        return buildMessageRawBody(
+          context,
+          message,
+          getBodyRawText(context),
+        );
         break;
 
       default:
-        throw "Invalud message widget type $messageWidgetType";
+        throw "Invalid message widget type $messageWidgetType";
     }
   }
 
@@ -85,10 +89,13 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
     isNeedDisplayText = _calculateIsNeedToDisplayMessageText(message);
 
     if (isNeedDisplayText) {
-      spans.addAll(createMessageTextSpans(
+      spans.addAll(
+        createMessageTextSpans(
           context: context,
           message: message,
-          isHighlightedBySearch: messageInListState.inSearchResult));
+          isHighlightedBySearch: messageInListState.inSearchResult,
+        ),
+      );
     }
 
     if (message.previews?.isNotEmpty == true) {
@@ -122,7 +129,9 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
       spans.add(
         TextSpan(
           text: "${params.join(_paramsMessageBodyTextSeparator)}",
-          style: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+          style: IAppIrcUiTextTheme.of(context)
+              .mediumDarkGrey
+              .copyWith(fontFamily: messagesFontFamily),
         ),
       );
     }
@@ -160,7 +169,9 @@ class RegularMessageWidget extends MessageWidget<RegularMessage> {
         createSpans(
           context: context,
           text: text,
-          defaultTextStyle: IAppIrcUiTextTheme.of(context).mediumDarkGrey,
+          defaultTextStyle: IAppIrcUiTextTheme.of(context)
+              .mediumDarkGrey
+              .copyWith(fontFamily: messagesFontFamily),
           spanBuilders: spanBuilders,
         ),
       );
@@ -177,7 +188,9 @@ TextSpan buildMessageTitleTextSpan({
 }) {
   return TextSpan(
     text: "$title ",
-    style: IAppIrcUiTextTheme.of(context).mediumBoldDarkGrey,
+    style: IAppIrcUiTextTheme.of(context)
+        .mediumBoldDarkGrey
+        .copyWith(fontFamily: messagesFontFamily),
   );
 }
 
