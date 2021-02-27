@@ -41,18 +41,28 @@ class ChatAppBarWidget extends StatelessWidget {
   }
 }
 
-Widget _buildSubTitle(BuildContext context, String subTitle) => Text(
-      subTitle,
-      overflow: TextOverflow.fade,
-      softWrap: false,
-      style: IAppIrcUiTextTheme.of(context)
-          .bigTallBoldLightGrey
-          .copyWith(color: Colors.white),
-    );
+Widget _buildSubTitle(BuildContext context, String subTitle) {
+  var platformProviderState = PlatformProvider.of(context);
+  return Text(
+    subTitle,
+    overflow: TextOverflow.fade,
+    softWrap: false,
+    style: IAppIrcUiTextTheme.of(context).bigBoldPrimary.copyWith(
+          color: platformProviderState.platform == TargetPlatform.android
+              ? Colors.white
+              : IAppIrcUiColorTheme.of(context).primary,
+        ),
+  );
+}
 
-Widget _buildTitle(BuildContext context, String title) => Text(
-      title,
-      style: IAppIrcUiTextTheme.of(context).bigTallLightGrey.copyWith(
-            color: Colors.white,
-          ),
-    );
+Widget _buildTitle(BuildContext context, String title) {
+  var platformProviderState = PlatformProvider.of(context);
+  return Text(
+    title,
+    style: IAppIrcUiTextTheme.of(context).bigPrimary.copyWith(
+          color: platformProviderState.platform == TargetPlatform.android
+              ? Colors.white
+              : IAppIrcUiColorTheme.of(context).primary,
+        ),
+  );
+}
