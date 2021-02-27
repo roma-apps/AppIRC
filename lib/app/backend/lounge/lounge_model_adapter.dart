@@ -63,24 +63,27 @@ ChatInitInformation toChatInitInformation(
 ChatConfig toChatConfig({
   @required ConfigurationLoungeResponseBody loungeConfig,
   @required List<String> commands,
-}) =>
-    ChatConfig(
-      defaultNetwork: NetworkConnectionPreferences(
-        serverPreferences: NetworkServerPreferences(
+}) {
+  var networkServerPreferences = NetworkServerPreferences(
           name: loungeConfig.defaults.name,
           serverHost: loungeConfig.defaults.host,
           serverPort: loungeConfig.defaults.port.toString(),
           useTls: loungeConfig.defaults.tls,
           useOnlyTrustedCertificates: loungeConfig.defaults.rejectUnauthorized,
-        ),
-        userPreferences: NetworkUserPreferences(
+        );
+  var networkUserPreferences = NetworkUserPreferences(
           nickname: loungeConfig.defaults.nick,
           realName: loungeConfig.defaults.realname,
           username: loungeConfig.defaults.username,
           password: loungeConfig.defaults.password,
           commands: null,
-        ),
-      ),
+        );
+  var networkConnectionPreferences = NetworkConnectionPreferences(
+        serverPreferences: networkServerPreferences,
+        userPreferences: networkUserPreferences,
+      );
+  return ChatConfig(
+      defaultNetwork: networkConnectionPreferences,
       defaultChannels: loungeConfig.defaults.join,
       fileUpload: loungeConfig.fileUpload,
       displayNetwork: loungeConfig.displayNetwork,
@@ -92,6 +95,7 @@ ChatConfig toChatConfig({
       fileUploadMaxSizeInBytes: loungeConfig.fileUploadMaxFileSize,
       commands: commands,
     );
+}
 
 ChatMessage toChatMessage(
   Channel channel,

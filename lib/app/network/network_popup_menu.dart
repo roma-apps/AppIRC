@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_appirc/app/async/async_operation_helper.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/network/join_channel/network_join_channel_page.dart';
 import 'package:flutter_appirc/app/network/network_bloc.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/preferences/page/network_edit_preferences_page.dart';
+import 'package:flutter_appirc/app/network/preferences/server/network_server_preferences_model.dart';
+import 'package:flutter_appirc/app/network/preferences/user/network_user_preferences_model.dart';
 import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:flutter_appirc/platform_aware/platform_aware_popup_menu_widget.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -159,28 +162,60 @@ PlatformAwarePopupMenuAction _buildEditAction(
   return PlatformAwarePopupMenuAction(
     text: S.of(context).chat_network_action_edit,
     iconData: Icons.edit,
-    actionCallback: (action) {
+    actionCallback: (action) async {
+      var dialogResult = await AsyncOperationHelper.performAsyncOperation(
+        context: context,
+        asyncCode: () => backendService.getNetworkInfo(
+          uuid: networkBloc.network.remoteId,
+        ),
+      );
+
+      var connectionPreferences = networkBloc.network.connectionPreferences;
+
+      if (dialogResult.success) {
+        var loungeNetwork = dialogResult.result;
+        connectionPreferences = NetworkConnectionPreferences(
+          serverPreferences: NetworkServerPreferences(
+            name: loungeNetwork.name,
+            serverHost: loungeNetwork.host,
+            serverPort: loungeNetwork.port.toString(),
+            useTls: loungeNetwork.tls,
+            useOnlyTrustedCertificates: loungeNetwork.rejectUnauthorized,
+          ),
+          userPreferences: NetworkUserPreferences(
+            nickname: loungeNetwork.nick,
+            password: loungeNetwork.password,
+            commands: null,
+            realName: loungeNetwork.realname,
+            username: loungeNetwork.username,
+          ),
+        );
+      }
+
       var titleText = S.of(context).irc_connection_edit_title;
       var buttonText = S.of(context).irc_connection_edit_action_save;
 
-      Navigator.push(
+      await Navigator.push(
         context,
         platformPageRoute(
           context: context,
-          builder: (_) => Provider<NetworkBloc>.value(
-            value: networkBloc,
-            child: EditNetworkPreferencesPage(
-              startValues: NetworkPreferences(
-                networkBloc.network.connectionPreferences,
-                [],
+          builder: (_) {
+            return Provider<NetworkBloc>.value(
+              value: networkBloc,
+              child: EditNetworkPreferencesPage(
+                startValues: NetworkPreferences(
+                  connectionPreferences,
+                  [],
+                ),
+                titleText: titleText,
+                buttonText: buttonText,
+                serverPreferencesEnabled:
+                    !backendService.chatConfig.lockNetwork,
+                serverPreferencesVisible:
+                    backendService.chatConfig.displayNetwork,
               ),
-              titleText: titleText,
-              buttonText: buttonText,
-              serverPreferencesEnabled: !backendService.chatConfig.lockNetwork,
-              serverPreferencesVisible:
-                  backendService.chatConfig.displayNetwork,
-            ),
-          ),
+            );
+          },
         ),
       );
     },

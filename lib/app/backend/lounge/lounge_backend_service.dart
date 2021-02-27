@@ -174,7 +174,6 @@ class LoungeBackendService extends DisposableOwner
       // maybe bug in socket io lib
     });
 
-
     loungeBackendConnectBloc = LoungeBackendConnectBloc(
       loungeBackendSocketIoApiWrapperBloc: socketIoApiWrapperBloc,
       loungeAuthPreferences: loungePreferences.authPreferences,
@@ -1638,6 +1637,11 @@ class LoungeBackendService extends DisposableOwner
       isNeedAddRequestToPending: false,
     );
   }
+
+  @override
+  Future<NetworkLoungeResponseBodyPart> getNetworkInfo(
+          {@required String uuid}) =>
+      socketIoApiWrapperBloc.sendNetworkGetAndWaitForResponse(uuid: uuid);
 }
 
 IDisposable _createEventListenerDisposable({

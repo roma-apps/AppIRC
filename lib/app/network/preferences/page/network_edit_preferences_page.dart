@@ -30,7 +30,10 @@ class EditNetworkPreferencesPage extends NetworkPreferencesPage {
     BuildContext context,
     NetworkPreferences preferences,
   ) async {
-    final NetworkBloc networkBloc = NetworkBloc.of(context);
+    final NetworkBloc networkBloc = NetworkBloc.of(
+      context,
+      listen: false,
+    );
 
     var result = await doAsyncOperationWithDialog(
       context: context,

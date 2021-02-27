@@ -1990,23 +1990,35 @@ class NetworkLoungeResponseBody extends LoungeResponseBody {
 
 @JsonSerializable()
 class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
-  final String uuid;
-  final String name;
+  final List<dynamic> commands;
+  final bool hasSTSPolicy;
   final String host;
+  final String leaveMessage;
+  final String name;
+  final String nick;
+  final String password;
   final int port;
+  final String realname;
+  final bool rejectUnauthorized;
+
+  final String sasl;
+  final String saslAccount;
+  final String saslPassword;
+
   final bool tls;
 
+  final String username;
+
+  final String uuid;
+
   bool get userDisconnected => status.connected != true;
-  final bool rejectUnauthorized;
   final bool isCollapsed;
   final bool isJoinChannelShown;
-  final String nick;
-  final String username;
-  final String realname;
-  final List<dynamic> commands;
   final List<ChannelLoungeResponseBodyPart> channels;
   final NetworkServerOptionsLoungeResponseBodyPart serverOptions;
   final NetworkStatusLoungeResponseBody status;
+
+
 
   const NetworkLoungeResponseBodyPart({
     @required this.uuid,
@@ -2024,66 +2036,89 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
     @required this.channels,
     @required this.serverOptions,
     @required this.status,
+    @required this.leaveMessage,
+    @required this.hasSTSPolicy,
+    @required this.sasl,
+    @required this.saslAccount,
+    @required this.saslPassword,
+    @required this.password,
   });
+
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is NetworkLoungeResponseBodyPart &&
           runtimeType == other.runtimeType &&
-          uuid == other.uuid &&
-          name == other.name &&
+          commands == other.commands &&
+          hasSTSPolicy == other.hasSTSPolicy &&
           host == other.host &&
+          leaveMessage == other.leaveMessage &&
+          name == other.name &&
+          nick == other.nick &&
+          password == other.password &&
           port == other.port &&
-          tls == other.tls &&
-          userDisconnected == other.userDisconnected &&
+          realname == other.realname &&
           rejectUnauthorized == other.rejectUnauthorized &&
+          sasl == other.sasl &&
+          saslAccount == other.saslAccount &&
+          saslPassword == other.saslPassword &&
+          tls == other.tls &&
+          username == other.username &&
+          uuid == other.uuid &&
           isCollapsed == other.isCollapsed &&
           isJoinChannelShown == other.isJoinChannelShown &&
-          nick == other.nick &&
-          username == other.username &&
-          realname == other.realname &&
-          commands == other.commands &&
           channels == other.channels &&
           serverOptions == other.serverOptions &&
           status == other.status;
 
   @override
   int get hashCode =>
-      uuid.hashCode ^
-      name.hashCode ^
+      commands.hashCode ^
+      hasSTSPolicy.hashCode ^
       host.hashCode ^
+      leaveMessage.hashCode ^
+      name.hashCode ^
+      nick.hashCode ^
+      password.hashCode ^
       port.hashCode ^
-      tls.hashCode ^
-      userDisconnected.hashCode ^
+      realname.hashCode ^
       rejectUnauthorized.hashCode ^
+      sasl.hashCode ^
+      saslAccount.hashCode ^
+      saslPassword.hashCode ^
+      tls.hashCode ^
+      username.hashCode ^
+      uuid.hashCode ^
       isCollapsed.hashCode ^
       isJoinChannelShown.hashCode ^
-      nick.hashCode ^
-      username.hashCode ^
-      realname.hashCode ^
-      commands.hashCode ^
       channels.hashCode ^
       serverOptions.hashCode ^
       status.hashCode;
 
+
   @override
   String toString() {
-    return 'NetworkLoungeResponseBody{'
-        'uuid: $uuid, '
-        'name: $name,'
+    return 'NetworkLoungeResponseBodyPart{'
+        'commands: $commands, '
+        'hasSTSPolicy: $hasSTSPolicy, '
         'host: $host, '
+        'leaveMessage: $leaveMessage, '
+        'name: $name, '
+        'nick: $nick, '
+        'password: $password, '
         'port: $port, '
-        'lts: $tls, '
-        'userDisconnected: $userDisconnected, '
+        'realname: $realname, '
         'rejectUnauthorized: $rejectUnauthorized, '
+        'sasl: $sasl, '
+        'saslAccount: $saslAccount, '
+        'saslPassword: $saslPassword, '
+        'tls: $tls, '
+        'username: $username, '
+        'uuid: $uuid, '
         'isCollapsed: $isCollapsed, '
         'isJoinChannelShown: $isJoinChannelShown, '
-        'nick: $nick, '
-        'username: $username, '
-        'realname: $realname, '
-        'commands: $commands, '
-        'channels: $channels,'
+        'channels: $channels, '
         'serverOptions: $serverOptions, '
         'status: $status'
         '}';

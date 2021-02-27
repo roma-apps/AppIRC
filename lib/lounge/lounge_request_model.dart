@@ -86,6 +86,13 @@ abstract class LoungeRawRequest<T> extends LoungeRequest {
 
   const LoungeRawRequest({@required this.body});
 }
+class LoungeNetworkGetRawRequest extends LoungeRawRequest<String> {
+  @override
+  String get eventName => RequestLoungeEventNames.networkGet;
+
+  LoungeNetworkGetRawRequest({@required String uuid}): super(body: uuid);
+
+}
 
 class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
   const ChannelOpenedLoungeRawRequest({

@@ -276,6 +276,31 @@ class LoungeBackendSocketIoApiWrapperBloc {
         ),
       );
 
+  Future sendNetworkGet({
+    @required String uuid,
+  }) =>
+      sendRequest(
+        LoungeNetworkGetRawRequest(
+          uuid: uuid,
+        ),
+      );
+
+  Future<NetworkLoungeResponseBodyPart> sendNetworkGetAndWaitForResponse({
+    @required String uuid,
+  }) {
+    NetworkLoungeResponseBodyPart handled;
+
+    return socketIOInstanceBloc.doSomethingAndWaitForResult(
+      listenDisposable: listenForNetworkInfo(
+        (NetworkLoungeResponseBodyPart data) => handled = data,
+      ),
+      action: () => sendNetworkGet(
+        uuid: uuid,
+      ),
+      resultChecker: () async => handled,
+    );
+  }
+
   Future sendNetworkEdit({
     @required String uuid,
     @required String host,
@@ -901,6 +926,15 @@ class LoungeBackendSocketIoApiWrapperBloc {
         eventName: NetworkLoungeResponseBody.eventName,
         listener: (json) => listener(
           NetworkLoungeResponseBody.fromJson(json),
+        ),
+      );
+
+  IDisposable listenForNetworkInfo(
+          Function(NetworkLoungeResponseBodyPart) listener) =>
+      listenJsonEvent(
+        eventName: LoungeResponseEventNames.networkInfo,
+        listener: (json) => listener(
+          NetworkLoungeResponseBodyPart.fromJson(json),
         ),
       );
 

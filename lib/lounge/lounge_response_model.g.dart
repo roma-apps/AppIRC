@@ -795,24 +795,36 @@ NetworkLoungeResponseBodyPart _$NetworkLoungeResponseBodyPartFromJson(
         ? null
         : NetworkStatusLoungeResponseBody.fromJson(
             json['status'] as Map<String, dynamic>),
+    leaveMessage: json['leaveMessage'] as String,
+    hasSTSPolicy: json['hasSTSPolicy'] as bool,
+    sasl: json['sasl'] as String,
+    saslAccount: json['saslAccount'] as String,
+    saslPassword: json['saslPassword'] as String,
+    password: json['password'] as String,
   );
 }
 
 Map<String, dynamic> _$NetworkLoungeResponseBodyPartToJson(
         NetworkLoungeResponseBodyPart instance) =>
     <String, dynamic>{
-      'uuid': instance.uuid,
-      'name': instance.name,
+      'commands': instance.commands,
+      'hasSTSPolicy': instance.hasSTSPolicy,
       'host': instance.host,
+      'leaveMessage': instance.leaveMessage,
+      'name': instance.name,
+      'nick': instance.nick,
+      'password': instance.password,
       'port': instance.port,
-      'tls': instance.tls,
+      'realname': instance.realname,
       'rejectUnauthorized': instance.rejectUnauthorized,
+      'sasl': instance.sasl,
+      'saslAccount': instance.saslAccount,
+      'saslPassword': instance.saslPassword,
+      'tls': instance.tls,
+      'username': instance.username,
+      'uuid': instance.uuid,
       'isCollapsed': instance.isCollapsed,
       'isJoinChannelShown': instance.isJoinChannelShown,
-      'nick': instance.nick,
-      'username': instance.username,
-      'realname': instance.realname,
-      'commands': instance.commands,
       'channels': instance.channels,
       'serverOptions': instance.serverOptions,
       'status': instance.status,

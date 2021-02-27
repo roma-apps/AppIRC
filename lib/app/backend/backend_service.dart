@@ -17,6 +17,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/preferences/network_preferences_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';
+import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 
 typedef void NetworkListener(NetworkWithState network);
 typedef void NetworkConnectionListener(NetworkPreferences networkPreferences);
@@ -51,6 +52,8 @@ abstract class ChatBackendService implements IDisposable {
   Future<RequestResult<bool>> disconnectChat({
     bool waitForResult = false,
   });
+
+  Future<NetworkLoungeResponseBodyPart> getNetworkInfo({@required String uuid});
 
   Future<RequestResult<NetworkWithState>> joinNetwork({
     @required NetworkPreferences networkPreferences,
