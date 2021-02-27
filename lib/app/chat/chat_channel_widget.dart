@@ -7,7 +7,6 @@ import 'package:flutter_appirc/app/message/list/load_more/message_list_load_more
 import 'package:flutter_appirc/app/message/list/message_list_bloc.dart';
 import 'package:flutter_appirc/app/message/list/message_list_widget.dart';
 import 'package:flutter_appirc/disposable/disposable_provider.dart';
-
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -34,13 +33,19 @@ class _ChannelWidgetState extends State<ChannelWidget> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Expanded(
-          child: DisposableProvider<MessageListLoadMoreBloc>(
-            create: (context) =>
-                MessageListLoadMoreBloc(channelBloc, messageListBloc),
-            child: DisposableProvider<MessagesListJumpToNewestBloc>(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: DisposableProvider<MessageListLoadMoreBloc>(
               create: (context) =>
-                  MessagesListJumpToNewestBloc(messageListBloc),
-              child: MessageListWidget(),
+                  MessageListLoadMoreBloc(channelBloc, messageListBloc),
+              child: DisposableProvider<MessagesListJumpToNewestBloc>(
+                create: (context) =>
+                    MessagesListJumpToNewestBloc(messageListBloc),
+                child: MessageListWidget(),
+              ),
             ),
           ),
         ),
