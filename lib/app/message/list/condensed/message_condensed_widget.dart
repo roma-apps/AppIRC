@@ -162,8 +162,8 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
     var messageListItem = widget._condensedMessageListItem;
     messageListItem.isCondensed = !messageListItem.isCondensed;
 
-    ChannelBloc channelBloc = ChannelBloc.of(context);
-    MessageCondensedBloc condensedBloc = Provider.of(context);
+    ChannelBloc channelBloc = ChannelBloc.of(context, listen: false);
+    MessageCondensedBloc condensedBloc = Provider.of(context, listen: false);
 
     condensedBloc.onCondensedStateChanged(channelBloc.channel, messageListItem);
 
