@@ -9,6 +9,6 @@ class ChatDatabaseService extends AsyncInitLoadingBloc {
   @override
   Future internalAsyncInit() async {
     chatDatabase =
-        await $FloorChatDatabase.databaseBuilder('flutter_database.db').build();
+        await $FloorChatDatabase.databaseBuilder('appirc_database.db').build();
   }
 }
