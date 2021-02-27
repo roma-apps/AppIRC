@@ -12,7 +12,7 @@ import 'package:rxdart/subjects.dart';
 
 var _logger = Logger("socket_io_instance_bloc.dart");
 
-const _defaultTimeoutDuration = Duration(seconds: 5);
+const _defaultTimeoutDuration = Duration(seconds: 20);
 const _defaultCheckResultIntervalDuration = Duration(milliseconds: 500);
 
 class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
