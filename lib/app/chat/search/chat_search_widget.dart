@@ -21,9 +21,16 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
   TextEditingController _searchController;
 
   @override
+  void initState() {
+    super.initState();
+
+    _searchController = TextEditingController();
+  }
+
+  @override
   void dispose() {
     super.dispose();
-    _searchController.dispose();
+    _searchController?.dispose();
   }
 
   @override
@@ -72,14 +79,14 @@ class _ChatSearchWidgetState extends State<ChatSearchWidget> {
                 },
                 groupSeparatorBuilder: _buildGroupSeparator,
                 itemBuilder: (context, message) => buildMessageWidget(
-                    message: message,
-                    enableMessageActions: true,
-                    messageWidgetType: MessageWidgetType.formatted,
-                    messageInListState: MessageInListState(
-                      inSearchResult: true,
-                      searchTerm: result.searchTerm,
-                    ),
+                  message: message,
+                  enableMessageActions: true,
+                  messageWidgetType: MessageWidgetType.formatted,
+                  messageInListState: MessageInListState(
+                    inSearchResult: true,
+                    searchTerm: result.searchTerm,
                   ),
+                ),
               );
             } else {
               return Text(
