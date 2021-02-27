@@ -37,6 +37,7 @@ import 'package:flutter_appirc/lounge/upload/lounge_upload_file_helper.dart';
 import 'package:flutter_appirc/socket_io/instance/socket_io_instance_bloc.dart';
 import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:logging/logging.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
 var _logger = Logger("lounge_backend_service.dart");
@@ -53,6 +54,20 @@ class LoungeBackendService extends DisposableOwner
   final LoungePreferences loungePreferences;
   final SocketIOService socketIoService;
   SocketIOInstanceBloc socketIOInstanceBloc;
+
+  bool get isPublicModeAndDisconnected =>
+      chatConfig?.public == true &&
+      connectionState == ChatConnectionState.disconnected;
+
+  Stream<bool> get isPublicModeAndDisconnectedStream => Rx.combineLatest2(
+        chatConfigStream,
+        connectionStateStream,
+        (chatConfig, connectionState) =>
+            chatConfig?.public == true &&
+            connectionState == ChatConnectionState.disconnected,
+      );
+
+  bool publicWasDisconnected = false;
 
   @override
   Stream<bool> get isChatConfigExistStream => chatConfigStream.map(
@@ -153,44 +168,50 @@ class LoungeBackendService extends DisposableOwner
 
     await socketIOInstanceBloc.performAsyncInit();
 
-    socketIOInstanceBloc.simpleConnectionStateStream
-        .listen((simpleConnectionState) {
-      connectionStateSubject.add(
-        mapConnectionState(
-          simpleConnectionState,
-        ),
-      );
-    });
+    addDisposable(
+      streamSubscription:
+          socketIOInstanceBloc.simpleConnectionStateStream.listen(
+        (simpleConnectionState) {
+          var connectionState = mapConnectionState(
+            simpleConnectionState,
+          );
+
+          if (!publicWasDisconnected) {
+            connectionStateSubject.add(
+              connectionState,
+            );
+          }
+
+          if (chatConfig?.public == true &&
+              connectionState == ChatConnectionState.disconnected) {
+            publicWasDisconnected = true;
+          }
+
+        },
+      ),
+    );
 
     socketIoApiWrapperBloc = LoungeBackendSocketIoApiWrapperBloc(
       socketIOInstanceBloc: socketIOInstanceBloc,
     );
 
-    socketIoApiWrapperBloc.listenForInit((init) {
-      _logger.fine(() => "debug init $init");
+    addDisposable(
+      disposable: socketIoApiWrapperBloc.listenForInit(
+        (init) {
+          _logger.fine(() => "debug init $init");
 
-      // TODO: I don't know why. But init not called after reconnection without
-      //  this debug subscription
-      // maybe bug in socket io lib
-    });
+          // TODO: I don't know why. But init not called after reconnection without
+          //  this debug subscription
+          // maybe bug in socket io lib
+        },
+      ),
+    );
 
     loungeBackendConnectBloc = LoungeBackendConnectBloc(
       loungeBackendSocketIoApiWrapperBloc: socketIoApiWrapperBloc,
       loungeAuthPreferences: loungePreferences.authPreferences,
     );
     addDisposable(disposable: loungeBackendConnectBloc);
-    addDisposable(
-      streamSubscription:
-          socketIOInstanceBloc.simpleConnectionStateStream.listen(
-        (socketState) {
-          ChatConnectionState newBackendState = mapConnectionState(socketState);
-
-          _logger.fine(() => "newState socketState $socketState "
-              " newBackendState $newBackendState");
-          connectionStateSubject.add(newBackendState);
-        },
-      ),
-    );
     _logger.fine(() => "init finished");
   }
 

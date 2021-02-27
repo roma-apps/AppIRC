@@ -8,7 +8,7 @@ import 'package:flutter_appirc/disposable/disposable_owner.dart';
 class ChatUploadBloc extends DisposableOwner {
   final LoungeBackendService backendService;
 
-  bool get isUploadSupported => backendService.chatConfig.fileUpload;
+  bool get isUploadSupported => backendService.chatConfig.fileUpload == true;
 
   int get maxUploadSizeInBytes =>
       backendService.chatConfig.fileUploadMaxSizeInBytes;

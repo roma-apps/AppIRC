@@ -1,6 +1,6 @@
 {
     "@@locale": "en",
-    "@@last_modified": "2021-02-20T18:40:43+00:00",
+    "@@last_modified": "2021-02-27T15:52:21+00:00",
     "app_init_fail": "Failed to start app.\nTry restart or re-install app.",
     "dialog_progress_content": "Loading...",
     "dialog_progress_action_cancel": "Cancel",
@@ -27,7 +27,7 @@
     "lounge_preferences_title": "Lounge preferences",
     "lounge_preferences_host_title": "Connection",
     "lounge_preferences_host_field_host_label": "Host",
-    "lounge_preferences_host_field_host_hint": "https://demo.thelounge.chat",
+    "lounge_preferences_host_field_host_hint": "https:\/\/demo.thelounge.chat",
     "lounge_preferences_host_action_connect": "Connect",
     "lounge_preferences_auth_title": "Authentication",
     "lounge_preferences_auth_field_username_label": "Username",
@@ -128,7 +128,6 @@
     "chat_message_title_simple": "Message",
     "chat_message_title_from": "Message from {user}",
     "chat_message_action_copy": "Copy text body",
-    "chat_message_condensed_join_separator": ", ",
     "chat_message_special_channels_list_users": "{users} users",
     "chat_message_special_who_is_hostmask": "Hostmask:",
     "chat_message_special_who_is_actual_hostname": "Actual hostname:",
@@ -193,5 +192,6 @@
     "chat_users_list_search_field_filter_hint": "Nickname",
     "chat_users_list_search_users_not_found": "Users not found",
     "chat_user_action_information": "User information",
-    "chat_user_action_direct_messages": "Direct Messages"
+    "chat_user_action_direct_messages": "Direct Messages",
+    "chat_connection_public_receonnect_not_supported": "Lounge don't support reconnect for public mode.\nClick to sign-out"
 }

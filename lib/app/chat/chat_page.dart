@@ -3,6 +3,7 @@ import 'package:flutter/material.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/channel/channel_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_blocs_bloc.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
@@ -523,10 +524,61 @@ class _ChatPageBodyWidget extends StatelessWidget {
 
           return Provider.value(
             value: activeChannel,
-            child: _ChatPageBodyActiveChannelWidget(),
+            child: Column(
+              children: [
+                _ChatPageBodyPublicModeReconnectWidget(),
+                Expanded(child: _ChatPageBodyActiveChannelWidget()),
+              ],
+            ),
           );
         },
       ),
+    );
+  }
+}
+
+class _ChatPageBodyPublicModeReconnectWidget extends StatelessWidget {
+  const _ChatPageBodyPublicModeReconnectWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var loungeBackendService = Provider.of<LoungeBackendService>(context);
+
+    return StreamBuilder<bool>(
+      stream: loungeBackendService.isPublicModeAndDisconnectedStream,
+      initialData: loungeBackendService.isPublicModeAndDisconnected,
+      builder: (context, snapshot) {
+        var isPublicModeAndDisconnected = snapshot.data;
+        if (isPublicModeAndDisconnected) {
+          return InkWell(
+            onTap: () {
+              loungeBackendService.signOut();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: IAppIrcUiColorTheme.of(context).error,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal:8.0, vertical:4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      S.of(context).chat_connection_public_receonnect_not_supported,
+                      textAlign: TextAlign.center,
+                      style: IAppIrcUiTextTheme.of(context).bigTallWhite,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
     );
   }
 }

@@ -1305,16 +1305,6 @@ class S {
     );
   }
 
-  /// `, `
-  String get chat_message_condensed_join_separator {
-    return Intl.message(
-      ', ',
-      name: 'chat_message_condensed_join_separator',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `{users} users`
   String chat_message_special_channels_list_users(Object users) {
     return Intl.message(
@@ -1980,6 +1970,16 @@ class S {
     return Intl.message(
       'Direct Messages',
       name: 'chat_user_action_direct_messages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lounge don't support reconnect for public mode.\nClick to sign-out`
+  String get chat_connection_public_receonnect_not_supported {
+    return Intl.message(
+      'Lounge don\'t support reconnect for public mode.\nClick to sign-out',
+      name: 'chat_connection_public_receonnect_not_supported',
       desc: '',
       args: [],
     );

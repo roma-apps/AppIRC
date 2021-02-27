@@ -99,7 +99,7 @@ abstract class MessageWidget<T extends ChatMessage> extends StatelessWidget {
   }
 
   void _showMessagePage(BuildContext context) {
-    var channel = ChannelBloc.of(context).channel;
+    var channel = ChannelBloc.of(context, listen: false).channel;
     Navigator.push(
       context,
       platformPageRoute(

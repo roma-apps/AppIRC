@@ -9,7 +9,6 @@ import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/message_widget.dart';
 import 'package:flutter_appirc/app/message/regular/message_regular_model.dart';
 import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
-import 'package:flutter_appirc/generated/l10n.dart';
 import 'package:provider/provider.dart';
 
 class CondensedMessageWidget extends StatefulWidget {
@@ -126,9 +125,7 @@ class _CondensedMessageWidgetState extends State<CondensedMessageWidget> {
             groupedByType[regularType].length,
           ),
         )
-        .join(
-          S.of(context).chat_message_condensed_join_separator,
-        );
+        .join(" ,");
 
     return GestureDetector(
       onTap: () {
