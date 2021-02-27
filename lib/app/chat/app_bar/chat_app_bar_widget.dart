@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appirc/app/ui/theme/appirc_ui_theme_model.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ChatAppBarWidget extends StatelessWidget {
@@ -44,10 +45,14 @@ Widget _buildSubTitle(BuildContext context, String subTitle) => Text(
       subTitle,
       overflow: TextOverflow.fade,
       softWrap: false,
-      // style: IAppIrcUiTextTheme.of(context).bigTallBoldLightGrey,
+      style: IAppIrcUiTextTheme.of(context)
+          .bigTallBoldLightGrey
+          .copyWith(color: Colors.white),
     );
 
 Widget _buildTitle(BuildContext context, String title) => Text(
       title,
-      // style: IAppIrcUiTextTheme.of(context).bigTallLightGrey,
+      style: IAppIrcUiTextTheme.of(context).bigTallLightGrey.copyWith(
+            color: Colors.white,
+          ),
     );
