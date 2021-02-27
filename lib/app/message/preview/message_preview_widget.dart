@@ -45,10 +45,14 @@ Widget buildPreview(
                 ),
               ),
               PlatformIconButton(
-                icon:
-                    Icon(preview.shown ? Icons.expand_less : Icons.expand_more),
+                icon: Icon(preview.shown == true
+                    ? Icons.expand_less
+                    : Icons.expand_more),
                 onPressed: () {
-                  ChannelBloc channelBloc = ChannelBloc.of(context);
+                  ChannelBloc channelBloc = ChannelBloc.of(
+                    context,
+                    listen: false,
+                  );
                   channelBloc.togglePreview(
                     message,
                     preview,
@@ -57,7 +61,7 @@ Widget buildPreview(
               )
             ],
           ),
-          preview.shown
+          preview.shown == true
               ? Padding(
                   padding: const EdgeInsets.symmetric(
                       vertical: 8.0, horizontal: 8.0),

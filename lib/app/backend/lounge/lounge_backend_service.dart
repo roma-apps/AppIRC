@@ -1619,7 +1619,7 @@ class LoungeBackendService extends DisposableOwner
       throw NotImplementedYetLoungeException();
     }
 
-    var shownInverted = !preview.shown;
+    var shownInverted = preview.shown != true;
     preview.shown = shownInverted;
     await _sendRequest(
       request: MsgPreviewToggleLoungeJsonRequest(
