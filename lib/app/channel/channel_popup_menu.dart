@@ -32,10 +32,8 @@ class ChannelPopupMenuButtonWidget extends StatelessWidget {
     var network = networkBloc.network;
 
     if (channel.type == ChannelType.lobby) {
-      return buildNetworkPopupMenuButton(
-        context: context,
+      return NetworkPopupMenuButtonWidget(
         isNeedPadding: isNeedPadding,
-        networkBloc: networkBloc,
         iconColor: iconColor,
       );
     }

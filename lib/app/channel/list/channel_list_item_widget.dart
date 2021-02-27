@@ -77,36 +77,22 @@ class ChannelListItemBodyWidget extends StatelessWidget {
 class ChannelListItemConnectionStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var channel = Provider.of<Channel>(context);
-
-    var chatActiveChannelBloc = ChatActiveChannelBloc.of(context);
-
     var networkBloc = NetworkBloc.of(context);
     var channelBloc = ChannelBloc.of(context);
     return StreamBuilder<bool>(
-      stream: chatActiveChannelBloc.isChannelActiveStream(channel),
-      initialData: chatActiveChannelBloc.isChannelActive(channel),
-      builder: (context, snapshot) {
-        var isChannelActive = snapshot.data;
-        return StreamBuilder<bool>(
-          stream: networkBloc.networkConnectedStream,
-          initialData: networkBloc.networkConnected,
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            var networkConnected = snapshot.data;
+      stream: networkBloc.networkConnectedStream,
+      initialData: networkBloc.networkConnected,
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        var networkConnected = snapshot.data;
 
-            return StreamBuilder(
-              initialData: channelBloc.channelConnected,
-              stream: channelBloc.channelConnectedStream,
-              builder: (context, snapshot) {
-                bool channelConnected = snapshot.data;
-                return buildConnectionIcon(
-                  context,
-                  isChannelActive
-                      ? IAppIrcUiColorTheme.of(context).darkGrey
-                      : IAppIrcUiColorTheme.of(context).darkGrey,
-                  networkConnected && channelConnected,
-                );
-              },
+        return StreamBuilder(
+          initialData: channelBloc.channelConnected,
+          stream: channelBloc.channelConnectedStream,
+          builder: (context, snapshot) {
+            bool channelConnected = snapshot.data;
+            return ChannelConnectionIconWidget(
+              foregroundColor: IAppIrcUiColorTheme.of(context).darkGrey,
+              connected: networkConnected && channelConnected,
             );
           },
         );

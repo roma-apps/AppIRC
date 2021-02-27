@@ -52,11 +52,11 @@ class NetworkBlocsBloc extends NetworkListListenerBloc {
   void onNetworkJoined(NetworkWithState networkWithState) {
     var network = networkWithState.network;
     _blocs[network] = NetworkBloc(
-      backendService,
-      network,
-      networkStatesBloc,
-      channelsStatesBloc,
-      activeChannelBloc,
+      backendService: backendService,
+      network: network,
+      networksStateBloc: networkStatesBloc,
+      channelsStateBloc: channelsStatesBloc,
+      activeChannelBloc: activeChannelBloc,
     );
   }
 

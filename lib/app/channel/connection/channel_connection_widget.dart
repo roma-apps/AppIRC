@@ -3,26 +3,35 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_bloc.dart';
 import 'package:provider/provider.dart';
 
-StreamBuilder<bool> buildConnectionIcon(
-    BuildContext context, Color foregroundColor, bool connected) {
-  ChatConnectionBloc chatConnectionBloc = Provider.of(context);
+class ChannelConnectionIconWidget extends StatelessWidget {
+  final Color foregroundColor;
+  final bool connected;
 
-  return StreamBuilder(
-    stream: chatConnectionBloc.isConnectedStream,
-    initialData: chatConnectionBloc.isConnected,
-    builder: (context, snapshot) {
-      var chatConnected = snapshot.data;
-      if (connected && chatConnected) {
-        return const SizedBox.shrink();
-      } else {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Icon(
-            Icons.cloud_off,
-            color: foregroundColor,
-          ),
-        );
-      }
-    },
-  );
+  const ChannelConnectionIconWidget({
+    @required this.foregroundColor,
+    @required this.connected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var chatConnectionBloc = Provider.of<ChatConnectionBloc>(context);
+    return StreamBuilder(
+      stream: chatConnectionBloc.isConnectedStream,
+      initialData: chatConnectionBloc.isConnected,
+      builder: (context, snapshot) {
+        var chatConnected = snapshot.data;
+        if (connected && chatConnected) {
+          return const SizedBox.shrink();
+        } else {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Icon(
+              Icons.cloud_off,
+              color: foregroundColor,
+            ),
+          );
+        }
+      },
+    );
+  }
 }

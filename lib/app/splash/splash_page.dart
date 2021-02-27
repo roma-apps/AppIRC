@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_appirc/platform_aware/platform_aware_scaffold.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class SplashPage extends StatelessWidget {

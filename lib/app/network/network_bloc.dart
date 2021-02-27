@@ -16,24 +16,24 @@ import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:provider/provider.dart';
 
 class NetworkBloc extends DisposableOwner {
-  final ChatBackendService _backendService;
+  final ChatBackendService backendService;
   final Network network;
-  final NetworkStatesBloc _networksStateBloc;
-  final ChannelStatesBloc _channelsStateBloc;
-  final ChatActiveChannelBloc _activeChannelBloc;
+  final NetworkStatesBloc networksStateBloc;
+  final ChannelStatesBloc channelsStateBloc;
+  final ChatActiveChannelBloc activeChannelBloc;
 
-  NetworkBloc(
-    this._backendService,
-    this.network,
-    this._networksStateBloc,
-    this._channelsStateBloc,
-    this._activeChannelBloc,
-  );
+  NetworkBloc({
+    @required this.backendService,
+    @required this.network,
+    @required this.networksStateBloc,
+    @required this.channelsStateBloc,
+    @required this.activeChannelBloc,
+  });
 
-  NetworkState get _networkState => _networksStateBloc.getNetworkState(network);
+  NetworkState get _networkState => networksStateBloc.getNetworkState(network);
 
   Stream<NetworkState> get _networkStateStream =>
-      _networksStateBloc.getNetworkStateStream(network);
+      networksStateBloc.getNetworkStateStream(network);
 
   NetworkTitle get networkTitle =>
       NetworkTitle(_networkState.name, _networkState.nick);
@@ -65,7 +65,7 @@ class NetworkBloc extends DisposableOwner {
   Future<RequestResult<List<SpecialMessage>>> printNetworkAvailableChannels({
     bool waitForResult = false,
   }) async =>
-      await _backendService.printNetworkAvailableChannels(
+      await backendService.printNetworkAvailableChannels(
         network: network,
         waitForResult: waitForResult,
       );
@@ -73,7 +73,7 @@ class NetworkBloc extends DisposableOwner {
   Future<RequestResult<ChatMessage>> printNetworkIgnoredUsers({
     bool waitForResult = false,
   }) async =>
-      await _backendService.printNetworkIgnoredUsers(
+      await backendService.printNetworkIgnoredUsers(
         network: network,
         waitForResult: waitForResult,
       );
@@ -81,7 +81,7 @@ class NetworkBloc extends DisposableOwner {
   Future<RequestResult<bool>> enableNetwork({
     bool waitForResult = false,
   }) async =>
-      await _backendService.enableNetwork(
+      await backendService.enableNetwork(
         network: network,
         waitForResult: waitForResult,
       );
@@ -89,7 +89,7 @@ class NetworkBloc extends DisposableOwner {
   Future<RequestResult<bool>> disableNetwork({
     bool waitForResult = false,
   }) async =>
-      await _backendService.disableNetwork(
+      await backendService.disableNetwork(
         network: network,
         waitForResult: waitForResult,
       );
@@ -98,8 +98,8 @@ class NetworkBloc extends DisposableOwner {
     NetworkPreferences networkPreferences, {
     bool waitForResult = false,
   }) async =>
-      await _backendService.editNetworkSettings(
-        network:  network,
+      await backendService.editNetworkSettings(
+        network: network,
         networkPreferences: networkPreferences,
         waitForResult: waitForResult,
       );
@@ -114,9 +114,9 @@ class NetworkBloc extends DisposableOwner {
     );
 
     if (alreadyJoinedChannel != null) {
-      await _activeChannelBloc.changeActiveChanel(alreadyJoinedChannel);
+      await activeChannelBloc.changeActiveChanel(alreadyJoinedChannel);
 
-      var channelState = _channelsStateBloc.getChannelState(
+      var channelState = channelsStateBloc.getChannelState(
         network,
         alreadyJoinedChannel,
       );
@@ -131,7 +131,7 @@ class NetworkBloc extends DisposableOwner {
         ),
       );
     } else {
-      return await _backendService.joinChannel(
+      return await backendService.joinChannel(
         network: network,
         channelPreferences: channelPreferences,
         waitForResult: waitForResult,
@@ -142,7 +142,7 @@ class NetworkBloc extends DisposableOwner {
   Future<RequestResult<bool>> leaveNetwork({
     bool waitForResult = false,
   }) async =>
-      await _backendService.leaveNetwork(
+      await backendService.leaveNetwork(
         network: network,
         waitForResult: waitForResult,
       );

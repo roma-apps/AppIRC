@@ -13,32 +13,39 @@ import 'package:provider/provider.dart';
 
 var _logger = Logger("network_popup_menu.dart");
 
-Widget buildNetworkPopupMenuButton({
-  @required BuildContext context,
-  @required NetworkBloc networkBloc,
-  @required Color iconColor,
-  bool isNeedPadding = true,
-}) {
-  return StreamBuilder<bool>(
-    stream: networkBloc.networkConnectedStream,
-    initialData: networkBloc.networkConnected,
-    builder: (context, snapshot) {
-      var connected = snapshot.data ?? false;
-      return createPlatformPopupMenuButton(
-        context,
-        isNeedPadding: isNeedPadding,
-        child: Icon(
-          Icons.more_vert,
-          color: iconColor,
-        ),
-        actions: _buildDropdownItems(
-          context: context,
-          connected: connected,
-          networkBloc: networkBloc,
-        ),
-      );
-    },
-  );
+class NetworkPopupMenuButtonWidget extends StatelessWidget {
+  final Color iconColor;
+  final bool isNeedPadding;
+
+  const NetworkPopupMenuButtonWidget({
+    @required this.iconColor,
+    this.isNeedPadding = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var networkBloc = NetworkBloc.of(context);
+    return StreamBuilder<bool>(
+      stream: networkBloc.networkConnectedStream,
+      initialData: networkBloc.networkConnected,
+      builder: (context, snapshot) {
+        var connected = snapshot.data ?? false;
+        return createPlatformPopupMenuButton(
+          context,
+          isNeedPadding: isNeedPadding,
+          child: Icon(
+            Icons.more_vert,
+            color: iconColor,
+          ),
+          actions: _buildDropdownItems(
+            context: context,
+            connected: connected,
+            networkBloc: networkBloc,
+          ),
+        );
+      },
+    );
+  }
 }
 
 List<PlatformAwarePopupMenuAction> _buildDropdownItems({
