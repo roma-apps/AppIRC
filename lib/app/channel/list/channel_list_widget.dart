@@ -127,8 +127,8 @@ class _ChannelListBodyWidgetItem extends StatelessWidget {
               return Container(
                 decoration: BoxDecoration(
                   color: isChannelActive
-                      ? IAppIrcUiColorTheme.of(context).transparent
-                      : IAppIrcUiColorTheme.of(context).lightGrey,
+                      ? IAppIrcUiColorTheme.of(context).lightGrey
+                      : IAppIrcUiColorTheme.of(context).transparent,
                 ),
                 child: ChannelListItemWidget(
                   onActionCallback: onActionCallback,

@@ -181,9 +181,7 @@ class NetworkListItem extends StatelessWidget {
             buildNetworkPopupMenuButton(
               context: context,
               networkBloc: networkBloc,
-              iconColor: isChannelActive
-                  ? IAppIrcUiColorTheme.of(context).lightGrey
-                  : IAppIrcUiColorTheme.of(context).darkGrey,
+              iconColor: null,
             )
           ],
         ),
@@ -192,8 +190,8 @@ class NetworkListItem extends StatelessWidget {
     var rowContainer = Container(
       decoration: BoxDecoration(
         color: isChannelActive
-            ? IAppIrcUiColorTheme.of(context).darkGrey
-            : IAppIrcUiColorTheme.of(context).lightGrey,
+            ? IAppIrcUiColorTheme.of(context).lightGrey
+            : IAppIrcUiColorTheme.of(context).transparent,
       ),
       child: row,
     );
@@ -210,7 +208,7 @@ class NetworkListItem extends StatelessWidget {
         return buildConnectionIcon(
           context,
           isChannelActive
-              ? IAppIrcUiColorTheme.of(context).lightGrey
+              ? IAppIrcUiColorTheme.of(context).darkGrey
               : IAppIrcUiColorTheme.of(context).darkGrey,
           connected,
         );
@@ -250,7 +248,7 @@ class NetworkListItem extends StatelessWidget {
               child: Text(
                 networkTitle,
                 style: isChannelActive
-                    ? IAppIrcUiTextTheme.of(context).mediumLightGrey
+                    ? IAppIrcUiTextTheme.of(context).mediumDarkGrey
                     : IAppIrcUiTextTheme.of(context).mediumDarkGrey,
               ),
             );
@@ -272,7 +270,7 @@ class NetworkListItem extends StatelessWidget {
       icon: Icon(
         networkExpandedStateIcon,
         color: isChannelActive
-            ? IAppIrcUiColorTheme.of(context).lightGrey
+            ? IAppIrcUiColorTheme.of(context).darkGrey
             : IAppIrcUiColorTheme.of(context).darkGrey,
       ),
       onPressed: () {
