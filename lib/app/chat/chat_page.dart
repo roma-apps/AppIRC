@@ -169,7 +169,10 @@ class _ChatPageConnectionWidget extends StatelessWidget {
           PlatformButton(
             child: Text(S.of(context).chat_state_connection_action_reconnect),
             onPressed: () {
-              var connectionBloc = Provider.of<ChatConnectionBloc>(context);
+              var connectionBloc = Provider.of<ChatConnectionBloc>(
+                context,
+                listen: false,
+              );
               connectionBloc.reconnect();
             },
           )

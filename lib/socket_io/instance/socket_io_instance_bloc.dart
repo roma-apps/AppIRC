@@ -336,7 +336,11 @@ class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
 
   Future connect() {
     assert(isInitialized);
-    assert(connectionState == SocketIoConnectionState.initialized);
+    assert(
+      simpleConnectionState == SimpleSocketIoConnectionState.initialized ||
+      simpleConnectionState == SimpleSocketIoConnectionState.disconnected,
+      "simpleConnectionState $simpleConnectionState",
+    );
     return socketIO.connect();
   }
 

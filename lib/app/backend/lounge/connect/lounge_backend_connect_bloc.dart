@@ -194,23 +194,10 @@ class LoungeBackendConnectBloc extends DisposableOwner {
     addDisposable(
       disposable: loungeBackendSocketIoApiWrapperBloc.listenForAuthStart(
         (auth) {
-          if (chatInit != null) {
-            //   // reconnect
-            //   var authToken = chatInit.authToken;
-            //
-            //   _logger.fine(() => "auth after reconnecting"
-            //       " authToken $authToken"
-            //       " auth $auth");
-            //
-            //   var result = await authAfterReconnect(
-            //       token: authToken,
-            //       activeChannelId: currentChannelExtractor()?.remoteId,
-            //       lastMessageId: await lastMessageRemoteIdExtractor(),
-            // user: loungePreferences?.authPreferences?.username,
-            // waitForResult: true,
-            // );
-            //
-            // _logger.fine(() => "auth after reconnecting result $result");
+          // reconnect in private mode
+          // public mode don't support reconnect to the same socket
+          if (authPerformResponse != null) {
+            login();
           }
         },
       ),
@@ -224,10 +211,11 @@ class LoungeBackendConnectBloc extends DisposableOwner {
             .sendAuthPerformAndWaitForResult(
       user: loungeAuthPreferences.username,
       password: loungeAuthPreferences.password,
-      token: null,
+      token: chatInit?.authToken,
+      // todo: fill all fields
       lastMessageRemoteId: null,
       openChannelRemoteId: null,
-      hasConfig: null,
+      hasConfig: config != null,
     );
 
     authPerformResponseSubject.add(authPerformComplexLoungeResponse);

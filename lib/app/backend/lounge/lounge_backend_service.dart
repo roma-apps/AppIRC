@@ -185,13 +185,6 @@ class LoungeBackendService extends DisposableOwner
         (socketState) {
           ChatConnectionState newBackendState = mapConnectionState(socketState);
 
-          // reconnecting
-          if (newBackendState == ChatConnectionState.connected &&
-              chatInit != null) {
-            // send connect after reconnecting. required by lounge
-            socketIOInstanceBloc.connect();
-          }
-
           _logger.fine(() => "newState socketState $socketState "
               " newBackendState $newBackendState");
           connectionStateSubject.add(newBackendState);
