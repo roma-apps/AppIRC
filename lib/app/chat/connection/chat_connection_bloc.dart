@@ -4,6 +4,9 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger("chat_connection_bloc.dart");
 
 class ChatConnectionBloc extends DisposableOwner {
   final ChatBackendService backendService;
@@ -32,8 +35,8 @@ class ChatConnectionBloc extends DisposableOwner {
   Future reconnect() => _reconnectIfNeeded();
 
   Future _reconnectIfNeeded() async {
-//    _logger.fine(() => "_reconnectIfNeeded = $connectionState "
-//        "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
+   _logger.fine(() => "_reconnectIfNeeded = $connectionState "
+       "backendService.isReadyToConnect = ${backendService.isReadyToConnect}");
     if (connectionState == ChatConnectionState.disconnected) {
       var connectivityResult = await (Connectivity().checkConnectivity());
 

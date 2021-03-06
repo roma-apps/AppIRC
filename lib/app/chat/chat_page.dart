@@ -547,11 +547,11 @@ class _ChatPageBodyPublicModeReconnectWidget extends StatelessWidget {
     var loungeBackendService = Provider.of<LoungeBackendService>(context);
 
     return StreamBuilder<bool>(
-      stream: loungeBackendService.isPublicModeAndDisconnectedStream,
-      initialData: loungeBackendService.isPublicModeAndDisconnected,
+      stream: loungeBackendService.isPublicModeAndDisconnectedAndVersion4Stream,
+      initialData: loungeBackendService.isPublicModeAndDisconnectedAndVersion4,
       builder: (context, snapshot) {
-        var isPublicModeAndDisconnected = snapshot.data;
-        if (isPublicModeAndDisconnected) {
+        var isPublicModeAndDisconnectedAndVersion4 = snapshot.data;
+        if (isPublicModeAndDisconnectedAndVersion4) {
           return InkWell(
             onTap: () {
               loungeBackendService.signOut();
@@ -566,7 +566,7 @@ class _ChatPageBodyPublicModeReconnectWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      S.of(context).chat_connection_public_receonnect_not_supported,
+                      S.of(context).chat_connection_public_reconnectNotSupportedOnTheLounge4x,
                       textAlign: TextAlign.center,
                       style: IAppIrcUiTextTheme.of(context).bigTallWhite,
                     ),

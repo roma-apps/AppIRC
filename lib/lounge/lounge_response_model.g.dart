@@ -26,6 +26,23 @@ Map<String, dynamic> _$MessagePreviewToggleLoungeResponseBodyToJson(
       'shown': instance.shown,
     };
 
+Auth3xLoungeResponseBody _$Auth3xLoungeResponseBodyFromJson(
+    Map<String, dynamic> json) {
+  return Auth3xLoungeResponseBody(
+    success: json['success'] as bool,
+    serverHash: json['serverHash'] as int,
+    signUp: json['signUp'] as bool,
+  );
+}
+
+Map<String, dynamic> _$Auth3xLoungeResponseBodyToJson(
+        Auth3xLoungeResponseBody instance) =>
+    <String, dynamic>{
+      'success': instance.success,
+      'serverHash': instance.serverHash,
+      'signUp': instance.signUp,
+    };
+
 MoreLoungeResponseBody _$MoreLoungeResponseBodyFromJson(
     Map<String, dynamic> json) {
   return MoreLoungeResponseBody(

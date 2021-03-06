@@ -106,6 +106,13 @@ class LoungeBackendSocketIoApiWrapperBloc {
     ComplexLoungeResponseWaitConfig waitConfig =
         ComplexLoungeResponseWaitConfig.defaultValue,
   }) {
+
+    _logger.finest(() => "checkIsComplexWaitFinished "
+        "isRequiredFieldsExist ${complexResponse.isRequiredFieldsExist} "
+        "isOptionalFieldsExist ${complexResponse.isOptionalFieldsExist}\n"
+        "\t complexResponse $complexResponse"
+    );
+
     if (complexResponse == null) {
       return false;
     }
@@ -167,17 +174,24 @@ class LoungeBackendSocketIoApiWrapperBloc {
     LoungeConnectDetailsPrivatePart handledPrivatePart;
 
     disposableOwner.addDisposable(
-        disposable: listenLoungeConnectDetailsPublicPartComplexResponse(
-      (publicPart) {
-        handledPublicPart = publicPart;
-      },
-    ));
+      disposable: listenLoungeConnectDetailsPublicPartComplexResponse(
+        (publicPart) {
+          handledPublicPart = publicPart;
+          _logger.finest(() =>
+              "connectAndWaitForResponse handledPublicPart $handledPublicPart");
+        },
+      ),
+    );
     disposableOwner.addDisposable(
-        disposable: listenLoungeConnectDetailsPrivatePartComplexResponse(
-      (privatePart) {
-        handledPrivatePart = privatePart;
-      },
-    ));
+      disposable: listenLoungeConnectDetailsPrivatePartComplexResponse(
+        (privatePart) {
+          handledPrivatePart = privatePart;
+
+          _logger.finest(() =>
+              "connectAndWaitForResponse handledPrivatePart $handledPrivatePart");
+        },
+      ),
+    );
 
     var connectionState =
         await socketIOInstanceBloc.connectAndWaitForConnectionResult(
@@ -203,6 +217,7 @@ class LoungeBackendSocketIoApiWrapperBloc {
         );
 
         if (isFinished) {
+          _logger.finest(() => "connectAndWaitForResponse finished private");
           return LoungeConnectDetails.private(
             privatePart: handledPrivatePart,
           );
@@ -217,6 +232,7 @@ class LoungeBackendSocketIoApiWrapperBloc {
         );
 
         if (isFinished) {
+          _logger.finest(() => "connectAndWaitForResponse finished public");
           return LoungeConnectDetails.public(
             publicPart: handledPublicPart,
           );
@@ -330,7 +346,7 @@ class LoungeBackendSocketIoApiWrapperBloc {
         ),
       );
 
-  Future sendAuthPerform({
+  Future sendAuth4xPerform({
     @required String user,
     @required String password,
     @required String token,
@@ -339,7 +355,7 @@ class LoungeBackendSocketIoApiWrapperBloc {
     @required bool hasConfig,
   }) =>
       sendRequest(
-        AuthPerformLoungeJsonRequest(
+        Auth4xPerformLoungeJsonRequest(
           user: user,
           password: password,
           token: token,
@@ -349,7 +365,78 @@ class LoungeBackendSocketIoApiWrapperBloc {
         ),
       );
 
-  Future<AuthPerformComplexLoungeResponse> sendAuthPerformAndWaitForResult({
+  Future sendAuth3x({
+    @required String user,
+    @required String password,
+    @required String token,
+    @required int lastMessageRemoteId,
+    @required int openChannelRemoteId,
+  }) =>
+      sendRequest(
+        Auth3xLoungeJsonRequest(
+          user: user,
+          password: password,
+          token: token,
+          lastMessageRemoteId: lastMessageRemoteId,
+          openChannelRemoteId: openChannelRemoteId,
+        ),
+      );
+
+  Future<Auth3xComplexLoungeResponse> sendAuth3xAndWaitForResult({
+    @required String user,
+    @required String password,
+    @required String token,
+    @required int lastMessageRemoteId,
+    @required int openChannelRemoteId,
+    ComplexLoungeResponseWaitConfig waitConfig =
+        ComplexLoungeResponseWaitConfig.defaultValue,
+  }) async {
+    _logger.finest(() => "sendAuth3xAndWaitForResult start");
+    Auth3xComplexLoungeResponse result;
+
+    var disposableOwner = DisposableOwner();
+
+    var startTime = DateTime.now();
+
+    disposableOwner.addDisposable(
+      disposable: listenForAuth3xComplexLoungeResponse(
+        (Auth3xComplexLoungeResponse auth3xComplexLoungeResponse) {
+          _logger.finest(() => "sendAuth3xAndWaitForResult "
+              "auth3xComplexLoungeResponse $auth3xComplexLoungeResponse");
+          result = auth3xComplexLoungeResponse;
+        },
+      ),
+    );
+
+    await sendRequest(
+      Auth3xLoungeJsonRequest(
+        user: user,
+        password: password,
+        token: token,
+        lastMessageRemoteId: lastMessageRemoteId,
+        openChannelRemoteId: openChannelRemoteId,
+      ),
+    );
+
+    while (result == null) {
+      await Future.delayed(_defaultCheckResultIntervalDuration);
+      DateTime now = DateTime.now();
+
+      var diffTimeout = now.difference(startTime).abs();
+
+      var timeoutReached = diffTimeout > waitConfig.timeoutDuration;
+      if (timeoutReached) {
+        result = Auth3xComplexLoungeResponse
+            .loungeNotSentRequiredDataAndTimeoutReached();
+      }
+    }
+
+    await disposableOwner.dispose();
+
+    return result;
+  }
+
+  Future<Auth4xPerformComplexLoungeResponse> sendAuth4xPerformAndWaitForResult({
     @required String user,
     @required String password,
     @required String token,
@@ -359,22 +446,23 @@ class LoungeBackendSocketIoApiWrapperBloc {
     ComplexLoungeResponseWaitConfig waitConfig =
         ComplexLoungeResponseWaitConfig.defaultValue,
   }) async {
-    AuthPerformComplexLoungeResponse result;
+    Auth4xPerformComplexLoungeResponse result;
 
     var disposableOwner = DisposableOwner();
 
     var startTime = DateTime.now();
 
     disposableOwner.addDisposable(
-      disposable: listenForAuthPerformComplexLoungeResponse(
-        (AuthPerformComplexLoungeResponse authPerformComplexLoungeResponse) {
-          result = authPerformComplexLoungeResponse;
+      disposable: listenForAuth4xPerformComplexLoungeResponse(
+        (Auth4xPerformComplexLoungeResponse
+            auth4xPerformComplexLoungeResponse) {
+          result = auth4xPerformComplexLoungeResponse;
         },
       ),
     );
 
     await sendRequest(
-      AuthPerformLoungeJsonRequest(
+      Auth4xPerformLoungeJsonRequest(
         user: user,
         password: password,
         token: token,
@@ -392,7 +480,7 @@ class LoungeBackendSocketIoApiWrapperBloc {
 
       var timeoutReached = diffTimeout > waitConfig.timeoutDuration;
       if (timeoutReached) {
-        result = AuthPerformComplexLoungeResponse
+        result = Auth4xPerformComplexLoungeResponse
             .loungeNotSentRequiredDataAndTimeoutReached();
       }
     }
@@ -516,13 +604,16 @@ class LoungeBackendSocketIoApiWrapperBloc {
 
   IDisposable listenLoungeConnectDetailsPublicPartComplexResponse(
       Function(LoungeConnectDetailsPublicPart publicPart) listener) {
-    AuthSuccessComplexLoungeResponse handledAuthSuccessComplexLoungeResponse;
+    Auth4xSuccessComplexLoungeResponse handledAuthSuccessComplexLoungeResponse;
+    Authorized3xComplexLoungeResponse handledAuthorizedComplexLoungeResponse;
 
     var listenerCallback = () {
       listener(
         LoungeConnectDetailsPublicPart(
-          authSuccessComplexLoungeResponse:
+          auth4xSuccessComplexLoungeResponse:
               handledAuthSuccessComplexLoungeResponse,
+          authorized3xComplexLoungeResponse:
+              handledAuthorizedComplexLoungeResponse,
         ),
       );
     };
@@ -530,10 +621,21 @@ class LoungeBackendSocketIoApiWrapperBloc {
     var disposableOwner = DisposableOwner();
 
     disposableOwner.addDisposable(
-      disposable: listenForAuthSuccessComplexAuthResponse(
-        (AuthSuccessComplexLoungeResponse authSuccessComplexLoungeResponse) {
+      disposable: listenForAuth4xSuccessComplexAuthResponse(
+        (Auth4xSuccessComplexLoungeResponse
+            auth4xSuccessComplexLoungeResponse) {
           handledAuthSuccessComplexLoungeResponse =
-              authSuccessComplexLoungeResponse;
+              auth4xSuccessComplexLoungeResponse;
+          listenerCallback();
+        },
+      ),
+    );
+
+    disposableOwner.addDisposable(
+      disposable: listenForAuthorized3xComplexLoungeResponse(
+        (Authorized3xComplexLoungeResponse authorized3xComplexLoungeResponse) {
+          handledAuthorizedComplexLoungeResponse =
+              authorized3xComplexLoungeResponse;
           listenerCallback();
         },
       ),
@@ -542,19 +644,21 @@ class LoungeBackendSocketIoApiWrapperBloc {
     return disposableOwner;
   }
 
-  IDisposable listenForAuthPerformComplexLoungeResponse(
+  IDisposable listenForAuth4xPerformComplexLoungeResponse(
       Function(
-              AuthPerformComplexLoungeResponse authPerformComplexLoungeResponse)
+              Auth4xPerformComplexLoungeResponse
+                  authPerformComplexLoungeResponse)
           listener) {
-    AuthSuccessComplexLoungeResponse handledAuthSuccessComplexLoungeResponse;
+    Auth4xSuccessComplexLoungeResponse
+        handledAuth4xSuccessComplexLoungeResponse;
     bool authFailedReceived = false;
 
     DateTime startTime = DateTime.now();
 
     var listenerCallback = () {
-      var response = AuthPerformComplexLoungeResponse.response(
-        authSuccessComplexLoungeResponse:
-            handledAuthSuccessComplexLoungeResponse,
+      var response = Auth4xPerformComplexLoungeResponse.response(
+        auth4xSuccessComplexLoungeResponse:
+            handledAuth4xSuccessComplexLoungeResponse,
         authFailedReceived: authFailedReceived,
       );
 
@@ -571,9 +675,9 @@ class LoungeBackendSocketIoApiWrapperBloc {
     var disposableOwner = DisposableOwner();
 
     disposableOwner.addDisposable(
-      disposable: listenForAuthSuccessComplexAuthResponse(
-        (AuthSuccessComplexLoungeResponse authSuccessComplexLoungeResponse) {
-          handledAuthSuccessComplexLoungeResponse =
+      disposable: listenForAuth4xSuccessComplexAuthResponse(
+        (Auth4xSuccessComplexLoungeResponse authSuccessComplexLoungeResponse) {
+          handledAuth4xSuccessComplexLoungeResponse =
               authSuccessComplexLoungeResponse;
           listenerCallback();
         },
@@ -581,7 +685,7 @@ class LoungeBackendSocketIoApiWrapperBloc {
     );
 
     disposableOwner.addDisposable(
-      disposable: listenForAuthFailed(
+      disposable: listenForAuth4xFailed(
         () {
           authFailedReceived = true;
           listenerCallback();
@@ -592,30 +696,97 @@ class LoungeBackendSocketIoApiWrapperBloc {
     return disposableOwner;
   }
 
-  IDisposable listenForAuthSuccessComplexAuthResponse(
+  IDisposable listenForAuth3xComplexLoungeResponse(
+      Function(Auth3xComplexLoungeResponse auth3xComplexLoungeResponse)
+          listener) {
+
+    _logger.finest(() => "listenForAuth3xComplexLoungeResponse start");
+    Auth3xLoungeResponseBody handledAuth3xLoungeResponseBody;
+    Authorized3xComplexLoungeResponse handledAuthorized3xComplexLoungeResponse;
+
+    DateTime startTime = DateTime.now();
+
+    var listenerCallback = () {
+      var response = Auth3xComplexLoungeResponse.response(
+        auth3xLoungeResponseBody: handledAuth3xLoungeResponseBody,
+        authorized3xComplexLoungeResponse:
+            handledAuthorized3xComplexLoungeResponse,
+      );
+
+      var isFinished = checkIsComplexWaitFinished(
+        complexResponse: response,
+        startTime: startTime,
+      );
+
+      if (isFinished) {
+        listener(response);
+      }
+    };
+
+    var disposableOwner = DisposableOwner();
+
+    disposableOwner.addDisposable(
+      disposable: listenForAuth3x(
+        (Auth3xLoungeResponseBody auth3xLoungeResponseBody) {
+          _logger.finest(() => "listenForAuth3xComplexLoungeResponse "
+              "auth3xLoungeResponseBody $auth3xLoungeResponseBody");
+          handledAuth3xLoungeResponseBody = auth3xLoungeResponseBody;
+          listenerCallback();
+        },
+      ),
+    );
+
+    disposableOwner.addDisposable(
+      disposable: listenForAuthorized3xComplexLoungeResponse(
+        (Authorized3xComplexLoungeResponse authorized3xComplexLoungeResponse) {
+          _logger.finest(() => "listenForAuth3xComplexLoungeResponse "
+              "authorized3xComplexLoungeResponse $authorized3xComplexLoungeResponse");
+          handledAuthorized3xComplexLoungeResponse =
+              authorized3xComplexLoungeResponse;
+          listenerCallback();
+        },
+      ),
+    );
+
+    return disposableOwner;
+  }
+
+  IDisposable listenForAuth4xSuccessComplexAuthResponse(
       Function(
-              AuthSuccessComplexLoungeResponse authSuccessComplexLoungeResponse)
+              Auth4xSuccessComplexLoungeResponse
+                  auth4xSuccessComplexLoungeResponse)
           listener) {
     InitLoungeResponseBody handledInitLoungeResponseBody;
     ConfigurationLoungeResponseBody handledConfigurationLoungeResponseBody;
     PushIsSubscribedLoungeResponseBody
         handledPushIsSubscribedLoungeResponseBody;
     CommandsLoungeResponseBody handledCommandsLoungeResponseBody;
+    bool authSuccessReceived;
 
     var listenerCallback = () {
       listener(
-        AuthSuccessComplexLoungeResponse(
+        Auth4xSuccessComplexLoungeResponse(
           initLoungeResponseBody: handledInitLoungeResponseBody,
           configurationLoungeResponseBody:
               handledConfigurationLoungeResponseBody,
           pushIsSubscribedLoungeResponseBody:
               handledPushIsSubscribedLoungeResponseBody,
           commandsLoungeResponseBody: handledCommandsLoungeResponseBody,
+          authSuccessReceived: authSuccessReceived,
         ),
       );
     };
 
     var disposableOwner = DisposableOwner();
+
+    disposableOwner.addDisposable(
+      disposable: listenForAuth4xSuccess(
+        () {
+          authSuccessReceived = true;
+          listenerCallback();
+        },
+      ),
+    );
 
     disposableOwner.addDisposable(
       disposable: listenForInit(
@@ -659,16 +830,82 @@ class LoungeBackendSocketIoApiWrapperBloc {
     return disposableOwner;
   }
 
+  IDisposable listenForAuthorized3xComplexLoungeResponse(
+      Function(
+              Authorized3xComplexLoungeResponse
+                  authorized3xComplexLoungeResponse)
+          listener) {
+    InitLoungeResponseBody handledInitLoungeResponseBody;
+    ConfigurationLoungeResponseBody handledConfigurationLoungeResponseBody;
+    CommandsLoungeResponseBody handledCommandsLoungeResponseBody;
+    bool authorizedReceived;
+
+    var listenerCallback = () {
+      listener(
+        Authorized3xComplexLoungeResponse(
+          initLoungeResponseBody: handledInitLoungeResponseBody,
+          configurationLoungeResponseBody:
+              handledConfigurationLoungeResponseBody,
+          commandsLoungeResponseBody: handledCommandsLoungeResponseBody,
+          authorizedReceived: authorizedReceived,
+        ),
+      );
+    };
+
+    var disposableOwner = DisposableOwner();
+
+    disposableOwner.addDisposable(
+      disposable: listenForAuthorized3x(
+        () {
+          authorizedReceived = true;
+          listenerCallback();
+        },
+      ),
+    );
+
+    disposableOwner.addDisposable(
+      disposable: listenForInit(
+        (InitLoungeResponseBody initLoungeResponseBody) {
+          handledInitLoungeResponseBody = initLoungeResponseBody;
+          listenerCallback();
+        },
+      ),
+    );
+
+    disposableOwner.addDisposable(
+      disposable: listenForConfiguration(
+        (ConfigurationLoungeResponseBody configurationLoungeResponseBody) {
+          handledConfigurationLoungeResponseBody =
+              configurationLoungeResponseBody;
+          listenerCallback();
+        },
+      ),
+    );
+
+    disposableOwner.addDisposable(
+      disposable: listenForCommands(
+        (CommandsLoungeResponseBody commandsLoungeResponseBody) {
+          handledCommandsLoungeResponseBody = commandsLoungeResponseBody;
+          listenerCallback();
+        },
+      ),
+    );
+
+    return disposableOwner;
+  }
+
   IDisposable listenLoungeConnectDetailsPrivatePartComplexResponse(
       Function(LoungeConnectDetailsPrivatePart privatePart) listener) {
     SignUpAvailableLoungeResponseBody handledSignUpAvailableLoungeResponseBody;
-    AuthStartLoungeResponseBody handledAuthStartLoungeResponseBody;
+    Auth4xStartLoungeResponseBody handledAuth4xStartLoungeResponseBody;
+    Auth3xLoungeResponseBody handledAuth3xLoungeResponseBody;
 
     var listenerCallback = () {
       listener(
         LoungeConnectDetailsPrivatePart(
           signUpAvailableResponseBody: handledSignUpAvailableLoungeResponseBody,
-          authStartLoungeResponseBody: handledAuthStartLoungeResponseBody,
+          auth4xStartLoungeResponseBody: handledAuth4xStartLoungeResponseBody,
+          auth3xLoungeResponseBody: handledAuth3xLoungeResponseBody,
         ),
       );
     };
@@ -678,6 +915,9 @@ class LoungeBackendSocketIoApiWrapperBloc {
     disposableOwner.addDisposable(
       disposable: listenForSignUpAvailable(
         (SignUpAvailableLoungeResponseBody signUpAvailableResponseBody) {
+          _logger.finest(() =>
+              "listenLoungeConnectDetailsPrivatePartComplexResponse "
+                  "signUpAvailableResponseBody $signUpAvailableResponseBody");
           handledSignUpAvailableLoungeResponseBody =
               signUpAvailableResponseBody;
           listenerCallback();
@@ -686,9 +926,23 @@ class LoungeBackendSocketIoApiWrapperBloc {
     );
 
     disposableOwner.addDisposable(
-      disposable: listenForAuthStart(
-        (AuthStartLoungeResponseBody authStartLoungeResponseBody) {
-          handledAuthStartLoungeResponseBody = authStartLoungeResponseBody;
+      disposable: listenForAuth4xStart(
+        (Auth4xStartLoungeResponseBody auth4xStartLoungeResponseBody) {
+          _logger.finest(() =>
+          "listenLoungeConnectDetailsPrivatePartComplexResponse "
+              "auth4xStartLoungeResponseBody $auth4xStartLoungeResponseBody");
+          handledAuth4xStartLoungeResponseBody = auth4xStartLoungeResponseBody;
+          listenerCallback();
+        },
+      ),
+    );
+    disposableOwner.addDisposable(
+      disposable: listenForAuth3x(
+        (Auth3xLoungeResponseBody auth3xLoungeResponseBody) {
+          _logger.finest(() =>
+          "listenLoungeConnectDetailsPrivatePartComplexResponse "
+              "auth3xLoungeResponseBody $auth3xLoungeResponseBody");
+          handledAuth3xLoungeResponseBody = auth3xLoungeResponseBody;
           listenerCallback();
         },
       ),
@@ -947,28 +1201,34 @@ class LoungeBackendSocketIoApiWrapperBloc {
         ),
       );
 
-  IDisposable listenForAuthStart(
-          Function(AuthStartLoungeResponseBody) listener) =>
-      listenRawEvent(
-        eventName: AuthStartLoungeResponseBody.eventName,
-        listener: (raw) => listener(
-          AuthStartLoungeResponseBody.fromRaw(raw),
+  IDisposable listenForAuth3x(Function(Auth3xLoungeResponseBody) listener) =>
+      listenJsonEvent(
+        eventName: Auth3xLoungeResponseBody.eventName,
+        listener: (json) => listener(
+          Auth3xLoungeResponseBody.fromJson(json),
         ),
       );
 
-  IDisposable listenForAuthSuccess(Function() listener) => listenEmptyEvent(
+  IDisposable listenForAuth4xStart(
+          Function(Auth4xStartLoungeResponseBody) listener) =>
+      listenRawEvent(
+        eventName: Auth4xStartLoungeResponseBody.eventName,
+        listener: (raw) => listener(
+          Auth4xStartLoungeResponseBody.fromRaw(raw),
+        ),
+      );
+
+  IDisposable listenForAuth4xSuccess(Function() listener) => listenEmptyEvent(
         eventName: LoungeResponseEventNames.authSuccess,
         listener: () => listener(),
       );
 
-  IDisposable listenForAuthSuccessComplexResponse(Function() listener) {
-    return listenEmptyEvent(
-      eventName: LoungeResponseEventNames.authSuccess,
-      listener: () => listener(),
-    );
-  }
+  IDisposable listenForAuthorized3x(Function() listener) => listenEmptyEvent(
+        eventName: LoungeResponseEventNames.authorized,
+        listener: () => listener(),
+      );
 
-  IDisposable listenForAuthFailed(Function() listener) => listenEmptyEvent(
+  IDisposable listenForAuth4xFailed(Function() listener) => listenEmptyEvent(
         eventName: LoungeResponseEventNames.authFailed,
         listener: () => listener(),
       );

@@ -105,7 +105,6 @@ class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
     Duration checkResultIntervalDuration = _defaultCheckResultIntervalDuration,
   }) async {
     assert(isInitialized);
-    assert(connectionState == SocketIoConnectionState.initialized);
 
     try {
       return doSomethingAndWaitForResult(
@@ -217,6 +216,8 @@ class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
       offConnectTimeout(listener);
     });
   }
+
+  Future<bool> isConnected() => socketIO.isConnected();
 
   void onConnect(SocketEventListener listener) => socketIO.onConnect(listener);
 
@@ -338,7 +339,7 @@ class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
     assert(isInitialized);
     assert(
       simpleConnectionState == SimpleSocketIoConnectionState.initialized ||
-      simpleConnectionState == SimpleSocketIoConnectionState.disconnected,
+          simpleConnectionState == SimpleSocketIoConnectionState.disconnected,
       "simpleConnectionState $simpleConnectionState",
     );
     return socketIO.connect();

@@ -1,4 +1,4 @@
-import 'package:flutter_appirc/pushes/push_model.dart';
+import 'package:flutter_appirc/push/push_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logging/logging.dart';
 

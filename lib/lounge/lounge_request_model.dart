@@ -23,6 +23,7 @@ class RequestLoungeEventNames {
   static const String authPerform = "auth:perform";
 
   static const String signUp = "sign-up";
+  static const String auth = "auth";
 }
 
 abstract class LoungeRequest {
@@ -53,6 +54,87 @@ class UploadAuthLoungeEmptyRequest extends LoungeEmptyRequest {
   String toString() {
     return 'UploadAuthLoungeEmptyRequest{}';
   }
+}
+
+@JsonSerializable()
+class Auth3xLoungeJsonRequest extends LoungeJsonRequest {
+  @override
+  String get eventName => RequestLoungeEventNames.auth;
+
+  final String user;
+  final String password;
+
+  @JsonKey(name: "lastMessage")
+  final int lastMessageRemoteId;
+  @JsonKey(name: "openChannel")
+  final int openChannelRemoteId;
+  final String token;
+
+  Auth3xLoungeJsonRequest({
+    @required this.user,
+    @required this.password,
+    @required this.lastMessageRemoteId,
+    @required this.openChannelRemoteId,
+    @required this.token,
+  });
+
+  Auth3xLoungeJsonRequest.login({
+    @required String user,
+    @required String password,
+  }) : this(
+          user: user,
+          password: password,
+          lastMessageRemoteId: null,
+          openChannelRemoteId: null,
+          token: null,
+        );
+
+  Auth3xLoungeJsonRequest.reconnect({
+    @required String user,
+    @required int lastMessageRemoteId,
+    @required int openChannelRemoteId,
+    @required String token,
+  }) : this(
+          user: user,
+          password: null,
+          lastMessageRemoteId: lastMessageRemoteId,
+          openChannelRemoteId: openChannelRemoteId,
+          token: token,
+        );
+
+  @override
+  String toString() => 'Auth3xLoungeJsonRequest{'
+      'user: $user, '
+      'password: $password, '
+      'lastMessageId: $lastMessageRemoteId, '
+      'openChannelId: $openChannelRemoteId, '
+      'token: $token'
+      '}';
+
+  @override
+  Map<String, dynamic> toJson() => _$Auth3xLoungeJsonRequestToJson(this);
+
+  factory Auth3xLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$Auth3xLoungeJsonRequestFromJson(json);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Auth3xLoungeJsonRequest &&
+          runtimeType == other.runtimeType &&
+          user == other.user &&
+          password == other.password &&
+          lastMessageRemoteId == other.lastMessageRemoteId &&
+          openChannelRemoteId == other.openChannelRemoteId &&
+          token == other.token;
+
+  @override
+  int get hashCode =>
+      user.hashCode ^
+      password.hashCode ^
+      lastMessageRemoteId.hashCode ^
+      openChannelRemoteId.hashCode ^
+      token.hashCode;
 }
 
 class SignOutLoungeEmptyRequest extends LoungeEmptyRequest {
@@ -86,12 +168,12 @@ abstract class LoungeRawRequest<T> extends LoungeRequest {
 
   const LoungeRawRequest({@required this.body});
 }
+
 class LoungeNetworkGetRawRequest extends LoungeRawRequest<String> {
   @override
   String get eventName => RequestLoungeEventNames.networkGet;
 
-  LoungeNetworkGetRawRequest({@required String uuid}): super(body: uuid);
-
+  LoungeNetworkGetRawRequest({@required String uuid}) : super(body: uuid);
 }
 
 class ChannelOpenedLoungeRawRequest extends LoungeRawRequest<int> {
@@ -367,7 +449,7 @@ class SignUpLoungeJsonRequest extends LoungeJsonRequest {
 }
 
 @JsonSerializable(includeIfNull: false)
-class AuthPerformLoungeJsonRequest extends LoungeJsonRequest {
+class Auth4xPerformLoungeJsonRequest extends LoungeJsonRequest {
   @override
   String get eventName => RequestLoungeEventNames.authPerform;
 
@@ -380,7 +462,7 @@ class AuthPerformLoungeJsonRequest extends LoungeJsonRequest {
   final int openChannelRemoteId;
   final bool hasConfig;
 
-  const AuthPerformLoungeJsonRequest({
+  const Auth4xPerformLoungeJsonRequest({
     @required this.user,
     @required this.password,
     @required this.token,
@@ -392,7 +474,7 @@ class AuthPerformLoungeJsonRequest extends LoungeJsonRequest {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AuthPerformLoungeJsonRequest &&
+      other is Auth4xPerformLoungeJsonRequest &&
           runtimeType == other.runtimeType &&
           user == other.user &&
           password == other.password &&
@@ -412,7 +494,7 @@ class AuthPerformLoungeJsonRequest extends LoungeJsonRequest {
 
   @override
   String toString() {
-    return 'AuthPerformLoungeJsonRequestBody{'
+    return 'Auth4xPerformLoungeJsonRequest{'
         'user: $user, '
         'password: $password, '
         'token: $token, '
@@ -423,11 +505,10 @@ class AuthPerformLoungeJsonRequest extends LoungeJsonRequest {
   }
 
   @override
-  Map<String, dynamic> toJson() =>
-      _$AuthPerformLoungeJsonRequestToJson(this);
+  Map<String, dynamic> toJson() => _$Auth4xPerformLoungeJsonRequestToJson(this);
 
-  factory AuthPerformLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
-      _$AuthPerformLoungeJsonRequestFromJson(json);
+  factory Auth4xPerformLoungeJsonRequest.fromJson(Map<dynamic, dynamic> json) =>
+      _$Auth4xPerformLoungeJsonRequestFromJson(json);
 }
 
 @JsonSerializable(includeIfNull: false)

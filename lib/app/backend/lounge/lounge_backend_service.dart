@@ -55,16 +55,19 @@ class LoungeBackendService extends DisposableOwner
   final SocketIOService socketIoService;
   SocketIOInstanceBloc socketIOInstanceBloc;
 
-  bool get isPublicModeAndDisconnected =>
+  bool get isPublicModeAndDisconnectedAndVersion4 =>
       chatConfig?.public == true &&
-      connectionState == ChatConnectionState.disconnected;
+      connectionState == ChatConnectionState.disconnected &&
+      loungeBackendConnectBloc.loungeVersion == LoungeVersion.version4_x;
 
-  Stream<bool> get isPublicModeAndDisconnectedStream => Rx.combineLatest2(
+  Stream<bool> get isPublicModeAndDisconnectedAndVersion4Stream =>
+      Rx.combineLatest2(
         chatConfigStream,
         connectionStateStream,
         (chatConfig, connectionState) =>
             chatConfig?.public == true &&
-            connectionState == ChatConnectionState.disconnected,
+            connectionState == ChatConnectionState.disconnected &&
+            loungeBackendConnectBloc.loungeVersion == LoungeVersion.version4_x,
       );
 
   bool publicWasDisconnected = false;
@@ -176,7 +179,9 @@ class LoungeBackendService extends DisposableOwner
             simpleConnectionState,
           );
 
-          if (!publicWasDisconnected) {
+          if (loungeBackendConnectBloc.loungeVersion ==
+                  LoungeVersion.version3_x ||
+              !publicWasDisconnected) {
             connectionStateSubject.add(
               connectionState,
             );
@@ -186,7 +191,6 @@ class LoungeBackendService extends DisposableOwner
               connectionState == ChatConnectionState.disconnected) {
             publicWasDisconnected = true;
           }
-
         },
       ),
     );
@@ -208,6 +212,8 @@ class LoungeBackendService extends DisposableOwner
     );
 
     loungeBackendConnectBloc = LoungeBackendConnectBloc(
+      currentChannelExtractor: currentChannelExtractor,
+      lastMessageRemoteIdExtractor: lastMessageRemoteIdExtractor,
       loungeBackendSocketIoApiWrapperBloc: socketIoApiWrapperBloc,
       loungeAuthPreferences: loungePreferences.authPreferences,
     );
@@ -237,17 +243,9 @@ class LoungeBackendService extends DisposableOwner
           .connectDetails.isLoungeNotSentRequiredDataAndTimeoutReached) {
         requestResult = RequestResult.timeout();
       } else {
-        var success =
-            loungeConnectAndAuthDetails.connectDetails.publicPart != null ||
-                (loungeConnectAndAuthDetails.authPerformComplexLoungeResponse !=
-                        null &&
-                    loungeConnectAndAuthDetails
-                        .authPerformComplexLoungeResponse.isSuccess);
         ChatLoginResult loginResult = ChatLoginResult(
-          success: success,
-          isAuthUsed:
-              loungeConnectAndAuthDetails.authPerformComplexLoungeResponse !=
-                  null,
+          success: loungeConnectAndAuthDetails.success,
+          isAuthUsed: loungeConnectAndAuthDetails.isAuthUsed,
           config: loungeBackendConnectBloc.config,
           chatInit: loungeBackendConnectBloc.chatInit,
         );
@@ -1361,14 +1359,16 @@ class LoungeBackendService extends DisposableOwner
   Future _sendRequest({
     @required LoungeRequest request,
     @required bool isNeedAddRequestToPending,
-  }) {
+  }) async {
     if (isNeedAddRequestToPending) {
       _pendingRequests.add(request);
     }
-    _logger.fine(() => "_sendCommand $request");
+    var isConnected = await socketIOInstanceBloc.isConnected();
+    
+    _logger.fine(() => "_sendCommand isConnected $isConnected $request");
     var socketIOCommand = request.toSocketIOCommand();
     _logger.fine(() => "socketIOCommand $socketIOCommand");
-    return socketIOInstanceBloc.emit(socketIOCommand);
+    return await socketIOInstanceBloc.emit(socketIOCommand);
   }
 
   Future disconnect() async {

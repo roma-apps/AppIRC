@@ -3,6 +3,9 @@ import 'package:flutter_appirc/app/backend/lounge/lounge_backend_model.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/lounge/lounge_response_model.dart';
 import 'package:flutter_appirc/socket_io/socket_io_model.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger("lounge_backend_connect_model.dart");
 
 enum LoungeBackendConnectState {
   connected,
@@ -34,17 +37,40 @@ extension LoungeSimpleSocketIoConnectionStateExtension
 
 class LoungeConnectDetailsPrivatePart extends LoungeComplexResponse {
   final SignUpAvailableLoungeResponseBody signUpAvailableResponseBody;
-  final AuthStartLoungeResponseBody authStartLoungeResponseBody;
+
+  final Auth4xStartLoungeResponseBody auth4xStartLoungeResponseBody;
+  final Auth3xLoungeResponseBody auth3xLoungeResponseBody;
+
+  LoungeVersion get loungeVersion {
+    var isLounge3x = auth3xLoungeResponseBody != null;
+    var isLounge4x = auth4xStartLoungeResponseBody != null;
+    assert(!(isLounge3x && isLounge4x));
+    if (!isLounge3x && !isLounge4x) {
+      return null;
+    } else if (isLounge4x) {
+      return LoungeVersion.version4_x;
+    } else {
+      return LoungeVersion.version3_x;
+    }
+  }
 
   @override
-  List<dynamic> get optionalFields => [signUpAvailableResponseBody];
+  List<dynamic> get optionalFields => [
+        signUpAvailableResponseBody,
+      ];
 
   @override
-  List<dynamic> get requiredFields => [authStartLoungeResponseBody];
+  List<dynamic> get requiredFields =>
+      throw UnsupportedError("Only isRequiredFieldsExist is available");
+
+  @override
+  bool get isRequiredFieldsExist =>
+      auth4xStartLoungeResponseBody != null || auth3xLoungeResponseBody != null;
 
   LoungeConnectDetailsPrivatePart({
     @required this.signUpAvailableResponseBody,
-    @required this.authStartLoungeResponseBody,
+    @required this.auth4xStartLoungeResponseBody,
+    @required this.auth3xLoungeResponseBody,
   });
 
   @override
@@ -53,37 +79,65 @@ class LoungeConnectDetailsPrivatePart extends LoungeComplexResponse {
       other is LoungeConnectDetailsPrivatePart &&
           runtimeType == other.runtimeType &&
           signUpAvailableResponseBody == other.signUpAvailableResponseBody &&
-          authStartLoungeResponseBody == other.authStartLoungeResponseBody;
+          auth3xLoungeResponseBody == other.auth3xLoungeResponseBody &&
+          auth4xStartLoungeResponseBody == other.auth4xStartLoungeResponseBody;
 
   @override
   int get hashCode =>
+      auth3xLoungeResponseBody.hashCode ^
       signUpAvailableResponseBody.hashCode ^
-      authStartLoungeResponseBody.hashCode;
+      auth4xStartLoungeResponseBody.hashCode;
 
   @override
   String toString() {
     return 'LoungeConnectDetailsPrivatePart{'
+        'authLoungeResponseBody: $auth3xLoungeResponseBody, '
         'signUpAvailableResponseBody: $signUpAvailableResponseBody, '
-        'authStartLoungeResponseBody: $authStartLoungeResponseBody'
+        'authStartLoungeResponseBody: $auth4xStartLoungeResponseBody'
         '}';
   }
 }
 
 class LoungeConnectDetailsPublicPart extends LoungeComplexResponse {
-  final AuthSuccessComplexLoungeResponse authSuccessComplexLoungeResponse;
+  final Auth4xSuccessComplexLoungeResponse auth4xSuccessComplexLoungeResponse;
+  final Authorized3xComplexLoungeResponse authorized3xComplexLoungeResponse;
+
+  LoungeVersion get loungeVersion {
+    var isLounge3x =
+        authorized3xComplexLoungeResponse?.isRequiredFieldsExist == true;
+    var isLounge4x =
+        auth4xSuccessComplexLoungeResponse?.isRequiredFieldsExist == true;
+    assert(!(isLounge3x && isLounge4x));
+    if (!isLounge3x && !isLounge4x) {
+      return null;
+    } else if (isLounge4x) {
+      return LoungeVersion.version4_x;
+    } else {
+      return LoungeVersion.version3_x;
+    }
+  }
 
   @override
-  List<dynamic> get optionalFields => [
-        ...authSuccessComplexLoungeResponse.optionalFields,
-      ];
+  List<dynamic> get optionalFields =>
+      throw UnsupportedError("Only isOptionalFieldsExist is available");
 
   @override
-  List<dynamic> get requiredFields => [
-        ...authSuccessComplexLoungeResponse.requiredFields,
-      ];
+  List<dynamic> get requiredFields =>
+      throw UnsupportedError("Only isRequiredFieldsExist is available");
+
+  @override
+  bool get isOptionalFieldsExist =>
+      auth4xSuccessComplexLoungeResponse?.isOptionalFieldsExist == true ||
+      authorized3xComplexLoungeResponse?.isOptionalFieldsExist == true;
+
+  @override
+  bool get isRequiredFieldsExist =>
+      auth4xSuccessComplexLoungeResponse?.isRequiredFieldsExist == true ||
+      authorized3xComplexLoungeResponse?.isRequiredFieldsExist == true;
 
   LoungeConnectDetailsPublicPart({
-    @required this.authSuccessComplexLoungeResponse,
+    @required this.auth4xSuccessComplexLoungeResponse,
+    @required this.authorized3xComplexLoungeResponse,
   });
 
   @override
@@ -91,28 +145,68 @@ class LoungeConnectDetailsPublicPart extends LoungeComplexResponse {
       identical(this, other) ||
       other is LoungeConnectDetailsPublicPart &&
           runtimeType == other.runtimeType &&
-          authSuccessComplexLoungeResponse ==
-              other.authSuccessComplexLoungeResponse;
+          auth4xSuccessComplexLoungeResponse ==
+              other.auth4xSuccessComplexLoungeResponse &&
+          authorized3xComplexLoungeResponse ==
+              other.authorized3xComplexLoungeResponse;
 
   @override
-  int get hashCode => authSuccessComplexLoungeResponse.hashCode;
+  int get hashCode =>
+      auth4xSuccessComplexLoungeResponse.hashCode ^
+      authorized3xComplexLoungeResponse.hashCode;
 
   @override
   String toString() {
     return 'LoungeConnectDetailsPublicPart{'
-        'authSuccessComplexLoungeResponse: $authSuccessComplexLoungeResponse'
+        'authSuccessComplexLoungeResponse: $auth4xSuccessComplexLoungeResponse, '
+        'authorizedComplexLoungeResponse: $authorized3xComplexLoungeResponse'
         '}';
   }
 }
 
 class LoungeConnectAndAuthDetails {
   final LoungeConnectDetails connectDetails;
-  final AuthPerformComplexLoungeResponse authPerformComplexLoungeResponse;
+  final Auth4xPerformComplexLoungeResponse auth4xPerformComplexLoungeResponse;
+  final Auth3xComplexLoungeResponse auth3xComplexLoungeResponse;
 
-  const LoungeConnectAndAuthDetails({
+  bool get isAuthUsed =>
+      auth4xPerformComplexLoungeResponse != null ||
+      auth3xComplexLoungeResponse != null;
+
+  bool get success =>
+      connectDetails.publicPart != null ||
+      auth4xPerformComplexLoungeResponse?.isSuccess == true ||
+      auth3xComplexLoungeResponse?.isSuccess == true;
+
+  const LoungeConnectAndAuthDetails.private({
     @required this.connectDetails,
-    @required this.authPerformComplexLoungeResponse,
+    @required this.auth4xPerformComplexLoungeResponse,
+    @required this.auth3xComplexLoungeResponse,
   });
+
+  const LoungeConnectAndAuthDetails.version3x({
+    @required LoungeConnectDetails connectDetails,
+    @required Auth3xComplexLoungeResponse auth3xComplexLoungeResponse,
+  }) : this.private(
+          connectDetails: connectDetails,
+          auth3xComplexLoungeResponse: auth3xComplexLoungeResponse,
+          auth4xPerformComplexLoungeResponse: null,
+        );
+
+  const LoungeConnectAndAuthDetails.version4x({
+    @required LoungeConnectDetails connectDetails,
+    @required
+        Auth4xPerformComplexLoungeResponse auth4xPerformComplexLoungeResponse,
+  }) : this.private(
+          connectDetails: connectDetails,
+          auth3xComplexLoungeResponse: null,
+          auth4xPerformComplexLoungeResponse:
+              auth4xPerformComplexLoungeResponse,
+        );
+
+  bool get isResponseExist =>
+      auth4xPerformComplexLoungeResponse != null ||
+      auth3xComplexLoungeResponse != null;
 
   @override
   bool operator ==(Object other) =>
@@ -120,18 +214,22 @@ class LoungeConnectAndAuthDetails {
       other is LoungeConnectAndAuthDetails &&
           runtimeType == other.runtimeType &&
           connectDetails == other.connectDetails &&
-          authPerformComplexLoungeResponse ==
-              other.authPerformComplexLoungeResponse;
+          auth4xPerformComplexLoungeResponse ==
+              other.auth4xPerformComplexLoungeResponse &&
+          auth3xComplexLoungeResponse == other.auth3xComplexLoungeResponse;
 
   @override
   int get hashCode =>
-      connectDetails.hashCode ^ authPerformComplexLoungeResponse.hashCode;
+      connectDetails.hashCode ^
+      auth4xPerformComplexLoungeResponse.hashCode ^
+      auth3xComplexLoungeResponse.hashCode;
 
   @override
   String toString() {
     return 'LoungeConnectAndAuthDetails{'
         'connectDetails: $connectDetails, '
-        'authPerformComplexLoungeResponse: $authPerformComplexLoungeResponse'
+        'auth4xPerformComplexLoungeResponse: $auth4xPerformComplexLoungeResponse, '
+        'auth3xComplexLoungeResponse: $auth3xComplexLoungeResponse'
         '}';
   }
 }
@@ -140,6 +238,23 @@ class LoungeConnectDetails {
   final bool isSocketError;
   final bool isSocketTimeout;
   final bool isLoungeNotSentRequiredDataAndTimeoutReached;
+
+  LoungeVersion get loungeVersion {
+    if (backendMode == null) {
+      return null;
+    }
+
+    switch (backendMode) {
+      case LoungeBackendMode.private:
+        return privatePart.loungeVersion;
+        break;
+      case LoungeBackendMode.public:
+        return publicPart.loungeVersion;
+        break;
+    }
+
+    throw "Invalid backendMode $backendMode";
+  }
 
   LoungeBackendMode get backendMode {
     if (publicPart != null) {
@@ -214,14 +329,15 @@ class LoungeConnectDetails {
   bool get connected => backendMode != null;
 
   bool get isPrivateMode => backendMode == LoungeBackendMode.private;
+
   bool get isPublicMode => backendMode == LoungeBackendMode.public;
 
   bool get isSuccess {
-    if(backendMode == null) {
+    if (backendMode == null) {
       return false;
     }
 
-    if(isPublicMode) {
+    if (isPublicMode) {
       return true;
     } else {
       return false;
@@ -262,12 +378,12 @@ enum LoungeBackendAuthState {
   logged,
 }
 
-class AuthPerformComplexLoungeResponse extends LoungeComplexResponse {
-  final AuthSuccessComplexLoungeResponse authSuccessComplexLoungeResponse;
+class Auth4xPerformComplexLoungeResponse extends LoungeComplexResponse {
+  final Auth4xSuccessComplexLoungeResponse auth4xSuccessComplexLoungeResponse;
   final bool authFailedReceived;
   final bool loungeNotSentRequiredDataAndTimeoutReached;
 
-  bool get isSuccess => authSuccessComplexLoungeResponse != null;
+  bool get isSuccess => auth4xSuccessComplexLoungeResponse != null;
 
   bool get isFail =>
       authFailedReceived == true ||
@@ -281,27 +397,29 @@ class AuthPerformComplexLoungeResponse extends LoungeComplexResponse {
 
   @override
   bool get isRequiredFieldsExist =>
-      authSuccessComplexLoungeResponse?.isRequiredFieldsExist == true ||
+      auth4xSuccessComplexLoungeResponse?.isRequiredFieldsExist == true ||
       authFailedReceived == true;
 
-  AuthPerformComplexLoungeResponse._private({
-    @required this.authSuccessComplexLoungeResponse,
+  Auth4xPerformComplexLoungeResponse._private({
+    @required this.auth4xSuccessComplexLoungeResponse,
     @required this.authFailedReceived,
     @required this.loungeNotSentRequiredDataAndTimeoutReached,
   });
 
-  AuthPerformComplexLoungeResponse.response({
-    @required AuthSuccessComplexLoungeResponse authSuccessComplexLoungeResponse,
+  Auth4xPerformComplexLoungeResponse.response({
+    @required
+        Auth4xSuccessComplexLoungeResponse auth4xSuccessComplexLoungeResponse,
     @required bool authFailedReceived,
   }) : this._private(
-          authSuccessComplexLoungeResponse: authSuccessComplexLoungeResponse,
+          auth4xSuccessComplexLoungeResponse:
+              auth4xSuccessComplexLoungeResponse,
           authFailedReceived: authFailedReceived,
           loungeNotSentRequiredDataAndTimeoutReached: false,
         );
 
-  AuthPerformComplexLoungeResponse.loungeNotSentRequiredDataAndTimeoutReached()
+  Auth4xPerformComplexLoungeResponse.loungeNotSentRequiredDataAndTimeoutReached()
       : this._private(
-          authSuccessComplexLoungeResponse: null,
+          auth4xSuccessComplexLoungeResponse: null,
           authFailedReceived: null,
           loungeNotSentRequiredDataAndTimeoutReached: true,
         );
@@ -309,30 +427,127 @@ class AuthPerformComplexLoungeResponse extends LoungeComplexResponse {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AuthPerformComplexLoungeResponse &&
+      other is Auth4xPerformComplexLoungeResponse &&
           runtimeType == other.runtimeType &&
-          authSuccessComplexLoungeResponse ==
-              other.authSuccessComplexLoungeResponse &&
+          auth4xSuccessComplexLoungeResponse ==
+              other.auth4xSuccessComplexLoungeResponse &&
           authFailedReceived == other.authFailedReceived;
 
   @override
   int get hashCode =>
-      authSuccessComplexLoungeResponse.hashCode ^ authFailedReceived.hashCode;
+      auth4xSuccessComplexLoungeResponse.hashCode ^ authFailedReceived.hashCode;
 
   @override
   String toString() {
-    return 'AuthPerformComplexLoungeResponse{'
-        'authSuccessComplexLoungeResponse: $authSuccessComplexLoungeResponse, '
+    return 'Auth4xPerformComplexLoungeResponse{'
+        'authSuccessComplexLoungeResponse: $auth4xSuccessComplexLoungeResponse, '
         'authFailedReceived: $authFailedReceived'
         '}';
   }
 }
 
-class AuthSuccessComplexLoungeResponse extends LoungeComplexResponse {
+class Auth3xComplexLoungeResponse extends LoungeComplexResponse {
+  final Authorized3xComplexLoungeResponse authorized3xComplexLoungeResponse;
+  final Auth3xLoungeResponseBody auth3xLoungeResponseBody;
+  final bool loungeNotSentRequiredDataAndTimeoutReached;
+
+  bool get isSuccess => authorized3xComplexLoungeResponse != null || auth3xLoungeResponseBody.success == true;
+
+  bool get isFail => !isSuccess;
+
+  @override
+  List<dynamic> get optionalFields => [];
+
+  @override
+  List<dynamic> get requiredFields => throw "Unsupported";
+
+  @override
+  bool get isRequiredFieldsExist {
+    _logger.finest(() => "isRequiredFieldsExist "
+        "authorized3xComplexLoungeResponse $authorized3xComplexLoungeResponse");
+    _logger.finest(() => "isRequiredFieldsExist "
+        "auth3xLoungeResponseBody $auth3xLoungeResponseBody");
+
+    var result;
+
+    if (authorized3xComplexLoungeResponse != null) {
+      _logger.finest(() => "isRequiredFieldsExist "
+          "authorized3xComplexLoungeResponse.isRequiredFieldsExist "
+          "${authorized3xComplexLoungeResponse.isRequiredFieldsExist}");
+      result = authorized3xComplexLoungeResponse.isRequiredFieldsExist == true;
+    } else {
+      if (auth3xLoungeResponseBody == null) {
+        result = false;
+      }
+
+      if (auth3xLoungeResponseBody.success) {
+        result =
+            authorized3xComplexLoungeResponse?.isRequiredFieldsExist == true;
+      } else {
+        result = true;
+      }
+    }
+
+    _logger.finest(() => "isRequiredFieldsExist "
+        "result $result");
+
+    return result;
+  }
+
+  Auth3xComplexLoungeResponse._private({
+    @required this.authorized3xComplexLoungeResponse,
+    @required this.auth3xLoungeResponseBody,
+    @required this.loungeNotSentRequiredDataAndTimeoutReached,
+  });
+
+  Auth3xComplexLoungeResponse.response({
+    @required
+        Authorized3xComplexLoungeResponse authorized3xComplexLoungeResponse,
+    @required Auth3xLoungeResponseBody auth3xLoungeResponseBody,
+  }) : this._private(
+          authorized3xComplexLoungeResponse: authorized3xComplexLoungeResponse,
+          auth3xLoungeResponseBody: auth3xLoungeResponseBody,
+          loungeNotSentRequiredDataAndTimeoutReached: false,
+        );
+
+  Auth3xComplexLoungeResponse.loungeNotSentRequiredDataAndTimeoutReached()
+      : this._private(
+          authorized3xComplexLoungeResponse: null,
+          auth3xLoungeResponseBody: null,
+          loungeNotSentRequiredDataAndTimeoutReached: true,
+        );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Auth3xComplexLoungeResponse &&
+          runtimeType == other.runtimeType &&
+          authorized3xComplexLoungeResponse ==
+              other.authorized3xComplexLoungeResponse &&
+          auth3xLoungeResponseBody == other.auth3xLoungeResponseBody &&
+          loungeNotSentRequiredDataAndTimeoutReached ==
+              other.loungeNotSentRequiredDataAndTimeoutReached;
+
+  @override
+  int get hashCode =>
+      authorized3xComplexLoungeResponse.hashCode ^
+      auth3xLoungeResponseBody.hashCode ^
+      loungeNotSentRequiredDataAndTimeoutReached.hashCode;
+
+  @override
+  String toString() => 'Auth3xComplexLoungeResponse{'
+      'authorizedComplexLoungeResponse: $authorized3xComplexLoungeResponse, '
+      'authLoungeResponseBody: $auth3xLoungeResponseBody, '
+      'loungeNotSentRequiredDataAndTimeoutReached: $loungeNotSentRequiredDataAndTimeoutReached'
+      '}';
+}
+
+class Auth4xSuccessComplexLoungeResponse extends LoungeComplexResponse {
   final ConfigurationLoungeResponseBody configurationLoungeResponseBody;
   final InitLoungeResponseBody initLoungeResponseBody;
   final CommandsLoungeResponseBody commandsLoungeResponseBody;
   final PushIsSubscribedLoungeResponseBody pushIsSubscribedLoungeResponseBody;
+  final bool authSuccessReceived;
 
   @override
   List<dynamic> get optionalFields => [
@@ -344,24 +559,27 @@ class AuthSuccessComplexLoungeResponse extends LoungeComplexResponse {
   List<dynamic> get requiredFields => [
         configurationLoungeResponseBody,
         initLoungeResponseBody,
+        authSuccessReceived,
       ];
 
-  AuthSuccessComplexLoungeResponse({
+  Auth4xSuccessComplexLoungeResponse({
     @required this.configurationLoungeResponseBody,
     @required this.initLoungeResponseBody,
     @required this.commandsLoungeResponseBody,
     @required this.pushIsSubscribedLoungeResponseBody,
+    @required this.authSuccessReceived,
   });
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AuthSuccessComplexLoungeResponse &&
+      other is Auth4xSuccessComplexLoungeResponse &&
           runtimeType == other.runtimeType &&
           configurationLoungeResponseBody ==
               other.configurationLoungeResponseBody &&
           initLoungeResponseBody == other.initLoungeResponseBody &&
           commandsLoungeResponseBody == other.commandsLoungeResponseBody &&
+          authSuccessReceived == other.authSuccessReceived &&
           pushIsSubscribedLoungeResponseBody ==
               other.pushIsSubscribedLoungeResponseBody;
 
@@ -370,15 +588,71 @@ class AuthSuccessComplexLoungeResponse extends LoungeComplexResponse {
       configurationLoungeResponseBody.hashCode ^
       initLoungeResponseBody.hashCode ^
       commandsLoungeResponseBody.hashCode ^
+      authSuccessReceived.hashCode ^
       pushIsSubscribedLoungeResponseBody.hashCode;
 
   @override
   String toString() {
-    return 'AuthSuccessComplexLoungeResponse{'
+    return 'Auth4xSuccessComplexLoungeResponse{'
         'configurationLoungeResponseBody: $configurationLoungeResponseBody, '
         'initLoungeResponseBody: $initLoungeResponseBody, '
         'commandsLoungeResponseBody: $commandsLoungeResponseBody, '
+        'authSuccessReceived: $authSuccessReceived, '
         'pushIsSubscribedLoungeResponseBody: $pushIsSubscribedLoungeResponseBody'
+        '}';
+  }
+}
+
+class Authorized3xComplexLoungeResponse extends LoungeComplexResponse {
+  final ConfigurationLoungeResponseBody configurationLoungeResponseBody;
+  final InitLoungeResponseBody initLoungeResponseBody;
+  final CommandsLoungeResponseBody commandsLoungeResponseBody;
+  final bool authorizedReceived;
+
+  @override
+  List<dynamic> get optionalFields => [
+        commandsLoungeResponseBody,
+      ];
+
+  @override
+  List<dynamic> get requiredFields => [
+        authorizedReceived,
+        initLoungeResponseBody,
+        configurationLoungeResponseBody,
+      ];
+
+  Authorized3xComplexLoungeResponse({
+    @required this.configurationLoungeResponseBody,
+    @required this.initLoungeResponseBody,
+    @required this.commandsLoungeResponseBody,
+    @required this.authorizedReceived,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Authorized3xComplexLoungeResponse &&
+          runtimeType == other.runtimeType &&
+          configurationLoungeResponseBody ==
+              other.configurationLoungeResponseBody &&
+          initLoungeResponseBody == other.initLoungeResponseBody &&
+          commandsLoungeResponseBody == other.commandsLoungeResponseBody &&
+          authorizedReceived == other.authorizedReceived;
+
+  @override
+  int get hashCode =>
+      configurationLoungeResponseBody.hashCode ^
+      initLoungeResponseBody.hashCode ^
+      commandsLoungeResponseBody.hashCode ^
+      authorizedReceived.hashCode;
+
+  @override
+  String toString() {
+    return 'Authorized3xComplexLoungeResponse{'
+        'configurationLoungeResponseBody: $configurationLoungeResponseBody, '
+        'initLoungeResponseBody: $initLoungeResponseBody, '
+        'commandsLoungeResponseBody: $commandsLoungeResponseBody, '
+        'authorizedReceived: $authorizedReceived'
         '}';
   }
 }

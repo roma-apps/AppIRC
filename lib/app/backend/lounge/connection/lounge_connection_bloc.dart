@@ -11,6 +11,7 @@ import 'package:rxdart/subjects.dart';
 var _logger = Logger("lounge_connection_form_bloc.dart");
 
 class LoungeConnectionBloc extends DisposableOwner {
+
   final SocketIOService socketIOService;
 
   LoungePreferences get preferences => LoungePreferences(

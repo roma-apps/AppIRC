@@ -6,6 +6,27 @@ part of 'lounge_request_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+Auth3xLoungeJsonRequest _$Auth3xLoungeJsonRequestFromJson(
+    Map<String, dynamic> json) {
+  return Auth3xLoungeJsonRequest(
+    user: json['user'] as String,
+    password: json['password'] as String,
+    lastMessageRemoteId: json['lastMessage'] as int,
+    openChannelRemoteId: json['openChannel'] as int,
+    token: json['token'] as String,
+  );
+}
+
+Map<String, dynamic> _$Auth3xLoungeJsonRequestToJson(
+        Auth3xLoungeJsonRequest instance) =>
+    <String, dynamic>{
+      'user': instance.user,
+      'password': instance.password,
+      'lastMessage': instance.lastMessageRemoteId,
+      'openChannel': instance.openChannelRemoteId,
+      'token': instance.token,
+    };
+
 PushFCMTokenLoungeJsonRequest _$PushFCMTokenLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
   return PushFCMTokenLoungeJsonRequest(
@@ -104,9 +125,9 @@ Map<String, dynamic> _$SignUpLoungeJsonRequestToJson(
       'password': instance.password,
     };
 
-AuthPerformLoungeJsonRequest _$AuthPerformLoungeJsonRequestFromJson(
+Auth4xPerformLoungeJsonRequest _$Auth4xPerformLoungeJsonRequestFromJson(
     Map<String, dynamic> json) {
-  return AuthPerformLoungeJsonRequest(
+  return Auth4xPerformLoungeJsonRequest(
     user: json['user'] as String,
     password: json['password'] as String,
     token: json['token'] as String,
@@ -116,8 +137,8 @@ AuthPerformLoungeJsonRequest _$AuthPerformLoungeJsonRequestFromJson(
   );
 }
 
-Map<String, dynamic> _$AuthPerformLoungeJsonRequestToJson(
-    AuthPerformLoungeJsonRequest instance) {
+Map<String, dynamic> _$Auth4xPerformLoungeJsonRequestToJson(
+    Auth4xPerformLoungeJsonRequest instance) {
   final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {

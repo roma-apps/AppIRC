@@ -28,7 +28,7 @@ import 'package:flutter_appirc/app/network/state/network_states_bloc.dart';
 import 'package:flutter_appirc/local_preferences/local_preferences_service.dart';
 import 'package:flutter_appirc/lounge/lounge_model.dart';
 import 'package:flutter_appirc/provider/provider_context_bloc_impl.dart';
-import 'package:flutter_appirc/pushes/push_service.dart';
+import 'package:flutter_appirc/push/fcm/fcm_push_service.dart';
 import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:logging/logging.dart';
 
@@ -59,7 +59,7 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
     appContextBloc.get<ICurrentAuthInstanceBloc>();
 
     var socketIoService = appContextBloc.get<SocketIOService>();
-    var pushesService = appContextBloc.get<PushesService>();
+    var fcmPushService = appContextBloc.get<IFcmPushService>();
     var localPreferenceService = appContextBloc.get<ILocalPreferencesService>();
 
     var loungeBackendService = LoungeBackendService(
@@ -137,7 +137,7 @@ class CurrentAuthInstanceContextBloc extends ProviderContextBloc
         .asyncInitAndRegister<ChatInitBloc>(chatInitBloc);
 
     var chatPushesService = ChatPushesService(
-      pushesService: pushesService,
+      fcmPushService: fcmPushService,
       backendService: loungeBackendService,
       chatInitBloc: chatInitBloc,
     );

@@ -21,7 +21,8 @@ import 'package:flutter_appirc/app/ui/theme/light/light_appirc_ui_theme_model.da
 import 'package:flutter_appirc/local_preferences/local_preferences_service.dart';
 import 'package:flutter_appirc/local_preferences/shared_preferences_local_preferences_service_impl.dart';
 import 'package:flutter_appirc/provider/provider_context_bloc_impl.dart';
-import 'package:flutter_appirc/pushes/push_service.dart';
+import 'package:flutter_appirc/push/fcm/fcm_push_service.dart';
+import 'package:flutter_appirc/push/fcm/fcm_push_service_impl.dart';
 import 'package:flutter_appirc/socket_io/socket_io_service.dart';
 import 'package:flutter_appirc/ui/theme/system/brightness/ui_theme_system_brightness_bloc.dart';
 import 'package:flutter_appirc/ui/theme/system/brightness/ui_theme_system_brightness_bloc_impl.dart';
@@ -52,15 +53,14 @@ class AppContextBloc extends ProviderContextBloc implements IAppContextBloc {
         sharedPreferencesLocalPreferencesService);
     addDisposable(disposable: sharedPreferencesLocalPreferencesService);
 
-    var pushesService = PushesService();
+    var fcmPushService = FcmPushService();
 
-    await pushesService.init();
-    await pushesService.askPermissions();
-    await pushesService.configure();
-    addDisposable(disposable: pushesService);
+    addDisposable(disposable: fcmPushService);
 
     await globalProviderService
-        .asyncInitAndRegister<PushesService>(pushesService);
+        .asyncInitAndRegister<IFcmPushService>(fcmPushService);
+    await globalProviderService
+        .asyncInitAndRegister<FcmPushService>(fcmPushService);
 
     var chatDatabaseService = ChatDatabaseService();
     await globalProviderService

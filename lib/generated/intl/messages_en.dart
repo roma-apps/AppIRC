@@ -81,7 +81,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "chat_channel_topic_dialog_field_edit_hint" : MessageLookupByLibrary.simpleMessage("Hey there!"),
     "chat_channel_topic_dialog_field_edit_label" : MessageLookupByLibrary.simpleMessage("Topic"),
     "chat_channel_topic_dialog_title" : m0,
-    "chat_connection_public_receonnect_not_supported" : MessageLookupByLibrary.simpleMessage("Lounge don\'t support reconnect for public mode.\nClick to sign-out"),
+    "chat_connection_public_reconnectNotSupportedOnTheLounge4x" : MessageLookupByLibrary.simpleMessage("The Lounge 4.x don\'t support reconnect for public mode.\nClick to sign-out."),
     "chat_message_action_copy" : MessageLookupByLibrary.simpleMessage("Copy text body"),
     "chat_message_preview_error_server" : MessageLookupByLibrary.simpleMessage("Server failed to fetch preview metadata"),
     "chat_message_preview_loading" : MessageLookupByLibrary.simpleMessage("Loading..."),

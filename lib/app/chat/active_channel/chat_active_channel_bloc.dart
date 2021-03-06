@@ -13,7 +13,7 @@ import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/app/network/state/network_state_model.dart';
 import 'package:flutter_appirc/local_preferences/local_preference_bloc_impl.dart';
 import 'package:flutter_appirc/local_preferences/local_preferences_service.dart';
-import 'package:flutter_appirc/pushes/push_model.dart';
+import 'package:flutter_appirc/push/push_model.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/subjects.dart';

@@ -1975,11 +1975,11 @@ class S {
     );
   }
 
-  /// `Lounge don't support reconnect for public mode.\nClick to sign-out`
-  String get chat_connection_public_receonnect_not_supported {
+  /// `The Lounge 4.x don't support reconnect for public mode.\nClick to sign-out.`
+  String get chat_connection_public_reconnectNotSupportedOnTheLounge4x {
     return Intl.message(
-      'Lounge don\'t support reconnect for public mode.\nClick to sign-out',
-      name: 'chat_connection_public_receonnect_not_supported',
+      'The Lounge 4.x don\'t support reconnect for public mode.\nClick to sign-out.',
+      name: 'chat_connection_public_reconnectNotSupportedOnTheLounge4x',
       desc: '',
       args: [],
     );

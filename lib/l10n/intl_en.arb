@@ -1,6 +1,6 @@
 {
     "@@locale": "en",
-    "@@last_modified": "2021-02-27T15:52:21+00:00",
+    "@@last_modified": "2021-03-06T17:51:10+00:00",
     "app_init_fail": "Failed to start app.\nTry restart or re-install app.",
     "dialog_progress_content": "Loading...",
     "dialog_progress_action_cancel": "Cancel",
@@ -193,5 +193,5 @@
     "chat_users_list_search_users_not_found": "Users not found",
     "chat_user_action_information": "User information",
     "chat_user_action_direct_messages": "Direct Messages",
-    "chat_connection_public_receonnect_not_supported": "Lounge don't support reconnect for public mode.\nClick to sign-out"
+    "chat_connection_public_reconnectNotSupportedOnTheLounge4x": "The Lounge 4.x don't support reconnect for public mode.\nClick to sign-out."
 }

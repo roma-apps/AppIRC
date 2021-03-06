@@ -5,6 +5,11 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'lounge_model.g.dart';
 
+enum LoungeVersion {
+  version3_x,
+  version4_x,
+}
+
 enum LoungeBackendMode {
   private,
   public,

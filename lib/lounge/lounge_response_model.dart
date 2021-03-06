@@ -38,6 +38,9 @@ class LoungeResponseEventNames {
 
   static const String signedUp = "signed-up";
 
+  static const String auth = "auth";
+  static const String authorized = "authorized";
+
   static const String authSuccess = "auth:success";
   static const String authFailed = "auth:failed";
   static const String authStart = "auth:start";
@@ -90,18 +93,18 @@ class SignUpAvailableLoungeResponseBody extends LoungeResponseBody {
   }
 }
 
-class AuthStartLoungeResponseBody extends LoungeResponseBody {
+class Auth4xStartLoungeResponseBody extends LoungeResponseBody {
   static String get eventName => LoungeResponseEventNames.authStart;
 
   final String serverHash;
 
-  AuthStartLoungeResponseBody.fromRaw(dynamic raw)
+  Auth4xStartLoungeResponseBody.fromRaw(dynamic raw)
       : serverHash = raw?.toString();
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AuthStartLoungeResponseBody &&
+      other is Auth4xStartLoungeResponseBody &&
           runtimeType == other.runtimeType &&
           serverHash == other.serverHash;
 
@@ -110,7 +113,7 @@ class AuthStartLoungeResponseBody extends LoungeResponseBody {
 
   @override
   String toString() {
-    return 'AuthStartLoungeResponseBody{'
+    return 'Auth4xStartLoungeResponseBody{'
         'serverHash: $serverHash'
         '}';
   }
@@ -271,6 +274,51 @@ class MessagePreviewToggleLoungeResponseBody extends LoungeResponseBody {
 
   Map<String, dynamic> toJson() =>
       _$MessagePreviewToggleLoungeResponseBodyToJson(this);
+}
+
+@JsonSerializable()
+class Auth3xLoungeResponseBody extends LoungeResponseBody {
+  static String get eventName => LoungeResponseEventNames.auth;
+
+  final bool success;
+  final int serverHash;
+
+  // TODO: remove todo when will be in master branch
+  // only available in custom the lounge version
+  // https://github.com/xal/thelounge/tree/xal/sign_up
+  final bool signUp;
+
+  Auth3xLoungeResponseBody({
+    @required this.success,
+    @required this.serverHash,
+    @required this.signUp,
+  });
+
+  @override
+  String toString() {
+    return 'Auth3xLoungeResponseBody{'
+        'success: $success, '
+        'serverHash: $serverHash, '
+        'signUp: $signUp'
+        '}';
+  }
+
+  factory Auth3xLoungeResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$Auth3xLoungeResponseBodyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$Auth3xLoungeResponseBodyToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Auth3xLoungeResponseBody &&
+          runtimeType == other.runtimeType &&
+          success == other.success &&
+          serverHash == other.serverHash &&
+          signUp == other.signUp;
+
+  @override
+  int get hashCode => success.hashCode ^ serverHash.hashCode ^ signUp.hashCode;
 }
 
 @JsonSerializable()
@@ -801,6 +849,10 @@ class ConfigurationLoungeResponseBody extends LoungeResponseBody {
   final String applicationServerKey;
   final String version;
   final String gitCommit;
+
+  bool get is4Version => version.startsWith("4.");
+
+  bool get is3Version => version.startsWith("3.");
 
   bool get displayNetwork => !lockNetwork;
 
@@ -2018,8 +2070,6 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
   final NetworkServerOptionsLoungeResponseBodyPart serverOptions;
   final NetworkStatusLoungeResponseBody status;
 
-
-
   const NetworkLoungeResponseBodyPart({
     @required this.uuid,
     @required this.name,
@@ -2043,7 +2093,6 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
     @required this.saslPassword,
     @required this.password,
   });
-
 
   @override
   bool operator ==(Object other) =>
@@ -2095,7 +2144,6 @@ class NetworkLoungeResponseBodyPart extends LoungeResponseBodyPart {
       channels.hashCode ^
       serverOptions.hashCode ^
       status.hashCode;
-
 
   @override
   String toString() {

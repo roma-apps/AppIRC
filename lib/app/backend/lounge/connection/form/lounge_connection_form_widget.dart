@@ -135,6 +135,8 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                     await socketIOInstanceBloc.performAsyncInit();
 
                     loungeBackendConnectBloc = LoungeBackendConnectBloc(
+                      lastMessageRemoteIdExtractor: null,
+                      currentChannelExtractor: null,
                       loungeAuthPreferences: loungePreferences.authPreferences,
                       loungeBackendSocketIoApiWrapperBloc:
                           LoungeBackendSocketIoApiWrapperBloc(
@@ -279,6 +281,8 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                                 socketIOInstanceBloc: socketIOInstanceBloc);
 
                         loungeBackendConnectBloc = LoungeBackendConnectBloc(
+                          lastMessageRemoteIdExtractor: null,
+                          currentChannelExtractor: null,
                           loungeBackendSocketIoApiWrapperBloc:
                               loungeBackendSocketIoApiWrapperBloc,
                           loungeAuthPreferences:
@@ -304,10 +308,8 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                     if (requestResult.connectDetails.isSocketTimeout) {
                       await showLoungeTimeoutAlertDialog(context);
                     } else {
-                      if (requestResult.authPerformComplexLoungeResponse !=
-                          null) {
-                        var success = requestResult
-                            .authPerformComplexLoungeResponse.isSuccess;
+                      if (requestResult.isResponseExist) {
+                        var success = requestResult.success;
 
                         if (success) {
                           successCallback(
@@ -398,6 +400,8 @@ class LoungeConnectionFormWidget extends StatelessWidget {
                                 socketIOInstanceBloc: socketIOInstanceBloc);
 
                         loungeBackendConnectBloc = LoungeBackendConnectBloc(
+                          lastMessageRemoteIdExtractor: null,
+                          currentChannelExtractor: null,
                           loungeBackendSocketIoApiWrapperBloc: loungeBackendSocketIoApiWrapperBloc,
                           loungeAuthPreferences: loungePreferences.authPreferences,
                         );
