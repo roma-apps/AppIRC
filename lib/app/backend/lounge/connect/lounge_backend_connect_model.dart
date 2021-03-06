@@ -451,7 +451,7 @@ class Auth3xComplexLoungeResponse extends LoungeComplexResponse {
   final Auth3xLoungeResponseBody auth3xLoungeResponseBody;
   final bool loungeNotSentRequiredDataAndTimeoutReached;
 
-  bool get isSuccess => authorized3xComplexLoungeResponse != null || auth3xLoungeResponseBody.success == true;
+  bool get isSuccess => authorized3xComplexLoungeResponse != null;
 
   bool get isFail => !isSuccess;
 

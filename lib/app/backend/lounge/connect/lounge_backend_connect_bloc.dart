@@ -20,22 +20,22 @@ class LoungeBackendConnectBloc extends DisposableOwner {
       BehaviorSubject.seeded(null);
 
   final BehaviorSubject<Auth4xPerformComplexLoungeResponse>
-      auth4xPerformComplexResponseSubject = BehaviorSubject.seeded(null);
+      auth4xPerformComplexLoungeResponseSubject = BehaviorSubject.seeded(null);
 
   Stream<Auth4xPerformComplexLoungeResponse>
-      get authPerformComplexResponseStream =>
-          auth4xPerformComplexResponseSubject.stream;
+      get auth4xPerformComplexLoungeResponseStream =>
+          auth4xPerformComplexLoungeResponseSubject.stream;
 
-  Auth4xPerformComplexLoungeResponse get authPerformComplexResponse =>
-      auth4xPerformComplexResponseSubject.value;
+  Auth4xPerformComplexLoungeResponse get auth4xPerformComplexLoungeResponse =>
+      auth4xPerformComplexLoungeResponseSubject.value;
 
   final BehaviorSubject<Auth3xComplexLoungeResponse>
       auth3xComplexLoungeResponseSubject = BehaviorSubject.seeded(null);
 
-  Stream<Auth3xComplexLoungeResponse> get authComplexLoungeResponseStream =>
+  Stream<Auth3xComplexLoungeResponse> get auth3xComplexLoungeResponseStream =>
       auth3xComplexLoungeResponseSubject.stream;
 
-  Auth3xComplexLoungeResponse get authComplexLoungeResponse =>
+  Auth3xComplexLoungeResponse get auth3xComplexLoungeResponse =>
       auth3xComplexLoungeResponseSubject.value;
 
   final Channel Function() currentChannelExtractor;
@@ -66,17 +66,26 @@ class LoungeBackendConnectBloc extends DisposableOwner {
 
   LoungeBackendAuthState get authState => calculateAuthState(
         backendMode: backendMode,
-        authPerformResponse: authPerformComplexResponse,
+        auth4xPerformLoungeResponse: auth4xPerformComplexLoungeResponse,
+        auth3xComplexLoungeResponse: auth3xComplexLoungeResponse,
         connectState: connectState,
       );
 
-  Stream<LoungeBackendAuthState> get authStateStream => Rx.combineLatest3(
+  Stream<LoungeBackendAuthState> get authStateStream => Rx.combineLatest4(
         backendModeStream,
         connectStateStream,
-        authPerformComplexResponseStream,
-        (backendMode, authPerformResponse, connectState) => calculateAuthState(
+        auth4xPerformComplexLoungeResponseStream,
+        auth3xComplexLoungeResponseStream,
+        (
+          backendMode,
+          connectState,
+          auth4xPerformLoungeResponse,
+          auth3xComplexLoungeResponse,
+        ) =>
+            calculateAuthState(
           backendMode: backendMode,
-          authPerformResponse: authPerformResponse,
+          auth4xPerformLoungeResponse: auth4xPerformLoungeResponse,
+          auth3xComplexLoungeResponse: auth3xComplexLoungeResponse,
           connectState: connectState,
         ),
       );
@@ -92,11 +101,11 @@ class LoungeBackendConnectBloc extends DisposableOwner {
       case LoungeBackendMode.private:
         switch (loungeVersion) {
           case LoungeVersion.version3_x:
-            initLoungeResponseBody ??= authComplexLoungeResponse
+            initLoungeResponseBody ??= auth3xComplexLoungeResponse
                 ?.authorized3xComplexLoungeResponse?.initLoungeResponseBody;
             break;
           case LoungeVersion.version4_x:
-            initLoungeResponseBody = authPerformComplexResponse
+            initLoungeResponseBody = auth4xPerformComplexLoungeResponse
                 ?.auth4xSuccessComplexLoungeResponse?.initLoungeResponseBody;
 
             break;
@@ -126,29 +135,29 @@ class LoungeBackendConnectBloc extends DisposableOwner {
   }
 
   ChatConfig get config => _calculateConfig(
-        authPerformResponse: authPerformComplexResponse,
-        authComplexLoungeResponse: authComplexLoungeResponse,
+        auth4xPerformResponse: auth4xPerformComplexLoungeResponse,
+        authComplexLoungeResponse: auth3xComplexLoungeResponse,
         connectDetails: connectDetails,
       );
 
   Stream<ChatConfig> get configStream => Rx.combineLatest3(
         connectDetailsStream,
-        authPerformComplexResponseStream,
-        authComplexLoungeResponseStream,
+        auth4xPerformComplexLoungeResponseStream,
+        auth3xComplexLoungeResponseStream,
         (
           connectDetails,
-          authPerformResponse,
+          auth4xPerformResponse,
           authComplexLoungeResponse,
         ) =>
             _calculateConfig(
-          authPerformResponse: authPerformResponse,
+          auth4xPerformResponse: auth4xPerformResponse,
           connectDetails: connectDetails,
           authComplexLoungeResponse: authComplexLoungeResponse,
         ),
       );
 
   ChatConfig _calculateConfig({
-    @required Auth4xPerformComplexLoungeResponse authPerformResponse,
+    @required Auth4xPerformComplexLoungeResponse auth4xPerformResponse,
     @required LoungeConnectDetails connectDetails,
     @required Auth3xComplexLoungeResponse authComplexLoungeResponse,
   }) {
@@ -165,10 +174,10 @@ class LoungeBackendConnectBloc extends DisposableOwner {
                 ?.authorized3xComplexLoungeResponse?.commandsLoungeResponseBody;
             break;
           case LoungeVersion.version4_x:
-            configLoungeResponseBody = authPerformResponse
+            configLoungeResponseBody = auth4xPerformResponse
                 ?.auth4xSuccessComplexLoungeResponse
                 ?.configurationLoungeResponseBody;
-            commandsLoungeResponseBody = authPerformResponse
+            commandsLoungeResponseBody = auth4xPerformResponse
                 ?.auth4xSuccessComplexLoungeResponse
                 ?.commandsLoungeResponseBody;
             break;
@@ -227,7 +236,8 @@ class LoungeBackendConnectBloc extends DisposableOwner {
 
     var loungeVersion = connectDetails?.loungeVersion;
 
-    _logger.finest(() => "connectAndLoginAndWaitForResult loungeVersion $loungeVersion");
+    _logger.finest(
+        () => "connectAndLoginAndWaitForResult loungeVersion $loungeVersion");
 
     switch (loungeVersion) {
       case LoungeVersion.version3_x:
@@ -251,7 +261,7 @@ class LoungeBackendConnectBloc extends DisposableOwner {
         if (connectDetails.isPrivateMode) {
           if (loungeAuthPreferences != null) {
             authPerformComplexLoungeResponse = await login4x();
-            auth4xPerformComplexResponseSubject
+            auth4xPerformComplexLoungeResponseSubject
                 .add(authPerformComplexLoungeResponse);
           }
         }
@@ -275,20 +285,44 @@ class LoungeBackendConnectBloc extends DisposableOwner {
     @required this.lastMessageRemoteIdExtractor,
   }) {
     addDisposable(subject: connectDetailsSubject);
-    addDisposable(subject: auth4xPerformComplexResponseSubject);
+    addDisposable(subject: auth4xPerformComplexLoungeResponseSubject);
     addDisposable(subject: auth3xComplexLoungeResponseSubject);
 
-    // listenFor4xReconnect();
+    listenFor3xPrivateReconnect();
+    listenFor4xPrivateReconnect();
   }
 
-  void listenFor4xReconnect() {
+  void listenForPublicReconnect() {
+    addDisposable(
+      disposable: loungeBackendSocketIoApiWrapperBloc.listenForInit(
+        (init) {
+          // reconnect public
+          if(backendMode == LoungeBackendMode.public) {
+
+          }
+        },
+      ),
+    );
+  }
+
+  void listenFor4xPrivateReconnect() {
     addDisposable(
       disposable: loungeBackendSocketIoApiWrapperBloc.listenForAuth4xStart(
         (auth) {
-          // reconnect in private mode
-          // public mode don't support reconnect to the same socket
-          if (authPerformComplexResponse != null) {
+          if (auth4xPerformComplexLoungeResponse != null) {
             login4x();
+          }
+        },
+      ),
+    );
+  }
+
+  void listenFor3xPrivateReconnect() {
+    addDisposable(
+      disposable: loungeBackendSocketIoApiWrapperBloc.listenForAuth3x(
+        (auth) {
+          if (auth3xComplexLoungeResponse != null) {
+            login3x();
           }
         },
       ),
@@ -312,7 +346,8 @@ class LoungeBackendConnectBloc extends DisposableOwner {
       hasConfig: config != null,
     );
 
-    auth4xPerformComplexResponseSubject.add(auth4xPerformComplexLoungeResponse);
+    auth4xPerformComplexLoungeResponseSubject
+        .add(auth4xPerformComplexLoungeResponse);
 
     return auth4xPerformComplexLoungeResponse;
   }
@@ -340,20 +375,34 @@ class LoungeBackendConnectBloc extends DisposableOwner {
 
   static LoungeBackendAuthState calculateAuthState({
     @required LoungeBackendMode backendMode,
-    @required Auth4xPerformComplexLoungeResponse authPerformResponse,
+    @required Auth4xPerformComplexLoungeResponse auth4xPerformLoungeResponse,
+    @required Auth3xComplexLoungeResponse auth3xComplexLoungeResponse,
     @required LoungeBackendConnectState connectState,
   }) {
     switch (connectState) {
       case LoungeBackendConnectState.connected:
         switch (backendMode) {
           case LoungeBackendMode.private:
-            if (authPerformResponse?.isSuccess == true) {
-              return LoungeBackendAuthState.logged;
-            } else if (authPerformResponse?.isFail == true) {
-              return LoungeBackendAuthState.loginFailed;
+            if (auth4xPerformLoungeResponse != null) {
+              if (auth4xPerformLoungeResponse?.isSuccess == true) {
+                return LoungeBackendAuthState.logged;
+              } else if (auth4xPerformLoungeResponse?.isFail == true) {
+                return LoungeBackendAuthState.loginFailed;
+              } else {
+                return LoungeBackendAuthState.waitForAuth;
+              }
+            } else if (auth3xComplexLoungeResponse != null) {
+              if (auth3xComplexLoungeResponse?.isSuccess == true) {
+                return LoungeBackendAuthState.logged;
+              } else if (auth3xComplexLoungeResponse?.isFail == true) {
+                return LoungeBackendAuthState.loginFailed;
+              } else {
+                return LoungeBackendAuthState.waitForAuth;
+              }
             } else {
-              return LoungeBackendAuthState.waitForAuth;
+              throw "Invalid state";
             }
+
             break;
           case LoungeBackendMode.public:
             return LoungeBackendAuthState.logged;

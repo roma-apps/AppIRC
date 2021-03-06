@@ -7,10 +7,10 @@ part 'network_user_preferences_model.g.dart';
 @JsonSerializable()
 class NetworkUserPreferences extends IJsonObject {
   String nickname;
-  String username;
-  String password;
-  String realName;
-  String commands;
+  final String username;
+  final String password;
+  final String realName;
+  final String commands;
 
   NetworkUserPreferences({
     @required this.nickname,
