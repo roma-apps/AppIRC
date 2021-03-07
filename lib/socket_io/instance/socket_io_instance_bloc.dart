@@ -302,8 +302,9 @@ class SocketIOInstanceBloc extends AsyncInitLoadingBloc {
         SocketIoConnectionState.connectTimeout, "connectTimeout", data);
     SocketEventListener connectingListener = (data) =>
         listener(SocketIoConnectionState.connecting, "connecting", data);
+    // look like bug in adhara socket ui reconnect actually means is connect error
     SocketEventListener reconnectListener = (data) =>
-        listener(SocketIoConnectionState.reconnected, "reconnect", data);
+        listener(SocketIoConnectionState.connectTimeout, "reconnect", data);
     SocketEventListener reconnectFailedListener = (data) => listener(
         SocketIoConnectionState.reconnectFailed, "reconnectFailed", data);
     SocketEventListener reconnectErrorListener = (data) => listener(
