@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/channel/channel_model.dart';
-import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
+import 'package:flutter_appirc/app/chat/push/chat_push_service.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:logging/logging.dart';

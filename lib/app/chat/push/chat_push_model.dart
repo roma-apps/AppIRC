@@ -2,7 +2,7 @@ import 'package:flutter_appirc/push/push_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logging/logging.dart';
 
-part 'chat_push_notifications_model.g.dart';
+part 'chat_push_model.g.dart';
 
 var _logger = Logger("chat_push_notifications_model.dart");
 

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat_push_notifications_model.dart';
+part of 'chat_push_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

@@ -15,7 +15,7 @@ import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_bloc.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_model.dart';
 import 'package:flutter_appirc/app/chat/preferences/chat_preferences_saver_bloc.dart';
-import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
+import 'package:flutter_appirc/app/chat/push/chat_push_service.dart';
 import 'package:flutter_appirc/app/chat/upload/chat_upload_bloc.dart';
 import 'package:flutter_appirc/app/context/app_context_bloc_impl.dart';
 import 'package:flutter_appirc/app/instance/current/context/current_auth_instance_context_bloc.dart';

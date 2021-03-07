@@ -3,12 +3,12 @@ import 'package:flutter_appirc/app/backend/backend_service.dart';
 import 'package:flutter_appirc/app/chat/connection/chat_connection_model.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_bloc.dart';
 import 'package:flutter_appirc/app/chat/init/chat_init_model.dart';
-import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications_model.dart';
+import 'package:flutter_appirc/app/chat/push/chat_push_model.dart';
 import 'package:flutter_appirc/disposable/disposable_owner.dart';
 import 'package:flutter_appirc/push/fcm/fcm_push_service.dart';
 import 'package:logging/logging.dart';
 
-var _logger = Logger("chat_push_notifications.dart");
+var _logger = Logger("chat_push_service.dart");
 
 class ChatPushesService extends DisposableOwner {
   final IFcmPushService fcmPushService;
@@ -36,8 +36,9 @@ class ChatPushesService extends DisposableOwner {
     addDisposable(
       streamSubscription: chatInitBloc.stateStream.listen(
         (newState) {
-          if (newState == ChatInitState.finished) {
             var token = fcmPushService.deviceToken;
+          _logger.finest(() => "ChatInitState $newState token $token");
+          if (newState == ChatInitState.finished) {
             if (token != null) {
               backendService.sendDevicePushFCMTokenToServer(newToken: token);
             }
@@ -51,6 +52,7 @@ class ChatPushesService extends DisposableOwner {
         (connectionState) {
           var token = fcmPushService.deviceToken;
 
+          _logger.finest(() => "connectionState $connectionState token $token");
           if (token != null &&
               connectionState == ChatConnectionState.connected) {
             backendService.sendDevicePushFCMTokenToServer(newToken: token);
@@ -61,6 +63,7 @@ class ChatPushesService extends DisposableOwner {
     addDisposable(
       streamSubscription: fcmPushService.deviceTokenStream.listen(
         (token) {
+          _logger.finest(() => "connectionState ${backendService.connectionState} token $token");
           if (token != null &&
               backendService.connectionState == ChatConnectionState.connected) {
             backendService.sendDevicePushFCMTokenToServer(newToken: token);

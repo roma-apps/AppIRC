@@ -9,7 +9,7 @@ import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
 import 'package:flutter_appirc/app/chat/chat_model.dart';
 import 'package:flutter_appirc/app/chat/input_message/chat_input_message_bloc.dart';
-import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
+import 'package:flutter_appirc/app/chat/push/chat_push_service.dart';
 import 'package:flutter_appirc/app/message/list/message_list_model.dart';
 import 'package:flutter_appirc/app/message/message_model.dart';
 import 'package:flutter_appirc/app/message/preview/message_preview_model.dart';

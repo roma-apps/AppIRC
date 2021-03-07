@@ -5,7 +5,7 @@ import 'package:flutter_appirc/app/channel/channel_model.dart';
 import 'package:flutter_appirc/app/channel/list/channel_list_listener_bloc.dart';
 import 'package:flutter_appirc/app/channel/state/channel_state_model.dart';
 import 'package:flutter_appirc/app/channel/state/channel_states_bloc.dart';
-import 'package:flutter_appirc/app/chat/push_notifications/chat_push_notifications.dart';
+import 'package:flutter_appirc/app/chat/push/chat_push_service.dart';
 import 'package:flutter_appirc/app/network/list/network_list_bloc.dart';
 import 'package:flutter_appirc/app/network/network_model.dart';
 import 'package:flutter_appirc/disposable/disposable.dart';

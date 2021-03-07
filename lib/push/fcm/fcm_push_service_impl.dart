@@ -64,9 +64,8 @@ class FcmPushService extends AsyncInitLoadingBloc implements IFcmPushService {
 
   @override
   Future internalAsyncInit() async {
-    _logger.finest(() => "init");
+    _logger.finest(() => "internalAsyncInit");
 
-    _logger.finest(() => "listen ");
     addDisposable(
       streamSubscription: _fcm.onTokenRefresh.listen(
         (newToken) {
@@ -74,8 +73,6 @@ class FcmPushService extends AsyncInitLoadingBloc implements IFcmPushService {
         },
       ),
     );
-
-    _logger.finest(() => "configure start");
 
     try {
       _fcm.configure(
@@ -99,12 +96,10 @@ class FcmPushService extends AsyncInitLoadingBloc implements IFcmPushService {
         ),
         onBackgroundMessage: null,
       );
-      _logger.finest(() => "configure finish");
 
+      await askPermissions();
 
-      _logger.finest(() => "setAutoInitEnabled start");
       await _fcm.setAutoInitEnabled(true);
-      _logger.finest(() => "setAutoInitEnabled finish");
 
       unawaited(_updateToken());
     } catch (e, stackTrace) {
