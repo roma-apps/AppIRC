@@ -117,7 +117,10 @@ class ChannelNewMessageState extends State<ChannelNewMessageWidget> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(suggestion),
+                child: Text(
+                  suggestion,
+                  style: IAppIrcUiTextTheme.of(context).bigDarkGrey,
+                ),
               ),
             );
           },

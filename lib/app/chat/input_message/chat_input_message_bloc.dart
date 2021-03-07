@@ -68,11 +68,18 @@ class ChatInputMessageBloc extends DisposableOwner {
     var lastWord = findLastWord(currentMessage);
 
     var replaceText = "$selectedSuggestion ";
-    var newMessage = currentMessage.replaceAll(lastWord, replaceText);
+    replaceText = replaceText.replaceFirst("@", "");
+    var newMessage = currentMessage.replaceAll(
+      lastWord,
+      replaceText,
+    );
 
     messageController.text = newMessage;
-    messageController.selection =
-        TextSelection.fromPosition(TextPosition(offset: newMessage.length));
+    messageController.selection = TextSelection.fromPosition(
+      TextPosition(
+        offset: newMessage.length,
+      ),
+    );
 
     _logger.fine(() => "after onAutoCompleteSelected $currentMessage "
         "replaceText = $replaceText "
