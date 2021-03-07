@@ -80,6 +80,8 @@ dependencies:
   # used for connection/channels settings
   streaming_shared_preferences: ^1.0.2
 
+  shared_preferences: ^0.5.10
+
   # send message autocomplete
   flutter_typeahead: ^2.0.0
 
