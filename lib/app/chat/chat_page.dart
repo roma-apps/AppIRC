@@ -552,59 +552,57 @@ class _ChatPageBodyPublicModeReconnectWidget extends StatelessWidget {
       builder: (context, snapshot) {
         var isPublicModeAndDisconnected = snapshot.data;
         if (isPublicModeAndDisconnected) {
-          return InkWell(
-            onTap: () {
-              loungeBackendService.signOut();
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: IAppIrcUiColorTheme.of(context).error,
-              ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
+          return Container(
+            decoration: BoxDecoration(
+              color: IAppIrcUiColorTheme.of(context).error,
+            ),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
                           S
                               .of(context)
                               .chat_connection_public_reconnectNotSupported_description,
                           textAlign: TextAlign.center,
+                          softWrap: true,
                           style: IAppIrcUiTextTheme.of(context).bigTallWhite,
                         ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        PlatformButton(
-                          child: Text(
-                            S
-                                .of(context)
-                                .chat_connection_public_reconnectNotSupported_action_restart,
-                          ),
-                          onPressed: () {
-                            loungeBackendService.restart();
-                          },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      PlatformButton(
+                        child: Text(
+                          S
+                              .of(context)
+                              .chat_connection_public_reconnectNotSupported_action_restart,
                         ),
-                        PlatformButton(
-                          child: Text(
-                            S
-                                .of(context)
-                                .chat_connection_public_reconnectNotSupported_action_signOut,
-                          ),
-                          onPressed: () {
-                            loungeBackendService.signOut();
-                          },
+                        onPressed: () {
+                          loungeBackendService.restart();
+                        },
+                      ),
+                      PlatformButton(
+                        child: Text(
+                          S
+                              .of(context)
+                              .chat_connection_public_reconnectNotSupported_action_signOut,
                         ),
-                      ],
-                    )
-                  ],
-                ),
+                        onPressed: () {
+                          loungeBackendService.signOut();
+                        },
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
           );
