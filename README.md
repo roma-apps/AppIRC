@@ -1,10 +1,11 @@
 # AppIRC
 
-* 27 Feb 2021 App (2.0.0) updated to support The Lounge 4.x. The Lounge 3.x support abandoned
+* 7 march 2021 App (2.0.0) updated to support The Lounge 4.x. Currently app suppports The Lounge 3.x and The Lounge 4.x
 
 Flutter (iOS/Android) mobile client for [TheLounge](https://thelounge.chat/). TheLounge is self-hosted IRC proxy and Web client:
 
-* `Private` and `Public` The Lounge 4.x server support
+* `Private` and `Public` 
+* The Lounge 3.x or 4.x server support
 * Works on `iOS 11+` `Android 5.0+`
 * Native UI widgets for Android and iOS
 * Push notifications support
@@ -21,7 +22,8 @@ Flutter (iOS/Android) mobile client for [TheLounge](https://thelounge.chat/). Th
 The Lounge support web push notifications, which works (with some limitations) only on Android via PWA.
 
 AppIRC support native push notifications on iOS and Android via FCM.
-FCM push notifications works only with **private** TheLounge mode with additional server code modifications (see below).
+FCM push notifications designed for **private** mode. However **public** mode support FCM pushes too, only when socket.io connection is active.
+To enable FCM notifications you should use custom The Lounge mode forks (see below).
 
 # Build from source
 
@@ -35,12 +37,17 @@ keyAlias=alias
 storeFile=/path_to_key/key.jks
 ```
 
-- If you want to use push notifications feature you should add FCM config files: `android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist` from your FCM account. Lounge instance should use `serverKey` from same account. Also, it is required to setup iOS APN key in this Firebase account to enabled pushes on iOS.
+- If you want to use push notifications feature you should add FCM config files: `android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist` from your FCM account. Lounge instance should use `serverKey` from same account. Also, it is required to setup iOS APN key in this Firebase account to enable pushes on iOS.
 
 
 ## The Lounge FCM notifications fork
 
-TheLounge fork with push notifications support - [https://github.com/xal/thelounge/tree/xal/fcm_push_4_x](https://github.com/xal/thelounge/tree/xal/fcm_push_4_x). 
+TheLounge fork with push notifications support:
+
+* 3.x - [https://github.com/xal/thelounge/tree/xal/fcm_push](https://github.com/xal/thelounge/tree/xal/fcm_push)
+* 4.x - [https://github.com/xal/thelounge/tree/xal/fcm_push_4_x](https://github.com/xal/thelounge/tree/xal/fcm_push_4_x)
+
+
 You should add server FCM key in your `config.js`. For example:
 
 ```
@@ -78,8 +85,10 @@ You should add server FCM key in your `config.js`. For example:
 
 ## The Lounge Sign up fork
 
-AppIRC support registration on private The Lounge instances from fork - [https://github.com/xal/thelounge/tree/xal/sign_up_4_x](https://github.com/xal/thelounge/tree/xal/sign_up_4_x)
+AppIRC support registration on private The Lounge instances from fork:
 
+* 3.x - [https://github.com/xal/thelounge/tree/xal/sign_up](https://github.com/xal/thelounge/tree/xal/sign_up)
+* 4.x - [https://github.com/xal/thelounge/tree/xal/sign_up_4_x](https://github.com/xal/thelounge/tree/xal/sign_up_4_x)
 
 Don't forget to update your `config.js` file
 
@@ -97,4 +106,8 @@ Don't forget to update your `config.js` file
 
 ## FCM push + Sign up fork
 
-The lounge FCM push and sign up fork [https://github.com/xal/thelounge/tree/xal/sign_up_and_fcm_push_4_x](https://github.com/xal/thelounge/tree/xal/sign_up_and_fcm_push_4_x) 
+The lounge FCM push and sign up fork:
+
+* 3.x [https://github.com/xal/thelounge/tree/xal/sign_up_and_fcm_push](https://github.com/xal/thelounge/tree/xal/sign_up_and_fcm_push) 
+* 4.x [https://github.com/xal/thelounge/tree/xal/sign_up_and_fcm_push_4_x](https://github.com/xal/thelounge/tree/xal/sign_up_and_fcm_push_4_x) 
+
