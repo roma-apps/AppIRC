@@ -89,7 +89,7 @@ abstract class ProgressDialog extends BaseDialog {
                     }
                   };
                 }
-                return InkWell(
+                return GestureDetector(
                   child: Text(
                     S.of(context).dialog_progress_action_cancel,
                   ),
