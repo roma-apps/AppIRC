@@ -5,6 +5,7 @@ import 'package:flutter_appirc/async/loading/init/async_init_loading_bloc_impl.d
 import 'package:flutter_appirc/push/fcm/fcm_push_service.dart';
 import 'package:flutter_appirc/push/push_model.dart';
 import 'package:logging/logging.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 
 var _logger = Logger("fcm_push_service_impl.dart");
@@ -46,10 +47,12 @@ class FcmPushService extends AsyncInitLoadingBloc implements IFcmPushService {
   }
 
   Future _updateToken() async {
+    _logger.finest(() => "_updateToken start");
     var token = await _fcm.getToken();
     if (token != null) {
       _onNewToken(token);
     }
+    _logger.finest(() => "_updateToken finish");
   }
 
   @override
@@ -63,7 +66,7 @@ class FcmPushService extends AsyncInitLoadingBloc implements IFcmPushService {
   Future internalAsyncInit() async {
     _logger.finest(() => "init");
 
-    _logger.finest(() => "configure");
+    _logger.finest(() => "listen ");
     addDisposable(
       streamSubscription: _fcm.onTokenRefresh.listen(
         (newToken) {
@@ -71,6 +74,8 @@ class FcmPushService extends AsyncInitLoadingBloc implements IFcmPushService {
         },
       ),
     );
+
+    _logger.finest(() => "configure start");
 
     try {
       _fcm.configure(
@@ -94,13 +99,19 @@ class FcmPushService extends AsyncInitLoadingBloc implements IFcmPushService {
         ),
         onBackgroundMessage: null,
       );
+      _logger.finest(() => "configure finish");
 
+
+      _logger.finest(() => "setAutoInitEnabled start");
       await _fcm.setAutoInitEnabled(true);
+      _logger.finest(() => "setAutoInitEnabled finish");
 
-      await _updateToken();
+      unawaited(_updateToken());
     } catch (e, stackTrace) {
       _logger.warning(() => "error during _fcm.configure", e, stackTrace);
     }
+
+
   }
 }
 
