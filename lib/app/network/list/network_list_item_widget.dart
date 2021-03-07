@@ -213,7 +213,7 @@ class NetworkListItemChannelBodyWidget extends StatelessWidget {
               const NetworkListItemConnectionWidget(),
               const ChannelUnreadCountBadgeWidget(),
               NetworkPopupMenuButtonWidget(
-                iconColor: null,
+                iconColor: IAppIrcUiColorTheme.of(context).darkGrey,
               ),
             ],
           ),

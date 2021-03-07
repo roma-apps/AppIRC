@@ -275,10 +275,10 @@ class S {
     );
   }
 
-  /// `Connection`
+  /// `Connection (The Lounge 4.x or 3.x)`
   String get lounge_preferences_host_title {
     return Intl.message(
-      'Connection',
+      'Connection (The Lounge 4.x or 3.x)',
       name: 'lounge_preferences_host_title',
       desc: '',
       args: [],
@@ -1975,11 +1975,31 @@ class S {
     );
   }
 
-  /// `The Lounge 4.x don't support reconnect for public mode.\nClick to sign-out.`
-  String get chat_connection_public_reconnectNotSupportedOnTheLounge4x {
+  /// `The Lounge don't support reconnect in public mode.`
+  String get chat_connection_public_reconnectNotSupported_description {
     return Intl.message(
-      'The Lounge 4.x don\'t support reconnect for public mode.\nClick to sign-out.',
-      name: 'chat_connection_public_reconnectNotSupportedOnTheLounge4x',
+      'The Lounge don\'t support reconnect in public mode.',
+      name: 'chat_connection_public_reconnectNotSupported_description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restart`
+  String get chat_connection_public_reconnectNotSupported_action_restart {
+    return Intl.message(
+      'Restart',
+      name: 'chat_connection_public_reconnectNotSupported_action_restart',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sign out`
+  String get chat_connection_public_reconnectNotSupported_action_signOut {
+    return Intl.message(
+      'Sign out',
+      name: 'chat_connection_public_reconnectNotSupported_action_signOut',
       desc: '',
       args: [],
     );

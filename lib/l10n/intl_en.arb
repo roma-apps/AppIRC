@@ -1,6 +1,6 @@
 {
     "@@locale": "en",
-    "@@last_modified": "2021-03-06T17:51:10+00:00",
+    "@@last_modified": "2021-03-06T21:54:31+00:00",
     "app_init_fail": "Failed to start app.\nTry restart or re-install app.",
     "dialog_progress_content": "Loading...",
     "dialog_progress_action_cancel": "Cancel",
@@ -25,7 +25,7 @@
     "lounge_dialog_invalid_response_error_title": "Invalid server response",
     "lounge_dialog_invalid_response_error_content": "Correct response not received. Maybe remote server have unsupported Lounge version.",
     "lounge_preferences_title": "Lounge preferences",
-    "lounge_preferences_host_title": "Connection",
+    "lounge_preferences_host_title": "Connection (The Lounge 4.x or 3.x)",
     "lounge_preferences_host_field_host_label": "Host",
     "lounge_preferences_host_field_host_hint": "https:\/\/demo.thelounge.chat",
     "lounge_preferences_host_action_connect": "Connect",
@@ -193,5 +193,7 @@
     "chat_users_list_search_users_not_found": "Users not found",
     "chat_user_action_information": "User information",
     "chat_user_action_direct_messages": "Direct Messages",
-    "chat_connection_public_reconnectNotSupportedOnTheLounge4x": "The Lounge 4.x don't support reconnect for public mode.\nClick to sign-out."
+    "chat_connection_public_reconnectNotSupported_description": "The Lounge don't support reconnect in public mode.",
+    "chat_connection_public_reconnectNotSupported_action_restart": "Restart",
+    "chat_connection_public_reconnectNotSupported_action_signOut": "Sign out"
 }

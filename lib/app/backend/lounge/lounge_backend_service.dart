@@ -55,19 +55,16 @@ class LoungeBackendService extends DisposableOwner
   final SocketIOService socketIoService;
   SocketIOInstanceBloc socketIOInstanceBloc;
 
-  bool get isPublicModeAndDisconnectedAndVersion4 =>
+  bool get isPublicModeAndDisconnected =>
       chatConfig?.public == true &&
-      connectionState == ChatConnectionState.disconnected &&
-      loungeBackendConnectBloc.loungeVersion == LoungeVersion.version4_x;
+      connectionState == ChatConnectionState.disconnected;
 
-  Stream<bool> get isPublicModeAndDisconnectedAndVersion4Stream =>
-      Rx.combineLatest2(
+  Stream<bool> get isPublicModeAndDisconnectedStream => Rx.combineLatest2(
         chatConfigStream,
         connectionStateStream,
         (chatConfig, connectionState) =>
             chatConfig?.public == true &&
-            connectionState == ChatConnectionState.disconnected &&
-            loungeBackendConnectBloc.loungeVersion == LoungeVersion.version4_x,
+            connectionState == ChatConnectionState.disconnected,
       );
 
   bool publicWasDisconnected = false;
@@ -111,6 +108,9 @@ class LoungeBackendService extends DisposableOwner
   // ignore: close_sinks
   final BehaviorSubject<bool> signOutSubject = BehaviorSubject();
 
+  // ignore: close_sinks
+  final StreamController<bool> restartStreamController = StreamController.broadcast();
+
   // lounge don't response properly to edit request
   // ignore: close_sinks
   final BehaviorSubject<NetworkPreferences> editNetworkRequests =
@@ -143,6 +143,7 @@ class LoungeBackendService extends DisposableOwner
     @required this.loungePreferences,
   }) {
     addDisposable(subject: signOutSubject);
+    addDisposable(streamController: restartStreamController);
     addDisposable(subject: connectionStateSubject);
     addDisposable(subject: editNetworkRequests);
     addDisposable(subject: messageTogglePreviewSubject);
@@ -179,9 +180,7 @@ class LoungeBackendService extends DisposableOwner
             simpleConnectionState,
           );
 
-          if (loungeBackendConnectBloc.loungeVersion ==
-                  LoungeVersion.version3_x ||
-              !publicWasDisconnected) {
+          if (!publicWasDisconnected) {
             connectionStateSubject.add(
               connectionState,
             );
@@ -1364,7 +1363,7 @@ class LoungeBackendService extends DisposableOwner
       _pendingRequests.add(request);
     }
     var isConnected = await socketIOInstanceBloc.isConnected();
-    
+
     _logger.fine(() => "_sendCommand isConnected $isConnected $request");
     var socketIOCommand = request.toSocketIOCommand();
     _logger.fine(() => "socketIOCommand $socketIOCommand");
@@ -1500,6 +1499,16 @@ class LoungeBackendService extends DisposableOwner
     );
 
     return disposable;
+  }
+
+  IDisposable listenForRestart(VoidCallback callback) {
+    return StreamSubscriptionDisposable(
+      restartStreamController.stream.listen(
+        (_) {
+          callback();
+        },
+      ),
+    );
   }
 
   IDisposable listenForSignOut(VoidCallback callback) {
@@ -1656,6 +1665,10 @@ class LoungeBackendService extends DisposableOwner
   Future<NetworkLoungeResponseBodyPart> getNetworkInfo(
           {@required String uuid}) =>
       socketIoApiWrapperBloc.sendNetworkGetAndWaitForResponse(uuid: uuid);
+
+  void restart() {
+    restartStreamController.add(true);
+  }
 }
 
 IDisposable _createEventListenerDisposable({

@@ -127,11 +127,14 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/images/logo.png
+
   fonts:
     - family: CourierNew
       fonts:
-        - asset: fonts/courier_new_regular.ttf
-        - asset: fonts/courier_new_bold.ttf
+        - asset: assets/fonts/courier_new_regular.ttf
+        - asset: assets/fonts/courier_new_bold.ttf
           weight: 700
   # To add assets to your application, add an assets section, like this:
   # assets:

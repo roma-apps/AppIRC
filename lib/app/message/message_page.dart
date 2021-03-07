@@ -61,11 +61,13 @@ class MessagePage extends StatelessWidget {
         value: channelBloc,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: buildMessageWidget(
-            message: message,
-            messageInListState: notInSearchState,
-            messageWidgetType: MessageWidgetType.raw,
-            enableMessageActions: false,
+          child: SingleChildScrollView(
+            child: buildMessageWidget(
+              message: message,
+              messageInListState: notInSearchState,
+              messageWidgetType: MessageWidgetType.raw,
+              enableMessageActions: false,
+            ),
           ),
         ),
       ),

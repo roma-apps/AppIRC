@@ -547,11 +547,11 @@ class _ChatPageBodyPublicModeReconnectWidget extends StatelessWidget {
     var loungeBackendService = Provider.of<LoungeBackendService>(context);
 
     return StreamBuilder<bool>(
-      stream: loungeBackendService.isPublicModeAndDisconnectedAndVersion4Stream,
-      initialData: loungeBackendService.isPublicModeAndDisconnectedAndVersion4,
+      stream: loungeBackendService.isPublicModeAndDisconnectedStream,
+      initialData: loungeBackendService.isPublicModeAndDisconnected,
       builder: (context, snapshot) {
-        var isPublicModeAndDisconnectedAndVersion4 = snapshot.data;
-        if (isPublicModeAndDisconnectedAndVersion4) {
+        var isPublicModeAndDisconnected = snapshot.data;
+        if (isPublicModeAndDisconnected) {
           return InkWell(
             onTap: () {
               loungeBackendService.signOut();
@@ -561,15 +561,48 @@ class _ChatPageBodyPublicModeReconnectWidget extends StatelessWidget {
                 color: IAppIrcUiColorTheme.of(context).error,
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal:8.0, vertical:4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      S.of(context).chat_connection_public_reconnectNotSupportedOnTheLounge4x,
-                      textAlign: TextAlign.center,
-                      style: IAppIrcUiTextTheme.of(context).bigTallWhite,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          S
+                              .of(context)
+                              .chat_connection_public_reconnectNotSupported_description,
+                          textAlign: TextAlign.center,
+                          style: IAppIrcUiTextTheme.of(context).bigTallWhite,
+                        ),
+                      ],
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        PlatformButton(
+                          child: Text(
+                            S
+                                .of(context)
+                                .chat_connection_public_reconnectNotSupported_action_restart,
+                          ),
+                          onPressed: () {
+                            loungeBackendService.restart();
+                          },
+                        ),
+                        PlatformButton(
+                          child: Text(
+                            S
+                                .of(context)
+                                .chat_connection_public_reconnectNotSupported_action_signOut,
+                          ),
+                          onPressed: () {
+                            loungeBackendService.signOut();
+                          },
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),

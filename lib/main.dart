@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/form/lounge_connection_form_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/lounge_connection_bloc.dart';
 import 'package:flutter_appirc/app/backend/lounge/connection/page/lounge_new_connection_page.dart';
+import 'package:flutter_appirc/app/backend/lounge/lounge_backend_service.dart';
 import 'package:flutter_appirc/app/chat/chat_page.dart';
 import 'package:flutter_appirc/app/context/app_context_bloc.dart';
 import 'package:flutter_appirc/app/context/app_context_bloc_impl.dart';
@@ -52,9 +53,9 @@ void main() async {
 
   // we need specify initialPlatform to detect
   // current platform selection inside widgets
-  if(Platform.isAndroid) {
+  if (Platform.isAndroid) {
     initialPlatform = TargetPlatform.android;
-  } else if(Platform.isIOS) {
+  } else if (Platform.isIOS) {
     initialPlatform = TargetPlatform.iOS;
   } else {
     throw "unsupported platform";
@@ -84,14 +85,14 @@ void main() async {
         var currentInstanceBloc =
             initBloc.appContextBloc.get<ICurrentAuthInstanceBloc>();
 
-        currentInstanceBloc.currentInstanceStream
-            .distinct()
-            .listen((currentInstance) {
-          runInitializedApp(
-            appContextBloc: initBloc.appContextBloc,
-            currentInstance: currentInstance,
-          );
-        });
+        currentInstanceBloc.currentInstanceStream.distinct().listen(
+          (currentInstance) {
+            runInitializedApp(
+              appContextBloc: initBloc.appContextBloc,
+              currentInstance: currentInstance,
+            );
+          },
+        );
       } else if (newState == AsyncInitLoadingState.failed) {
         runInitFailedApp();
       }
@@ -157,6 +158,18 @@ Future runInitializedCurrentInstanceApp({
   await currentInstanceContextBloc.performAsyncInit();
   _logger.finest(
       () => "buildCurrentInstanceApp CurrentInstanceContextLoadingPage");
+
+  currentInstanceContextBloc.addDisposable(
+    disposable:
+        currentInstanceContextBloc.get<LoungeBackendService>().listenForRestart(
+      () {
+        runInitializedCurrentInstanceApp(
+          appContextBloc: appContextBloc,
+          currentInstance: currentInstance,
+        );
+      },
+    ),
+  );
 
   runApp(
     appContextBloc.provideContextToChild(
